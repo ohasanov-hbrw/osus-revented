@@ -1,0 +1,16 @@
+***** variables
+    public members -> PascalCase
+    private members -> snake_case
+    variables in small scopes (if, functions) -> camelCase
+***** functions ->
+    void OnAliCry() {
+
+    }
+***** ifs -> 
+    if () {
+        Epik();
+    } else {
+        VeryCool();
+    }
+
+    if () Noice;

@@ -1,0 +1,16 @@
+-std=c++17
+-O2 
+-g 
+-Wall 
+-Wextra 
+-Werror 
+-Wstrict-aliasing
+-Wno-pointer-arith 
+-Wno-newline-eof 
+-Wno-unused-parameter 
+-Wno-gnu-statement-expression
+-Wno-gnu-compound-literal-initializer 
+-Wno-gnu-zero-variadic-macro-arguments
+-Ivendor/raylib/src 
+-Iinclude
+-lraylib
