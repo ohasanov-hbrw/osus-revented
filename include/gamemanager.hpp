@@ -1,9 +1,7 @@
 #pragma once
 #include "parser.hpp"
 #include <raylib.h>
-extern "C" {
-	#include <raymath.h>
-}
+#include "raymath.h"
 
 class GameManager{
 	public:

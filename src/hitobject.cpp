@@ -98,15 +98,15 @@ std::vector<Vector2> interpolate(std::vector<Vector2> &points, int index, int po
 std::vector<Vector2> interpolate(std::vector<Vector2> &coordinates, float length){
     std::vector<Vector2> vertices;
     std::vector<int> pointsPerSegment;
-    for (int i = 0; i < coordinates.size(); i++){
+    for (size_t i = 0; i < coordinates.size(); i++){
         vertices.push_back(coordinates[i]);
         if(i > 0)
             pointsPerSegment.push_back(distance(vertices[i], vertices[i-1]));
     }
     float lengthAll = 0;
-    for(int i = 0; i < pointsPerSegment.size(); i++) 
+    for(size_t i = 0; i < pointsPerSegment.size(); i++) 
         lengthAll += pointsPerSegment[i];
-    for(int i = 0; i < pointsPerSegment.size(); i++)
+    for(size_t i = 0; i < pointsPerSegment.size(); i++)
         pointsPerSegment[i] *= length/lengthAll;
     float dx = vertices[1].x - vertices[0].x;
     float dy = vertices[1].y - vertices[0].y;
@@ -122,9 +122,9 @@ std::vector<Vector2> interpolate(std::vector<Vector2> &coordinates, float length
     vertices.insert(vertices.begin(), start);
     vertices.push_back(end);
     std::vector<Vector2> result;
-    for (int i = 0; i < vertices.size() - 3; i++) {
+    for (size_t i = 0; i < vertices.size() - 3; i++) {
         std::vector<Vector2> points = interpolate(vertices, i, pointsPerSegment[i]);
-        for(int i = (result.size() > 0) ? 1 : 0; i < points.size(); i++)
+        for(size_t i = (result.size() > 0) ? 1 : 0; i < points.size(); i++)
             result.push_back(points[i]);
     }
     return result;
@@ -157,7 +157,7 @@ int orientation(Vector2 &p1, Vector2 &p2, Vector2 &p3){
 //gets the points needed for a bezier curve, we can also define a resolution for it
 Vector2 getBezierPoint(std::vector<Vector2> &points, int numPoints, float t){
     Vector2* tmp = new Vector2[numPoints];
-    for(int i = 0; i < points.size(); i++){
+    for(size_t i = 0; i < points.size(); i++){
         tmp[i] = points[i];
     }
     int i = numPoints - 1;
@@ -194,9 +194,7 @@ Circle::Circle(HitObjectData data){
 }
 
 //initilizes a circle
-void Circle::init(){
-    GameManager* gm = GameManager::getInstance();
-}
+void Circle::init(){}
 
 //the main code that runs for every circle on screen, the collision and point manager is in the GamerManager
 void Circle::update(){

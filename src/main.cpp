@@ -18,6 +18,7 @@ int main() {
         BeginDrawing();
         ClearBackground({ 30, 0, 60, 255 });
         DrawRectangleV(global.zero_point, {640.0f * global.scale, 480.0f * global.scale}, RED);
+        DrawRectangle(20 * global.scale, 20 * global.scale, 30 * global.scale, 30 * global.scale, BLUE);
         DrawText(TextFormat("Width: %d, Height: %d", GetScreenWidth(), GetScreenHeight()), 5, 25, 20, LIGHTGRAY);
         DrawText(TextFormat("Scale: %.3f", global.scale), 5, 45, 20, LIGHTGRAY);
         DrawFPS(5,5);
