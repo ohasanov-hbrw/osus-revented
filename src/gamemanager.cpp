@@ -83,19 +83,8 @@ void GameManager::update(){
 			//calculate the slider speed
 			if(tempBeatLength < 0){
 				timingSettingsForHitObject.sliderSpeedOverride = (100 / tempBeatLength * (-1));
-				//std::cout << "slider speed override: " << sliderSpeedOverride << std::endl;
 			}
 			gameFile.timingPoints.pop_back();
-			/*std::cout << "T----------------------T" << std::endl;
-		    std::cout << timingSettingsForHitObject.beatLength << std::endl;
-		    std::cout << timingSettingsForHitObject.meter << std::endl;
-		    std::cout << timingSettingsForHitObject.sampleSet << std::endl;
-		    std::cout << timingSettingsForHitObject.sampleIndex << std::endl;
-		    std::cout << timingSettingsForHitObject.volume << std::endl;
-		    std::cout << timingSettingsForHitObject.uninherited << std::endl;
-		    std::cout << timingSettingsForHitObject.effects << std::endl;
-		    std::cout << timingSettingsForHitObject.sliderSpeedOverride << std::endl;
-		    std::cout << "T----------------------T" << std::endl;*/
 		}
 		else
 			break;

@@ -50,7 +50,6 @@ int Search(std::vector<float> arr, float x,int l,int r) {
         return l;
 }
 
-
 float interpolate(float *p, float *time, float t) {
     float L01 = p[0] * (time[1] - t) / (time[1] - time[0]) + p[1] * (t - time[0]) / (time[1] - time[0]);
     float L12 = p[1] * (time[2] - t) / (time[2] - time[1]) + p[2] * (t - time[1]) / (time[2] - time[1]);
@@ -60,7 +59,6 @@ float interpolate(float *p, float *time, float t) {
     float C12 = L012 * (time[2] - t) / (time[2] - time[1]) + L123 * (t - time[1]) / (time[2] - time[1]);
     return C12;
 }   
-
 
 std::vector<Vector2> interpolate(std::vector<Vector2> &points, int index, int pointsPerSegment) {
     std::vector<Vector2> result;
@@ -93,7 +91,6 @@ std::vector<Vector2> interpolate(std::vector<Vector2> &points, int index, int po
     result.push_back(points[index + 2]);
     return result;
 }
-
 
 std::vector<Vector2> interpolate(std::vector<Vector2> &coordinates, float length){
     std::vector<Vector2> vertices;
@@ -218,20 +215,10 @@ void Circle::render(){
     if (approachScale <= 1)
         approachScale = 1;
     float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
-    //draws the hitcircle texture, the code line here is pretty long but gotta deal with that (also there is a fallback protection)
-    if(data.colour.size() > 2)
-        DrawTextureEx(gm->hitCircle, Vector2{data.x*gm->windowScale-gm->hitCircle.width*0.5f*gm->windowScale/2,data.y*gm->windowScale-gm->hitCircle.height*0.5f*gm->windowScale/2},0,gm->windowScale/2, Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade));
-    else
-        DrawTextureEx(gm->hitCircle, Vector2{data.x*gm->windowScale-gm->hitCircle.width*0.5f*gm->windowScale/2,data.y*gm->windowScale-gm->hitCircle.height*0.5f*gm->windowScale/2},0,gm->windowScale/2, Fade(WHITE, clampedFade));
-    //renders the combo number
-    render_combo();
-    //renders the overlay, that one doesnt change colors thankfully
-    DrawTextureEx(gm->hitCircleOverlay, Vector2{data.x*gm->windowScale-gm->hitCircleOverlay.width*0.5f*gm->windowScale/2,data.y*gm->windowScale-gm->hitCircleOverlay.height*0.5f*gm->windowScale/2},0,1*gm->windowScale/2, Fade(WHITE, clampedFade));
-    //finally renders the approach circle, the same deal as the hitcircle itself
-    if(data.colour.size() > 2)
-        DrawTextureEx(gm->approachCircle, Vector2{data.x*gm->windowScale-gm->approachCircle.width*approachScale*0.5f*gm->windowScale/2,data.y*gm->windowScale-gm->approachCircle.height*approachScale*0.5f*gm->windowScale/2},0,approachScale*gm->windowScale/2, Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade));
-    else
-        DrawTextureEx(gm->approachCircle, Vector2{data.x*gm->windowScale-gm->approachCircle.width*approachScale*0.5f*gm->windowScale/2,data.y*gm->windowScale-gm->approachCircle.height*approachScale*0.5f*gm->windowScale/2},0,approachScale*gm->windowScale/2, Fade(WHITE, clampedFade));
+    //TODO: draws the hitcircle texture, the code line here is pretty long but gotta deal with that (also there is a fallback protection)
+    //TODO: renders the combo number
+    //TODO: renders the overlay, that one doesnt change colors thankfully
+    //TODO: finally renders the approach circle, the same deal as the hitcircle itself
 }
 
 //renders the "dead" Circle
@@ -243,26 +230,14 @@ void Circle::dead_render(){
     //the points move up and they fade so here is some fancy code for that too, MAKE IT DEPENDANT TO APPROACH RATE
     float fadePoint = (1-((gm->currentTime*1000 + 400 - data.time )/400-1));
     float movePoint = (((gm->currentTime*1000 + 400 - data.time )/400-1))*20;
-    //we draw the overlay instead of the hitcircle, maybe you can modify it to do it both but it looks cooler this way
-    if(data.colour.size() > 2)
-        DrawTextureEx(gm->hitCircleOverlay, Vector2{data.x*gm->windowScale-gm->hitCircleOverlay.width*scale*0.5f*gm->windowScale/2,data.y*gm->windowScale-gm->hitCircleOverlay.height*scale*0.5f*gm->windowScale/2},0,scale*gm->windowScale/2, Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, fadeAnimation));
-    else
-        DrawTextureEx(gm->hitCircleOverlay, Vector2{data.x*gm->windowScale-gm->hitCircleOverlay.width*scale*0.5f*gm->windowScale/2,data.y*gm->windowScale-gm->hitCircleOverlay.height*scale*0.5f*gm->windowScale/2},0,scale*gm->windowScale/2, Fade(WHITE, fadeAnimation));
-    //renders the point numbers
-    if(data.point == 0)
-        DrawTextureEx(gm->hit0, Vector2{data.x*gm->windowScale-gm->hit0.width*1*0.5f*gm->windowScale/2 ,data.y*gm->windowScale-gm->hit0.height*1*0.5f*gm->windowScale/2},(1-fadePoint)*15,1*gm->windowScale/2, Fade(WHITE, fadePoint));
-    else if(data.point == 1)
-        DrawTextureEx(gm->hit50, Vector2{data.x*gm->windowScale-gm->hit50.width*1*0.5f*gm->windowScale/2 ,data.y*gm->windowScale-gm->hit50.height*1*0.5f*gm->windowScale/2 },0,1*gm->windowScale/2, Fade(WHITE, fadePoint));
-    else if(data.point == 2)
-        DrawTextureEx(gm->hit100, Vector2{data.x*gm->windowScale-gm->hit100.width*1*0.5f*gm->windowScale/2 ,data.y*gm->windowScale-gm->hit100.height*1*0.5f*gm->windowScale/2},0,1*gm->windowScale/2, Fade(WHITE, fadePoint));
-    else if(data.point == 3)
-        DrawTextureEx(gm->hit300, Vector2{data.x*gm->windowScale-gm->hit300.width*1*0.5f*gm->windowScale/2 ,data.y*gm->windowScale-gm->hit300.height*1*0.5f*gm->windowScale/2},0,1*gm->windowScale/2, Fade(WHITE, fadePoint));
+    //TODO: we draw the overlay instead of the hitcircle, maybe you can modify it to do it both but it looks cooler this way
+    //TODO: renders the point numbers
 }
 
 //just gives more time to render the "dead" Circle 
 void Circle::dead_update(){
     GameManager* gm = GameManager::getInstance();
-    //gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
+    //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
     if (data.time+400 < gm->currentTime*1000)
         gm->destroyDeadHitObject(data.index);
 }
@@ -272,30 +247,9 @@ void Circle::render_combo(){
     GameManager* gm = GameManager::getInstance();
     //calculates the opacity
     float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
-    //checks how many digits there are, dont do it like this please
-    int digits = 1;
-    if
-        (data.comboNumber >= 1000) digits = 4;
-    else if
-        (data.comboNumber >= 100) digits = 3;
-    else if
-        (data.comboNumber >= 10) digits = 2;
-    //the textures are drawn from the top left so we need to find that point
-    int origin = (gm->numbers[0].width + (digits - 3) * (gm->numbers[0].width - 150)) / 2;
-    //again, not the smartest code but we render each digit individually
-    for(int i = digits; i >= 1 ; i--){
-        int number = data.comboNumber;
-        if(i == 1)
-            number = number % 10;
-        else if(i == 2)
-            number = (number % 100 - number % 10)/10;
-        else if(i == 3)
-            number = (number % 1000 - number % 100)/100;
-        else if(i == 4)
-            number = (number % 10000 - number % 1000)/1000;
-        //renders the digit as a texture
-        DrawTextureEx(gm->numbers[number], Vector2{(float)data.x*gm->windowScale - origin*gm->windowScale/2 + (digits - i - 1) * (gm->numbers[0].width - 150)*gm->windowScale/2, (float)data.y*gm->windowScale - gm->numbers[0].width*gm->windowScale/2 / 2 },0,gm->windowScale / 2, Fade(WHITE, clampedFade));
-    }
+    //TODO: checks how many digits there are, dont do it like this please
+    //TODO: the textures are drawn from the top left so we need to find that point
+    //TODO: again, not the smartest code but we render each digit individually
 }
 
 //creates a Slider
@@ -596,14 +550,6 @@ void Slider::update(){
 void Slider::render(){
     GameManager* gm = GameManager::getInstance();
     
-    if (tickCount > 0){
-        for(int i = 0; i < tickCount; i++){
-            int tick_pos = (int)(data.length / (tickCount + 1)) * (i+1);
-            if (position < tick_pos)
-                DrawCircleV(renderPoints[tick_pos] * vectorize(2), 20, RED);
-        }
-    }
-
     if(data.curveType == 'L' || data.curveType == 'B' || data.curveType == 'P' || data.curveType == 'C'){
         if(renderPoints.size() > 0){
             //calculate the opacity
