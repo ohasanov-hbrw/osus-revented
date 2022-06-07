@@ -19,7 +19,7 @@ files:
 	mkdir -p bin object
 
 deps:
-	cd vendor/raylib/src/ && make
+	cd vendor/raylib/src/ && $(MAKE)
 
 run: $(name)
 	bin/$(name)
