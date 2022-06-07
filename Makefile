@@ -21,7 +21,7 @@ files:
 deps:
 	cd vendor/raylib/src/ && make
 
-run: all
+run: $(name)
 	bin/$(name)
 
 $(name): $(objects)
