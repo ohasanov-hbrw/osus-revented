@@ -30,38 +30,23 @@ GameManager::GameManager(){
 //initilize the game manager
 void GameManager::init(){
 	//initilize the audio part of raylib
-	InitAudioDevice();
+	
 	//initilize the window
-	SetConfigFlags(FLAG_MSAA_4X_HINT);
-	InitWindow(640*windowScale,480*windowScale,"osus?");
+	
 	//set the fps to the common number of 60
-	SetTargetFPS(1440);
+	
 	//hide the cursor because we have a custom one
-	HideCursor();
+	
 	//load all the textures (can also do this in load_game)
-	hitCircle = LoadTexture("resources/skin/hitcircle.png");
-    hitCircleOverlay = LoadTexture("resources/skin/hitcircleoverlay.png");
-    approachCircle = LoadTexture("resources/skin/approachcircle.png");
-    cursor = LoadTexture("resources/skin/Extra Cursors/cursor.png");
-    selectCircle = LoadTexture("resources/skin/hitcircleselect.png");
-    hit0 = LoadTexture("resources/skin/hit0.png");
-    hit50 = LoadTexture("resources/skin/hit50.png");
-    hit100 = LoadTexture("resources/skin/hit100.png");
-    hit300 = LoadTexture("resources/skin/hit300.png");
-    sliderb = LoadTexture("resources/skin/sliderb0.png");
-    reverseArrow = LoadTexture("resources/skin/reversearrow.png");
-    for(int i = 0; i < 10; i++)
-    	numbers[i] = LoadTexture(("resources/skin/default-" + (std::to_string(i)) + ".png").c_str());
     timingSettingsForHitObject.sliderSpeedOverride = 1;
 }
 
 //main game loop
 void GameManager::update(){
 	//update the music an  d get the time from it
-	UpdateMusicStream(backgroundMusic);
-	currentTime = GetMusicTimePlayed(backgroundMusic);
+	
 	//get the mouse position and state
-	MousePosition = Vector2{(float)GetMouseX(), (float)GetMouseY()};
+	
 	pressed = IsMouseButtonPressed(0);
 	down = IsMouseButtonDown(0);
 	//currently not used that much but it will be
@@ -211,36 +196,22 @@ void GameManager::update(){
 //main rendering loop
 void GameManager::render(){
 	//set the screen for drawing
-	BeginDrawing();
+	
 	//currently the background is a set color but we can change that
-	ClearBackground(Color{5,0,15,255});
+	
 	//draw the fps
-	DrawFPS(10, 10);
+	
 	//this is the mouse scale... i think
-	float scale = 0.6f;
+	
 	//render all the objects
-	for(int i = objects.size() - 1; i >= 0; i--)
-		objects[i]->render();
-	for(int i = dead_objects.size() - 1; i >= 0; i--)
-		dead_objects[i]->dead_render();
+	
 	//render the points and the combo
-	render_points();
-	render_combo();
-	//draw the custom mouse cursor
-	DrawTextureEx(cursor, Vector2{GetMouseX()-cursor.width*windowScale/2*scale*0.5f,GetMouseY()-cursor.height*scale*windowScale/2*0.5f},0,scale*windowScale/2, WHITE);
-	EndDrawing();
+	
 }
 
 void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
-	PlayMusicStream(backgroundMusic);
-    SetMusicVolume(backgroundMusic, 0.2f);
-	//just run the game 
-	while(!WindowShouldClose()){
-		update();
-		render();
-	}
-	CloseWindow();
+	
 }
 
 //load the beatmap
@@ -317,40 +288,10 @@ void GameManager::destroyDeadHitObject(int index){
 
 void GameManager::render_points(){
 	//garbage digit finder code but it works, NO IT DOESNT WORK WITH SOME SKINS
-    int digits = 1;
-    int tempScore = score;
-    while(!false){
-    	if (tempScore < 10)
-    		break;
-    	digits++;
-    	tempScore /= 10;
-    }
-    for(int i = digits; i >= 1 ; i--){
-        int number = score;
-        int mod = 10;
-        for(int j = 1; j < i; j++)
-        	mod *= 10;
-        number = (number % mod - number % (mod/10))/(mod/10);
-        DrawTextureEx(numbers[number], Vector2{0 + (digits - i - 1) * (numbers[0].width - 150)*windowScale/2, 0 },0,windowScale/2, Fade(WHITE, 1));
-    }
+    
 }
 
 void GameManager::render_combo(){
 	//garbage digit finder code but it works, NO IT DOESNT WORK WITH SOME SKINS
-    int digits = 1;
-    int tempCombo = clickCombo;
-    while(!false){
-    	if (tempCombo < 10)
-    		break;
-    	digits++;
-    	tempCombo /= 10;
-    }
-    for(int i = digits; i >= 1 ; i--){
-        int number = clickCombo;
-        int mod = 10;
-        for(int j = 1; j < i; j++)
-        	mod *= 10;
-        number = (number % mod - number % (mod/10))/(mod/10);
-        DrawTextureEx(numbers[number], Vector2{0 + (digits - i - 1) * (numbers[0].width - 150)*windowScale/2 /2, 440*windowScale },0,0.5f*windowScale/2, Fade(WHITE, 1));
-    }
+    
 }

@@ -3,14 +3,15 @@
 #include "raylib.h"
 
 struct Globals {
-    float scale = 1.f;
-    Vector2 zero_point = {0.f, 0.f};
-    Color background = BLACK;
-    int FPS = 60;
-    int width = 640;
-    int height = 480;
-
+    float Scale = 1.f;
+    Vector2 ZeroPoint = {0.f, 0.f};
+    Color Background = BLACK;
+    int FPS = 144;
+    int Width = 640;
+    int Height = 480;
+    bool MouseInFocus = false;
+    Vector2 MousePosition;
     Globals() = default;
 };
 
-extern Globals global;
+extern Globals Global;
