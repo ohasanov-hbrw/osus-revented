@@ -15,7 +15,7 @@ int main() {
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
     SetTargetFPS(Global.FPS);
-    Font DefaultFont = LoadFont("resources/Aller_Rg.ttf");
+    Font DefaultFont = LoadFont("resources/fragile_bombers.ttf");
     SetTextureFilter(DefaultFont.texture, TEXTURE_FILTER_BILINEAR);
     HideCursor();
 
