@@ -241,7 +241,7 @@ GameFile Parser::parse(std::string filename){
 
 							tempHitObject.curveType = tempVectorCurvePoints[0][0];
 
-							for(int i = 1; i < tempVectorCurvePoints.size(); i++){
+							for(size_t i = 1; i < tempVectorCurvePoints.size(); i++){
 								std::vector<std::string> tempVectorCurvePointCords;
 								tempVectorCurvePointCords = parseSeperatedLists(tempVectorCurvePoints[i], ':');
 								tempHitObject.curvePoints.push_back(std::make_pair(std::stoi(tempVectorCurvePointCords[0])+64, std::stoi(tempVectorCurvePointCords[1])+48));
@@ -253,14 +253,14 @@ GameFile Parser::parse(std::string filename){
 							if(tempVector.size() > 8){
 								std::vector<std::string> tempVectorEdgeSounds;
 								tempVectorEdgeSounds = parseSeperatedLists(tempVector[8], '|');
-								for(int i = 0; i < tempVectorEdgeSounds.size(); i++)
+								for(size_t i = 0; i < tempVectorEdgeSounds.size(); i++)
 									tempHitObject.edgeSounds.push_back(std::stoi(tempVectorEdgeSounds[i]));
 							}
 							if(tempVector.size() > 9){
 								std::vector<std::string> tempVectorEdgeSets;
 								tempVectorEdgeSets = parseSeperatedLists(tempVector[9], '|');
 
-								for(int i = 1; i < tempVectorEdgeSets.size(); i++){
+								for(size_t i = 1; i < tempVectorEdgeSets.size(); i++){
 									std::vector<std::string> tempVectorEdgeSetsCords;
 									tempVectorEdgeSetsCords = parseSeperatedLists(tempVectorEdgeSets[i], ':');
 									tempHitObject.edgeSets.push_back(std::make_pair(std::stoi(tempVectorEdgeSetsCords[0]), std::stoi(tempVectorEdgeSetsCords[1])));
@@ -330,7 +330,7 @@ GameFile Parser::parse(std::string filename){
 
 std::pair<std::string, std::string> Parser::parseKeyValue(std::string line, bool hasSpaceBefore, bool hasSpaceAfter)
 {
-	int spliceLocation;
+	size_t spliceLocation;
 	for(spliceLocation = 0; spliceLocation < line.size(); spliceLocation++)
 		if(line[spliceLocation] == ':')
 			break;
@@ -341,7 +341,7 @@ std::pair<std::string, std::string> Parser::parseKeyValue(std::string line, bool
 std::vector<std::string> Parser::parseSeperatedLists(std::string list, char seperator){
 	std::vector<std::string> ans;
 	int lastCommaLocation = - 1;
-	for(int i = 0; i < list.size(); i++){
+	for(size_t i = 0; i < list.size(); i++){
 		if(list[i] == seperator or i == list.size()-1){
 			ans.push_back(list.substr(lastCommaLocation + 1, i - lastCommaLocation - 1 + int(i == list.size()-1)));
 			lastCommaLocation = i;

@@ -56,7 +56,7 @@ class HitObject{
     public:
         
         HitObject(){};
-        ~HitObject() = default;
+        virtual ~HitObject() = default;
         virtual void init(){}
         virtual void render(){}
         virtual void render_combo(){}
@@ -104,5 +104,5 @@ class Slider : public HitObject{
         float timer;
         std::vector<Vector2> edgePoints; 
         RenderTexture2D sliderTexture;
-        float minX = INT_MAX, minY = INT_MAX, maxX = INT_MIN, maxY = INT_MIN;
+        float minX = static_cast<float>(INT_MAX), minY = static_cast<float>(INT_MAX), maxX = INT_MIN, maxY = INT_MIN;
 };

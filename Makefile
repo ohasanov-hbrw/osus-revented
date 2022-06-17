@@ -1,5 +1,5 @@
 CC = g++
-cflags = -std=c++17 -O2 -g
+cflags = -std=c++17 -O2 -g -Wall -Wextra
 cflags += -Ivendor/raylib/src -Iinclude
 ldflags += -lraylib
 name = osus

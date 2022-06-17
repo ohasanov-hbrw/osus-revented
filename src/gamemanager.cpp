@@ -187,7 +187,7 @@ void GameManager::update(){
 		}
 	}
 	//also update the dead objects
-	for(int i = 0; i < dead_objects.size(); i++){
+	for(size_t i = 0; i < dead_objects.size(); i++){
 		dead_objects[i]->data.index = i;
 		dead_objects[i]->dead_update();
 	}
