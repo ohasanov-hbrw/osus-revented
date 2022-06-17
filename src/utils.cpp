@@ -11,14 +11,16 @@ void GetScale(){
 
 void GetMouse(){
     Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){Global.ZeroPoint.x, Global.ZeroPoint.y, 640.0f * Global.Scale, 480.0f * Global.Scale});
-    if(!Global.MouseInFocus)
+    if(!Global.MouseInFocus){
         Global.MousePosition = {0,0};
         if(IsCursorHidden())
             ShowCursor();
-    else
+    }
+    else {
         Global.MousePosition = {(GetMouseX() - Global.ZeroPoint.x) / Global.Scale, (GetMouseY() - Global.ZeroPoint.y) / Global.Scale};
         if(!IsCursorHidden())
             HideCursor();
+    }
 }
 
 void GetKeys(){
