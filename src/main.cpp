@@ -6,11 +6,18 @@
 
 Globals Global;
 
+float Scale(float a){
+    return a * Global.Scale;
+}
+
 int main() {
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
     SetTargetFPS(Global.FPS);
+    Font DefaultFont = LoadFont("resources/Aller_Rg.ttf");
+    SetTextureFilter(DefaultFont.texture, TEXTURE_FILTER_BILINEAR);
     HideCursor();
 
     while(!WindowShouldClose()){
@@ -24,18 +31,19 @@ int main() {
         BeginDrawing();
         ClearBackground({ 30, 0, 60, 255 });
 
-        DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, RED);
-        DrawRectangle(20 * Global.Scale + Global.ZeroPoint.x, 20 * Global.Scale + Global.ZeroPoint.y, 30 * Global.Scale, 30 * Global.Scale, BLUE);
+        //DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, RED);
+        //DrawRectangle(20 * Global.Scale + Global.ZeroPoint.x, 20 * Global.Scale + Global.ZeroPoint.y, 30 * Global.Scale, 30 * Global.Scale, BLUE);
 
         DrawCircle(GetMouseX(),GetMouseY(), 3.0f * Global.Scale, GREEN);
 
-        DrawText(TextFormat("Width: %d, Height: %d", GetScreenWidth(), GetScreenHeight()), 5, 25, 20, LIGHTGRAY);
-        DrawText(TextFormat("Scale: %.3f", Global.Scale), 5, 45, 20, LIGHTGRAY);
-        DrawText(TextFormat("MX: %.3f, MY: %.3f", Global.MousePosition.x, Global.MousePosition.y), 5, 65, 20, LIGHTGRAY);
-        DrawText(TextFormat("MouseFocus: %d", (int) Global.MouseInFocus), 5, 85, 20, LIGHTGRAY);
-        DrawFPS(5,5);
+        DrawTextEx(DefaultFont, TextFormat("Width: %d, Height: %d", GetScreenWidth(), GetScreenHeight()), {Scale(5), Scale(25)}, Scale(20), 1, LIGHTGRAY);
+        DrawTextEx(DefaultFont, TextFormat("Scale: %.3f", Global.Scale), {Scale(5), Scale(45)}, Scale(20), 1, LIGHTGRAY);
+        DrawTextEx(DefaultFont, TextFormat("MX: %.3f, MY: %.3f", Global.MousePosition.x, Global.MousePosition.y), {Scale(5), Scale(65)}, Scale(20), 1, LIGHTGRAY);
+        DrawTextEx(DefaultFont, TextFormat("MouseFocus: %d", (int) Global.MouseInFocus), {Scale(5), Scale(85)}, Scale(20) , 1, LIGHTGRAY);
+        DrawFPS(Scale(5), Scale(5));
         EndDrawing();
     }
 
     CloseWindow();
 }
+
