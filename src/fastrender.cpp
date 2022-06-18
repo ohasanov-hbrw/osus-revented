@@ -1,5 +1,11 @@
 #include <fastrender.hpp>
 
+void initMouseTrail(){
+    while(MouseTrail.size() < 150){
+        MouseTrail.push_back({-10,-10});
+    }
+}
+
 void updateMouseTrail(){
     FrameTimeCounterTrail += GetFrameTime()*1000.0f;
     while(FrameTimeCounterTrail > 1.0f){

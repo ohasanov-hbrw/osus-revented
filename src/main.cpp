@@ -21,6 +21,7 @@ int main() {
     Global.DefaultFont = LoadFont("resources/fragile_bombers.ttf");
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
+    initMouseTrail();
 
     while(!WindowShouldClose()){
         GetScale();
