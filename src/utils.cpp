@@ -68,3 +68,40 @@ Vector2 GetCenter(Rectangle a){
 Vector2 GetRaylibOrigin(Rectangle a){
     return {a.x - a.width / 2, a.y - a.height / 2};
 }
+
+Rectangle GetRaylibOriginR(Rectangle a){
+    return {a.x - a.width / 2, a.y - a.height / 2, a.width, a.height};
+}
+
+float clip( float n, float lower, float upper ){
+    n = ( n > lower ) * n + !( n > lower ) * lower;
+    return ( n < upper ) * n + !( n < upper ) * upper;
+}
+
+Vector2 lerp(Vector2 a, Vector2 b, float t){
+    return { .x = (1 - t) * a.x + t * b.x, .y = (1 - t) * a.y + t * b.y};
+}
+
+
+
+Vector2 vectorize(float i) {
+    return Vector2{i, i};
+}
+
+float distance(Vector2 &p0, Vector2 &p1){
+    return std::sqrt(std::pow(std::abs(p0.x - p1.x),2) + std::pow(std::abs(p0.y - p1.y),2));
+}
+
+int Search(std::vector<float> arr, float x,int l,int r) {
+    if (r >= l) {
+        int mid = (l + r) / 2;
+        if (arr[mid] == x || l==r)
+            return mid;
+        if (arr[mid] > x)
+            return Search(arr, x,l, mid - 1);
+        else 
+            return Search(arr, x,mid + 1, r);
+    }
+    else
+        return l;
+}

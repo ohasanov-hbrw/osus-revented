@@ -15,6 +15,8 @@ struct Globals {
     int MouseBlur = 20;
     Vector2 MousePosition;
 
+    Font DefaultFont;
+
     int MouseTrailSize = 150;
 
     bool Key1P = false;

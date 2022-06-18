@@ -2,53 +2,7 @@
 #include <cmath>
 #include <algorithm>
 #include "gamemanager.hpp"
-
-float clip( float n, float lower, float upper ){
-    n = ( n > lower ) * n + !( n > lower ) * lower;
-    return ( n < upper ) * n + !( n < upper ) * upper;
-}
-
-Vector2 lerp(Vector2 a, Vector2 b, float t){
-    return { .x = (1 - t) * a.x + t * b.x, .y = (1 - t) * a.y + t * b.y};
-}
-
-inline Vector2 operator + (Vector2 p0, Vector2 p1){
-    return Vector2Add(p0, p1);
-}
-
-inline Vector2 operator - (Vector2 p0, Vector2 p1){
-    return Vector2Subtract(p0, p1);
-}
-
-inline Vector2 operator * (Vector2 p0, Vector2 p1){
-    return Vector2Multiply(p0, p1);
-}
-
-inline Vector2 operator / (Vector2 p0, Vector2 p1){
-    return Vector2Divide(p0, p1);
-}
-
-Vector2 vectorize(float i) {
-    return Vector2{i, i};
-}
-
-float distance(Vector2 &p0, Vector2 &p1){
-    return std::sqrt(std::pow(std::abs(p0.x - p1.x),2) + std::pow(std::abs(p0.y - p1.y),2));
-}
-
-int Search(std::vector<float> arr, float x,int l,int r) {
-    if (r >= l) {
-        int mid = (l + r) / 2;
-        if (arr[mid] == x || l==r)
-            return mid;
-        if (arr[mid] > x)
-            return Search(arr, x,l, mid - 1);
-        else 
-            return Search(arr, x,mid + 1, r);
-    }
-    else
-        return l;
-}
+#include "utils.hpp"
 
 float interpolate(float *p, float *time, float t) {
     float L01 = p[0] * (time[1] - t) / (time[1] - time[0]) + p[1] * (t - time[0]) / (time[1] - time[0]);
