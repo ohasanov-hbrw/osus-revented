@@ -40,6 +40,14 @@ void GetKeys(){
         Global.Key2D = true;
     else
         Global.Key2D = false;
+    if(IsKeyReleased(KEY_Z) or IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+        Global.Key1R = true;
+    else
+        Global.Key1R = false;
+    if(IsKeyReleased(KEY_X) or IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
+        Global.Key2R = true;
+    else
+        Global.Key2R = false;
 }
 
 float Scale(float a){

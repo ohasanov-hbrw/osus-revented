@@ -10,7 +10,9 @@ public:
     Vector2 size;
 
     bool focused = false;
+    bool focusbreak = false;
     bool clicked = false;
+    bool action = false;
 
     GuiElement(Vector2 position, Vector2 size);
     

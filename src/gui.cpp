@@ -26,7 +26,7 @@ void Button::render() {
     Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text, textsize, 1);
     Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
     //melih buradaki variablelar calismio placeholder koydum
-    if (this->clicked or (Global.Key1D and this->focused)){
+    if ((this->clicked or (Global.Key1D and this->focused)) and !this->focusbreak){
         DrawRectangleRec(ScaleRect(this->getRect()), textcolor);
         DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
@@ -49,6 +49,7 @@ void Button::update() {
     if (hover and click) {
         this->focused = true;
         this->clicked = true;
+        this->focusbreak = false;
     }
     else if (hover) {
         this->focused = true;
@@ -57,5 +58,14 @@ void Button::update() {
     else {
         this->focused = false;
         this->clicked = false;
+        this->focusbreak = true;
     }
+
+    if(hover and !focusbreak and Global.Key1R)
+        action = true;
+    else
+        action = false;
+
+    if(action == true)
+        std::cout << "amongus" << std::endl;
 }

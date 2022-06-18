@@ -23,6 +23,8 @@ struct Globals {
     bool Key1D = false;
     bool Key2P = false;
     bool Key2D = false;
+    bool Key1R = false;
+    bool Key2R = false;
 
     Globals() = default;
 };
