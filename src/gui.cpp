@@ -23,22 +23,22 @@ Button::Button(Vector2 position, Vector2 size, Color color, char* text, Color te
 
 
 void Button::render() {
-    Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, "text", 20, 1);
+    Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text, textsize, 1);
     Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
     //melih buradaki variablelar calismio placeholder koydum
     if (this->clicked or (Global.Key1D and this->focused)){
         DrawRectangleRec(ScaleRect(this->getRect()), BLACK);
-        DrawTextEx(Global.DefaultFont, "text", ScaleCords(TextBoxLocation), Scale(20),  Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
     }
     else if (this->focused){
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
-        DrawTextEx(Global.DefaultFont, "text", ScaleCords(TextBoxLocation), Scale(20),  Scale(1), BLACK);
+        DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
     }
     else{
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
-        DrawTextEx(Global.DefaultFont, "text", ScaleCords(TextBoxLocation), Scale(20),  Scale(1), BLACK);
+        DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
     }
     
 
