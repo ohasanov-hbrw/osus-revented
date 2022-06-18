@@ -18,7 +18,7 @@ Rectangle GuiElement::getRect() {
 }
 
 Button::Button(Vector2 position, Vector2 size, Color color, char* text, Color textcolor, int textsize) 
-    : GuiElement(position, size), color(color)
+    : GuiElement(position, size), color(color), text(text), textcolor(textcolor), textsize(textsize)
 {  }
 
 
