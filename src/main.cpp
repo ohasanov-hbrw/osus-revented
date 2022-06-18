@@ -7,7 +7,7 @@
 #include <gui.hpp>
 
 
-Button DemoButton ({320,240}, {69,31}, RED, "Hello World", BLACK, 10);
+Button DemoButton ({320,240}, {69,31}, RED, "Hello World", BLUE, 10);
 
 Globals Global;
 

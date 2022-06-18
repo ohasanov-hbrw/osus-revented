@@ -27,7 +27,7 @@ void Button::render() {
     Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
     //melih buradaki variablelar calismio placeholder koydum
     if (this->clicked or (Global.Key1D and this->focused)){
-        DrawRectangleRec(ScaleRect(this->getRect()), BLACK);
+        DrawRectangleRec(ScaleRect(this->getRect()), textcolor);
         DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
     }
