@@ -62,7 +62,7 @@ int main() {
             for(int i = Global.MouseTrailSize - 1; i >= 0; i--){
                 if(MouseTrail[(index+i) % Global.MouseTrailSize].x != LastPosition.x or MouseTrail[(index+i) % Global.MouseTrailSize].y != LastPosition.y ){ 
                     LastPosition = MouseTrail[(index+i) % Global.MouseTrailSize];
-                    Color MouseTrailer = {0,255,0,255 - i*(255/Global.MouseTrailSize)*255};
+                    Color MouseTrailer = {0,255,0,(float)i*(255.f/(float)Global.MouseTrailSize)};
                     DrawCircleV(ScaleCords(MouseTrail[(index+i) % Global.MouseTrailSize]), Scale(3.0f), MouseTrailer);
                 }
             }
