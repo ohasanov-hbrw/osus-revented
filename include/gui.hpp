@@ -35,8 +35,17 @@ public:
     void update() override;
 };
 
-class TextBox {
+class TextBox : public GuiElement {
+private:
+    Color textcolor;
+    std::string text;
+    int textsize;
+    bool editable;
+public:
+    TextBox(Vector2 position, Vector2 size, Color textcolor, int textsize, bool editable = true);
     
+    void render() override;
+    void update() override;
 };
 
 class SelectableList {

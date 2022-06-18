@@ -69,3 +69,41 @@ void Button::update() {
     if(action == true)
         std::cout << "amongus" << std::endl;
 }
+
+TextBox::TextBox(Vector2 position, Vector2 size, Color textcolor, int textsize, bool editable)
+    : GuiElement(position, size), textcolor(textcolor), textsize(textsize), editable(editable)
+{  }
+
+void TextBox::render() {
+    Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text, textsize, 1);
+    Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
+
+    DrawRectangleRec(ScaleRect(this->getRect()), BLUE);
+    if (action) {
+        DrawRectangleRec(ScaleRect(this->getRect()), textcolor);
+        DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
+    }
+    else {
+        DrawRectangleRec(ScaleRect(this->getRect()), this->color);
+        DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+    }
+}
+
+void TextBox::update() {
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    bool click = Global.MouseInFocus and Global.Key1P;
+
+    if (hover and click) {
+        this->action = true;
+        this->focused = true;
+        this->clicked = true;
+        this->focusbreak = false;
+    }
+    else if (hover) {
+        this->focused = true;
+        this->clicked = false;
+    }
+    else if (!hover and click) {
+        this->action = false;
+    }
+}
