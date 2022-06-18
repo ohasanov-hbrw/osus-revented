@@ -37,12 +37,12 @@ public:
 
 class TextBox : public GuiElement {
 private:
+    Color color;
     Color textcolor;
-    std::string text;
+    char* text;
     int textsize;
-    bool editable;
 public:
-    TextBox(Vector2 position, Vector2 size, Color textcolor, int textsize, bool editable = true);
+    TextBox(Vector2 position, Vector2 size, Color color, char* text, Color textcolor, int textsize);
     
     void render() override;
     void update() override;

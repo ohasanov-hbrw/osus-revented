@@ -8,7 +8,8 @@
 #include <gui.hpp>
 
 
-Button DemoButton ({320,240}, {69,31}, RED, "Hello World", BLUE, 10);
+Button DemoButton ({320,240}, {100,30}, RED, "Hello World!", BLUE, 10);
+TextBox DemoTextbox ({320,150}, {100,70}, PURPLE, "TEXTBOX\n TESTS", BLACK, 15);
 
 Globals Global;
 
@@ -18,8 +19,8 @@ int main() {
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
     SetTargetFPS(Global.FPS);
-    Global.DefaultFont = LoadFont("resources/fragile_bombers.ttf");
-    SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
+    Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
+    SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_ANISOTROPIC_8X );
     HideCursor();
     initMouseTrail();
 
@@ -31,6 +32,13 @@ int main() {
         updateMouseTrail();
         DemoButton.update();
 
+        if(Global.Key2D){
+            DemoTextbox.focused = true;
+        }
+        else{
+            DemoTextbox.focused = false;
+        }
+
         BeginDrawing();
 
         ClearBackground(Global.Background);
@@ -38,7 +46,9 @@ int main() {
         DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, BLACK);
         //DrawRectangle(20 * Global.Scale + Global.ZeroPoint.x, 20 * Global.Scale + Global.ZeroPoint.y, 30 * Global.Scale, 30 * Global.Scale, BLUE);
         
+        
         DemoButton.render();
+        DemoTextbox.render();
         
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, 255 * (int)Global.Key1P , 255 * (int)Global.Key1D, 255});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, 255 * (int)Global.Key2P , 255 * (int)Global.Key2D, 255});
