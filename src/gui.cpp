@@ -40,10 +40,6 @@ void Button::render() {
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
         DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
     }
-    
-
-    std::cout << TextBoxLocation.x << " " << TextBoxLocation.y << " " << "text" << std::endl;
-    std::cout << TextBoxSize.x << " " << TextBoxSize.y << " " << "size" << std::endl;
 }
 
 void Button::update() {
