@@ -12,7 +12,7 @@ void GetScale(){
 void GetMouse(){
     Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){Global.ZeroPoint.x, Global.ZeroPoint.y, 640.0f * Global.Scale, 480.0f * Global.Scale});
     if(!Global.MouseInFocus){
-        Global.MousePosition = {0,0};
+        Global.MousePosition = {-10,-10};
         if(IsCursorHidden())
             ShowCursor();
     }
@@ -46,7 +46,11 @@ float Scale(float a){
     return a * Global.Scale;
 }
 
-Vector2 ScaleCordsVector(Vector2 a){
+Rectangle ScaleRect(Rectangle a){
+    return {a.x * Global.Scale + Global.ZeroPoint.x, a.y * Global.Scale + Global.ZeroPoint.y, a.width * Global.Scale, a.height * Global.Scale};
+}
+
+Vector2 ScaleCords(Vector2 a){
     return {a.x * Global.Scale + Global.ZeroPoint.x, a.y * Global.Scale + Global.ZeroPoint.y};
 }
 
@@ -56,4 +60,11 @@ float ScaleCordX(float a){
 
 float ScaleCordY(float a){
     return a * Global.Scale + Global.ZeroPoint.y;
+}
+
+Vector2 GetCenter(Rectangle a){
+    return {a.x + a.width / 2, a.y + a.height / 2};
+}
+Vector2 GetRaylibOrigin(Rectangle a){
+    return {a.x - a.width / 2, a.y - a.height / 2};
 }

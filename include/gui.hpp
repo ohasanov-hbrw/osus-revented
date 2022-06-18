@@ -7,11 +7,9 @@ class GuiElement {
 public:
     Vector2 position;
     Vector2 size;
-    enum class MouseEvent {
-        Hover,
-        Press,
-        None,
-    } event;
+
+    bool focused = false;
+    bool clicked = false;
 
     GuiElement(Vector2 position, Vector2 size);
     

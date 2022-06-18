@@ -1,29 +1,20 @@
 #include "gui.hpp"
+#include "utils.hpp"
+#include <iostream>
 
-GuiElement::GuiElement(Vector2 position, Vector2 size) : position(position), size(size), event(MouseEvent::None)
+GuiElement::GuiElement(Vector2 position, Vector2 size) : position(position), size(size)
 {  }
 
 void GuiElement::update() {
-    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
-    bool click = Global.MouseInFocus and IsMouseButtonDown(MOUSE_BUTTON_LEFT);
-
-    if (hover and click) {
-        event = MouseEvent::Press;
-    }
-    else if (hover) {
-        event = MouseEvent::Hover;
-    }
-    else {
-        event = MouseEvent::None;
-    }
+    
 }
 
 void GuiElement::render() {
-
+   
 }
 
 Rectangle GuiElement::getRect() {
-    return Rectangle{.x = position.x, .y = position.y, .width = size.x, .height = size.y};
+    return {position.x, position.y, size.x, size.y};
 }
 
 Button::Button(Vector2 position, Vector2 size, Color color) 
@@ -32,8 +23,31 @@ Button::Button(Vector2 position, Vector2 size, Color color)
 
 
 void Button::render() {
+    if (this->clicked or Global.Key1D){
+        DrawRectangleRec(ScaleRect(this->getRect()), BLACK);
+    }
+    else{
+        DrawRectangleRec(ScaleRect(this->getRect()), this->color);
+    }
+    if (this->focused){
+        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
+    }
 }
 
 void Button::update() {
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    bool click = Global.MouseInFocus and Global.Key1P;
 
+    if (hover and click) {
+        this->focused = true;
+        this->clicked = true;
+    }
+    else if (hover) {
+        this->focused = true;
+        this->clicked = false;
+    }
+    else {
+        this->focused = false;
+        this->clicked = false;
+    }
 }
