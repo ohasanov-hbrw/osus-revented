@@ -8,7 +8,10 @@
 #include <gui.hpp>
 
 
-Button DemoButton ({320,240}, {100,30}, RED, "Hello World!", BLUE, 10);
+std::vector<char*> text = {"aaa", "bbb", "ccc", "ddd", "eee"};
+
+SelectableList DemoList ({320, 400}, {100, 60}, PURPLE, text, BLACK, 10, 15, 50);
+Button DemoButton ({320,240}, {100,30}, PURPLE, "Hello World!", BLACK, 10);
 TextBox DemoTextbox ({320,150}, {100,70}, PURPLE, "TEXTBOX\n TESTS", BLACK, 15);
 
 Globals Global;
@@ -20,9 +23,12 @@ int main() {
     SetWindowMinSize(320, 240);
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
-    SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_ANISOTROPIC_8X );
+    GenTextureMipmaps(&Global.DefaultFont.texture);
+    SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
     initMouseTrail();
+
+    DemoList.init();
 
     while(!WindowShouldClose()){
         GetScale();

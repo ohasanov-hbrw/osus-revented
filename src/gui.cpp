@@ -92,3 +92,25 @@ void TextBox::render() {
 void TextBox::update() {
     
 }
+
+SelectableList::SelectableList(Vector2 position, Vector2 size, Color color, std::vector<char*> text, Color textcolor, int textsize, int objectsize, int maxlength)
+    : GuiElement(position, size), color(color), text(text), textcolor(textcolor), textsize(textsize), objectsize(objectsize), maxlength(maxlength)
+{  }
+
+void SelectableList::render() {
+    for(int i = 0; i < objects.size(); i++){
+        objects[i].render;
+    }
+}
+
+void SelectableList::update() {
+    
+}
+
+void SelectableList::init() {
+    while(text.size() > 0) {
+        objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, text[text.size() - 1], textcolor, textsize));
+        text.pop_back();
+    }
+    std::cout << objects.size() << std::endl;
+}

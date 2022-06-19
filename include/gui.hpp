@@ -3,6 +3,7 @@
 #include "globals.hpp"
 #include "raylib.h"
 #include <string>
+#include <vector>
 
 class GuiElement {
 public:
@@ -48,8 +49,21 @@ public:
     void update() override;
 };
 
-class SelectableList {
+class SelectableList : public GuiElement {
+private:
+    Color color;
+    Color textcolor;
+    std::vector<char*> text;
+    int textsize;
+    int objectsize;
+    int maxlength;
+    std::vector<TextBox> objects;
+public:
+    SelectableList(Vector2 position, Vector2 size, Color color, std::vector<char*> text, Color textcolor, int textsize, int objectsize, int maxlength);
     
+    void init();
+    void render() override;
+    void update() override;
 };
 
 class ErrorDialogue {
