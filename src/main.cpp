@@ -10,7 +10,7 @@
 
 std::vector<char*> text = {"aaa", "bbb", "ccc", "ddd", "eee"};
 
-SelectableList DemoList ({320, 400}, {100, 60}, PURPLE, text, BLACK, 10, 15, 50);
+SelectableList DemoList ({320, 400}, {300, 60}, PURPLE, text, BLACK, 10, 15, 50);
 Button DemoButton ({320,240}, {100,30}, PURPLE, "Hello World!", BLACK, 10);
 TextBox DemoTextbox ({320,150}, {100,70}, PURPLE, "TEXTBOX\n TESTS", BLACK, 15);
 
@@ -37,6 +37,7 @@ int main() {
 
         updateMouseTrail();
         DemoButton.update();
+        DemoList.update();
 
         if(Global.Key2D){
             DemoTextbox.focused = true;
@@ -55,6 +56,7 @@ int main() {
         
         DemoButton.render();
         DemoTextbox.render();
+        DemoList.render();
         
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, 255 * (int)Global.Key1P , 255 * (int)Global.Key1D, 255});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, 255 * (int)Global.Key2P , 255 * (int)Global.Key2D, 255});

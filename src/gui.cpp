@@ -99,18 +99,20 @@ SelectableList::SelectableList(Vector2 position, Vector2 size, Color color, std:
 
 void SelectableList::render() {
     for(int i = 0; i < objects.size(); i++){
-        objects[i].render;
+        objects[i].render();
     }
 }
 
 void SelectableList::update() {
-    
+    for(int i = 0; i < objects.size(); i++){
+        objects[i].position = {position.x, position.y - size.y / 2.0f + i*objectsize};
+    }
 }
 
 void SelectableList::init() {
-    while(text.size() > 0) {
-        objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, text[text.size() - 1], textcolor, textsize));
-        text.pop_back();
+    for(int i = 0; i < text.size(); i++) {
+        objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, text[i], textcolor, textsize));
     }
+    text.clear();
     std::cout << objects.size() << std::endl;
 }
