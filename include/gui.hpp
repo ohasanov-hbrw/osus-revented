@@ -38,12 +38,14 @@ public:
 
 class TextBox : public GuiElement {
 private:
+    
+public:
+    TextBox(Vector2 position, Vector2 size, Color color, char* text, Color textcolor, int textsize);
+
     Color color;
     Color textcolor;
     char* text;
     int textsize;
-public:
-    TextBox(Vector2 position, Vector2 size, Color color, char* text, Color textcolor, int textsize);
     
     void render() override;
     void update() override;
@@ -58,6 +60,9 @@ private:
     int objectsize;
     int maxlength;
     std::vector<TextBox> objects;
+    int selectedindex = 0;
+    int renderinxde1 = 0;
+    int renderindex2 = 0;
 public:
     SelectableList(Vector2 position, Vector2 size, Color color, std::vector<char*> text, Color textcolor, int textsize, int objectsize, int maxlength);
     

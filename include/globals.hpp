@@ -25,6 +25,7 @@ struct Globals {
     bool Key2D = false;
     bool Key1R = false;
     bool Key2R = false;
+    int Wheel = 0;
 
     Globals() = default;
 };

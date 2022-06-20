@@ -48,6 +48,7 @@ void GetKeys(){
         Global.Key2R = true;
     else
         Global.Key2R = false;
+    Global.Wheel = GetMouseWheelMove();
 }
 
 float Scale(float a){

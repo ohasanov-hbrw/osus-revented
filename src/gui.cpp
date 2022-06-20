@@ -98,14 +98,38 @@ SelectableList::SelectableList(Vector2 position, Vector2 size, Color color, std:
 {  }
 
 void SelectableList::render() {
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+
     for(int i = 0; i < objects.size(); i++){
+        if(selectedindex == i){
+            objects[i].color = textcolor;
+            objects[i].textcolor = color;
+        }
         objects[i].render();
+        if(selectedindex == i){
+            objects[i].color = color;
+            objects[i].textcolor = textcolor;
+        }
     }
+
+    if(hover)
+         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
 }
 
 void SelectableList::update() {
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    if (hover){   
+        selectedindex -= Global.Wheel;
+        if(selectedindex >= (int)objects.size()){
+            selectedindex = 0;
+        }
+        if(selectedindex < 0){
+            std::cout << selectedindex << std::endl;
+            selectedindex = objects.size() - 1;
+        }
+    }
     for(int i = 0; i < objects.size(); i++){
-        objects[i].position = {position.x, position.y - size.y / 2.0f + i*objectsize};
+        objects[i].position = {position.x, position.y - size.y / 2.0f + i*objectsize + objectsize/2};
     }
 }
 

@@ -20,11 +20,11 @@ void updateMouseTrail(){
 void renderMouse(){
     Vector2 LastPosition = {-10,-10};
     if(Global.MouseInFocus){
-        DrawCircleV(ScaleCords(Global.MousePosition), Scale(3.0f), GREEN);
+        DrawCircleV(ScaleCords(Global.MousePosition), Scale(3.0f), WHITE);
         for(int i = Global.MouseTrailSize - 1; i >= 0; i--){
             if(MouseTrail[(indexTrail+i) % Global.MouseTrailSize].x != LastPosition.x or MouseTrail[(indexTrail+i) % Global.MouseTrailSize].y != LastPosition.y ){ 
                 LastPosition = MouseTrail[(indexTrail+i) % Global.MouseTrailSize];
-                Color MouseTrailer = {0,255,0,(float)i*(255.f/(float)Global.MouseTrailSize)};
+                Color MouseTrailer = {255,255,255,(float)i*(255.f/(float)Global.MouseTrailSize)};
                 DrawCircleV(ScaleCords(MouseTrail[(indexTrail+i) % Global.MouseTrailSize]), Scale(3.0f), MouseTrailer);
             }
         }
