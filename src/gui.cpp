@@ -143,7 +143,7 @@ void SelectableList::update() {
 
 void SelectableList::init() {
     for(int i = 0; i < text.size(); i++) {
-        std::string temptext = text[i];
+        /*std::string temptext = text[i];
         bool longtext = false;
         while(MeasureTextEx(Global.DefaultFont, temptext.c_str(), textsize, 1).x > size.x){
             if(temptext.length() == 0) {
@@ -162,8 +162,8 @@ void SelectableList::init() {
                 temptext[temptext.length() - 2] = '.';
             if(temptext.length()>2)
                 temptext[temptext.length() - 3] = '.';
-        }
-        objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, temptext, textcolor, textsize));
+        }*/
+        objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, text[i], textcolor, textsize));
     }
     text.clear();
 }

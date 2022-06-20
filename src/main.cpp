@@ -11,10 +11,11 @@
 std::vector<std::string> text = {"aaa", "bbb", "ccc", "ddd", "eee" , "fff", "ggg", "hhh", "iii", "jjj", "kkk", "lll"};
 std::vector<std::string> text2 = {"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbb"};
 
-SelectableList DemoList ({320, 400}, {300, 60}, PURPLE, text, BLACK, 10, 15, 50);
-SelectableList DemoList2 ({320, 300}, {300, 60}, PURPLE, text2, BLACK, 10, 15, 50);
-Button DemoButton ({320,200}, {100,30}, PURPLE, "Hello World!", BLACK, 10);
-TextBox DemoTextbox ({320,100}, {100,70}, PURPLE, "TEXTBOX\n TESTS", BLACK, 15);
+SelectableList DemoList ({320, 170}, {520, 60}, PURPLE, text, BLACK, 10, 15, 50);
+SelectableList DemoList2 ({320, 300}, {520, 120}, PURPLE, text2, BLACK, 10, 15, 50);
+Button DemoButton ({520,420}, {120,40}, PURPLE, "Select", BLACK, 15);
+TextBox DemoTextbox ({360,420}, {120,40}, PURPLE, "N/A", BLACK, 15);
+TextBox DemoTextbox2 ({200,420}, {120,40}, PURPLE, "N/A", BLACK, 15);
 
 Globals Global;
 
@@ -45,6 +46,7 @@ int main() {
 
         if(DemoButton.action){
             DemoTextbox.text = DemoList.objects[DemoList.selectedindex].text;
+            DemoTextbox2.text = DemoList2.objects[DemoList2.selectedindex].text;
         }
 
         if(Global.Key2D){
@@ -64,6 +66,7 @@ int main() {
         
         DemoButton.render();
         DemoTextbox.render();
+        DemoTextbox2.render();
         DemoList.render();
         DemoList2.render();
         
