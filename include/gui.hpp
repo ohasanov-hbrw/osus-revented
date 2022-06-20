@@ -40,11 +40,11 @@ class TextBox : public GuiElement {
 private:
     
 public:
-    TextBox(Vector2 position, Vector2 size, Color color, char* text, Color textcolor, int textsize);
+    TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize);
 
     Color color;
     Color textcolor;
-    char* text;
+    std::string text;
     int textsize;
     
     void render() override;
@@ -53,22 +53,23 @@ public:
 
 class SelectableList : public GuiElement {
 private:
+    
+public:
+    SelectableList(Vector2 position, Vector2 size, Color color, std::vector<std::string> text, Color textcolor, int textsize, int objectsize, int maxlength);
+    
+    void init();
+    void render() override;
+    void update() override;
     Color color;
     Color textcolor;
-    std::vector<char*> text;
+    std::vector<std::string> text;
     int textsize;
     int objectsize;
     int maxlength;
     std::vector<TextBox> objects;
     int selectedindex = 0;
-    int renderinxde1 = 0;
+    int renderindex1 = 0;
     int renderindex2 = 0;
-public:
-    SelectableList(Vector2 position, Vector2 size, Color color, std::vector<char*> text, Color textcolor, int textsize, int objectsize, int maxlength);
-    
-    void init();
-    void render() override;
-    void update() override;
 };
 
 class ErrorDialogue {

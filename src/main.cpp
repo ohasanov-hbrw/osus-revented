@@ -8,11 +8,13 @@
 #include <gui.hpp>
 
 
-std::vector<char*> text = {"aaa", "bbb", "ccc", "ddd", "eee"};
+std::vector<std::string> text = {"aaa", "bbb", "ccc", "ddd", "eee" , "fff", "ggg", "hhh", "iii", "jjj", "kkk", "lll"};
+std::vector<std::string> text2 = {"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbb"};
 
 SelectableList DemoList ({320, 400}, {300, 60}, PURPLE, text, BLACK, 10, 15, 50);
-Button DemoButton ({320,240}, {100,30}, PURPLE, "Hello World!", BLACK, 10);
-TextBox DemoTextbox ({320,150}, {100,70}, PURPLE, "TEXTBOX\n TESTS", BLACK, 15);
+SelectableList DemoList2 ({320, 300}, {300, 60}, PURPLE, text2, BLACK, 10, 15, 50);
+Button DemoButton ({320,200}, {100,30}, PURPLE, "Hello World!", BLACK, 10);
+TextBox DemoTextbox ({320,100}, {100,70}, PURPLE, "TEXTBOX\n TESTS", BLACK, 15);
 
 Globals Global;
 
@@ -29,6 +31,7 @@ int main() {
     initMouseTrail();
 
     DemoList.init();
+    DemoList2.init();
 
     while(!WindowShouldClose()){
         GetScale();
@@ -38,6 +41,11 @@ int main() {
         updateMouseTrail();
         DemoButton.update();
         DemoList.update();
+        DemoList2.update();
+
+        if(DemoButton.action){
+            DemoTextbox.text = DemoList.objects[DemoList.selectedindex].text;
+        }
 
         if(Global.Key2D){
             DemoTextbox.focused = true;
@@ -57,6 +65,7 @@ int main() {
         DemoButton.render();
         DemoTextbox.render();
         DemoList.render();
+        DemoList2.render();
         
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, 255 * (int)Global.Key1P , 255 * (int)Global.Key1D, 255});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, 255 * (int)Global.Key2P , 255 * (int)Global.Key2D, 255});
