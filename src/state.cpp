@@ -8,7 +8,7 @@ PlayMenu::PlayMenu() {
     bg = TextBox({320,240}, {530,290}, BLUE, "", BLUE, 15, 10);
     back = Button({395,360}, {120,40}, PURPLE, "Back", BLACK, 15);
     select = Button({520,360}, {120,40}, PURPLE, "Select", BLACK, 15);
-    close = Button({240, 360}, {120,40}, PURPLE, "Close", BLACK, 15);
+    close = Button({70, 110}, {20,20}, PURPLE, "x", BLACK, 15);
     auto dir = ls();
     dir_list = SelectableList({320, 260}, {520, 150}, PURPLE, dir, BLACK, 10, 15, 50);
     path = TextBox({195,360}, {270,40}, BLUE, Global.Path, WHITE, 8, 40);
@@ -22,11 +22,17 @@ void PlayMenu::render() {
     path.render();
     select.render();
     dir_list.render();
+    close.render();
 }
 void PlayMenu::update() {
     dir_list.update();
     select.update();
     back.update();
+    close.update();
+
+    if(close.action){
+        Global.CurrentState.reset(new PlayMenu());
+    }
 
     if(select.action){
         if(dir_list.objects.size() > 0 and dir_list.objects[dir_list.selectedindex].text.size() > 0){
