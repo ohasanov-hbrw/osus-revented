@@ -1,6 +1,8 @@
 #pragma once
 
 #include "raylib.h"
+#include <string.h>
+#include <filesystem>
 
 struct Globals {
     float Scale = 1.f;
@@ -17,6 +19,7 @@ struct Globals {
 
     Font DefaultFont;
 
+    std::string Path = std::filesystem::current_path();
     int MouseTrailSize = 150;
 
     float FrameTimeCounterWheel = 0.f;
