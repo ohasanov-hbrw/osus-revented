@@ -9,18 +9,11 @@
 #include "fastrender.hpp"
 #include <gui.hpp>
 #include "fs.hpp"
+#include "state.hpp"
 
 Globals Global;
 
 int main() {
-    auto dir = ls();
-
-    SelectableList DemoList2 ({320, 300}, {520, 120}, PURPLE, dir, BLACK, 10, 15, 50);
-    Button DemoButton ({520,420}, {120,40}, PURPLE, "Select", BLACK, 15);
-    Button DemoButton2 ({360,420}, {120,40}, PURPLE, "Back", BLACK, 15);
-    TextBox DemoTextbox3 ({320,240}, {540,420}, BLUE, "", BLUE, 15, 10);
-    TextBox DemoTextbox4 ({320,100}, {540,40}, BLUE, "Selectable List Demo", WHITE, 15, 50);
-
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
@@ -31,6 +24,8 @@ int main() {
     HideCursor();
     initMouseTrail();
 
+    State* current_state = new PlayMenu();
+
     while(!WindowShouldClose()){
         GetScale();
         GetMouse();
@@ -38,35 +33,7 @@ int main() {
 
         updateMouseTrail();
         updateUpDown();
-        DemoButton.update();
-        DemoButton2.update();
-        DemoList2.update();
-
-        if(DemoButton.action){
-            if(DemoList2.objects.size() > 0 and DemoList2.objects[DemoList2.selectedindex].text.size() > 0){
-                
-                if(DemoList2.objects[DemoList2.selectedindex].text[DemoList2.objects[DemoList2.selectedindex].text.size()-1] == '/'){
-                    DemoList2.objects[DemoList2.selectedindex].text.pop_back();
-                    Global.Path += '/' + DemoList2.objects[DemoList2.selectedindex].text;
-                    auto dir = ls();
-                    DemoList2 = SelectableList({320, 300}, {520, 120}, PURPLE, dir, BLACK, 10, 15, 50);
-                    DemoList2.init();
-                }
-            }
-        }
-        if(DemoButton2.action){
-            while(true){
-                if(Global.Path[Global.Path.size()-1] == '/'){
-                    if(Global.Path.size() > 1)
-                        Global.Path.pop_back();
-                    break;
-                }
-                Global.Path.pop_back();
-            }
-            auto dir = ls();
-            DemoList2 = SelectableList({320, 300}, {520, 120}, PURPLE, dir, BLACK, 10, 15, 50);
-            DemoList2.init();
-        }
+        current_state->update();
 
         BeginDrawing();
 
@@ -74,11 +41,7 @@ int main() {
 
         DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, BLACK);
         
-        DemoTextbox3.render();
-        DemoButton.render();
-        DemoButton2.render();
-        DemoTextbox4.render();
-        DemoList2.render();
+        current_state->render();
         
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, 255 * (int)Global.Key1P , 255 * (int)Global.Key1D, 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, 255 * (int)Global.Key2P , 255 * (int)Global.Key2D, 100});
@@ -94,6 +57,8 @@ int main() {
 
         EndDrawing();
     }
+
+    delete current_state;
 
     CloseWindow();
 }

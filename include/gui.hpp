@@ -16,6 +16,7 @@ public:
     bool action = false;
 
     GuiElement(Vector2 position, Vector2 size);
+    GuiElement() = default;
     
     virtual void render();
     virtual void update();
@@ -31,6 +32,8 @@ private:
     int textsize;
 public:
     Button(Vector2 position, Vector2 size, Color color, char* text, Color textcolor, int textsize);
+    Button() = default;
+
     void render() override;
     void update() override;
 };
@@ -40,6 +43,7 @@ private:
     
 public:
     TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize, int maxlength);
+    TextBox() = default;
 
     Color color;
     Color textcolor;
@@ -57,6 +61,7 @@ private:
     
 public:
     SelectableList(Vector2 position, Vector2 size, Color color, std::vector<std::string> text, Color textcolor, int textsize, int objectsize, int maxlength);
+    SelectableList() = default;
     
     void init();
     void render() override;
