@@ -26,28 +26,28 @@ void PlayMenu::update() {
     back.update();
 
     if(select.action){
-            if(dir_list.objects.size() > 0 and dir_list.objects[dir_list.selectedindex].text.size() > 0){
-                
-                if(dir_list.objects[dir_list.selectedindex].text[dir_list.objects[dir_list.selectedindex].text.size()-1] == '/'){
-                    dir_list.objects[dir_list.selectedindex].text.pop_back();
-                    Global.Path += '/' + dir_list.objects[dir_list.selectedindex].text;
-                    auto dir = ls();
-                    dir_list = SelectableList({320, 300}, {520, 120}, PURPLE, dir, BLACK, 10, 15, 50);
-                    dir_list.init();
-                }
+        if(dir_list.objects.size() > 0 and dir_list.objects[dir_list.selectedindex].text.size() > 0){
+
+            if(dir_list.objects[dir_list.selectedindex].text[dir_list.objects[dir_list.selectedindex].text.size()-1] == '/'){
+                dir_list.objects[dir_list.selectedindex].text.pop_back();
+                Global.Path += '/' + dir_list.objects[dir_list.selectedindex].text;
+                auto dir = ls();
+                dir_list = SelectableList({320, 300}, {520, 120}, PURPLE, dir, BLACK, 10, 15, 50);
+                dir_list.init();
             }
         }
-        if(back.action){
-            while(true){
-                if(Global.Path[Global.Path.size()-1] == '/'){
-                    if(Global.Path.size() > 1)
-                        Global.Path.pop_back();
-                    break;
-                }
-                Global.Path.pop_back();
+    }
+    if(back.action){
+        while(true){
+            if(Global.Path[Global.Path.size()-1] == '/'){
+                if(Global.Path.size() > 1)
+                    Global.Path.pop_back();
+                break;
             }
-            auto dir = ls();
-            dir_list = SelectableList({320, 300}, {520, 120}, PURPLE, dir, BLACK, 10, 15, 50);
-            dir_list.init();
+            Global.Path.pop_back();
         }
+        auto dir = ls();
+        dir_list = SelectableList({320, 300}, {520, 120}, PURPLE, dir, BLACK, 10, 15, 50);
+        dir_list.init();
+    }
 }
