@@ -31,7 +31,6 @@ private:
     int textsize;
 public:
     Button(Vector2 position, Vector2 size, Color color, char* text, Color textcolor, int textsize);
-
     void render() override;
     void update() override;
 };
@@ -40,13 +39,15 @@ class TextBox : public GuiElement {
 private:
     
 public:
-    TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize);
+    TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize, int maxlength);
 
     Color color;
     Color textcolor;
     std::string text;
+    std::string rendertext;
     int textsize;
-    
+    int maxlength;
+    void init();
     void render() override;
     void update() override;
 };

@@ -71,22 +71,34 @@ void Button::update() {
         std::cout << "amongus" << std::endl;
 }
 
-TextBox::TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize)
-    : GuiElement(position, size), color(color), text(text), textcolor(textcolor), textsize(textsize)
+TextBox::TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize, int maxlength)
+    : GuiElement(position, size), color(color), text(text), textcolor(textcolor), textsize(textsize), maxlength(maxlength)
 {  }
 
 void TextBox::render() {
-    Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text.c_str(), textsize, 1);
+    Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, rendertext.c_str(), textsize, 1);
     Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
 
     DrawRectangleRec(ScaleRect(this->getRect()), BLUE);
     if (focused) {
         DrawRectangleRec(ScaleRect(this->getRect()), textcolor);
-        DrawTextEx(Global.DefaultFont, text.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
+        DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
     }
     else {
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
-        DrawTextEx(Global.DefaultFont, text.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+        DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+    }
+}
+void TextBox::init() {
+    rendertext = text;
+    if(text.length() > maxlength){
+        rendertext = text;
+        while(rendertext.length() > 0 and rendertext.length() > maxlength - 3){
+            rendertext.pop_back();
+        }
+        rendertext.push_back('.');
+        rendertext.push_back('.');
+        rendertext.push_back('.');
     }
 }
 
@@ -163,7 +175,8 @@ void SelectableList::init() {
             if(temptext.length()>2)
                 temptext[temptext.length() - 3] = '.';
         }*/
-        objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, text[i], textcolor, textsize));
+        objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, text[i], textcolor, textsize, maxlength));
+        objects[objects.size()-1].init();
     }
     text.clear();
 }

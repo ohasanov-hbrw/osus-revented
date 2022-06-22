@@ -14,8 +14,8 @@ std::vector<std::string> text2 = {"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 SelectableList DemoList ({320, 170}, {520, 60}, PURPLE, text, BLACK, 10, 15, 50);
 SelectableList DemoList2 ({320, 300}, {520, 120}, PURPLE, text2, BLACK, 10, 15, 50);
 Button DemoButton ({520,420}, {120,40}, PURPLE, "Select", BLACK, 15);
-TextBox DemoTextbox ({360,420}, {120,40}, PURPLE, "N/A", BLACK, 15);
-TextBox DemoTextbox2 ({200,420}, {120,40}, PURPLE, "N/A", BLACK, 15);
+TextBox DemoTextbox ({360,420}, {120,40}, PURPLE, "N/A", BLACK, 15, 10);
+TextBox DemoTextbox2 ({200,420}, {120,40}, PURPLE, "N/A", BLACK, 15, 10);
 
 Globals Global;
 
@@ -32,6 +32,8 @@ int main() {
     initMouseTrail();
 
     DemoList.init();
+    DemoTextbox.init();
+    DemoTextbox2.init();
     DemoList2.init();
 
     while(!WindowShouldClose()){
@@ -47,6 +49,8 @@ int main() {
         if(DemoButton.action){
             DemoTextbox.text = DemoList.objects[DemoList.selectedindex].text;
             DemoTextbox2.text = DemoList2.objects[DemoList2.selectedindex].text;
+            DemoTextbox.init();
+            DemoTextbox2.init();
         }
 
         if(Global.Key2D){
