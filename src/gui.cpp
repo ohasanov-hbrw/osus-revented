@@ -149,7 +149,7 @@ void SelectableList::update() {
         }
     }
     for(int i = renderindex1; i < renderindex2; i++){
-        objects[i].position = {position.x, position.y - size.y / 2.0f + (i-renderindex1)*objectsize + objectsize/2};
+        objects[i].position = {position.x, position.y - size.y / 2.0f + (i-renderindex1)*objectsize + objectsize/2.0f };
     }
 }
 
