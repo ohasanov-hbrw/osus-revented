@@ -23,12 +23,17 @@ void ls(){
         std::string filename = entry.path().filename();
         fs::directory_entry isDirectory(entry.path());
         if(filename[0] != '.'){
-            std::cout << isDirectory << " " << isDirectory.is_directory() << std::endl;
-            if(isDirectory.is_directory())
+            if(isDirectory.is_directory()){
                 filename.push_back('/');
-            text.push_back(filename);
+                text.push_back(filename);
+            }
+            else if(entry.path().extension() == ".osu"){
+                text.push_back(filename);
+            }
+            
         }
     }
+    sort(text.begin(), text.end());
 }
 
 int main() {
@@ -38,7 +43,6 @@ int main() {
     SelectableList DemoList ({320, 170}, {520, 60}, PURPLE, text2, BLACK, 10, 15, 50);
     Button DemoButton ({520,420}, {120,40}, PURPLE, "Select", BLACK, 15);
     Button DemoButton2 ({360,420}, {120,40}, PURPLE, "Back", BLACK, 15);
-    TextBox DemoTextbox2 ({200,420}, {120,40}, PURPLE, "N/A", BLACK, 15, 10);
     TextBox DemoTextbox3 ({320,240}, {540,420}, BLUE, "", BLUE, 15, 10);
     TextBox DemoTextbox4 ({320,100}, {540,40}, BLUE, "Selectable List Demo", WHITE, 15, 50);
 
@@ -75,8 +79,8 @@ int main() {
                     DemoList2.init();
                 }
                 else{
-                    DemoTextbox2.text = DemoList2.objects[DemoList2.selectedindex].text;
-                    DemoTextbox2.init();
+                    std::string temp = DemoList2.objects[DemoList2.selectedindex].text;
+                    std::cout << path + temp << std::endl;
                 }
             }
         }
@@ -103,7 +107,6 @@ int main() {
         DemoTextbox3.render();
         DemoButton.render();
         DemoButton2.render();
-        DemoTextbox2.render();
         DemoTextbox4.render();
         DemoList.render();
         DemoList2.render();
