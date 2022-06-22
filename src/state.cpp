@@ -38,7 +38,7 @@ void PlayMenu::update() {
         }
     }
     if(back.action){
-        while(true){
+        while(Global.Path.size() > 0){
             if(Global.Path[Global.Path.size()-1] == '/'){
                 if(Global.Path.size() > 1)
                     Global.Path.pop_back();
