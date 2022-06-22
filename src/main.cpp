@@ -81,19 +81,17 @@ int main() {
             }
         }
         if(DemoButton2.action){
-            if(DemoList2.objects.size() > 0 and DemoList2.objects[DemoList2.selectedindex].text.size() > 0){
-                while(true){
-                    if(path[path.size()-1] == '/'){
-                        if(path.size() > 1)
-                            path.pop_back();
-                        break;
-                    }
-                    path.pop_back();
+            while(true){
+                if(path[path.size()-1] == '/'){
+                    if(path.size() > 1)
+                        path.pop_back();
+                    break;
                 }
-                ls();
-                DemoList2 = SelectableList({320, 300}, {520, 120}, PURPLE, text, BLACK, 10, 15, 50);
-                DemoList2.init();
+                path.pop_back();
             }
+            ls();
+            DemoList2 = SelectableList({320, 300}, {520, 120}, PURPLE, text, BLACK, 10, 15, 50);
+            DemoList2.init();
         }
 
         BeginDrawing();
