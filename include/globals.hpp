@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <memory>
 #include "state.hpp"
+#include "gamemanager.hpp"
 
 struct Globals {
     float Scale = 1.f;
@@ -22,6 +23,7 @@ struct Globals {
     Font DefaultFont;
 
     std::string Path = std::filesystem::current_path();
+    std::string selectedPath = "";
     int MouseTrailSize = 150;
 
     float FrameTimeCounterWheel = 0.f;
@@ -37,6 +39,8 @@ struct Globals {
     int Wheel = 0;
 
     std::shared_ptr<State> CurrentState = std::make_shared<MainMenu>();
+
+    GameManager *gameManager = GameManager::getInstance();
 
     Globals() = default;
 };

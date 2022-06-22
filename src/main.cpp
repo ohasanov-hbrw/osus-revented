@@ -14,6 +14,8 @@
 Globals Global;
 
 int main() {
+
+    InitAudioDevice();
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
@@ -25,8 +27,6 @@ int main() {
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
     initMouseTrail();
-
-    
 
     while(!WindowShouldClose()){
         GetScale();

@@ -6,6 +6,7 @@
 #include <vector>
 #include <math.h>
 #include <hitobject.hpp>
+#include "globals.hpp"
 
 //for some reason the clamp function didnt work so here is a manual one
 float GameManager::clip(float value, float min, float max){
@@ -211,7 +212,8 @@ void GameManager::render(){
 
 void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
-	
+	UpdateMusicStream(backgroundMusic);
+	currentTime = GetMusicTimePlayed(backgroundMusic);
 }
 
 //load the beatmap
@@ -239,8 +241,8 @@ void GameManager::loadGame(std::string filename){
 	gameFile.p100Final = gameFile.p100 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p100Change;
 	gameFile.p50Final = gameFile.p50 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p50Change;
 	//debug, just say what the name of the music file is and load it
-	std::cout << ("resources/beatmaps/" + gameFile.configGeneral["AudioFilename"]) << std::endl;
-	backgroundMusic = LoadMusicStream(("resources/beatmaps/" + gameFile.configGeneral["AudioFilename"]).c_str());
+	std::cout << (Global.Path + '/' + gameFile.configGeneral["AudioFilename"]) << std::endl;
+	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
 	
     //these are not used right now, USE THEM
 	float hpdrainrate = std::stof(gameFile.configDifficulty["HPDrainRate"]);
@@ -250,6 +252,8 @@ void GameManager::loadGame(std::string filename){
 	difficultyMultiplier = ((hpdrainrate + circlesize + overalldifficulty + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
 	if (gameFile.configDifficulty.find("SliderMultiplier") != gameFile.configDifficulty.end())
 		sliderSpeed = std::stof(gameFile.configDifficulty["SliderMultiplier"]);
+	PlayMusicStream(backgroundMusic);
+    SetMusicVolume(backgroundMusic, 0.2f);
 }
 
 void GameManager::spawnHitObject(HitObjectData data){

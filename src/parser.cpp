@@ -11,7 +11,7 @@ GameFile Parser::parse(std::string filename){
 	gameFile.configDifficulty["OverallDifficulty"] = "5";
 	gameFile.configDifficulty["ApproachRate"] = "5";
 	gameFile.configDifficulty["SliderTickRate"] = "1";
-    std::ifstream ifs("resources/beatmaps/" + filename);
+    std::ifstream ifs(filename);
 	std::string line;
 	if (ifs.is_open()){
 		while(std::getline(ifs, line)){

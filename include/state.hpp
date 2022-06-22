@@ -40,3 +40,13 @@ public:
     void render() override;
     void update() override;
 };
+
+class Game : public State {
+private:
+public:
+    Game();
+
+    void init() override;
+    void render() override;
+    void update() override;
+};
