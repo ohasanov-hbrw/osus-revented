@@ -49,6 +49,7 @@ class GameManager{
 		bool pressed = false;
 		bool down = false;
 		float angle = 0;
+		bool stop = false;
 		Vector2 MousePosition;
 		GameFile gameFile;
 		Parser parser;

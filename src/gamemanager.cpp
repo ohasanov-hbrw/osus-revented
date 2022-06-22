@@ -214,6 +214,10 @@ void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
 	UpdateMusicStream(backgroundMusic);
 	currentTime = GetMusicTimePlayed(backgroundMusic);
+	if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
+		stop = true;
+	if(stop && currentTime < 1.0f)
+		StopMusicStream(backgroundMusic);
 	GameManager::update();
 }
 
