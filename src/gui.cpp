@@ -70,7 +70,9 @@ void Button::update() {
 
 TextBox::TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize, int maxlength)
     : GuiElement(position, size), color(color), text(text), textcolor(textcolor), textsize(textsize), maxlength(maxlength)
-{  }
+{
+    init();
+}
 
 void TextBox::render() {
     Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, rendertext.c_str(), textsize, 1);
@@ -105,7 +107,9 @@ void TextBox::update() {
 
 SelectableList::SelectableList(Vector2 position, Vector2 size, Color color, std::vector<std::string> text, Color textcolor, int textsize, int objectsize, int maxlength)
     : GuiElement(position, size), color(color), text(text), textcolor(textcolor), textsize(textsize), objectsize(objectsize), maxlength(maxlength)
-{  }
+{
+    init();
+}
 
 void SelectableList::render() {
     bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
@@ -152,26 +156,6 @@ void SelectableList::update() {
 
 void SelectableList::init() {
     for(int i = 0; i < text.size(); i++) {
-        /*std::string temptext = text[i];
-        bool longtext = false;
-        while(MeasureTextEx(Global.DefaultFont, temptext.c_str(), textsize, 1).x > size.x){
-            if(temptext.length() == 0) {
-                break;
-            }
-            if(MeasureTextEx(Global.DefaultFont, temptext.c_str(), textsize, 1).x < size.x){
-                break;
-            }
-            temptext.pop_back();
-            longtext = true;
-        }
-        if(longtext){
-            if(temptext.length()>0)
-                temptext[temptext.length() - 1] = '.';
-            if(temptext.length()>1)
-                temptext[temptext.length() - 2] = '.';
-            if(temptext.length()>2)
-                temptext[temptext.length() - 3] = '.';
-        }*/
         objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, text[i], textcolor, textsize, maxlength));
         objects[objects.size()-1].init();
     }

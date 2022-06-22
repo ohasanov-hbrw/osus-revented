@@ -15,8 +15,6 @@ std::vector<std::string> text;
 std::vector<std::string> text2 = {"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbb"};
 std::string path = fs::current_path();
 
-
-
 Globals Global;
 
 void ls(){
@@ -34,8 +32,6 @@ void ls(){
 }
 
 int main() {
-
-    
     ls();
 
     SelectableList DemoList2 ({320, 300}, {520, 120}, PURPLE, text, BLACK, 10, 15, 50);
@@ -46,9 +42,7 @@ int main() {
     TextBox DemoTextbox3 ({320,240}, {540,420}, BLUE, "", BLUE, 15, 10);
     TextBox DemoTextbox4 ({320,100}, {540,40}, BLUE, "Selectable List Demo", WHITE, 15, 50);
 
-
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    //SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
     SetTargetFPS(Global.FPS);
@@ -57,11 +51,6 @@ int main() {
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
     initMouseTrail();
-
-    DemoList.init();
-    DemoTextbox2.init();
-    DemoTextbox4.init();
-    DemoList2.init();
 
     while(!WindowShouldClose()){
         GetScale();
@@ -112,7 +101,6 @@ int main() {
         ClearBackground(Global.Background);
 
         DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, BLACK);
-        //DrawRectangle(20 * Global.Scale + Global.ZeroPoint.x, 20 * Global.Scale + Global.ZeroPoint.y, 30 * Global.Scale, 30 * Global.Scale, BLUE);
         
         DemoTextbox3.render();
         DemoButton.render();

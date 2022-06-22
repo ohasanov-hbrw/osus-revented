@@ -19,7 +19,7 @@ struct Globals {
 
     int MouseTrailSize = 150;
 
-    int FrameTimeCounterWheel = 0;
+    float FrameTimeCounterWheel = 0.f;
 
     bool Key1P = false;
     bool Key1D = false;
