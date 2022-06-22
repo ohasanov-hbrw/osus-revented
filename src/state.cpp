@@ -98,7 +98,19 @@ void Game::init() {
 }
 void Game::update() {
     Global.gameManager->run();
+    if(IsKeyPressed(KEY_BACKSPACE)){
+        Global.CurrentState.reset(new PlayMenu());
+    }
+    if(IsKeyPressed(KEY_SPACE)){
+        if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic))
+            PauseMusicStream(Global.gameManager->backgroundMusic);
+        else
+            ResumeMusicStream(Global.gameManager->backgroundMusic);
+    }
 }
 void Game::render() {
-    
+    if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic))
+        DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+    else
+        DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
 }

@@ -214,6 +214,7 @@ void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
 	UpdateMusicStream(backgroundMusic);
 	currentTime = GetMusicTimePlayed(backgroundMusic);
+	GameManager::update();
 }
 
 //load the beatmap
