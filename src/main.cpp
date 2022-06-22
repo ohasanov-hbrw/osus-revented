@@ -61,7 +61,7 @@ int main() {
     }
 
     UnloadTexture(Global.OsusLogo);
-
+    UnloadFont(Global.DefaultFont);
     CloseWindow();
 }
 
