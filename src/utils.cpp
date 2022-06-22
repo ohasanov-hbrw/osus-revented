@@ -3,6 +3,27 @@
 #include <vector>
 #include <algorithm>
 #include <globals.hpp>
+#include <iostream>
+
+void updateUpDown(){
+    Global.Wheel = GetMouseWheelMove();
+    if(IsKeyPressed(KEY_DOWN)){
+        Global.Wheel = -1;
+        Global.FrameTimeCounterWheel = -150;
+    }
+    if(IsKeyPressed(KEY_UP)){
+        Global.Wheel = 1;
+        Global.FrameTimeCounterWheel = -150;
+    }
+    Global.FrameTimeCounterWheel += GetFrameTime()*1000.0f;
+    while(Global.FrameTimeCounterWheel > 100.0f){
+        Global.FrameTimeCounterWheel -= 100.0f;
+        if(IsKeyDown(KEY_UP))
+            Global.Wheel = 1;
+        if(IsKeyDown(KEY_DOWN))
+            Global.Wheel = -1;
+    }
+}
 
 void GetScale(){
     Global.Scale = std::min(GetScreenWidth()/640.0f, GetScreenHeight()/480.0f);
@@ -48,7 +69,6 @@ void GetKeys(){
         Global.Key2R = true;
     else
         Global.Key2R = false;
-    Global.Wheel = GetMouseWheelMove();
 }
 
 float Scale(float a){

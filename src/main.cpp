@@ -16,6 +16,8 @@ SelectableList DemoList2 ({320, 300}, {520, 120}, PURPLE, text2, BLACK, 10, 15, 
 Button DemoButton ({520,420}, {120,40}, PURPLE, "Select", BLACK, 15);
 TextBox DemoTextbox ({360,420}, {120,40}, PURPLE, "N/A", BLACK, 15, 10);
 TextBox DemoTextbox2 ({200,420}, {120,40}, PURPLE, "N/A", BLACK, 15, 10);
+TextBox DemoTextbox3 ({320,240}, {540,420}, BLUE, "", BLUE, 15, 10);
+TextBox DemoTextbox4 ({320,100}, {540,40}, BLUE, "Selectable List Demo", WHITE, 15, 50);
 
 Globals Global;
 
@@ -34,6 +36,7 @@ int main() {
     DemoList.init();
     DemoTextbox.init();
     DemoTextbox2.init();
+    DemoTextbox4.init();
     DemoList2.init();
 
     while(!WindowShouldClose()){
@@ -42,6 +45,7 @@ int main() {
         GetKeys();
 
         updateMouseTrail();
+        updateUpDown();
         DemoButton.update();
         DemoList.update();
         DemoList2.update();
@@ -53,13 +57,6 @@ int main() {
             DemoTextbox2.init();
         }
 
-        if(Global.Key2D){
-            DemoTextbox.focused = true;
-        }
-        else{
-            DemoTextbox.focused = false;
-        }
-
         BeginDrawing();
 
         ClearBackground(Global.Background);
@@ -67,15 +64,16 @@ int main() {
         DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, BLACK);
         //DrawRectangle(20 * Global.Scale + Global.ZeroPoint.x, 20 * Global.Scale + Global.ZeroPoint.y, 30 * Global.Scale, 30 * Global.Scale, BLUE);
         
-        
+        DemoTextbox3.render();
         DemoButton.render();
         DemoTextbox.render();
         DemoTextbox2.render();
+        DemoTextbox4.render();
         DemoList.render();
         DemoList2.render();
         
-        DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, 255 * (int)Global.Key1P , 255 * (int)Global.Key1D, 255});
-        DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, 255 * (int)Global.Key2P , 255 * (int)Global.Key2D, 255});
+        DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, 255 * (int)Global.Key1P , 255 * (int)Global.Key1D, 100});
+        DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, 255 * (int)Global.Key2P , 255 * (int)Global.Key2D, 100});
 
         renderMouse();
 

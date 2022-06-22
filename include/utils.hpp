@@ -5,6 +5,8 @@ extern "C" {
 #include "raymath.h"
 }
 
+void updateUpDown();
+
 void GetScale();
 void GetMouse(); //No Tom, you will never be able to catch Jerry :'(
 void GetKeys();
