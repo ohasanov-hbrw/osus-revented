@@ -2,6 +2,7 @@
 #include "utils.hpp"
 #include <iostream>
 #include <cstring>
+#include "globals.hpp"
 
 GuiElement::GuiElement(Vector2 position, Vector2 size) : position(position), size(size)
 {  }

@@ -1,6 +1,7 @@
 #include "state.hpp"
 #include "fs.hpp"
 #include <iostream>
+#include "globals.hpp"
 
 PlayMenu::PlayMenu() {
     description = TextBox({320,100}, {540,40}, BLUE, "Selectable List Demo", WHITE, 15, 50);

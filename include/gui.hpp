@@ -1,6 +1,5 @@
 #pragma once
 
-#include "globals.hpp"
 #include "raylib.h"
 #include <string>
 #include <vector>

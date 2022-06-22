@@ -24,8 +24,6 @@ int main() {
     HideCursor();
     initMouseTrail();
 
-    State* current_state = new PlayMenu();
-
     while(!WindowShouldClose()){
         GetScale();
         GetMouse();
@@ -33,7 +31,7 @@ int main() {
 
         updateMouseTrail();
         updateUpDown();
-        current_state->update();
+        Global.CurrentState->update();
 
         BeginDrawing();
 
@@ -41,7 +39,7 @@ int main() {
 
         DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, BLACK);
         
-        current_state->render();
+        Global.CurrentState->render();
         
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, 255 * (int)Global.Key1P , 255 * (int)Global.Key1D, 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, 255 * (int)Global.Key2P , 255 * (int)Global.Key2D, 100});
@@ -57,8 +55,6 @@ int main() {
 
         EndDrawing();
     }
-
-    delete current_state;
 
     CloseWindow();
 }

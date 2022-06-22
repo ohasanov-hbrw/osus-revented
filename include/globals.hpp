@@ -3,6 +3,8 @@
 #include "raylib.h"
 #include <string.h>
 #include <filesystem>
+#include <memory>
+#include "state.hpp"
 
 struct Globals {
     float Scale = 1.f;
@@ -31,6 +33,8 @@ struct Globals {
     bool Key1R = false;
     bool Key2R = false;
     int Wheel = 0;
+
+    std::shared_ptr<State> CurrentState = std::make_shared<PlayMenu>();
 
     Globals() = default;
 };
