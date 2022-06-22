@@ -19,10 +19,14 @@ int main() {
     SetWindowMinSize(320, 240);
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
+    Global.OsusLogo = LoadTexture("resources/osus.png");
+    GenTextureMipmaps(&Global.OsusLogo);
     GenTextureMipmaps(&Global.DefaultFont.texture);
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
     initMouseTrail();
+
+    
 
     while(!WindowShouldClose()){
         GetScale();
@@ -55,6 +59,8 @@ int main() {
 
         EndDrawing();
     }
+
+    UnloadTexture(Global.OsusLogo);
 
     CloseWindow();
 }

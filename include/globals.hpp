@@ -26,6 +26,8 @@ struct Globals {
 
     float FrameTimeCounterWheel = 0.f;
 
+    Texture2D OsusLogo;
+
     bool Key1P = false;
     bool Key1D = false;
     bool Key2P = false;
@@ -34,7 +36,7 @@ struct Globals {
     bool Key2R = false;
     int Wheel = 0;
 
-    std::shared_ptr<State> CurrentState = std::make_shared<PlayMenu>();
+    std::shared_ptr<State> CurrentState = std::make_shared<MainMenu>();
 
     Globals() = default;
 };

@@ -28,3 +28,15 @@ public:
     void render() override;
     void update() override;
 };
+
+class MainMenu : public State {
+private:
+    Button play;
+    Button load;
+public:
+    MainMenu();
+
+    void init() override;
+    void render() override;
+    void update() override;
+};

@@ -23,6 +23,8 @@ Vector2 GetCenter(Rectangle);
 Vector2 GetRaylibOrigin(Rectangle);
 Rectangle GetRaylibOriginR(Rectangle);
 
+void DrawTextureCenter(Texture2D, float, float, float, Color);
+
 float clip( float, float, float);
 Vector2 lerp(Vector2, Vector2, float);
 Vector2 vectorize(float);

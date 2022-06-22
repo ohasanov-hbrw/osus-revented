@@ -2,6 +2,7 @@
 #include "fs.hpp"
 #include <iostream>
 #include "globals.hpp"
+#include "utils.hpp"
 
 PlayMenu::PlayMenu() {
     description = TextBox({320,140}, {520,40}, BLUE, "Select a Beatmap\n    to play!", WHITE, 15, 50);
@@ -31,7 +32,7 @@ void PlayMenu::update() {
     close.update();
 
     if(close.action){
-        Global.CurrentState.reset(new PlayMenu());
+        Global.CurrentState.reset(new MainMenu());
     }
 
     if(select.action){
@@ -62,4 +63,22 @@ void PlayMenu::update() {
         dir_list.init();
         path = TextBox({195,360}, {270,40}, BLUE, Global.Path, WHITE, 8, 40);
     }
+}
+
+MainMenu::MainMenu() {
+    play = Button({250,420}, {120,60}, PURPLE, "Play", BLACK, 20);
+    load = Button({390,420}, {120,60}, PURPLE, "Load", BLACK, 20);
+}
+void MainMenu::init() {}
+void MainMenu::update() {
+    play.update();
+    load.update();
+    if(play.action){
+        Global.CurrentState.reset(new PlayMenu());
+    }
+}
+void MainMenu::render() {
+    DrawTextureCenter(Global.OsusLogo, 320, 200, 1/3.f, WHITE);
+    play.render();
+    load.render();
 }
