@@ -66,9 +66,6 @@ void Button::update() {
         action = true;
     else
         action = false;
-
-    if(action == true)
-        std::cout << "amongus" << std::endl;
 }
 
 TextBox::TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize, int maxlength)

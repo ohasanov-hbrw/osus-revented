@@ -9,15 +9,15 @@ void updateUpDown(){
     Global.Wheel = GetMouseWheelMove();
     if(IsKeyPressed(KEY_DOWN)){
         Global.Wheel = -1;
-        Global.FrameTimeCounterWheel = -150;
+        Global.FrameTimeCounterWheel = -170;
     }
     if(IsKeyPressed(KEY_UP)){
         Global.Wheel = 1;
-        Global.FrameTimeCounterWheel = -150;
+        Global.FrameTimeCounterWheel = -170;
     }
     Global.FrameTimeCounterWheel += GetFrameTime()*1000.0f;
-    while(Global.FrameTimeCounterWheel > 100.0f){
-        Global.FrameTimeCounterWheel -= 100.0f;
+    while(Global.FrameTimeCounterWheel > 50.0f){
+        Global.FrameTimeCounterWheel -= 50.0f;
         if(IsKeyDown(KEY_UP))
             Global.Wheel = 1;
         if(IsKeyDown(KEY_DOWN))

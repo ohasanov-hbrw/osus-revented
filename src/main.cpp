@@ -4,24 +4,49 @@
 #include <utils.hpp>
 #include "raylib.h"
 #include "globals.hpp"
+#include <iostream>
+#include <filesystem>
 #include "fastrender.hpp"
 #include <gui.hpp>
 
+namespace fs = std::filesystem;
 
-std::vector<std::string> text = {"aaa", "bbb", "ccc", "ddd", "eee" , "fff", "ggg", "hhh", "iii", "jjj", "kkk", "lll"};
+std::vector<std::string> text;
 std::vector<std::string> text2 = {"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbb"};
+std::string path = fs::current_path();
 
-SelectableList DemoList ({320, 170}, {520, 60}, PURPLE, text, BLACK, 10, 15, 50);
-SelectableList DemoList2 ({320, 300}, {520, 120}, PURPLE, text2, BLACK, 10, 15, 50);
-Button DemoButton ({520,420}, {120,40}, PURPLE, "Select", BLACK, 15);
-TextBox DemoTextbox ({360,420}, {120,40}, PURPLE, "N/A", BLACK, 15, 10);
-TextBox DemoTextbox2 ({200,420}, {120,40}, PURPLE, "N/A", BLACK, 15, 10);
-TextBox DemoTextbox3 ({320,240}, {540,420}, BLUE, "", BLUE, 15, 10);
-TextBox DemoTextbox4 ({320,100}, {540,40}, BLUE, "Selectable List Demo", WHITE, 15, 50);
+
 
 Globals Global;
 
+void ls(){
+    text.clear();
+    for (const auto & entry : fs::directory_iterator(path)){
+        std::string filename = entry.path().filename();
+        fs::directory_entry isDirectory(entry.path());
+        if(filename[0] != '.'){
+            std::cout << isDirectory << " " << isDirectory.is_directory() << std::endl;
+            if(isDirectory.is_directory())
+                filename.push_back('/');
+            text.push_back(filename);
+        }
+    }
+}
+
 int main() {
+
+    
+    ls();
+
+    SelectableList DemoList2 ({320, 300}, {520, 120}, PURPLE, text, BLACK, 10, 15, 50);
+    SelectableList DemoList ({320, 170}, {520, 60}, PURPLE, text2, BLACK, 10, 15, 50);
+    Button DemoButton ({520,420}, {120,40}, PURPLE, "Select", BLACK, 15);
+    Button DemoButton2 ({360,420}, {120,40}, PURPLE, "Back", BLACK, 15);
+    TextBox DemoTextbox2 ({200,420}, {120,40}, PURPLE, "N/A", BLACK, 15, 10);
+    TextBox DemoTextbox3 ({320,240}, {540,420}, BLUE, "", BLUE, 15, 10);
+    TextBox DemoTextbox4 ({320,100}, {540,40}, BLUE, "Selectable List Demo", WHITE, 15, 50);
+
+
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     //SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(Global.Width, Global.Height, "osus-revented");
@@ -34,7 +59,6 @@ int main() {
     initMouseTrail();
 
     DemoList.init();
-    DemoTextbox.init();
     DemoTextbox2.init();
     DemoTextbox4.init();
     DemoList2.init();
@@ -47,14 +71,40 @@ int main() {
         updateMouseTrail();
         updateUpDown();
         DemoButton.update();
+        DemoButton2.update();
         DemoList.update();
         DemoList2.update();
 
         if(DemoButton.action){
-            DemoTextbox.text = DemoList.objects[DemoList.selectedindex].text;
-            DemoTextbox2.text = DemoList2.objects[DemoList2.selectedindex].text;
-            DemoTextbox.init();
-            DemoTextbox2.init();
+            if(DemoList2.objects.size() > 0 and DemoList2.objects[DemoList2.selectedindex].text.size() > 0){
+                
+                if(DemoList2.objects[DemoList2.selectedindex].text[DemoList2.objects[DemoList2.selectedindex].text.size()-1] == '/'){
+                    DemoList2.objects[DemoList2.selectedindex].text.pop_back();
+                    path = path + '/' + DemoList2.objects[DemoList2.selectedindex].text;
+                    ls();
+                    DemoList2 = SelectableList({320, 300}, {520, 120}, PURPLE, text, BLACK, 10, 15, 50);
+                    DemoList2.init();
+                }
+                else{
+                    DemoTextbox2.text = DemoList2.objects[DemoList2.selectedindex].text;
+                    DemoTextbox2.init();
+                }
+            }
+        }
+        if(DemoButton2.action){
+            if(DemoList2.objects.size() > 0 and DemoList2.objects[DemoList2.selectedindex].text.size() > 0){
+                while(true){
+                    if(path[path.size()-1] == '/'){
+                        if(path.size() > 1)
+                            path.pop_back();
+                        break;
+                    }
+                    path.pop_back();
+                }
+                ls();
+                DemoList2 = SelectableList({320, 300}, {520, 120}, PURPLE, text, BLACK, 10, 15, 50);
+                DemoList2.init();
+            }
         }
 
         BeginDrawing();
@@ -66,7 +116,7 @@ int main() {
         
         DemoTextbox3.render();
         DemoButton.render();
-        DemoTextbox.render();
+        DemoButton2.render();
         DemoTextbox2.render();
         DemoTextbox4.render();
         DemoList.render();
