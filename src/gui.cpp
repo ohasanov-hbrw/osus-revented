@@ -113,6 +113,7 @@ SelectableList::SelectableList(Vector2 position, Vector2 size, Color color, std:
 }
 
 void SelectableList::render() {
+    bg.render();
     bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
     for(int i = renderindex1; i < renderindex2; i++){
         if(selectedindex == i){
@@ -161,4 +162,5 @@ void SelectableList::init() {
         objects[objects.size()-1].init();
     }
     text.clear();
+    bg = TextBox({position.x, position.y}, {size.x, size.y}, color, " ", BLACK, 0, 50);
 }

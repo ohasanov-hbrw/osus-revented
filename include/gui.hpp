@@ -72,6 +72,7 @@ public:
     int objectsize;
     int maxlength;
     std::vector<TextBox> objects;
+    TextBox bg;
     int selectedindex = 0;
     int renderindex1 = 0;
     int renderindex2 = 0;

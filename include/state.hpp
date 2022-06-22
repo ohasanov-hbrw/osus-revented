@@ -19,6 +19,7 @@ private:
     Button back;
     Button close;
     TextBox bg;
+    TextBox path;
     TextBox description;
 public:
     PlayMenu();
