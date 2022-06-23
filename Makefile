@@ -1,7 +1,7 @@
 CC = g++
 cflags = -std=c++17 -O2 -g
 cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src
-ldflags += -lraylib
+ldflags += -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip
 name = osus
 
 sources = $(wildcard src/*.cpp)
@@ -18,7 +18,7 @@ files:
 
 deps:
 	cd vendor/raylib/src/ && $(MAKE)
-	cd vendor/zip && mkdir build && cd build && cmake .. && make
+	cd vendor/zip && mkdir -p build && cd build && cmake .. && make
 
 run: $(name)
 	bin/$(name)
