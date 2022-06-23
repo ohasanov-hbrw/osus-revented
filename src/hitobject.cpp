@@ -164,11 +164,18 @@ void Circle::update(){
 //renders the Circle
 void Circle::render(){
     GameManager* gm = GameManager::getInstance();
-    //std::cout << "x: " << data.x << " y: " << data.y << std::endl;
-    //DrawTexture(gm->hitCircle,0,0,WHITE);
-    Color renderColor = Color{data.colour[0],data.colour[1],data.colour[2],255};
+    float approachScale = 3*(1-(gm->currentTime*1000 - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    if (approachScale <= 1)
+        approachScale = 1;
+    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
+    Color renderColor;
+    if(data.colour.size() > 2)
+        renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
+    else
+        renderColor =  Fade(Color{255,255,255}, clampedFade);
     DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
-    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , WHITE);
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
+    DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale/2.0f , renderColor);
 }
 
 //renders the "dead" Circle
@@ -402,6 +409,19 @@ void Slider::update(){
 }
 
 void Slider::render(){
+    GameManager* gm = GameManager::getInstance();
+    float approachScale = 3*(1-(gm->currentTime*1000 - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    if (approachScale <= 1)
+        approachScale = 1;
+    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
+    Color renderColor;
+    if(data.colour.size() > 2)
+        renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
+    else
+        renderColor =  Fade(Color{255,255,255}, clampedFade);
+    DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
+    DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale/2.0f , renderColor);
 }
 
 void Slider::dead_render(){

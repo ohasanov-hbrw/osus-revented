@@ -294,6 +294,20 @@ void GameManager::loadGame(std::string filename){
 			hit50 = LoadTexture((Global.Path + files[i]).c_str());
 		else if(files[i].rfind("hit0", 0) == 0)
 			hit0 = LoadTexture((Global.Path + files[i]).c_str());
+		GenTextureMipmaps(&hit0);
+    	SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
+		GenTextureMipmaps(&hit50);
+    	SetTextureFilter(hit50, TEXTURE_FILTER_TRILINEAR );
+		GenTextureMipmaps(&hit100);
+    	SetTextureFilter(hit100, TEXTURE_FILTER_TRILINEAR );
+		GenTextureMipmaps(&hit300);
+    	SetTextureFilter(hit300, TEXTURE_FILTER_TRILINEAR );
+		GenTextureMipmaps(&approachCircle);
+    	SetTextureFilter(approachCircle, TEXTURE_FILTER_TRILINEAR );
+		GenTextureMipmaps(&hitCircleOverlay);
+    	SetTextureFilter(hitCircleOverlay, TEXTURE_FILTER_TRILINEAR );
+		GenTextureMipmaps(&hitCircle);
+    	SetTextureFilter(hitCircle, TEXTURE_FILTER_TRILINEAR );
 	}
 	Global.Path = lastPath;
 	/*hitCircle

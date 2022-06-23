@@ -22,7 +22,9 @@ int main() {
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");
+    Global.cursor = LoadTexture("resources/skin/cursor.png");
     GenTextureMipmaps(&Global.OsusLogo);
+    GenTextureMipmaps(&Global.cursor);
     GenTextureMipmaps(&Global.DefaultFont.texture);
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
