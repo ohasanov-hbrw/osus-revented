@@ -11,9 +11,11 @@ class GameManager{
 		static GameManager* getInstance();
 		GameManager();
 		void run();
+		void unloadGame();
 		void loadGame(std::string filename);
 		void destroyHitObject(int index);
 		void destroyDeadHitObject(int index);
+		void render();
 		float windowScale = 2.0f;
 		int skip = 4;
 		Texture2D hitCircle;
@@ -61,7 +63,6 @@ class GameManager{
 	private:
 		static GameManager* inst_;
 		void init();
-		void render();
 		void update();
 		void spawnHitObject(HitObjectData data);
 		void render_points();

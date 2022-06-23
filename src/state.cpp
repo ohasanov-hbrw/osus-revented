@@ -11,7 +11,7 @@ PlayMenu::PlayMenu() {
     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 15);
     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 15);
     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 15);
-    auto dir = ls();
+    auto dir = ls(".osu");
     dir_list = SelectableList({320, 260}, {520, 150}, {255,135,198,255}, dir, BLACK, 10, 15, 60);
     path = TextBox({195,360}, {270,40}, {240,98,161,255}, Global.Path, WHITE, 8, 40);
 }
@@ -42,7 +42,7 @@ void PlayMenu::update() {
                 dir_list.objects[dir_list.selectedindex].text.pop_back();
                 if(Global.Path.size() == 1) Global.Path.pop_back();
                 Global.Path += '/' + dir_list.objects[dir_list.selectedindex].text;
-                auto dir = ls();
+                auto dir = ls(".osu");
                 dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
                 dir_list.init();
                 path = TextBox(path.position, path.size, path.color, Global.Path, path.textcolor, path.textsize, path.maxlength);
@@ -63,7 +63,7 @@ void PlayMenu::update() {
             }
             Global.Path.pop_back();
         }
-        auto dir = ls();
+        auto dir = ls(".osu");
         dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
         dir_list.init();
         path = TextBox(path.position, path.size, path.color, Global.Path, path.textcolor, path.textsize, path.maxlength);
@@ -100,6 +100,7 @@ void Game::init() {
 void Game::update() {
     Global.gameManager->run();
     if(IsKeyPressed(KEY_BACKSPACE)){
+        Global.gameManager->unloadGame();
         Global.CurrentState.reset(new PlayMenu());
     }
     if(IsKeyPressed(KEY_SPACE)){
@@ -110,6 +111,7 @@ void Game::update() {
     }
 }
 void Game::render() {
+    Global.gameManager->render();
     if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic))
         DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
     else

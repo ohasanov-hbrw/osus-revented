@@ -3,7 +3,7 @@
 
 namespace fs = std::filesystem;
 
-std::vector<std::string> ls() {
+std::vector<std::string> ls(char* extension) {
     std::vector<std::string> text;
     text.clear();
     for (const auto & entry : fs::directory_iterator(Global.Path)){
@@ -14,7 +14,7 @@ std::vector<std::string> ls() {
                 filename.push_back('/');
                 text.push_back(filename);
             }
-            else if(entry.path().extension() == ".osu"){
+            else if(entry.path().extension() == extension){
                 text.push_back(filename);
             }
             

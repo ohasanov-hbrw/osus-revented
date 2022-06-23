@@ -163,7 +163,9 @@ void Circle::update(){
 
 //renders the Circle
 void Circle::render(){
-    
+    GameManager* gm = GameManager::getInstance();
+    DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2 ,WHITE);
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2 ,WHITE);
 }
 
 //renders the "dead" Circle
