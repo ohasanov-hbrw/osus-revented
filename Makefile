@@ -1,6 +1,6 @@
 CC = g++
 cflags = -std=c++17 -O2 -g
-cflags += -Ivendor/raylib/src -Iinclude
+cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src
 ldflags += -lraylib
 name = osus
 
@@ -18,6 +18,7 @@ files:
 
 deps:
 	cd vendor/raylib/src/ && $(MAKE)
+	cd vendor/zip && mkdir build && cd build && cmake .. && make
 
 run: $(name)
 	bin/$(name)
