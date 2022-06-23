@@ -1,3 +1,6 @@
 [submodule "vendor/raylib"]
 	path = vendor/raylib
 	url = https://github.com/raysan5/raylib
+[submodule "vendor/raylib-physfs"]
+	path = vendor/raylib-physfs
+	url = https://github.com/RobLoach/raylib-physfs
