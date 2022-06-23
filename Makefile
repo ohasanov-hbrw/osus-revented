@@ -21,6 +21,7 @@ deps:
 	cd vendor/zip && mkdir -p build && cd build && cmake .. && make
 
 run: $(name)
+	mkdir -p beatmaps
 	bin/$(name)
 
 $(name): $(objects)

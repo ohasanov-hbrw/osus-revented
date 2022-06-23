@@ -23,3 +23,20 @@ std::vector<std::string> ls(char* extension) {
     sort(text.begin(), text.end());
     return text;
 }
+
+void create_dir(const std::string& path) {
+    fs::create_directory(path);
+}
+
+std::string get_without_ext(const std::string& path) {
+    fs::path path_p(Global.selectedPath);
+    return path_p.stem();
+}
+
+int on_extract_entry(const char *filename, void *arg) {
+    int i = 0;
+    int n = *(int *)arg;
+    printf("Extracted: %s (%d of %d)\n", filename, ++i, n);
+
+    return 0;
+}

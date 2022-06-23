@@ -14,14 +14,6 @@
 
 Globals Global;
 
-int on_extract_entry(const char *filename, void *arg) {
-    static int i = 0;
-    int n = *(int *)arg;
-    printf("Extracted: %s (%d of %d)\n", filename, ++i, n);
-
-    return 0;
-}
-
 int main() {
     InitAudioDevice();
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -38,7 +30,7 @@ int main() {
 
 
     int arg = 2;
-    zip_extract("foo.zip", "/tmp", on_extract_entry, &arg);
+    zip_extract("1381340_maki_ligon_-_Among_Us___Eurobeat_Remix.osz", "sus", on_extract_entry, &arg);
 
     while(!WindowShouldClose()){
         GetScale();

@@ -29,6 +29,23 @@ public:
     void update() override;
 };
 
+class LoadMenu : public State {
+private:
+    SelectableList dir_list;
+    Button select;
+    Button back;
+    Button close;
+    TextBox bg;
+    TextBox path;
+    TextBox description;
+public:
+    LoadMenu();
+
+    void init() override;
+    void render() override;
+    void update() override;
+};
+
 class MainMenu : public State {
 private:
     Button play;
