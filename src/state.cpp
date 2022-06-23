@@ -94,6 +94,7 @@ Game::Game() {
 void Game::init() {
     std::cout << Global.selectedPath << std::endl;
     Global.gameManager->loadGame(Global.selectedPath);
+    Global.gameManager->timingSettingsForHitObject.sliderSpeedOverride = 1;
 
 }
 void Game::update() {

@@ -163,6 +163,7 @@ void Circle::update(){
 
 //renders the Circle
 void Circle::render(){
+    
 }
 
 //renders the "dead" Circle

@@ -219,6 +219,7 @@ void GameManager::run(){
 	if(stop && currentTime < 1.0f)
 		StopMusicStream(backgroundMusic);
 	GameManager::update();
+	
 }
 
 //load the beatmap
