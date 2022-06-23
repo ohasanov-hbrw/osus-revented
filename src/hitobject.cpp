@@ -164,8 +164,11 @@ void Circle::update(){
 //renders the Circle
 void Circle::render(){
     GameManager* gm = GameManager::getInstance();
-    DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2 ,WHITE);
-    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2 ,WHITE);
+    //std::cout << "x: " << data.x << " y: " << data.y << std::endl;
+    //DrawTexture(gm->hitCircle,0,0,WHITE);
+    Color renderColor = Color{data.colour[0],data.colour[1],data.colour[2],255};
+    DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , WHITE);
 }
 
 //renders the "dead" Circle
