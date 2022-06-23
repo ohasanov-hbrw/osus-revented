@@ -207,7 +207,6 @@ void GameManager::render(){
 	//this is the mouse scale... i think
 	
 	//render all the objects
-	std::cout << "rendering" << std::endl;
 	for(int i = objects.size() - 1; i >= 0; i--){
 		objects[i]->render();
 	}
