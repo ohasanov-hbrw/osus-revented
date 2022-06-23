@@ -11,6 +11,6 @@
 -Wno-gnu-statement-expression
 -Wno-gnu-compound-literal-initializer 
 -Wno-gnu-zero-variadic-macro-arguments
--Ivendor/raylib/src 
+-Ivendor/raylib/src
+-Ivendor/zip/src
 -Iinclude
--lraylib

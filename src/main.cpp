@@ -10,8 +10,17 @@
 #include <gui.hpp>
 #include "fs.hpp"
 #include "state.hpp"
+#include "zip.h"
 
 Globals Global;
+
+int on_extract_entry(const char *filename, void *arg) {
+    static int i = 0;
+    int n = *(int *)arg;
+    printf("Extracted: %s (%d of %d)\n", filename, ++i, n);
+
+    return 0;
+}
 
 int main() {
     InitAudioDevice();
@@ -26,6 +35,10 @@ int main() {
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
     initMouseTrail();
+
+
+    int arg = 2;
+    zip_extract("foo.zip", "/tmp", on_extract_entry, &arg);
 
     while(!WindowShouldClose()){
         GetScale();
