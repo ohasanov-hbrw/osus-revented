@@ -39,7 +39,8 @@ public:
 
 class TextBox : public GuiElement {
 private:
-    
+    float counter = -100.f;
+    int renderpos = -1;
 public:
     TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize, int maxlength);
     TextBox() = default;
@@ -48,6 +49,7 @@ public:
     Color textcolor;
     std::string text;
     std::string rendertext;
+    std::string subtext;
     int textsize;
     int maxlength;
     void init();

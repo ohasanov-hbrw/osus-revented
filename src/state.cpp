@@ -12,17 +12,18 @@ PlayMenu::PlayMenu() {
     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 15);
     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 15);
     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 15);
-    auto dir = ls(".osu");
-    dir_list = SelectableList({320, 260}, {520, 150}, {255,135,198,255}, dir, BLACK, 10, 15, 60);
-    path = TextBox({195,360}, {270,40}, {240,98,161,255}, Global.Path, WHITE, 8, 40);
 }
 
-void PlayMenu::init() {}
+void PlayMenu::init() {
+    temp = Global.Path;
+    Global.Path = Global.BeatmapLocation;
+    auto dir = ls(".osu");
+    dir_list = SelectableList({320, 260}, {520, 150}, {255,135,198,255}, dir, BLACK, 10, 15, 65);
+}
 void PlayMenu::render() {
     bg.render();
     description.render();
     back.render();
-    path.render();
     select.render();
     dir_list.render();
     close.render();
@@ -34,6 +35,7 @@ void PlayMenu::update() {
     close.update();
 
     if(close.action){
+        Global.Path = temp;
         Global.CurrentState.reset(new MainMenu());
     }
 
@@ -46,7 +48,6 @@ void PlayMenu::update() {
                 auto dir = ls(".osu");
                 dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
                 dir_list.init();
-                path = TextBox(path.position, path.size, path.color, Global.Path, path.textcolor, path.textsize, path.maxlength);
             }
             else{
                 Global.selectedPath = Global.Path + '/' + dir_list.objects[dir_list.selectedindex].text;
@@ -56,18 +57,10 @@ void PlayMenu::update() {
         }
     }
     if(back.action){
-        while(Global.Path.size() > 0){
-            if(Global.Path[Global.Path.size()-1] == '/'){
-                if(Global.Path.size() > 1)
-                    Global.Path.pop_back();
-                break;
-            }
-            Global.Path.pop_back();
-        }
+        Global.Path = Global.BeatmapLocation;
         auto dir = ls(".osu");
         dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
         dir_list.init();
-        path = TextBox(path.position, path.size, path.color, Global.Path, path.textcolor, path.textsize, path.maxlength);
     }
 }
 
@@ -150,6 +143,7 @@ void MainMenu::update() {
     load.update();
     if(play.action){
         Global.CurrentState.reset(new PlayMenu());
+        Global.CurrentState->init();
     } else if(load.action){
         Global.CurrentState.reset(new LoadMenu());
     }
@@ -174,6 +168,7 @@ void Game::update() {
     if(IsKeyPressed(KEY_BACKSPACE)){
         Global.gameManager->unloadGame();
         Global.CurrentState.reset(new PlayMenu());
+        Global.CurrentState->init();
     }
     if(IsKeyPressed(KEY_SPACE)){
         if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic))

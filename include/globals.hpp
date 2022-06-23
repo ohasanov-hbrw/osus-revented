@@ -23,6 +23,7 @@ struct Globals {
     Font DefaultFont;
 
     std::string Path = std::filesystem::current_path();
+    std::string BeatmapLocation = (std::string)(std::filesystem::current_path()) + "/beatmaps";
     const std::string GamePath = std::filesystem::current_path();
     std::string selectedPath = "";
     int MouseTrailSize = 150;

@@ -21,6 +21,7 @@ private:
     TextBox bg;
     TextBox path;
     TextBox description;
+    std::string temp;
 public:
     PlayMenu();
 

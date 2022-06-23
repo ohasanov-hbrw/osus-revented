@@ -77,12 +77,14 @@ TextBox::TextBox(Vector2 position, Vector2 size, Color color, std::string text, 
 
 void TextBox::render() {
     Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, rendertext.c_str(), textsize, 1);
-    Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
-
+    Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});\
     DrawRectangleRec(ScaleRect(this->getRect()), BLUE);
     if (focused) {
         DrawRectangleRec(ScaleRect(this->getRect()), textcolor);
-        DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
+        if(renderpos > -1)
+            DrawTextEx(Global.DefaultFont, subtext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
+        else
+            DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
     }
     else {
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
@@ -103,7 +105,30 @@ void TextBox::init() {
 }
 
 void TextBox::update() {
-    
+    if(text.size() > maxlength){
+        if(focused){
+            if(counter < 0.f)
+                counter = 0.f;
+            counter += GetFrameTime()*1000.0f;
+            while(counter > 1000.0f){
+                renderpos++;
+                if(renderpos > (int)text.size()){
+                    renderpos = 0;
+                }
+                if(renderpos + maxlength <= (int)text.size()){
+                    subtext = text.substr(renderpos,maxlength);
+                }
+                else{
+                    subtext = text.substr(renderpos, text.size() - renderpos) + "/" + text.substr(0,maxlength - (text.size() - renderpos) - 1);
+                }
+                counter -= 100.0f;
+            }
+        }
+        else{
+            counter = -100.0f;
+            renderpos = -1;
+        }
+    }
 }
 
 SelectableList::SelectableList(Vector2 position, Vector2 size, Color color, std::vector<std::string> text, Color textcolor, int textsize, int objectsize, int maxlength)
@@ -117,13 +142,15 @@ void SelectableList::render() {
     bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
     for(int i = renderindex1; i < renderindex2; i++){
         if(selectedindex == i){
-            objects[i].color = textcolor;
-            objects[i].textcolor = color;
+            objects[i].focused = true;
+            //objects[i].color = textcolor;
+            //objects[i].textcolor = color;
         }
         objects[i].render();
         if(selectedindex == i){
-            objects[i].color = color;
-            objects[i].textcolor = textcolor;
+            objects[i].focused = false;
+            //objects[i].color = color;
+            //objects[i].textcolor = textcolor;
         }
     }
 
@@ -153,6 +180,13 @@ void SelectableList::update() {
     }
     for(int i = renderindex1; i < renderindex2; i++){
         objects[i].position = {position.x, position.y - size.y / 2.0f + (i-renderindex1)*objectsize + objectsize/2.0f };
+    }
+    for(int i = renderindex1; i < renderindex2; i++){
+        if(selectedindex == i)
+            objects[i].focused = true;
+        objects[i].update();
+        if(selectedindex == i)
+            objects[i].focused = false;
     }
 }
 
