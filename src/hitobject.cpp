@@ -363,15 +363,20 @@ void Slider::init(){
         maxY = std::max(maxY, renderPoints[i].y);
     }
     
-    float beatLengthBase = 1;
-    float beatLength = 1;
-    if (not data.timing.uninherited)
-        beatLength = beatLengthBase * data.timing.sliderSpeedOverride;
-    else
-        beatLengthBase = beatLength = data.timing.beatLength;
+    sliderTexture = LoadRenderTexture((maxX-minX+(float)gm->hitCircle.height/2), (maxY-minY+(float)gm->hitCircle.height/2));
+    //start to draw on the texture
+    BeginTextureMode(sliderTexture);
+    ClearBackground(BLANK);
+    for(int i = 0; i < renderPoints.size(); i+=gm->skip)
+        DrawCircle((renderPoints[i].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[i].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-2),Color{170,170,170,255});
+    DrawCircle((renderPoints[renderPoints.size()-1].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-2),Color{170,170,170,255});
+    for(int i = 0; i < renderPoints.size(); i+=gm->skip)
+        DrawCircle((renderPoints[i].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[i].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-5),Color{12,12,12,255});
+    DrawCircle((renderPoints[renderPoints.size()-1].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-5),Color{12,12,12,255});
+    EndTextureMode();
 
-    float tickLengthDiv = 100.0f *  data.timing.sliderSpeedOverride / std::stof(gm->gameFile.configDifficulty["SliderTickRate"]) / (beatLength / beatLengthBase);
-    tickCount = (int) std::ceil(data.length / tickLengthDiv) - 1;
+    GenTextureMipmaps(&sliderTexture.texture);
+    SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_TRILINEAR );
 }
 
 void Slider::update(){
@@ -415,6 +420,9 @@ void Slider::render(){
         approachScale = 1;
     float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
     Color renderColor;
+
+    DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade), gm-> hitCircle.height/2.0f);
+
     if(data.colour.size() > 2)
         renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
     else

@@ -138,3 +138,6 @@ int Search(std::vector<float> arr, float x,int l,int r) {
 void DrawTextureCenter(Texture2D tex, float x, float y, float s, Color color){
     DrawTextureEx(tex, ScaleCords(GetRaylibOrigin({x,y,tex.width*s,tex.height*s})), 0, Scale(s), color);
 }
+void DrawTextureSlider(Texture2D tex, float x, float y, Color color, float s){
+    DrawTextureEx(tex, ScaleCords({x-s/2.0f,y-s/2.0f}),0,Scale(1.0f), color);
+}

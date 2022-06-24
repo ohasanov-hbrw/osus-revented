@@ -24,6 +24,8 @@ Vector2 GetRaylibOrigin(Rectangle);
 Rectangle GetRaylibOriginR(Rectangle);
 
 void DrawTextureCenter(Texture2D, float, float, float, Color);
+void DrawTextureSlider(Texture2D, float, float, Color, float);
+
 
 float clip( float, float, float);
 Vector2 lerp(Vector2, Vector2, float);
