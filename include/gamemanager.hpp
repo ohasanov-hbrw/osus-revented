@@ -48,8 +48,8 @@ class GameManager{
 		int volume;
 		bool uninherited;
 		int effects;
-		float sliderSpeed = 1.0f;
-		float sliderSpeedOverride = 1.0f;
+		double sliderSpeed = 1.0f;
+		double sliderSpeedOverride = 1.0f;
 		bool pressed = false;
 		bool down = false;
 		float angle = 0;

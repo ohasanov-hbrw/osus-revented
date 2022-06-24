@@ -15,7 +15,7 @@ struct catmullRomSegment
 };
 
 struct timingSettings{
-    float beatLength;
+    double beatLength;
     float meter;
     float sampleSet;
     float sampleIndex;
@@ -28,7 +28,7 @@ struct timingSettings{
 struct HitObjectData{
     int x;
     int y;
-    int time;
+    double time;
     int type;
     int hitSound;
     int point = 0;

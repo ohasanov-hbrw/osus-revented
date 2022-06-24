@@ -391,8 +391,8 @@ void Slider::init(){
 
 void Slider::update(){
     GameManager* gm = GameManager::getInstance();
-    position = (gm->currentTime * 1000.f - (float)data.time) / (data.timing.beatLength) * gm->sliderSpeed * data.timing.sliderSpeedOverride;
-    position *= 100;
+    position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
+    position *= 100.0f;
     curRepeat = std::max(0,(int)(position / data.length));
     if((int)(std::max(0.0f, position) + data.length) < (int)(data.length*data.slides)){
         repeat = true;
@@ -406,11 +406,16 @@ void Slider::update(){
     else{
         repeat2 = false;
     }
+    
+    double absolutePosition = position;
+    while(absolutePosition > (double)data.length){
+        absolutePosition -= (double)data.length;
+    }
     if(gm->currentTime*1000 - data.time > 0){
         if ((int)((gm->currentTime*1000 - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
-            position = (int)data.length - ((int)position % (int)data.length + 1); 
+            position = (double)data.length - (absolutePosition + 1.0f); 
         else
-            position = (int)position % (int)data.length + 1; 
+            position = absolutePosition + 1.0f; 
     }
     position = std::max(0.f,position);
     if (is_hit_at_first || gm->currentTime*1000 > data.time + gm->gameFile.p100Final)
@@ -437,6 +442,7 @@ void Slider::render(){
             renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
         else
             renderColor =  Fade(Color{255,255,255}, clampedFade);
+
 
     int calPos = position;
     calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
