@@ -363,20 +363,30 @@ void Slider::init(){
         maxY = std::max(maxY, renderPoints[i].y);
     }
     
-    sliderTexture = LoadRenderTexture((maxX-minX+(float)gm->hitCircle.height/2), (maxY-minY+(float)gm->hitCircle.height/2));
+    sliderTexture = LoadRenderTexture((maxX-minX+(float)gm->hitCircle.height/2)+4, (maxY-minY+(float)gm->hitCircle.height/2)+4);
     //start to draw on the texture
     BeginTextureMode(sliderTexture);
     ClearBackground(BLANK);
-    for(int i = 0; i < renderPoints.size(); i+=gm->skip)
+    /*for(int i = 0; i < renderPoints.size(); i+=gm->skip)
         DrawCircle((renderPoints[i].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[i].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-2),Color{170,170,170,255});
     DrawCircle((renderPoints[renderPoints.size()-1].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-2),Color{170,170,170,255});
     for(int i = 0; i < renderPoints.size(); i+=gm->skip)
         DrawCircle((renderPoints[i].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[i].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-5),Color{12,12,12,255});
     DrawCircle((renderPoints[renderPoints.size()-1].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-5),Color{12,12,12,255});
+    */
+    BeginBlendMode(BLEND_ALPHA_PREMUL);
+    for(int i = 0; i < renderPoints.size(); i+=gm->skip)
+        DrawTextureEx(gm->sliderout, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderout.height/2)}, 0, 1/2.0f, WHITE);
+    DrawTextureEx(gm->sliderout, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderout.height/2)}, 0, 1/2.0f, WHITE);
+    for(int i = 0; i < renderPoints.size(); i+=gm->skip)
+        DrawTextureEx(gm->sliderin, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderin.height/2)}, 0, 1/2.0f, WHITE);
+    DrawTextureEx(gm->sliderin, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderin.height/2)}, 0, 1/2.0f, WHITE);
+    EndBlendMode();
+        
     EndTextureMode();
 
     GenTextureMipmaps(&sliderTexture.texture);
-    SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_TRILINEAR );
+    SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_TRILINEAR);
 }
 
 void Slider::update(){
@@ -421,7 +431,7 @@ void Slider::render(){
     float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
     Color renderColor;
 
-    DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade), gm-> hitCircle.height/2.0f);
+    DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade), gm-> hitCircle.height/2.0f);
 
     if(data.colour.size() > 2)
             renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);

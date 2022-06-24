@@ -17,7 +17,7 @@ class GameManager{
 		void destroyDeadHitObject(int index);
 		void render();
 		float windowScale = 2.0f;
-		int skip = 4;
+		int skip = 1;
 		Texture2D hitCircle;
 		Texture2D hitCircleOverlay;
 		Texture2D approachCircle;
@@ -29,6 +29,8 @@ class GameManager{
 		Texture2D hit300;
 		Texture2D sliderb;
 		Texture2D reverseArrow;
+		Texture2D sliderin;
+		Texture2D sliderout;
 		Texture2D numbers[10];
 		Music backgroundMusic;
 		double currentTime;
