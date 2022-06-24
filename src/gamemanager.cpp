@@ -274,51 +274,49 @@ void GameManager::loadGame(std::string filename){
 	std::reverse(files.begin(), files.end());
 
 	for(int i = 0; i < files.size(); i++){
-		if(files[i].rfind("hitcircleoverlay", 0) == 0)
-			hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
-		else if(files[i].rfind("hitcircle", 0) == 0)
-			hitCircle = LoadTexture((Global.Path + files[i]).c_str());
-		else if(files[i].rfind("approachcircle", 0) == 0)
-			approachCircle = LoadTexture((Global.Path + files[i]).c_str());
-		else if(files[i].rfind("hit300k", 0) == 0)
-			;
-		else if(files[i].rfind("hit300", 0) == 0)
-			hit300 = LoadTexture((Global.Path + files[i]).c_str());
-		else if(files[i].rfind("hit100k", 0) == 0)
-			;
-		else if(files[i].rfind("hit100", 0) == 0)
-			hit100 = LoadTexture((Global.Path + files[i]).c_str());
-		else if(files[i].rfind("hit50k", 0) == 0)
-			;
-		else if(files[i].rfind("hit50", 0) == 0)
-			hit50 = LoadTexture((Global.Path + files[i]).c_str());
-		else if(files[i].rfind("hit0", 0) == 0)
-			hit0 = LoadTexture((Global.Path + files[i]).c_str());
-		GenTextureMipmaps(&hit0);
-    	SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
-		GenTextureMipmaps(&hit50);
-    	SetTextureFilter(hit50, TEXTURE_FILTER_TRILINEAR );
-		GenTextureMipmaps(&hit100);
-    	SetTextureFilter(hit100, TEXTURE_FILTER_TRILINEAR );
-		GenTextureMipmaps(&hit300);
-    	SetTextureFilter(hit300, TEXTURE_FILTER_TRILINEAR );
-		GenTextureMipmaps(&approachCircle);
-    	SetTextureFilter(approachCircle, TEXTURE_FILTER_TRILINEAR );
-		GenTextureMipmaps(&hitCircleOverlay);
-    	SetTextureFilter(hitCircleOverlay, TEXTURE_FILTER_TRILINEAR );
-		GenTextureMipmaps(&hitCircle);
-    	SetTextureFilter(hitCircle, TEXTURE_FILTER_TRILINEAR );
+		if(IsFileExtension(files[i].c_str(),".png")){
+			if(files[i].rfind("hitcircleoverlay", 0) == 0)
+				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircle", 0) == 0)
+				hitCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("approachcircle", 0) == 0)
+				approachCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit300k", 0) == 0)
+				;
+			else if(files[i].rfind("hit300", 0) == 0)
+				hit300 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit100k", 0) == 0)
+				;
+			else if(files[i].rfind("hit100", 0) == 0)
+				hit100 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit50k", 0) == 0)
+				;
+			else if(files[i].rfind("hit50", 0) == 0)
+				hit50 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit0", 0) == 0)
+				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderb0", 0) == 0)
+				sliderb = LoadTexture((Global.Path + files[i]).c_str());
+		}
 	}
 	Global.Path = lastPath;
-	/*hitCircle
-	hitCircleOverlay
-	approachCircle
-	hit0
-	hit50
-	hit100
-	hit300
-	sliderb
-	reverseArrow*/
+	GenTextureMipmaps(&hit0);
+	SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&hit50);
+	SetTextureFilter(hit50, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&hit100);
+	SetTextureFilter(hit100, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&hit300);
+	SetTextureFilter(hit300, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&approachCircle);
+	SetTextureFilter(approachCircle, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&hitCircleOverlay);
+	SetTextureFilter(hitCircleOverlay, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&hitCircle);
+	SetTextureFilter(hitCircle, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&sliderb);
+	SetTextureFilter(sliderb, TEXTURE_FILTER_TRILINEAR );
+
 	PlayMusicStream(backgroundMusic);
     SetMusicVolume(backgroundMusic, 0.2f);
 }
@@ -331,6 +329,7 @@ void GameManager::unloadGame(){
 	UnloadTexture(hit100);
 	UnloadTexture(hit50);
 	UnloadTexture(hit0);
+	UnloadTexture(sliderb);
 	
 }
 

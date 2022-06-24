@@ -424,12 +424,22 @@ void Slider::render(){
     DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade), gm-> hitCircle.height/2.0f);
 
     if(data.colour.size() > 2)
-        renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
-    else
-        renderColor =  Fade(Color{255,255,255}, clampedFade);
-    DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
-    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
-    DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale/2.0f , renderColor);
+            renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
+        else
+            renderColor =  Fade(Color{255,255,255}, clampedFade);
+
+    int calPos = position;
+    calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
+
+    if(gm->currentTime*1000 - data.time > 0 or !state){
+        DrawTextureCenter(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, 1/2.0f , renderColor);
+    }
+
+    if(state){
+        DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
+        DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
+        DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale/2.0f , renderColor);
+    }
 }
 
 void Slider::dead_render(){
