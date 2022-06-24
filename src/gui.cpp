@@ -119,7 +119,7 @@ void TextBox::update() {
                     subtext = text.substr(renderpos,maxlength);
                 }
                 else{
-                    subtext = text.substr(renderpos, text.size() - renderpos) + "/" + text.substr(0,maxlength - (text.size() - renderpos) - 1);
+                    subtext = text.substr(renderpos, text.size() - renderpos) + "|" + text.substr(0,maxlength - (text.size() - renderpos) - 1);
                 }
                 counter -= 100.0f;
             }
