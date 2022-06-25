@@ -465,14 +465,14 @@ void Slider::render(){
     float clampedFade = clip((gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in, 0, 0.7f);
     Color renderColor;
 
-    if(data.curveType == 'P'){
+    /*if(data.curveType == 'P'){
         edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
         for(size_t i = 0; i < data.curvePoints.size(); i++)
             edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
         DrawCircleV(edgePoints[0], 15,RED);
         DrawCircleV(edgePoints[1], 15,RED);
         DrawCircleV(edgePoints[2], 15,RED);
-    }
+    }*/
     DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade), gm-> hitCircle.height/2.0f);
 
     if(data.colour.size() > 2)

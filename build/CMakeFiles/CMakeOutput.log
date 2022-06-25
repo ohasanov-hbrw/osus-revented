@@ -1,0 +1,271 @@
+The system is: CYGWIN - 3.3.5-341.x86_64 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.exe"
+
+The C compiler identification is GNU, found in "/cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/3.20.0/CompilerIdC/a.exe"
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make.exe -f Makefile cmTC_99af0/fast && /usr/bin/make  -f CMakeFiles/cmTC_99af0.dir/build.make CMakeFiles/cmTC_99af0.dir/build
+make[1]: Entering directory '/cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc   -v -o CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.20.0/Modules/CMakeCCompilerABI.c
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+Target: x86_64-pc-cygwin
+Configured with: /mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-11.3.0/configure --srcdir=/mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-11.3.0 --prefix=/usr --exec-prefix=/usr --localstatedir=/var --sysconfdir=/etc --docdir=/usr/share/doc/gcc --htmldir=/usr/share/doc/gcc/html -C --build=x86_64-pc-cygwin --host=x86_64-pc-cygwin --target=x86_64-pc-cygwin --without-libiconv-prefix --without-libintl-prefix --libexecdir=/usr/lib --with-gcc-major-version-only --enable-shared --enable-shared-libgcc --enable-static --enable-version-specific-runtime-libs --enable-bootstrap --enable-__cxa_atexit --with-dwarf2 --with-tune=generic --enable-languages=c,c++,fortran,lto,objc,obj-c++,jit --enable-graphite --enable-threads=posix --enable-libatomic --enable-libgomp --enable-libquadmath --enable-libquadmath-support --disable-libssp --enable-libada --disable-symvers --with-gnu-ld --with-gnu-as --with-cloog-include=/usr/include/cloog-isl --without-libiconv-prefix --without-libintl-prefix --with-system-zlib --enable-linker-build-id --with-default-libstdcxx-abi=gcc4-compatible --enable-libstdcxx-filesystem-ts
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.3.0 (GCC) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99af0.dir/'
+ /usr/lib/gcc/x86_64-pc-cygwin/11/cc1.exe -quiet -v -idirafter /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/../include/w32api -idirafter /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib/../../include/w32api /usr/share/cmake-3.20.0/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_99af0.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o /cygdrive/c/Users/renot/AppData/Local/Temp/ccJIeckc.s
+GNU C17 (GCC) version 11.3.0 (x86_64-pc-cygwin)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring nonexistent directory "/usr/local/include"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-pc-cygwin/11/include-fixed"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/include"
+ignoring duplicate directory "/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib/../../include/w32api"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/lib/gcc/x86_64-pc-cygwin/11/include
+ /usr/include
+ /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/../include/w32api
+End of search list.
+GNU C17 (GCC) version 11.3.0 (x86_64-pc-cygwin)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: e610203cc0750d34e6eff5a7387a08f9
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99af0.dir/'
+ /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/bin/as.exe -v -o CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o /cygdrive/c/Users/renot/AppData/Local/Temp/ccJIeckc.s
+GNU assembler version 2.38 (x86_64-pc-cygwin) using BFD version (GNU Binutils) 2.38
+COMPILER_PATH=/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/:/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/bin/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.'
+Linking C executable cmTC_99af0.exe
+/usr/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_99af0.dir/link.txt --verbose=1
+/usr/bin/cc -Wl,--enable-auto-import -v CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o -o cmTC_99af0.exe -Wl,--out-implib,libcmTC_99af0.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
+Using built-in specs.
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-pc-cygwin/11/lto-wrapper.exe
+Target: x86_64-pc-cygwin
+Configured with: /mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-11.3.0/configure --srcdir=/mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-11.3.0 --prefix=/usr --exec-prefix=/usr --localstatedir=/var --sysconfdir=/etc --docdir=/usr/share/doc/gcc --htmldir=/usr/share/doc/gcc/html -C --build=x86_64-pc-cygwin --host=x86_64-pc-cygwin --target=x86_64-pc-cygwin --without-libiconv-prefix --without-libintl-prefix --libexecdir=/usr/lib --with-gcc-major-version-only --enable-shared --enable-shared-libgcc --enable-static --enable-version-specific-runtime-libs --enable-bootstrap --enable-__cxa_atexit --with-dwarf2 --with-tune=generic --enable-languages=c,c++,fortran,lto,objc,obj-c++,jit --enable-graphite --enable-threads=posix --enable-libatomic --enable-libgomp --enable-libquadmath --enable-libquadmath-support --disable-libssp --enable-libada --disable-symvers --with-gnu-ld --with-gnu-as --with-cloog-include=/usr/include/cloog-isl --without-libiconv-prefix --without-libintl-prefix --with-system-zlib --enable-linker-build-id --with-default-libstdcxx-abi=gcc4-compatible --enable-libstdcxx-filesystem-ts
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.3.0 (GCC) 
+COMPILER_PATH=/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/:/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/bin/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_99af0.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_99af0.'
+ /usr/lib/gcc/x86_64-pc-cygwin/11/collect2.exe -plugin /usr/lib/gcc/x86_64-pc-cygwin/11/cyglto_plugin.dll -plugin-opt=/usr/lib/gcc/x86_64-pc-cygwin/11/lto-wrapper.exe -plugin-opt=-fresolution=/cygdrive/c/Users/renot/AppData/Local/Temp/ccltoBO3.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lcygwin -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id -m i386pep --wrap _Znwm --wrap _Znam --wrap _ZdlPv --wrap _ZdaPv --wrap _ZnwmRKSt9nothrow_t --wrap _ZnamRKSt9nothrow_t --wrap _ZdlPvRKSt9nothrow_t --wrap _ZdaPvRKSt9nothrow_t -Bdynamic --dll-search-prefix=cyg --tsaware -o cmTC_99af0.exe /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/crt0.o /usr/lib/gcc/x86_64-pc-cygwin/11/crtbegin.o -L/usr/lib/gcc/x86_64-pc-cygwin/11 -L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib -L/usr/lib/gcc/x86_64-pc-cygwin/11/../../.. --enable-auto-import CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o --out-implib libcmTC_99af0.dll.a --major-image-version 0 --minor-image-version 0 -lgcc_s -lgcc -lcygwin -ladvapi32 -lshell32 -luser32 -lkernel32 -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/default-manifest.o /usr/lib/gcc/x86_64-pc-cygwin/11/crtend.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_99af0.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_99af0.'
+make[1]: Leaving directory '/cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/usr/lib/gcc/x86_64-pc-cygwin/11/include]
+    add: [/usr/include]
+    add: [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/../include/w32api]
+  end of search list found
+  collapse include dir [/usr/lib/gcc/x86_64-pc-cygwin/11/include] ==> [/usr/lib/gcc/x86_64-pc-cygwin/11/include]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  collapse include dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/../include/w32api] ==> [/usr/include/w32api]
+  implicit include dirs: [/usr/lib/gcc/x86_64-pc-cygwin/11/include;/usr/include;/usr/include/w32api]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld\.exe|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/make.exe -f Makefile cmTC_99af0/fast && /usr/bin/make  -f CMakeFiles/cmTC_99af0.dir/build.make CMakeFiles/cmTC_99af0.dir/build]
+  ignore line: [make[1]: Entering directory '/cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc   -v -o CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.20.0/Modules/CMakeCCompilerABI.c]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [Target: x86_64-pc-cygwin]
+  ignore line: [Configured with: /mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-11.3.0/configure --srcdir=/mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-11.3.0 --prefix=/usr --exec-prefix=/usr --localstatedir=/var --sysconfdir=/etc --docdir=/usr/share/doc/gcc --htmldir=/usr/share/doc/gcc/html -C --build=x86_64-pc-cygwin --host=x86_64-pc-cygwin --target=x86_64-pc-cygwin --without-libiconv-prefix --without-libintl-prefix --libexecdir=/usr/lib --with-gcc-major-version-only --enable-shared --enable-shared-libgcc --enable-static --enable-version-specific-runtime-libs --enable-bootstrap --enable-__cxa_atexit --with-dwarf2 --with-tune=generic --enable-languages=c,c++,fortran,lto,objc,obj-c++,jit --enable-graphite --enable-threads=posix --enable-libatomic --enable-libgomp --enable-libquadmath --enable-libquadmath-support --disable-libssp --enable-libada --disable-symvers --with-gnu-ld --with-gnu-as --with-cloog-include=/usr/include/cloog-isl --without-libiconv-prefix --without-libintl-prefix --with-system-zlib --enable-linker-build-id --with-default-libstdcxx-abi=gcc4-compatible --enable-libstdcxx-filesystem-ts]
+  ignore line: [Thread model: posix]
+  ignore line: [Supported LTO compression algorithms: zlib zstd]
+  ignore line: [gcc version 11.3.0 (GCC) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99af0.dir/']
+  ignore line: [ /usr/lib/gcc/x86_64-pc-cygwin/11/cc1.exe -quiet -v -idirafter /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/../include/w32api -idirafter /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib/../../include/w32api /usr/share/cmake-3.20.0/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_99af0.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o /cygdrive/c/Users/renot/AppData/Local/Temp/ccJIeckc.s]
+  ignore line: [GNU C17 (GCC) version 11.3.0 (x86_64-pc-cygwin)]
+  ignore line: [	compiled by GNU C version 11.3.0  GMP version 6.2.1  MPFR version 4.1.0  MPC version 1.2.1  isl version isl-0.24-GMP]
+  ignore line: []
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [ignoring nonexistent directory "/usr/local/include"]
+  ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-pc-cygwin/11/include-fixed"]
+  ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/include"]
+  ignore line: [ignoring duplicate directory "/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib/../../include/w32api"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /usr/lib/gcc/x86_64-pc-cygwin/11/include]
+  ignore line: [ /usr/include]
+  ignore line: [ /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/../include/w32api]
+  ignore line: [End of search list.]
+  ignore line: [GNU C17 (GCC) version 11.3.0 (x86_64-pc-cygwin)]
+  ignore line: [	compiled by GNU C version 11.3.0  GMP version 6.2.1  MPFR version 4.1.0  MPC version 1.2.1  isl version isl-0.24-GMP]
+  ignore line: []
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [Compiler executable checksum: e610203cc0750d34e6eff5a7387a08f9]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99af0.dir/']
+  ignore line: [ /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/bin/as.exe -v -o CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o /cygdrive/c/Users/renot/AppData/Local/Temp/ccJIeckc.s]
+  ignore line: [GNU assembler version 2.38 (x86_64-pc-cygwin) using BFD version (GNU Binutils) 2.38]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/:/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/bin/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.']
+  ignore line: [Linking C executable cmTC_99af0.exe]
+  ignore line: [/usr/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_99af0.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc -Wl --enable-auto-import -v CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o -o cmTC_99af0.exe -Wl --out-implib libcmTC_99af0.dll.a -Wl --major-image-version 0 --minor-image-version 0 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-pc-cygwin/11/lto-wrapper.exe]
+  ignore line: [Target: x86_64-pc-cygwin]
+  ignore line: [Configured with: /mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-11.3.0/configure --srcdir=/mnt/share/cygpkgs/gcc/gcc.x86_64/src/gcc-11.3.0 --prefix=/usr --exec-prefix=/usr --localstatedir=/var --sysconfdir=/etc --docdir=/usr/share/doc/gcc --htmldir=/usr/share/doc/gcc/html -C --build=x86_64-pc-cygwin --host=x86_64-pc-cygwin --target=x86_64-pc-cygwin --without-libiconv-prefix --without-libintl-prefix --libexecdir=/usr/lib --with-gcc-major-version-only --enable-shared --enable-shared-libgcc --enable-static --enable-version-specific-runtime-libs --enable-bootstrap --enable-__cxa_atexit --with-dwarf2 --with-tune=generic --enable-languages=c,c++,fortran,lto,objc,obj-c++,jit --enable-graphite --enable-threads=posix --enable-libatomic --enable-libgomp --enable-libquadmath --enable-libquadmath-support --disable-libssp --enable-libada --disable-symvers --with-gnu-ld --with-gnu-as --with-cloog-include=/usr/include/cloog-isl --without-libiconv-prefix --without-libintl-prefix --with-system-zlib --enable-linker-build-id --with-default-libstdcxx-abi=gcc4-compatible --enable-libstdcxx-filesystem-ts]
+  ignore line: [Thread model: posix]
+  ignore line: [Supported LTO compression algorithms: zlib zstd]
+  ignore line: [gcc version 11.3.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/:/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/bin/]
+  ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-cygwin/11/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/:/usr/lib/gcc/x86_64-pc-cygwin/11/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_99af0.exe' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_99af0.']
+  link line: [ /usr/lib/gcc/x86_64-pc-cygwin/11/collect2.exe -plugin /usr/lib/gcc/x86_64-pc-cygwin/11/cyglto_plugin.dll -plugin-opt=/usr/lib/gcc/x86_64-pc-cygwin/11/lto-wrapper.exe -plugin-opt=-fresolution=/cygdrive/c/Users/renot/AppData/Local/Temp/ccltoBO3.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lcygwin -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id -m i386pep --wrap _Znwm --wrap _Znam --wrap _ZdlPv --wrap _ZdaPv --wrap _ZnwmRKSt9nothrow_t --wrap _ZnamRKSt9nothrow_t --wrap _ZdlPvRKSt9nothrow_t --wrap _ZdaPvRKSt9nothrow_t -Bdynamic --dll-search-prefix=cyg --tsaware -o cmTC_99af0.exe /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/crt0.o /usr/lib/gcc/x86_64-pc-cygwin/11/crtbegin.o -L/usr/lib/gcc/x86_64-pc-cygwin/11 -L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib -L/usr/lib/gcc/x86_64-pc-cygwin/11/../../.. --enable-auto-import CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o --out-implib libcmTC_99af0.dll.a --major-image-version 0 --minor-image-version 0 -lgcc_s -lgcc -lcygwin -ladvapi32 -lshell32 -luser32 -lkernel32 -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/default-manifest.o /usr/lib/gcc/x86_64-pc-cygwin/11/crtend.o]
+    arg [/usr/lib/gcc/x86_64-pc-cygwin/11/collect2.exe] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/lib/gcc/x86_64-pc-cygwin/11/cyglto_plugin.dll] ==> ignore
+    arg [-plugin-opt=/usr/lib/gcc/x86_64-pc-cygwin/11/lto-wrapper.exe] ==> ignore
+    arg [-plugin-opt=-fresolution=/cygdrive/c/Users/renot/AppData/Local/Temp/ccltoBO3.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lcygwin] ==> ignore
+    arg [-plugin-opt=-pass-through=-ladvapi32] ==> ignore
+    arg [-plugin-opt=-pass-through=-lshell32] ==> ignore
+    arg [-plugin-opt=-pass-through=-luser32] ==> ignore
+    arg [-plugin-opt=-pass-through=-lkernel32] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--build-id] ==> ignore
+    arg [-m] ==> ignore
+    arg [i386pep] ==> ignore
+    arg [--wrap] ==> ignore
+    arg [_Znwm] ==> ignore
+    arg [--wrap] ==> ignore
+    arg [_Znam] ==> ignore
+    arg [--wrap] ==> ignore
+    arg [_ZdlPv] ==> ignore
+    arg [--wrap] ==> ignore
+    arg [_ZdaPv] ==> ignore
+    arg [--wrap] ==> ignore
+    arg [_ZnwmRKSt9nothrow_t] ==> ignore
+    arg [--wrap] ==> ignore
+    arg [_ZnamRKSt9nothrow_t] ==> ignore
+    arg [--wrap] ==> ignore
+    arg [_ZdlPvRKSt9nothrow_t] ==> ignore
+    arg [--wrap] ==> ignore
+    arg [_ZdaPvRKSt9nothrow_t] ==> ignore
+    arg [-Bdynamic] ==> ignore
+    arg [--dll-search-prefix=cyg] ==> ignore
+    arg [--tsaware] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_99af0.exe] ==> ignore
+    arg [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/crt0.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-pc-cygwin/11/crtbegin.o] ==> ignore
+    arg [-L/usr/lib/gcc/x86_64-pc-cygwin/11] ==> dir [/usr/lib/gcc/x86_64-pc-cygwin/11]
+    arg [-L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib] ==> dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib]
+    arg [-L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib] ==> dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib]
+    arg [-L/lib/../lib] ==> dir [/lib/../lib]
+    arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+    arg [-L/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib] ==> dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib]
+    arg [-L/usr/lib/gcc/x86_64-pc-cygwin/11/../../..] ==> dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../..]
+    arg [--enable-auto-import] ==> ignore
+    arg [CMakeFiles/cmTC_99af0.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [--out-implib] ==> ignore
+    arg [libcmTC_99af0.dll.a] ==> ignore
+    arg [--major-image-version] ==> ignore
+    arg [0] ==> ignore
+    arg [--minor-image-version] ==> ignore
+    arg [0] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lcygwin] ==> lib [cygwin]
+    arg [-ladvapi32] ==> lib [advapi32]
+    arg [-lshell32] ==> lib [shell32]
+    arg [-luser32] ==> lib [user32]
+    arg [-lkernel32] ==> lib [kernel32]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib/default-manifest.o] ==> ignore
+    arg [/usr/lib/gcc/x86_64-pc-cygwin/11/crtend.o] ==> ignore
+  collapse library dir [/usr/lib/gcc/x86_64-pc-cygwin/11] ==> [/usr/lib/gcc/x86_64-pc-cygwin/11]
+  collapse library dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib/../lib] ==> [/usr/x86_64-pc-cygwin/lib]
+  collapse library dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../lib] ==> [/usr/lib]
+  collapse library dir [/lib/../lib] ==> [/lib]
+  collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+  collapse library dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../../../x86_64-pc-cygwin/lib] ==> [/usr/x86_64-pc-cygwin/lib]
+  collapse library dir [/usr/lib/gcc/x86_64-pc-cygwin/11/../../..] ==> [/usr/lib]
+  implicit libs: [gcc_s;gcc;cygwin;advapi32;shell32;user32;kernel32;gcc_s;gcc]
+  implicit dirs: [/usr/lib/gcc/x86_64-pc-cygwin/11;/usr/x86_64-pc-cygwin/lib;/usr/lib;/lib]
+  implicit fwks: []
+
+
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: /cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make.exe -f Makefile cmTC_c3b75/fast && /usr/bin/make  -f CMakeFiles/cmTC_c3b75.dir/build.make CMakeFiles/cmTC_c3b75.dir/build
+make[1]: Entering directory '/cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c3b75.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_c3b75.dir/CheckIncludeFile.c.o -c /cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+Linking C executable cmTC_c3b75.exe
+/usr/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_c3b75.dir/link.txt --verbose=1
+/usr/bin/cc -Wl,--enable-auto-import  CMakeFiles/cmTC_c3b75.dir/CheckIncludeFile.c.o -o cmTC_c3b75.exe -Wl,--out-implib,libcmTC_c3b75.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
+make[1]: Leaving directory '/cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp'
+
+
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD succeeded with the following output:
+Change Dir: /cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make.exe -f Makefile cmTC_43e64/fast && /usr/bin/make  -f CMakeFiles/cmTC_43e64.dir/build.make CMakeFiles/cmTC_43e64.dir/build
+make[1]: Entering directory '/cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_43e64.dir/src.c.o
+/usr/bin/cc -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_43e64.dir/src.c.o -c /cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_43e64.exe
+/usr/bin/cmake.exe -E cmake_link_script CMakeFiles/cmTC_43e64.dir/link.txt --verbose=1
+/usr/bin/cc -Wl,--enable-auto-import  CMakeFiles/cmTC_43e64.dir/src.c.o -o cmTC_43e64.exe -Wl,--out-implib,libcmTC_43e64.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
+make[1]: Leaving directory '/cygdrive/y/home/ohasanov/Projects/osus-revented/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+

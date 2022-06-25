@@ -1,8 +1,8 @@
 CC = g++
 cflags = -std=c++17 -O2 -g
 cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src
-ldflags += -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl
-name = osus
+ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -lwinmm -lgdi32 -lopengl32
+name = osus 
 
 sources = $(wildcard src/*.cpp)
 objects = $(patsubst src/%, object/%,$(sources:.cpp=.o))
@@ -18,7 +18,7 @@ files:
 
 deps:
 	cd vendor/raylib/src/ && $(MAKE)
-	cd vendor/zip && mkdir -p build && cd build && cmake .. && make
+	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make
 
 run: $(name)
 	mkdir -p beatmaps
@@ -31,4 +31,4 @@ object/%.o: src/%.cpp
 	$(CC) -MMD -o $@ -c $< $(cflags)
 
 clean:
-	rm -rf vendor/raylib/src/*.o vendor/raylib/src/libraylib.a bin/$(name) $(objects) object/*.d
+	rm -rf vendor/raylib/src/*.o vendor/raylib/src/libraylib.a bin/$(name) $(objects) object/*.d vendor/zip/build vendor/raylib/src/external/glfw/build

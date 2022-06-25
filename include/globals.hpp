@@ -12,7 +12,7 @@ struct Globals {
     Vector2 ZeroPoint = {0.f, 0.f};
     Color Background = { 30, 0, 60, 255 };
 
-    int FPS = 1440;
+    int FPS = 480;
     int Width = 640;
     int Height = 480;
 
