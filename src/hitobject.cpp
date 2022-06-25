@@ -433,7 +433,7 @@ void Slider::render(){
     float approachScale = 3*(1-(gm->currentTime*1000 - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
         approachScale = 1;
-    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
+    float clampedFade = clip((gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in, 0, 0.7f);
     Color renderColor;
 
     DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade), gm-> hitCircle.height/2.0f);
@@ -450,6 +450,8 @@ void Slider::render(){
     if(gm->currentTime*1000 - data.time > 0 or !state){
         DrawTextureCenter(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, 1/2.0f , renderColor);
     }
+
+    clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
 
     if(state){
         DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
@@ -470,4 +472,5 @@ void Slider::dead_update(){
 }
 
 void Slider::render_combo(){
+    
 }

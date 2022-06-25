@@ -1,5 +1,5 @@
 #include <utils.hpp>
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <algorithm>
 #include <globals.hpp>
@@ -31,9 +31,9 @@ void GetScale(){
 }
 
 void GetMouse(){
-    Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){Global.ZeroPoint.x, Global.ZeroPoint.y, 640.0f * Global.Scale, 480.0f * Global.Scale});
+    Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
     if(!Global.MouseInFocus){
-        Global.MousePosition = {-10,-10};
+        Global.MousePosition = {0,0};
         if(IsCursorHidden())
             ShowCursor();
     }

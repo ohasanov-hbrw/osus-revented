@@ -37,10 +37,14 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "Editor"){
 					std::string subLine;
                     while(std::getline(ifs, subLine)){
+						if(subLine.size() == 0)
+							break;
                         if(subLine[subLine.size()-1] == 13){
                             subLine.pop_back();
-                            if(subLine.size() == 0) break;
-                            if(subLine[0] == '/' and subLine[1] == '/') continue;
+                            if(subLine.size() == 0)
+								break;
+                            if(subLine[0] == '/' and subLine[1] == '/')
+								continue;
 
                             std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, true);
                             gameFile.configEditor[keyValue.first] = keyValue.second;

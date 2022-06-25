@@ -56,7 +56,7 @@ void PlayMenu::update() {
             }
         }
     }
-    if(back.action){
+    else if(back.action){
         Global.Path = Global.BeatmapLocation;
         auto dir = ls(".osu");
         dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
@@ -117,10 +117,10 @@ void LoadMenu::update() {
             }
         }
     }
-    if(back.action){
+    else if(back.action){
         while(Global.Path.size() > 0){
-            if(Global.Path[Global.Path.size()-1] == '/'){
-                if(Global.Path.size() > 1)
+            if(Global.Path[Global.Path.size()-1] == '/' || Global.Path[Global.Path.size() - 1] == ':'){
+                if(Global.Path.size() > 1  && Global.Path.size() != 2)
                     Global.Path.pop_back();
                 break;
             }
@@ -144,7 +144,8 @@ void MainMenu::update() {
     if(play.action){
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
-    } else if(load.action){
+    }
+    else if(load.action){
         Global.CurrentState.reset(new LoadMenu());
     }
 }

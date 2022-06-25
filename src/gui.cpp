@@ -192,7 +192,7 @@ void SelectableList::update() {
 
 void SelectableList::init() {
     for(int i = 0; i < text.size(); i++) {
-        objects.push_back(TextBox({0,0}, {size.x, objectsize}, color, text[i], textcolor, textsize, maxlength));
+        objects.push_back(TextBox({0,0}, {size.x, (float)objectsize}, color, text[i], textcolor, textsize, maxlength));
         objects[objects.size()-1].init();
     }
     text.clear();

@@ -15,6 +15,12 @@
 Globals Global;
 
 int main() {
+
+    for(int i = 0; i < Global.GamePath.size(); i++) {
+        if (Global.GamePath[i] == '\\')
+            Global.GamePath[i] = '/';
+    }
+
     InitAudioDevice();
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(Global.Width, Global.Height, "osus-revented");
@@ -47,12 +53,12 @@ int main() {
 
         ClearBackground(Global.Background);
 
-        DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, BLACK);
+        //DrawRectangleV(Global.ZeroPoint, {640.0f * Global.Scale, 480.0f * Global.Scale}, BLACK);
         
         Global.CurrentState->render();
         
-        DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, 255 * (int)Global.Key1P , 255 * (int)Global.Key1D, 100});
-        DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, 255 * (int)Global.Key2P , 255 * (int)Global.Key2D, 100});
+        DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+        DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
 
         renderMouse();
 
