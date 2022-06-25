@@ -113,6 +113,7 @@ void LoadMenu::update() {
                 std::string final_path = Global.GamePath + "/beatmaps/" + base_file;
                 create_dir(final_path);
                 int arg = 2;
+                std::cout << Global.selectedPath.c_str() << std::endl;
                 zip_extract(Global.selectedPath.c_str(), final_path.c_str(), on_extract_entry, &arg);
             }
         }

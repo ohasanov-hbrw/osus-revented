@@ -1,7 +1,7 @@
 CC = g++
 cflags = -std=c++17 -O2 -g
 cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src
-ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -lwinmm -lgdi32 -lopengl32
+ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl
 name = osus 
 
 sources = $(wildcard src/*.cpp)
