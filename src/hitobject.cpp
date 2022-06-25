@@ -133,9 +133,10 @@ std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
     int a = x1 * (y2 - y3) - y1 * (x2 - x3) + x2 * y3 - x3 * y2;
     int b = (x1 * x1 + y1 * y1) * (y3 - y2) + (x2 * x2 + y2 * y2) * (y1 - y3) + (x3 * x3 + y3 * y3) * (y2 - y1);
     int c = (x1 * x1 + y1 * y1) * (x2 - x3) + (x2 * x2 + y2 * y2) * (x3 - x1) + (x3 * x3 + y3 * y3) * (x1 - x2);
-    int x = -b / (2 * a);
-    int y = -c / (2 * a);
-    return std::make_pair(Vector2{(float)x,(float)y}, sqrt((x - x1) * (x - x1) + (y - y1) *(y - y1)));
+    float x = (float)-b / (2.0f * (float)a);
+    float y = (float)-c / (2.0f * (float)a);
+    std::cout << "x1: " << x1 << " y1: " << y1 << " x2: " << x2 << " y2: " << y2 << " x3: " << x3 << " y3: " << y3 << " a: " << a << " b: " << b << " c: " << c << " x: " << x << " y: " << y << std::endl; 
+    return std::make_pair(Vector2{x,y}, sqrt((x - x1) * (x - x1) + (y - y1) *(y - y1)));
 }
 
 //creates a circle
@@ -313,37 +314,62 @@ void Slider::init(){
         }
     }
     else if(data.curveType == 'P'){
-        std::pair<Vector2, int> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
-        Vector2 center = circleData.first;
-        int radius = circleData.second;
-        float degree1 = atan2(edgePoints[0].y - center.y , edgePoints[0].x - center.x) * RAD2DEG;
-        float degree2 = atan2(edgePoints[1].y - center.y , edgePoints[1].x - center.x) * RAD2DEG;
-        float degree3 = atan2(edgePoints[2].y - center.y , edgePoints[2].x - center.x) * RAD2DEG;
-        degree1 = degree1 < 0 ? degree1 + 360 : degree1;
-        degree2 = degree2 < 0 ? degree2 + 360 : degree2;
-        degree3 = degree3 < 0 ? degree3 + 360 : degree3;
-        bool clockwise = !orientation(edgePoints[0], edgePoints[1], edgePoints[2]);
-        if(clockwise){
-            degree1 = degree1 < degree3 ? degree1 + 360 : degree1;
-            degree2 = degree2 < degree3 ? degree2 + 360 : degree2;
-            for(float i = degree1; i > degree3 - (degree1-degree3)/resolution; i-= (degree1-degree3)/resolution){
-                if(currentResolution > resolution) break;
-                currentResolution++;
-                Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
-                renderPoints.push_back(tempPoint);
+        std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
+        std::cout << "Circledata1: " << circleData.first.x << " Circledata2: " << circleData.first.x << " Circledata3: " << circleData.second << std::endl;
+        float inf = std::numeric_limits<float>::infinity();
+        if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
+            std::vector<float> lineLengths;
+            for(size_t i = 0; i < edgePoints.size()-1; i++)
+                lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)));
+            //gets the total length of the calculated lines
+            for(size_t i = 0; i < lineLengths.size(); i++)
+                totalLength+=lineLengths[i];
+            //the calculated length is pretty different from the beatmap so we scale the calculations for that
+            lengthScale = totalLength/data.length;
+            //add the render points to a vector
+            for(size_t i = 0; i < edgePoints.size()-1; i++)
+                for(float j = 0; j < lineLengths[i]; j += lengthScale)
+                    renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/lineLengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/lineLengths[i]});
+            renderPoints.push_back(edgePoints[edgePoints.size()-1]);
+            //this is an inside joke, but yeah if we add more points than needed, we just delete them (doesn't happen that much)
+            while(!false){
+                if(renderPoints.size()-1 <= data.length) break;
+                renderPoints.pop_back();
             }
         }
         else{
-            degree2 = degree2 < degree1 ? degree2 + 360 : degree2;
-            degree3 = degree3 < degree1 ? degree3 + 360 : degree3;
-            for(float i = degree3; i > degree1 - (degree3-degree1)/resolution; i -= (degree3-degree1)/resolution){
-                if(currentResolution > resolution) break;
-                currentResolution++;
-                Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
-                renderPoints.push_back(tempPoint);
+            Vector2 center = circleData.first;
+            int radius = circleData.second;
+            float degree1 = atan2(edgePoints[0].y - center.y , edgePoints[0].x - center.x) * RAD2DEG;
+            float degree2 = atan2(edgePoints[1].y - center.y , edgePoints[1].x - center.x) * RAD2DEG;
+            float degree3 = atan2(edgePoints[2].y - center.y , edgePoints[2].x - center.x) * RAD2DEG;
+            degree1 = degree1 < 0 ? degree1 + 360 : degree1;
+            degree2 = degree2 < 0 ? degree2 + 360 : degree2;
+            degree3 = degree3 < 0 ? degree3 + 360 : degree3;
+            bool clockwise = !orientation(edgePoints[0], edgePoints[1], edgePoints[2]);
+            if(clockwise){
+                degree1 = degree1 < degree3 ? degree1 + 360 : degree1;
+                degree2 = degree2 < degree3 ? degree2 + 360 : degree2;
+                for(float i = degree1; i > degree3 - (degree1-degree3)/resolution; i-= (degree1-degree3)/resolution){
+                    if(currentResolution > resolution) break;
+                    currentResolution++;
+                    Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
+                    renderPoints.push_back(tempPoint);
+                }
             }
-            std::reverse(renderPoints.begin(), renderPoints.end());
+            else{
+                degree2 = degree2 < degree1 ? degree2 + 360 : degree2;
+                degree3 = degree3 < degree1 ? degree3 + 360 : degree3;
+                for(float i = degree3; i > degree1 - (degree3-degree1)/resolution; i -= (degree3-degree1)/resolution){
+                    if(currentResolution > resolution) break;
+                    currentResolution++;
+                    Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
+                    renderPoints.push_back(tempPoint);
+                }
+                std::reverse(renderPoints.begin(), renderPoints.end());
+            }
         }
+        std::cout << "RenderPoints Size: " << renderPoints.size() << std::endl;
     }
     else if(data.curveType == 'C'){
         renderPoints = interpolate(edgePoints, data.length);
@@ -373,14 +399,17 @@ void Slider::init(){
     for(int i = 0; i < renderPoints.size(); i+=gm->skip)
         DrawCircle((renderPoints[i].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[i].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-5),Color{12,12,12,255});
     DrawCircle((renderPoints[renderPoints.size()-1].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-5),Color{12,12,12,255});
+    renderPoints.size() > 0
     */
     BeginBlendMode(BLEND_ALPHA_PREMUL);
-    for(int i = 0; i < renderPoints.size(); i+=gm->skip)
-        DrawTextureEx(gm->sliderout, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderout.height/2)}, 0, 1/2.0f, WHITE);
-    DrawTextureEx(gm->sliderout, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderout.height/2)}, 0, 1/2.0f, WHITE);
-    for(int i = 0; i < renderPoints.size(); i+=gm->skip)
-        DrawTextureEx(gm->sliderin, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderin.height/2)}, 0, 1/2.0f, WHITE);
-    DrawTextureEx(gm->sliderin, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderin.height/2)}, 0, 1/2.0f, WHITE);
+    if(renderPoints.size() > 0){
+        for(int i = 0; i < renderPoints.size(); i+=gm->skip)
+            DrawTextureEx(gm->sliderout, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderout.height/2.0f)}, 0, 1/2.0f, WHITE);
+        DrawTextureEx(gm->sliderout, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderout.height/2.0f)}, 0, 1/2.0f, WHITE);
+        for(int i = 0; i < renderPoints.size(); i+=gm->skip)
+            DrawTextureEx(gm->sliderin, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderin.height/2.0f)}, 0, 1/2.0f, WHITE);
+        DrawTextureEx(gm->sliderin, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderin.height/2.0f)}, 0, 1/2.0f, WHITE);
+    }
     EndBlendMode();
         
     EndTextureMode();
@@ -436,6 +465,14 @@ void Slider::render(){
     float clampedFade = clip((gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in, 0, 0.7f);
     Color renderColor;
 
+    if(data.curveType == 'P'){
+        edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
+        for(size_t i = 0; i < data.curvePoints.size(); i++)
+            edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
+        DrawCircleV(edgePoints[0], 15,RED);
+        DrawCircleV(edgePoints[1], 15,RED);
+        DrawCircleV(edgePoints[2], 15,RED);
+    }
     DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade), gm-> hitCircle.height/2.0f);
 
     if(data.colour.size() > 2)
@@ -447,7 +484,7 @@ void Slider::render(){
     int calPos = position;
     calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
 
-    if(gm->currentTime*1000 - data.time > 0 or !state){
+    if((gm->currentTime*1000 - data.time > 0 or !state) and renderPoints.size() > 0){
         DrawTextureCenter(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, 1/2.0f , renderColor);
     }
 
