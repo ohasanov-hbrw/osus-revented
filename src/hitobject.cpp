@@ -244,10 +244,10 @@ void Slider::init(){
         renderPoints.push_back(edgePoints[edgePoints.size()-1]);
         //this is an inside joke, but yeah if we add more points than needed, we just delete them (doesn't happen that much)
         while(!false){
-            if(renderPoints.size()-1 <= data.length) break;
+            if(renderPoints.size() <= data.length) break;
             renderPoints.pop_back();
         }
-        std::cout << "Ldata: " << data.length << " calculated: " << totalLength << std::endl;
+        //std::cout << "Ldata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
     }
     else if(data.curveType == 'B'){
         //for the bezier curves we do the calculations in another function
@@ -285,7 +285,7 @@ void Slider::init(){
             if((edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y) || i == edgePoints.size()-1){
                 std::vector<float> tValues;
                 currentResolution = 0;
-                float tempResolution = resolution / (totalCalculatedLength / curveLengths[curveIndex]);
+                float tempResolution = curveLengths[curveIndex];
 
                 std::vector<Vector2> samples;
                 std::vector<int> indices;
@@ -306,8 +306,8 @@ void Slider::init(){
                 }
                 samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
                 for(float s = 0; s < 1; s += 1.0f / tempResolution){
-                    if(currentResolution > tempResolution) break;
                     currentResolution++;
+                    if(currentResolution > tempResolution) break;
                     if(s == 1){
                         renderPoints.push_back(samples[samples.size() - 1]);
                         continue;
@@ -322,11 +322,26 @@ void Slider::init(){
                 tempEdges.clear();
             }
         }
+        if(renderPoints.size() < data.length){
+            float angle = atan2(renderPoints[renderPoints.size()-1].y - renderPoints[renderPoints.size()-2].y, renderPoints[renderPoints.size()-1].x - renderPoints[renderPoints.size()-2].x) * 180 / 3.14159265;
+            float hipotenus = data.length - totalLength;
+            float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+            float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
+            extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/abs(angle))};
+            int lerploc = renderPoints.size() - 1;
+            int res = 0;
+            for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {
+                res++;
+                if(res > hipotenus) break;
+                renderPoints.push_back(lerp(renderPoints[lerploc], extraPosition, i));
+            }
+        }
         while(!false){
-            if(renderPoints.size()-1 <= data.length) break;
+            if(renderPoints.size() <= data.length)
+                break;
             renderPoints.pop_back();
         }
-        std::cout << "Bdata: " << data.length << " calculated: " << totalCalculatedLength << std::endl;
+        //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
     }
     else if(data.curveType == 'P'){
         std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
@@ -360,7 +375,7 @@ void Slider::init(){
             renderPoints.push_back(edgePoints[edgePoints.size()-1]);
             //this is an inside joke, but yeah if we add more points than needed, we just delete them (doesn't happen that much)
             while(!false){
-                if(renderPoints.size()-1 <= data.length) break;
+                if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
         }
@@ -406,17 +421,17 @@ void Slider::init(){
             while(renderPoints.size() > data.length){
                 renderPoints.pop_back();
             }
-            std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
+            //std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
         }
         
     }
     else if(data.curveType == 'C'){
         renderPoints = interpolate(edgePoints, data.length);
         while(!false){
-            if(renderPoints.size()-1 <= data.length) break;
+            if(renderPoints.size() <= data.length) break;
             renderPoints.pop_back();
         }
-        std::cout << "Cdata: " << data.length << " calculated: " << -1 << std::endl;
+        //std::cout << "Cdata: " << data.length << " calculated: " << -1 << std::endl;
     }
     else{
         std::__throw_invalid_argument("Invalid Slider type!");
@@ -526,9 +541,6 @@ void Slider::render(){
         DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
         DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale/2.0f , renderColor);
-    }
-    if(data.curveType == 'P'){
-        DrawCircleV(ScaleCords(extraPosition), Scale(15),RED);
     }
 }
 
