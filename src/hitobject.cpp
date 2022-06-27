@@ -135,7 +135,7 @@ std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
     int c = (x1 * x1 + y1 * y1) * (x2 - x3) + (x2 * x2 + y2 * y2) * (x3 - x1) + (x3 * x3 + y3 * y3) * (x1 - x2);
     float x = (float)-b / (2.0f * (float)a);
     float y = (float)-c / (2.0f * (float)a);
-    std::cout << "x1: " << x1 << " y1: " << y1 << " x2: " << x2 << " y2: " << y2 << " x3: " << x3 << " y3: " << y3 << " a: " << a << " b: " << b << " c: " << c << " x: " << x << " y: " << y << std::endl; 
+    //std::cout << "x1: " << x1 << " y1: " << y1 << " x2: " << x2 << " y2: " << y2 << " x3: " << x3 << " y3: " << y3 << " a: " << a << " b: " << b << " c: " << c << " x: " << x << " y: " << y << std::endl; 
     return std::make_pair(Vector2{x,y}, sqrt((x - x1) * (x - x1) + (y - y1) *(y - y1)));
 }
 
@@ -234,6 +234,7 @@ void Slider::init(){
             if(renderPoints.size()-1 <= data.length) break;
             renderPoints.pop_back();
         }
+        std::cout << "Ldata: " << data.length << " calculated: " << totalLength << std::endl;
     }
     else if(data.curveType == 'B'){
         //for the bezier curves we do the calculations in another function
@@ -312,10 +313,10 @@ void Slider::init(){
             if(renderPoints.size()-1 <= data.length) break;
             renderPoints.pop_back();
         }
+        std::cout << "Bdata: " << data.length << " calculated: " << totalCalculatedLength << std::endl;
     }
     else if(data.curveType == 'P'){
         std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
-        std::cout << "Circledata1: " << circleData.first.x << " Circledata2: " << circleData.first.x << " Circledata3: " << circleData.second << std::endl;
         float inf = std::numeric_limits<float>::infinity();
         if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
             std::vector<float> lineLengths;
@@ -368,8 +369,9 @@ void Slider::init(){
                 }
                 std::reverse(renderPoints.begin(), renderPoints.end());
             }
+            std::cout << "Pdata: " << data.length << " calculated: " << ( 2 * 3.14159265 * radius ) * ( abs(degree3-degree1) / 360 ) << std::endl;
         }
-        std::cout << "RenderPoints Size: " << renderPoints.size() << std::endl;
+        
     }
     else if(data.curveType == 'C'){
         renderPoints = interpolate(edgePoints, data.length);
@@ -377,7 +379,7 @@ void Slider::init(){
             if(renderPoints.size()-1 <= data.length) break;
             renderPoints.pop_back();
         }
-        
+        std::cout << "Cdata: " << data.length << " calculated: " << -1 << std::endl;
     }
     else{
         std::__throw_invalid_argument("Invalid Slider type!");
@@ -423,7 +425,6 @@ void Slider::update(){
     position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
     
     position *= 100.0f;
-    std::cout << "Time: " << gm->currentTime * (double)(1000) << " Position: " << position << std::endl;
     curRepeat = std::max(0,(int)(position / data.length));
     if((int)(std::max(0.0f, position) + data.length) < (int)(data.length*data.slides)){
         repeat = true;
