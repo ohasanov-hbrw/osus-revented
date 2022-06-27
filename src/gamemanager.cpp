@@ -305,10 +305,13 @@ void GameManager::loadGame(std::string filename){
 				hit0 = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("sliderb0", 0) == 0)
 				sliderb = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("reversearrow", 0) == 0)
+				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
 		}
 	}
 	sliderin = LoadTexture("resources/sliderin.png");
 	sliderout = LoadTexture("resources/sliderout.png");
+
 	Global.Path = lastPath;
 	GenTextureMipmaps(&hit0);
 	SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
@@ -330,6 +333,8 @@ void GameManager::loadGame(std::string filename){
 	SetTextureFilter(sliderin, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&sliderout);
 	SetTextureFilter(sliderout, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&reverseArrow);
+	SetTextureFilter(reverseArrow, TEXTURE_FILTER_TRILINEAR );
 
 	PlayMusicStream(backgroundMusic);
     SetMusicVolume(backgroundMusic, 0.2f);
@@ -346,6 +351,7 @@ void GameManager::unloadGame(){
 	UnloadTexture(sliderb);
 	UnloadTexture(sliderin);
 	UnloadTexture(sliderout);
+	UnloadTexture(reverseArrow);
 }
 
 void GameManager::spawnHitObject(HitObjectData data){

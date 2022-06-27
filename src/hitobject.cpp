@@ -512,15 +512,37 @@ void Slider::render(){
     float clampedFade = clip((gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in, 0, 0.7f);
     Color renderColor;
 
-    /*if(data.curveType == 'P'){
-        edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
-        for(size_t i = 0; i < data.curvePoints.size(); i++)
-            edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
-        DrawCircleV(edgePoints[0], 15,RED);
-        DrawCircleV(edgePoints[1], 15,RED);
-        DrawCircleV(edgePoints[2], 15,RED);
-    }*/
     DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade), gm-> hitCircle.height/2.0f);
+
+
+    int index = 0;
+    int topla = 1;
+    float angle = 0;
+    if(curRepeat%2 == 0){
+        index = renderPoints.size()-1;
+        topla = -1;
+    }
+    if(renderPoints.size() >= 2){
+        angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
+        angle = angle * 180 / PI + 180;
+    }
+    if(repeat){
+        DrawTexturePro(gm->reverseArrow, Rectangle{0,0,gm->reverseArrow.width,gm->reverseArrow.height}, Rectangle{ScaleCordX(renderPoints[index].x),ScaleCordY(renderPoints[index].y),Scale(gm->reverseArrow.width*0.5f),Scale(gm->reverseArrow.height*0.5f)}, Vector2{Scale(gm->reverseArrow.width*0.5f/2.0f), Scale(gm->reverseArrow.height*0.5f/2.0f)}, angle, Fade(WHITE, clampedFade));
+    }
+    index = renderPoints.size()-1;
+    topla = -1;
+    angle = 0;
+    if(curRepeat%2 == 0){
+        index = 0; 
+        topla = 1; 
+    }
+    if(renderPoints.size() >= 2){
+        angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
+        angle = angle * 180 / PI + 180;
+    }
+    if(repeat2 && position > 0){
+        DrawTexturePro(gm->reverseArrow, Rectangle{0,0,gm->reverseArrow.width,gm->reverseArrow.height}, Rectangle{ScaleCordX(renderPoints[index].x),ScaleCordY(renderPoints[index].y),Scale(gm->reverseArrow.width*0.5f),Scale(gm->reverseArrow.height*0.5f)}, Vector2{Scale(gm->reverseArrow.width*0.5f/2.0f), Scale(gm->reverseArrow.height*0.5f/2.0f)}, angle, Fade(WHITE, clampedFade));
+    }
 
     if(data.colour.size() > 2)
             renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
