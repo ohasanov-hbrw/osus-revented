@@ -227,9 +227,12 @@ void Slider::init(){
         //add the render points to a vector
 
         float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
-        std::cout << "angle: " << angle << std::endl;
-        
-        
+       
+        float hipotenus = data.length - totalLength;
+        float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+        float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
+        extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (angle/abs(angle))};
+        edgePoints[edgePoints.size()-1] = extraPosition;
         totalLength-=lineLengths[lineLengths.size()-1];
         lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
         totalLength+=lineLengths[lineLengths.size()-1];
@@ -336,8 +339,21 @@ void Slider::init(){
             for(size_t i = 0; i < lineLengths.size(); i++)
                 totalLength+=lineLengths[i];
             //the calculated length is pretty different from the beatmap so we scale the calculations for that
-            lengthScale = totalLength/data.length;
+            
             //add the render points to a vector
+
+            float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
+        
+            float hipotenus = data.length - totalLength;
+            float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+            float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
+            extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y + ydiff};
+            edgePoints[edgePoints.size()-1] = extraPosition;
+            totalLength-=lineLengths[lineLengths.size()-1];
+            lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
+            totalLength+=lineLengths[lineLengths.size()-1];
+            lengthScale = totalLength/data.length;
+
             for(size_t i = 0; i < edgePoints.size()-1; i++)
                 for(float j = 0; j < lineLengths[i]; j += lengthScale)
                     renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/lineLengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/lineLengths[i]});
@@ -358,28 +374,39 @@ void Slider::init(){
             degree2 = degree2 < 0 ? degree2 + 360 : degree2;
             degree3 = degree3 < 0 ? degree3 + 360 : degree3;
             bool clockwise = !orientation(edgePoints[0], edgePoints[1], edgePoints[2]);
+            float angle = (((data.length * 360) / radius ) / 3.14159265 ) / 2;
+            int a = 0;
             if(clockwise){
                 degree1 = degree1 < degree3 ? degree1 + 360 : degree1;
                 degree2 = degree2 < degree3 ? degree2 + 360 : degree2;
-                for(float i = degree1; i > degree3 - (degree1-degree3)/resolution; i-= (degree1-degree3)/resolution){
-                    if(currentResolution > resolution) break;
-                    currentResolution++;
+                for(float i = degree1; i > degree1 - angle; i-=angle/data.length){
+                    if(a > data.length){
+                        renderPoints.pop_back();
+                        break;
+                    }
                     Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
                     renderPoints.push_back(tempPoint);
+                    a++;
                 }
             }
             else{
                 degree2 = degree2 < degree1 ? degree2 + 360 : degree2;
                 degree3 = degree3 < degree1 ? degree3 + 360 : degree3;
-                for(float i = degree3; i > degree1 - (degree3-degree1)/resolution; i -= (degree3-degree1)/resolution){
-                    if(currentResolution > resolution) break;
-                    currentResolution++;
+                for(float i = degree1; i < degree1 + angle; i+=angle/data.length){
+                    if(a > data.length){
+                        renderPoints.pop_back();
+                        break;
+                    }
                     Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
                     renderPoints.push_back(tempPoint);
+                    a++;
                 }
-                std::reverse(renderPoints.begin(), renderPoints.end());
+                //std::reverse(renderPoints.begin(), renderPoints.end());
             }
-            std::cout << "Pdata: " << data.length << " calculated: " << ( 2 * 3.14159265 * radius ) * ( abs(degree3-degree1) / 360 ) << std::endl;
+            while(renderPoints.size() > data.length){
+                renderPoints.pop_back();
+            }
+            std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
         }
         
     }
@@ -499,6 +526,9 @@ void Slider::render(){
         DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
         DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale/2.0f , renderColor);
+    }
+    if(data.curveType == 'P'){
+        DrawCircleV(ScaleCords(extraPosition), Scale(15),RED);
     }
 }
 

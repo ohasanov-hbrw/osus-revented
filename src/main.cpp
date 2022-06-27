@@ -20,7 +20,7 @@ int main() {
         if (Global.GamePath[i] == '\\')
             Global.GamePath[i] = '/';
     }
-
+    SetTraceLogLevel(LOG_WARNING);
     InitAudioDevice();
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(Global.Width, Global.Height, "osus-revented");
@@ -35,8 +35,7 @@ int main() {
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
     initMouseTrail();
-
-
+    
     int arg = 2;
     zip_extract("1381340_maki_ligon_-_Among_Us___Eurobeat_Remix.osz", "sus", on_extract_entry, &arg);
 

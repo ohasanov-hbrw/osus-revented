@@ -99,6 +99,7 @@ class Slider : public HitObject{
         bool repeat = false;
         bool repeat2 = false;
         int curRepeat = 0;
+        Vector2 extraPosition;
     private:
         int tickCount;
         float timer;
