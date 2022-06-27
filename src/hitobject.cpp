@@ -223,8 +223,18 @@ void Slider::init(){
         for(size_t i = 0; i < lineLengths.size(); i++)
             totalLength+=lineLengths[i];
         //the calculated length is pretty different from the beatmap so we scale the calculations for that
-        lengthScale = totalLength/data.length;
+        
         //add the render points to a vector
+
+        float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
+        std::cout << "angle: " << angle << std::endl;
+        
+        
+        totalLength-=lineLengths[lineLengths.size()-1];
+        lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
+        totalLength+=lineLengths[lineLengths.size()-1];
+        lengthScale = totalLength/data.length;
+
         for(size_t i = 0; i < edgePoints.size()-1; i++)
             for(float j = 0; j < lineLengths[i]; j += lengthScale)
                 renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/lineLengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/lineLengths[i]});
@@ -395,14 +405,6 @@ void Slider::init(){
     //start to draw on the texture
     BeginTextureMode(sliderTexture);
     ClearBackground(BLANK);
-    /*for(int i = 0; i < renderPoints.size(); i+=gm->skip)
-        DrawCircle((renderPoints[i].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[i].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-2),Color{170,170,170,255});
-    DrawCircle((renderPoints[renderPoints.size()-1].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-2),Color{170,170,170,255});
-    for(int i = 0; i < renderPoints.size(); i+=gm->skip)
-        DrawCircle((renderPoints[i].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[i].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-5),Color{12,12,12,255});
-    DrawCircle((renderPoints[renderPoints.size()-1].x-minX+(float)gm->hitCircle.height/4), sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y-minY+(float)gm->hitCircle.height/4), (gm->hitCircle.height/4-5),Color{12,12,12,255});
-    renderPoints.size() > 0
-    */
     BeginBlendMode(BLEND_ALPHA_PREMUL);
     if(renderPoints.size() > 0){
         for(int i = 0; i < renderPoints.size(); i+=gm->skip)
