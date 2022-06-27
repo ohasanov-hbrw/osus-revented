@@ -34,6 +34,7 @@ class GameManager{
 		Texture2D numbers[10];
 		Music backgroundMusic;
 		double currentTime;
+		double currentTimeTemp = -1;
 		int combo = 1;
 		int clickCombo = 0;
 		Color comboColour;

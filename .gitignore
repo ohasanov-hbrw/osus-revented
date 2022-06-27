@@ -35,3 +35,6 @@ beatmaps
 *.exe
 *.out
 *.app
+
+#osu files
+*.osz

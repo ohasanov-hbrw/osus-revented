@@ -421,7 +421,9 @@ void Slider::init(){
 void Slider::update(){
     GameManager* gm = GameManager::getInstance();
     position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
+    
     position *= 100.0f;
+    std::cout << "Time: " << gm->currentTime * (double)(1000) << " Position: " << position << std::endl;
     curRepeat = std::max(0,(int)(position / data.length));
     if((int)(std::max(0.0f, position) + data.length) < (int)(data.length*data.slides)){
         repeat = true;
