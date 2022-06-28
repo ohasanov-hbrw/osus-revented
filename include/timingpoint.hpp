@@ -10,6 +10,6 @@ struct TimingPoint
     int sampleIndex;
     int volume;
     int effects;
-    float beatLength;
+    double beatLength;
     bool uninherited;
 };

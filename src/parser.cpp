@@ -137,6 +137,7 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "TimingPoints"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
+						std::cout << subLine << std::endl;
 						if(subLine[subLine.size()-1] == 13)
 							subLine.pop_back();
 						if(subLine.size() == 0)
@@ -148,7 +149,7 @@ GameFile Parser::parse(std::string filename){
 						std::vector<std::string> tempVector;
 						tempVector = parseSeperatedLists(subLine, ',');
 						tempTimingPoint.time = std::stoi(tempVector[0]);
-						tempTimingPoint.beatLength = std::stof(tempVector[1]);
+						tempTimingPoint.beatLength = std::stod(tempVector[1]);
 						tempTimingPoint.meter = std::stoi(tempVector[2]);
 						tempTimingPoint.sampleSet = std::stoi(tempVector[3]);
 						tempTimingPoint.sampleIndex = std::stoi(tempVector[4]);
@@ -191,7 +192,6 @@ GameFile Parser::parse(std::string filename){
 							break;
 						if(subLine[0] == '/' and subLine[1] == '/')
 							continue;
-
 						std::vector<std::string> tempVector;
 						tempVector = parseSeperatedLists(subLine, ',');
 
