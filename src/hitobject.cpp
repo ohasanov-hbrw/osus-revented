@@ -526,9 +526,9 @@ void Slider::render(){
         angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
         angle = angle * 180 / PI + 180;
     }
-    if(repeat){
-        DrawTexturePro(gm->reverseArrow, Rectangle{0,0,gm->reverseArrow.width,gm->reverseArrow.height}, Rectangle{ScaleCordX(renderPoints[index].x),ScaleCordY(renderPoints[index].y),Scale(gm->reverseArrow.width*0.5f),Scale(gm->reverseArrow.height*0.5f)}, Vector2{Scale(gm->reverseArrow.width*0.5f/2.0f), Scale(gm->reverseArrow.height*0.5f/2.0f)}, angle, Fade(WHITE, clampedFade));
-    }
+    if(repeat)
+        DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, 0.5f, angle, Fade(WHITE, clampedFade));
+    
     index = renderPoints.size()-1;
     topla = -1;
     angle = 0;
@@ -540,15 +540,12 @@ void Slider::render(){
         angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
         angle = angle * 180 / PI + 180;
     }
-    if(repeat2 && position > 0){
-        DrawTexturePro(gm->reverseArrow, Rectangle{0,0,gm->reverseArrow.width,gm->reverseArrow.height}, Rectangle{ScaleCordX(renderPoints[index].x),ScaleCordY(renderPoints[index].y),Scale(gm->reverseArrow.width*0.5f),Scale(gm->reverseArrow.height*0.5f)}, Vector2{Scale(gm->reverseArrow.width*0.5f/2.0f), Scale(gm->reverseArrow.height*0.5f/2.0f)}, angle, Fade(WHITE, clampedFade));
-    }
-
     if(data.colour.size() > 2)
-            renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
-        else
-            renderColor =  Fade(Color{255,255,255}, clampedFade);
-
+        renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
+    else
+        renderColor =  Fade(Color{255,255,255}, clampedFade);
+    if(repeat2 && position > 0)
+        DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, 0.5f, angle, Fade(WHITE, clampedFade));
 
     int calPos = position;
     calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));

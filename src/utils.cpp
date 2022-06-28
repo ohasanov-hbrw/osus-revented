@@ -141,3 +141,8 @@ void DrawTextureCenter(Texture2D tex, float x, float y, float s, Color color){
 void DrawTextureSlider(Texture2D tex, float x, float y, Color color, float s){
     DrawTextureEx(tex, ScaleCords({x-s/2.0f,y-s/2.0f}),0,Scale(1.0f), color);
 }
+//DrawTexturePro(gm->reverseArrow, Rectangle{0,0,gm->reverseArrow.width,gm->reverseArrow.height}, Rectangle{ScaleCordX(renderPoints[index].x),ScaleCordY(renderPoints[index].y),Scale(gm->reverseArrow.width*0.5f),Scale(gm->reverseArrow.height*0.5f)}, Vector2{Scale(gm->reverseArrow.width*0.5f/2.0f), Scale(gm->reverseArrow.height*0.5f/2.0f)}, angle, Fade(WHITE, clampedFade));
+
+void DrawTextureRotate(Texture2D tex, float x, float y, float s, float r, Color color){
+    DrawTexturePro(tex, Rectangle{0,0,tex.width,tex.height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex.width*s),Scale(tex.height*s)}, Vector2{Scale(tex.width*s/2.0f), Scale(tex.height*s/2.0f)}, r, color);
+}
