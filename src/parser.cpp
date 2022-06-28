@@ -137,7 +137,6 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "TimingPoints"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
-						std::cout << subLine << std::endl;
 						if(subLine[subLine.size()-1] == 13)
 							subLine.pop_back();
 						if(subLine.size() == 0)

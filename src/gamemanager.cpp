@@ -311,7 +311,6 @@ void GameManager::loadGame(std::string filename){
 				for(int j = 0; j < 10; j++){
 					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
     					numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
-						std::cout << "loaded index: " << j << std::endl;
 					}
 				}
 			}
