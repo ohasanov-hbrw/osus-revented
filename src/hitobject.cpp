@@ -445,7 +445,6 @@ void Slider::init(){
         maxX = std::max(maxX, renderPoints[i].x);
         maxY = std::max(maxY, renderPoints[i].y);
     }
-    
     sliderTexture = LoadRenderTexture((maxX-minX+(float)gm->hitCircle.height/2)+4, (maxY-minY+(float)gm->hitCircle.height/2)+4);
     //start to draw on the texture
     BeginTextureMode(sliderTexture);
@@ -460,9 +459,7 @@ void Slider::init(){
         DrawTextureEx(gm->sliderin, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderin.height/2.0f)}, 0, 1/2.0f, WHITE);
     }
     EndBlendMode();
-        
     EndTextureMode();
-
     GenTextureMipmaps(&sliderTexture.texture);
     SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_TRILINEAR);
 }

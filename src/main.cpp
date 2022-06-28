@@ -35,9 +35,6 @@ int main() {
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     HideCursor();
     initMouseTrail();
-    
-    int arg = 2;
-    zip_extract("1381340_maki_ligon_-_Among_Us___Eurobeat_Remix.osz", "sus", on_extract_entry, &arg);
 
     while(!WindowShouldClose()){
         GetScale();

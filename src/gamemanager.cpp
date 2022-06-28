@@ -110,9 +110,9 @@ void GameManager::update(){
 	int oldSize = objects.size();
 	for(int i = 0; i < newSize; i++){
 		if(std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final){
-			if (pressed){
+			if (Global.Key1P or Global.Key2P){
 				if (objects[i]->data.type != 2){
-					if (CheckCollisionPointCircle(Vector2{(float)GetMouseX(), (float)GetMouseY()},Vector2{(float)objects[i]->data.x*windowScale,(float)objects[i]->data.y*windowScale}, 56*windowScale/2) && pressed){
+					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, 56/2) && (Global.Key1P or Global.Key2P)){
 						if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
 							objects[i]->data.point = 0;
 							clickCombo = 0;
@@ -210,6 +210,7 @@ void GameManager::render(){
 	for(int i = objects.size() - 1; i >= 0; i--){
 		objects[i]->render();
 	}
+	DrawCNumbersCenter(score, 320, 15, 0.5f, GREEN);
 	//render the points and the combo
 	
 }
