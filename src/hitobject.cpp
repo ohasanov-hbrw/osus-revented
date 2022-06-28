@@ -175,6 +175,9 @@ void Circle::render(){
     else
         renderColor =  Fade(Color{255,255,255}, clampedFade);
     DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
+
+    DrawCNumbersCenter(data.comboNumber, data.x, data.y, 1/2.0f, Fade(WHITE,clampedFade));
+
     DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
     DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale/2.0f , renderColor);
 }
@@ -558,6 +561,7 @@ void Slider::render(){
 
     if(state){
         DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
+        DrawCNumbersCenter(data.comboNumber, data.x, data.y, 1/2.0f, Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale/2.0f , renderColor);
     }

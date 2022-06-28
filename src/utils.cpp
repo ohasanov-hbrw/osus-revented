@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <globals.hpp>
+#include <gamemanager.hpp>
 #include <iostream>
 
 void updateUpDown(){
@@ -145,4 +146,22 @@ void DrawTextureSlider(Texture2D tex, float x, float y, Color color, float s){
 
 void DrawTextureRotate(Texture2D tex, float x, float y, float s, float r, Color color){
     DrawTexturePro(tex, Rectangle{0,0,tex.width,tex.height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex.width*s),Scale(tex.height*s)}, Vector2{Scale(tex.width*s/2.0f), Scale(tex.height*s/2.0f)}, r, color);
+}
+
+int nthDigit(int v, int n){
+    while ( n > 0 ) {
+        v /= 10;
+        -- n;
+    }
+    return "0123456789"[v % 10] - '0';
+}
+
+void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
+    GameManager* gm = GameManager::getInstance();
+    int digits = log10(n) + 1;
+    //std::cout << gm->numbers[1].width << std::endl;
+    int i = (digits - 1) * 9;
+    for(int k = 0; k < digits; k++){
+        DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x - i + k * 18, y, s, color);
+    }
 }
