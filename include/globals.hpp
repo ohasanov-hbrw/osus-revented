@@ -17,6 +17,7 @@ struct Globals {
     int Height = 480;
 
     Texture2D cursor;
+    Texture2D cursorTrail;
     bool MouseInFocus = false;
     int MouseBlur = 20;
     Vector2 MousePosition;

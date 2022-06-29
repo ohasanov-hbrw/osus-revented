@@ -281,10 +281,11 @@ void GameManager::loadGame(std::string filename){
         return first.size() < second.size();
     });
 	std::reverse(files.begin(), files.end());
-
+	hitCircleOverlay = LoadTexture("resources/default_skin/hitcircleoverlay.png");
+	
 	for(int i = 0; i < files.size(); i++){
 		if(IsFileExtension(files[i].c_str(),".png")){
-			if(files[i].rfind("hitcircleoverlay", 0) == 0)
+			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
 				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("hitcircle", 0) == 0)
 				hitCircle = LoadTexture((Global.Path + files[i]).c_str());

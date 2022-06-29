@@ -26,7 +26,7 @@ void renderMouse(){
                 LastPosition = MouseTrail[(indexTrail+i) % Global.MouseTrailSize];
                 Color MouseTrailer = {255,255,255,(unsigned char)((float)i*(255.f/(float)Global.MouseTrailSize))};
                 //DrawCircleV(ScaleCords(MouseTrail[(indexTrail+i) % Global.MouseTrailSize]), Scale(3.0f), MouseTrailer);
-                DrawTextureCenter(Global.cursor, MouseTrail[(indexTrail+i) % Global.MouseTrailSize].x, MouseTrail[(indexTrail+i) % Global.MouseTrailSize].y , 0.3f, MouseTrailer);
+                DrawTextureCenter(Global.cursorTrail, MouseTrail[(indexTrail+i) % Global.MouseTrailSize].x, MouseTrail[(indexTrail+i) % Global.MouseTrailSize].y , 0.3f, MouseTrailer);
             }
         }
     }
