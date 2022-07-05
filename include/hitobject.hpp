@@ -22,7 +22,7 @@ struct timingSettings{
     float volume;
     bool uninherited;
     int effects;
-    float sliderSpeedOverride = 1;
+    double sliderSpeedOverride = 1;
 };
 
 struct HitObjectData{
@@ -95,7 +95,7 @@ class Slider : public HitObject{
         int demoPuan = 0;
         bool state = true;
         std::vector<Vector2> renderPoints; 
-        float position = 0;
+        double position = 0;
         bool repeat = false;
         bool repeat2 = false;
         int curRepeat = 0;

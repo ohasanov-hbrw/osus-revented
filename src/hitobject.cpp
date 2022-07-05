@@ -184,14 +184,25 @@ void Circle::render(){
 
 //renders the "dead" Circle
 void Circle::dead_render(){
+    GameManager* gm = GameManager::getInstance();
+    float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
+    if(data.point == 0)
+        DrawTextureCenter(gm->hit0, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
+    else if(data.point == 1)
+        DrawTextureCenter(gm->hit50, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
+    else if(data.point == 2)
+        DrawTextureCenter(gm->hit100, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
+    else if(data.point == 3)
+        DrawTextureCenter(gm->hit300, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
 }
 
 //just gives more time to render the "dead" Circle 
 void Circle::dead_update(){
     GameManager* gm = GameManager::getInstance();
     //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
-    if (data.time+400 < gm->currentTime*1000)
+    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000){
         gm->destroyDeadHitObject(data.index);
+    }
 }
 
 //renders the combo number on top of the circle, NEED TO FIX THE DIGITS
@@ -468,15 +479,15 @@ void Slider::update(){
     GameManager* gm = GameManager::getInstance();
     position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
     
-    position *= 100.0f;
+    position *= (double)100;
     curRepeat = std::max(0,(int)(position / data.length));
-    if((int)(std::max(0.0f, position) + data.length) < (int)(data.length*data.slides)){
+    if((int)(std::max((double)0, position) + data.length) < (int)(data.length*data.slides)){
         repeat = true;
     }
     else{
         repeat = false;
     }
-    if((int)(std::max(0.0f, position) + 2*data.length) < (int)(data.length*data.slides)){
+    if((int)(std::max((double)0, position) + 2*data.length) < (int)(data.length*data.slides)){
         repeat2 = true;
     }
     else{
@@ -493,7 +504,7 @@ void Slider::update(){
         else
             position = absolutePosition + 1.0f; 
     }
-    position = std::max(0.f,position);
+    position = std::max((double)0,position);
     if (is_hit_at_first || gm->currentTime*1000 > data.time + gm->gameFile.p100Final)
         state = false;
     if(gm->currentTime*1000 > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
@@ -565,11 +576,21 @@ void Slider::render(){
 }
 
 void Slider::dead_render(){
+    GameManager* gm = GameManager::getInstance();
+    float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
+    if(data.point == 0)
+        DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, 1/2.0f , Fade(WHITE,clampedFade));
+    else if(data.point == 1)
+        DrawTextureCenter(gm->hit50, renderPoints[position].x, renderPoints[position].y, 1/2.0f , Fade(WHITE,clampedFade));
+    else if(data.point == 2)
+        DrawTextureCenter(gm->hit100, renderPoints[position].x, renderPoints[position].y, 1/2.0f , Fade(WHITE,clampedFade));
+    else if(data.point == 3)
+        DrawTextureCenter(gm->hit300, renderPoints[position].x, renderPoints[position].y, 1/2.0f , Fade(WHITE,clampedFade));
 }
 
 void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
-    if (data.time+400 < gm->currentTime*1000){
+    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000){
         UnloadRenderTexture(sliderTexture);
         gm->destroyDeadHitObject(data.index);
     }

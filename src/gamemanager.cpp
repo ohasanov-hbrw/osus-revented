@@ -57,7 +57,7 @@ void GameManager::update(){
 	for(int i = timingSize-1; i >= 0; i--){
 		if(gameFile.timingPoints[i].time - gameFile.preempt <= currentTime*1000){
 			time = gameFile.timingPoints[i].time;
-			float tempBeatLength;
+			double tempBeatLength;
 			tempBeatLength = gameFile.timingPoints[i].beatLength;
 			//std::cout << "beatLength: " << tempBeatLength << std::endl;
 			if(tempBeatLength > 0)
@@ -108,8 +108,9 @@ void GameManager::update(){
 	//update and check collision for every hit circle
 	int newSize = objects.size();
 	int oldSize = objects.size();
+	bool stop = true;
 	for(int i = 0; i < newSize; i++){
-		if(std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final){
+		if(std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final && stop){
 			if (Global.Key1P or Global.Key2P){
 				if (objects[i]->data.type != 2){
 					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, 56/2) && (Global.Key1P or Global.Key2P)){
@@ -135,6 +136,7 @@ void GameManager::update(){
 						objects[i]->data.time = currentTime*1000;
 						destroyHitObject(i);
 						i--;
+						stop = false;
 					}
 					else{
 						objects[i]->data.index = i;
@@ -148,8 +150,10 @@ void GameManager::update(){
 				}
 				else if (objects[i]->data.type == 2){
 					if(Slider* tempslider = dynamic_cast<Slider*>(objects[i]))
-						if(CheckCollisionPointCircle(MousePosition,Vector2{tempslider->renderPoints[tempslider->position].x*windowScale, tempslider->renderPoints[tempslider->position].y*windowScale} ,128*windowScale/2 ) && pressed && currentTime*1000 < tempslider->data.time + gameFile.p100Final)
+						if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, 56/2) && (Global.Key1P or Global.Key2P) && currentTime*1000 < tempslider->data.time + gameFile.p50Final){
         					tempslider->is_hit_at_first = true;
+							stop = false;
+						}
         			//this cursed else train is nothing to worry about...
     				objects[i]->data.index = i;
 					objects[i]->update();
@@ -207,6 +211,9 @@ void GameManager::render(){
 	//this is the mouse scale... i think
 	
 	//render all the objects
+	for(int i = dead_objects.size() - 1; i >= 0; i--){
+		dead_objects[i]->dead_render();
+	}
 	for(int i = objects.size() - 1; i >= 0; i--){
 		objects[i]->render();
 	}
@@ -281,8 +288,10 @@ void GameManager::loadGame(std::string filename){
         return first.size() < second.size();
     });
 	std::reverse(files.begin(), files.end());
-	hitCircleOverlay = LoadTexture("resources/default_skin/hitcircleoverlay.png");
-	
+
+	std::string default_path = "resources/default_skin/";
+    hitCircleOverlay = LoadTexture((default_path + "hitcircleoverlay.png").c_str());
+
 	for(int i = 0; i < files.size(); i++){
 		if(IsFileExtension(files[i].c_str(),".png")){
 			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
