@@ -109,9 +109,9 @@ void GameManager::update(){
 	int newSize = objects.size();
 	int oldSize = objects.size();
 	bool stop = true;
-	for(int i = 0; i < newSize; i++){
-		if(std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final && stop){
-			if (Global.Key1P or Global.Key2P){
+	for(int i = newSize-1; i >= 0; i--){
+		if(std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final){
+			if (Global.Key1P or Global.Key2P && i == oldSize-1 && stop){
 				if (objects[i]->data.type != 2){
 					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, 56/2) && (Global.Key1P or Global.Key2P)){
 						if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
@@ -135,6 +135,7 @@ void GameManager::update(){
 						}
 						objects[i]->data.time = currentTime*1000;
 						destroyHitObject(i);
+						newSize = objects.size();
 						i--;
 						stop = false;
 					}
