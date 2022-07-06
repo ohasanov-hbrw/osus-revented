@@ -114,7 +114,7 @@ void GameManager::update(){
 		if(std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final){
 			if (Global.Key1P or Global.Key2P && i == susSize-1 && stop){
 				if (objects[i]->data.type != 2){
-					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, 56/2) && (Global.Key1P or Global.Key2P)){
+					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && (Global.Key1P or Global.Key2P)){
 						if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
 							objects[i]->data.point = 0;
 							clickCombo = 0;
@@ -152,7 +152,7 @@ void GameManager::update(){
 				}
 				else if (objects[i]->data.type == 2){
 					if(Slider* tempslider = dynamic_cast<Slider*>(objects[i]))
-						if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, 56/2) && (Global.Key1P or Global.Key2P) && currentTime*1000 < tempslider->data.time + gameFile.p50Final){
+						if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && (Global.Key1P or Global.Key2P) && currentTime*1000 < tempslider->data.time + gameFile.p50Final){
         					tempslider->is_hit_at_first = true;
 							stop = false;
 						}
