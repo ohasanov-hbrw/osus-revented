@@ -59,6 +59,7 @@ class GameManager{
 		float clip(float value, float min, float max);
 		timingSettings timingSettingsForHitObject;
 		int index;
+		float circlesize = 54.48*2.0f;
 	private:
 		static GameManager* inst_;
 		void init();

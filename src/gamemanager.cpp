@@ -274,7 +274,8 @@ void GameManager::loadGame(std::string filename){
 	
     //these are not used right now, USE THEM
 	float hpdrainrate = std::stof(gameFile.configDifficulty["HPDrainRate"]);
-	float circlesize = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
+	circlesize = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
+	circlesize *= 2.0f;
 	std::cout << circlesize << std::endl;
 	float overalldifficulty = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
 	//more difficulty stuff, may also be wrong
