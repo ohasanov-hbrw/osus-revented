@@ -427,6 +427,8 @@ void GameManager::unloadGame(){
 	for(int i = 0; i < 10; i++){
 		UnloadTexture(numbers[i]);
 	}
+	objects.clear();
+	dead_objects.clear();
 }
 
 void GameManager::spawnHitObject(HitObjectData data){
