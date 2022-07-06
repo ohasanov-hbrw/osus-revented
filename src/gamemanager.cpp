@@ -50,8 +50,6 @@ void GameManager::update(){
 	
 	//get the mouse position and state
 	
-	pressed = IsMouseButtonPressed(0);
-	down = IsMouseButtonDown(0);
 	//currently not used that much but it will be
 	int timingSize = gameFile.timingPoints.size();
 	for(int i = timingSize-1; i >= 0; i--){
@@ -110,11 +108,11 @@ void GameManager::update(){
 	int oldSize = objects.size();
 	int susSize = objects.size();
 	bool stop = true;
-	for(int i = newSize-1; i >= 0; i--){
-		if(std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final){
-			if (Global.Key1P or Global.Key2P && i == susSize-1 && stop){
+	for(int i = susSize-1; i >= 0; i--){
+		if((std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final)){
+			if ((Global.Key1P or Global.Key2P) && stop && i == 0){
 				if (objects[i]->data.type != 2){
-					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && (Global.Key1P or Global.Key2P)){
+					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
 						if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
 							objects[i]->data.point = 0;
 							clickCombo = 0;
@@ -152,7 +150,7 @@ void GameManager::update(){
 				}
 				else if (objects[i]->data.type == 2){
 					if(Slider* tempslider = dynamic_cast<Slider*>(objects[i]))
-						if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && (Global.Key1P or Global.Key2P) && currentTime*1000 < tempslider->data.time + gameFile.p50Final){
+						if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && currentTime*1000 < tempslider->data.time + gameFile.p50Final){
         					tempslider->is_hit_at_first = true;
 							stop = false;
 						}
