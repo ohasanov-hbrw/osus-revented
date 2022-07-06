@@ -281,7 +281,8 @@ void GameManager::loadGame(std::string filename){
 		sliderSpeed = std::stof(gameFile.configDifficulty["SliderMultiplier"]);
 
 	std::string lastPath = Global.Path;
-	Global.Path = "resources/skin/";
+
+	Global.Path = "resources/default_skin/";
 	std::vector<std::string> files = ls(".png");
 
 	std::sort(files.begin(), files.end(), []
@@ -290,13 +291,59 @@ void GameManager::loadGame(std::string filename){
     });
 	std::reverse(files.begin(), files.end());
 
-	std::string default_path = "resources/default_skin/";
-    hitCircleOverlay = LoadTexture((default_path + "hitcircleoverlay.png").c_str());
+	for(int i = 0; i < files.size(); i++){
+		if(IsFileExtension(files[i].c_str(),".png")){
+			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
+				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircleselect.png", 0) == 0)
+				selectCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircle", 0) == 0)
+				hitCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("approachcircle", 0) == 0)
+				approachCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit300k", 0) == 0)
+				;
+			else if(files[i].rfind("hit300", 0) == 0)
+				hit300 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit100k", 0) == 0)
+				;
+			else if(files[i].rfind("hit100", 0) == 0)
+				hit100 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit50k", 0) == 0)
+				;
+			else if(files[i].rfind("hit50", 0) == 0)
+				hit50 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit0", 0) == 0)
+				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderb0", 0) == 0)
+				sliderb = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("reversearrow", 0) == 0)
+				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
+			else{
+				for(int j = 0; j < 10; j++){
+					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
+    					numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
+					}
+				}
+			}
+		}
+	}
+	files.clear();
+	Global.Path = "resources/skin/";
+	files = ls(".png");
+
+	std::sort(files.begin(), files.end(), []
+    (const std::string& first, const std::string& second){
+        return first.size() < second.size();
+    });
+	std::reverse(files.begin(), files.end());
 
 	for(int i = 0; i < files.size(); i++){
 		if(IsFileExtension(files[i].c_str(),".png")){
 			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
 				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircleselect.png", 0) == 0)
+				selectCircle = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("hitcircle", 0) == 0)
 				hitCircle = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("approachcircle", 0) == 0)
@@ -342,6 +389,8 @@ void GameManager::loadGame(std::string filename){
 	SetTextureFilter(hit300, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&approachCircle);
 	SetTextureFilter(approachCircle, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&selectCircle);
+	SetTextureFilter(selectCircle, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&hitCircleOverlay);
 	SetTextureFilter(hitCircleOverlay, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&hitCircle);
@@ -364,6 +413,7 @@ void GameManager::loadGame(std::string filename){
 
 void GameManager::unloadGame(){
 	UnloadTexture(hitCircleOverlay);
+	UnloadTexture(selectCircle);
 	UnloadTexture(hitCircle);
 	UnloadTexture(approachCircle);
 	UnloadTexture(hit300);

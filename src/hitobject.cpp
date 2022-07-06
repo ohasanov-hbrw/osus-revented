@@ -186,6 +186,19 @@ void Circle::render(){
 void Circle::dead_render(){
     GameManager* gm = GameManager::getInstance();
     float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
+    float clampedFade2 = (gm->gameFile.fade_in/8.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/8.0f);
+    float scale = (gm->currentTime*1000 + gm->gameFile.fade_in/4.0f - data.time) / (gm->gameFile.fade_in/4.0f);
+    scale = clip(scale,1,2);
+    Color renderColor;
+    if(data.colour.size() > 2)
+        renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
+    else
+        renderColor =  Fade(Color{255,255,255}, clampedFade2);
+    DrawTextureCenter(gm->hitCircle, data.x, data.y, 1/2.0f , renderColor);
+    DrawCNumbersCenter(data.comboNumber, data.x, data.y, 1/2.0f, Fade(WHITE,clampedFade2));
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade2));
+    if(data.point != 0)
+        DrawTextureCenter(gm->selectCircle, data.x, data.y, scale/2.0f , renderColor);
     if(data.point == 0)
         DrawTextureCenter(gm->hit0, data.x, data.y, 1/2.0f , Fade(WHITE,clampedFade));
     else if(data.point == 1)
@@ -578,6 +591,8 @@ void Slider::render(){
 void Slider::dead_render(){
     GameManager* gm = GameManager::getInstance();
     float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
+    float clampedFade2 = (gm->gameFile.fade_in/8.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/8.0f);
+    DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade2), gm->hitCircle.height/2.0f);
     if(data.point == 0)
         DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, 1/2.0f , Fade(WHITE,clampedFade));
     else if(data.point == 1)
