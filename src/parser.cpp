@@ -193,7 +193,6 @@ GameFile Parser::parse(std::string filename){
 							continue;
 						std::vector<std::string> tempVector;
 						tempVector = parseSeperatedLists(subLine, ',');
-
 						HitObjectData tempHitObject;
 
 						tempHitObject.x = std::stoi(tempVector[0]) + 64;
@@ -203,7 +202,6 @@ GameFile Parser::parse(std::string filename){
 
 						std::string typeInBinary;
 						typeInBinary = DecimalToBinaryString(tempHitObject.type);
-
 						if(typeInBinary[0] == '1'){
 							tempHitObject.type = 1;
 							tempHitObject.hitSound = std::stoi(tempVector[4]);
@@ -213,10 +211,22 @@ GameFile Parser::parse(std::string filename){
 							if(tempVector.size() > 5){
 								std::vector<std::string> tempVectorHitSample;
 								tempVectorHitSample = parseSeperatedLists(tempVector[5], ':');
-								tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
-								tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
-								tempHitObject.index = std::stoi(tempVectorHitSample[2]);
-								tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+								if(tempVectorHitSample.size() > 0)
+									tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
+								else
+									tempHitObject.normalSet = 0;
+								if(tempVectorHitSample.size() > 1)
+									tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
+								else
+									tempHitObject.additionSet = 0;
+								if(tempVectorHitSample.size() > 2)
+									tempHitObject.index = std::stoi(tempVectorHitSample[2]);
+								else
+									tempHitObject.index = 0;
+								if(tempVectorHitSample.size() > 3)
+									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+								else
+									tempHitObject.volume = 0;
 								if(tempVectorHitSample.size() > 4){
 									tempHitObject.filename = tempVectorHitSample[4];
 									tempHitObject.useDefaultHitSound = false;
@@ -241,7 +251,6 @@ GameFile Parser::parse(std::string filename){
 
 							std::vector<std::string> tempVectorCurvePoints;
 							tempVectorCurvePoints = parseSeperatedLists(tempVector[5], '|');
-
 							tempHitObject.curveType = tempVectorCurvePoints[0][0];
 
 							for(size_t i = 1; i < tempVectorCurvePoints.size(); i++){
@@ -252,7 +261,6 @@ GameFile Parser::parse(std::string filename){
 
 							tempHitObject.slides = std::stoi(tempVector[6]);
 							tempHitObject.length = std::stoi(tempVector[7]);
-
 							if(tempVector.size() > 8){
 								std::vector<std::string> tempVectorEdgeSounds;
 								tempVectorEdgeSounds = parseSeperatedLists(tempVector[8], '|');
@@ -272,10 +280,22 @@ GameFile Parser::parse(std::string filename){
 							if(tempVector.size() > 10){
 								std::vector<std::string> tempVectorHitSample;
 								tempVectorHitSample = parseSeperatedLists(tempVector[10], ':');
-								tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
-								tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
-								tempHitObject.index = std::stoi(tempVectorHitSample[2]);
-								tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+								if(tempVectorHitSample.size() > 0)
+									tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
+								else
+									tempHitObject.normalSet = 0;
+								if(tempVectorHitSample.size() > 1)
+									tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
+								else
+									tempHitObject.additionSet = 0;
+								if(tempVectorHitSample.size() > 2)
+									tempHitObject.index = std::stoi(tempVectorHitSample[2]);
+								else
+									tempHitObject.index = 0;
+								if(tempVectorHitSample.size() > 3)
+									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+								else
+									tempHitObject.volume = 0;
 								if(tempVectorHitSample.size() > 4){
 									tempHitObject.filename = tempVectorHitSample[4];
 									tempHitObject.useDefaultHitSound = false;
@@ -303,10 +323,22 @@ GameFile Parser::parse(std::string filename){
 								std::vector<std::string> tempVectorHitSample;
 								tempVectorHitSample = parseSeperatedLists(tempVector[6], ':');
 
-								tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
-								tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
-								tempHitObject.index = std::stoi(tempVectorHitSample[2]);
-								tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+								if(tempVectorHitSample.size() > 0)
+									tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
+								else
+									tempHitObject.normalSet = 0;
+								if(tempVectorHitSample.size() > 1)
+									tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
+								else
+									tempHitObject.additionSet = 0;
+								if(tempVectorHitSample.size() > 2)
+									tempHitObject.index = std::stoi(tempVectorHitSample[2]);
+								else
+									tempHitObject.index = 0;
+								if(tempVectorHitSample.size() > 3)
+									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+								else
+									tempHitObject.volume = 0;
 								if(tempVectorHitSample.size() > 4){
 									tempHitObject.filename = tempVectorHitSample[4];
 									tempHitObject.useDefaultHitSound = false;
