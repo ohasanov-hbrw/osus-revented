@@ -4,6 +4,8 @@
 #include "gamemanager.hpp"
 #include "utils.hpp"
 
+
+
 float interpolate(float *p, float *time, float t) {
     float L01 = p[0] * (time[1] - t) / (time[1] - time[0]) + p[1] * (t - time[0]) / (time[1] - time[0]);
     float L12 = p[1] * (time[2] - t) / (time[2] - time[1]) + p[2] * (t - time[1]) / (time[2] - time[1]);

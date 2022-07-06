@@ -108,10 +108,11 @@ void GameManager::update(){
 	//update and check collision for every hit circle
 	int newSize = objects.size();
 	int oldSize = objects.size();
+	int susSize = objects.size();
 	bool stop = true;
 	for(int i = newSize-1; i >= 0; i--){
 		if(std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final){
-			if (Global.Key1P or Global.Key2P && i == oldSize-1 && stop){
+			if (Global.Key1P or Global.Key2P && i == susSize-1 && stop){
 				if (objects[i]->data.type != 2){
 					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, 56/2) && (Global.Key1P or Global.Key2P)){
 						if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
@@ -273,7 +274,8 @@ void GameManager::loadGame(std::string filename){
 	
     //these are not used right now, USE THEM
 	float hpdrainrate = std::stof(gameFile.configDifficulty["HPDrainRate"]);
-	float circlesize = std::stof(gameFile.configDifficulty["CircleSize"]);
+	float circlesize = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
+	std::cout << circlesize << std::endl;
 	float overalldifficulty = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
 	//more difficulty stuff, may also be wrong
 	difficultyMultiplier = ((hpdrainrate + circlesize + overalldifficulty + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);

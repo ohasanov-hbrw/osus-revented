@@ -1,3 +1,4 @@
+#pragma once
 #include <utils.hpp>
 #include <math.h>
 #include <vector>

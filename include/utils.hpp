@@ -1,9 +1,10 @@
 #pragma once
 #include "raylib.h"
 #include <vector>
-extern "C" {
-#include "raymath.h"
-}
+#define RAYMATH_IMPLEMENTATION
+//extern "C" {
+    #include "raymath.h"
+//}
 
 void updateUpDown();
 
@@ -35,7 +36,6 @@ Vector2 lerp(Vector2, Vector2, float);
 Vector2 vectorize(float);
 float distance(Vector2 &, Vector2 &);
 int Search(std::vector<float>, float,int,int);
-
 
 inline Vector2 operator + (Vector2 p0, Vector2 p1){
     return Vector2Add(p0, p1);

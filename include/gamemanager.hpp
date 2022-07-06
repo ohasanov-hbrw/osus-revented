@@ -2,10 +2,6 @@
 #include "parser.hpp"
 #include <raylib.h>
 
-extern "C" {
-#include "raymath.h"
-}
-
 class GameManager{
 	public:
 		static GameManager* getInstance();

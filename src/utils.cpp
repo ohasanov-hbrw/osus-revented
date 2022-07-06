@@ -165,3 +165,4 @@ void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
         DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x - i + k * 18, y, s, color);
     }
 }
+
