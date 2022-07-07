@@ -42,6 +42,7 @@ void GameManager::init(){
 	
 	//load all the textures (can also do this in load_game)
     timingSettingsForHitObject.sliderSpeedOverride = 1;
+
 }
 
 //main game loop
@@ -274,6 +275,7 @@ void GameManager::loadGame(std::string filename){
     //these are not used right now, USE THEM
 	float hpdrainrate = std::stof(gameFile.configDifficulty["HPDrainRate"]);
 	circlesize = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
+	slidertickrate = std::stof(gameFile.configDifficulty["SliderTickRate"]);
 	circlesize *= 2.0f;
 	std::cout << circlesize << std::endl;
 	float overalldifficulty = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
@@ -317,6 +319,8 @@ void GameManager::loadGame(std::string filename){
 				hit50 = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("hit0", 0) == 0)
 				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
+				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("sliderb0", 0) == 0)
 				sliderb = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("reversearrow", 0) == 0)
@@ -364,6 +368,8 @@ void GameManager::loadGame(std::string filename){
 				hit50 = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("hit0", 0) == 0)
 				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
+				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("sliderb0", 0) == 0)
 				sliderb = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("reversearrow", 0) == 0)
@@ -411,6 +417,7 @@ void GameManager::loadGame(std::string filename){
 	}
 	PlayMusicStream(backgroundMusic);
     SetMusicVolume(backgroundMusic, 0.2f);
+	stop = false;
 }
 
 void GameManager::unloadGame(){

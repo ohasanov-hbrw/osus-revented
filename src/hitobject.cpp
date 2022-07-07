@@ -2,6 +2,7 @@
 #include <cmath>
 #include <algorithm>
 #include "gamemanager.hpp"
+#include "globals.hpp"
 #include "utils.hpp"
 
 
@@ -523,6 +524,22 @@ void Slider::update(){
     if (is_hit_at_first || gm->currentTime*1000 > data.time + gm->gameFile.p100Final)
         state = false;
     if(gm->currentTime*1000 > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
+        int ticks = 0;
+        
+        float sliderDuration = ((float)(data.length/100) * (float)(data.timing.beatLength) / (float)((float)gm->sliderSpeed * (float)data.timing.sliderSpeedOverride) * (float)data.slides);
+
+        ticks = (float)sliderDuration / ((float)data.timing.beatLength/(float)gm->slidertickrate);
+
+        if((float)data.timing.beatLength*(float)data.slides == (float)sliderDuration)
+            ticks-=data.slides;
+
+        if(ticks < 0)
+            ticks = 0;
+
+        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && Global.Key1D)
+            is_hit_at_end = true;
+        std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
+
         data.time = gm->currentTime*1000;
         data.point = 0;
         gm->clickCombo = 0;
@@ -573,11 +590,23 @@ void Slider::render(){
     if(repeat2 && position > 0)
         DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/gm->reverseArrow.width)*0.5f, angle, Fade(WHITE, clampedFade));
 
-    int calPos = position;
+    calPos = position;
     calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
 
     if((gm->currentTime*1000 - data.time > 0 or !state) and renderPoints.size() > 0){
-        DrawTextureCenter(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, gm->circlesize/gm->sliderb.width , renderColor);
+        if(calPos == 0){
+            angle = atan2(renderPoints[calPos].y- renderPoints[calPos+1].y, renderPoints[calPos].x - renderPoints[calPos+1].x);
+            angle = angle * 180 / PI + 180; 
+        }
+        else{
+            angle = atan2(renderPoints[calPos].y- renderPoints[calPos-1].y, renderPoints[calPos].x - renderPoints[calPos-1].x);
+            angle = angle * 180 / PI; 
+        }
+        if(curRepeat%2 == 0)
+            angle+=180;
+        DrawTextureRotate(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, gm->circlesize/gm->sliderb.width , angle, Fade(WHITE,clampedFade));
+        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize))
+            DrawTextureRotate(gm->sliderfollow, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderfollow.width)*2 , angle, Fade(WHITE,clampedFade));
     }
 
     clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;

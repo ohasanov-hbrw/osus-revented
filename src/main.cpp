@@ -28,8 +28,47 @@ int main() {
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");
-    Global.cursor = LoadTexture("resources/skin/cursor.png");
-    Global.cursorTrail = LoadTexture("resources/skin/cursortrail.png");
+
+
+    std::string lastPath = Global.Path;
+	Global.Path = "resources/default_skin/";
+	std::vector<std::string> files = ls(".png");
+	std::sort(files.begin(), files.end(), []
+    (const std::string& first, const std::string& second){
+        return first.size() < second.size();
+    });
+	std::reverse(files.begin(), files.end());
+
+	for(int i = 0; i < files.size(); i++){
+		if(IsFileExtension(files[i].c_str(),".png")){
+			if(files[i].rfind("cursortrail.png", 0) == 0)
+				Global.cursorTrail = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("cursor.png", 0) == 0)
+                Global.cursor = LoadTexture((Global.Path + files[i]).c_str());
+		}
+	}
+	files.clear();
+    Global.Path = "resources/skin/";
+    files = ls(".png");
+	std::sort(files.begin(), files.end(), []
+    (const std::string& first, const std::string& second){
+        return first.size() < second.size();
+    });
+	std::reverse(files.begin(), files.end());
+
+	for(int i = 0; i < files.size(); i++){
+		if(IsFileExtension(files[i].c_str(),".png")){
+			if(files[i].rfind("cursortrail.png", 0) == 0)
+				Global.cursorTrail = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("cursor.png", 0) == 0)
+                Global.cursor = LoadTexture((Global.Path + files[i]).c_str());
+		}
+	}
+	files.clear();
+    Global.Path = lastPath;
+
+
+
     GenTextureMipmaps(&Global.OsusLogo);
     GenTextureMipmaps(&Global.cursor);
     GenTextureMipmaps(&Global.DefaultFont.texture);

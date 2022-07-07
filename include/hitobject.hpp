@@ -92,12 +92,14 @@ class Slider : public HitObject{
         void dead_update() override;
         void dead_render() override;
         bool is_hit_at_first = false;
+        bool is_hit_at_end = false;
         int demoPuan = 0;
         bool state = true;
         std::vector<Vector2> renderPoints; 
         double position = 0;
         bool repeat = false;
         bool repeat2 = false;
+        int calPos;
         int curRepeat = 0;
         Vector2 extraPosition;
     private:

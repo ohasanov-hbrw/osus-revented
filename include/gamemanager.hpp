@@ -24,6 +24,7 @@ class GameManager{
 		Texture2D hit100;
 		Texture2D hit300;
 		Texture2D sliderb;
+		Texture2D sliderfollow;
 		Texture2D reverseArrow;
 		Texture2D sliderin;
 		Texture2D sliderout;
@@ -40,6 +41,7 @@ class GameManager{
 		int time;
 		int meter;
 		float beatLength;
+		float slidertickrate = 1.0f;
 		int sampleSet;
 		int sampleIndex;
 		int volume;
