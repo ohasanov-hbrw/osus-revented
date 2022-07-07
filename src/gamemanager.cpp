@@ -211,11 +211,12 @@ void GameManager::render(){
 	//this is the mouse scale... i think
 	
 	//render all the objects
-	for(int i = dead_objects.size() - 1; i >= 0; i--){
-		dead_objects[i]->dead_render();
-	}
+	
 	for(int i = objects.size() - 1; i >= 0; i--){
 		objects[i]->render();
+	}
+	for(int i = dead_objects.size() - 1; i >= 0; i--){
+		dead_objects[i]->dead_render();
 	}
 	DrawCNumbersCenter(score, 320, 15, 0.5f, GREEN);
 	//render the points and the combo
