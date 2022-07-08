@@ -4,7 +4,11 @@
 #include "gamemanager.hpp"
 #include "globals.hpp"
 #include "utils.hpp"
+#include <limits>
 
+bool AreSame(double a, double b) {
+    return std::fabs(a - b) < 0.0001f;
+}
 
 
 float interpolate(float *p, float *time, float t) {
@@ -228,7 +232,7 @@ void Circle::render_combo(){
 //creates a Slider
 Slider::Slider(HitObjectData data){
     this->data = data;
-    init();
+    //init();
 }
 
 //initilizes a Slider, all the curve stuff and the texture creation happens here
@@ -489,6 +493,38 @@ void Slider::init(){
     EndTextureMode();
     GenTextureMipmaps(&sliderTexture.texture);
     SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_TRILINEAR);
+
+
+    ticks = 0;
+    sliderDuration = ((double)(data.length/100) * (double)(data.timing.beatLength) / (double)((double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride) * (double)data.slides);
+    currentDuration = 0.0f;
+    while(true){
+        currentDuration += (double)data.timing.beatLength / (double)gm->slidertickrate;
+        if(AreSame((double)currentDuration, (double)sliderDuration) || (double)currentDuration > (double)sliderDuration)
+            break;
+        else{
+            ticks++;
+        }
+    }
+    if(ticks < 0)
+        ticks = 0;
+    for(int i = 1; i <= ticks; i++){
+        //std::cout << (double)(i) * (double)((double)data.timing.beatLength / (double)gm->slidertickrate) << std::endl;
+        double absolutePosition = ((double)(i) * (double)((double)data.timing.beatLength / (double)gm->slidertickrate));
+        bool add = true;
+        for(int k = 1; k <= (int)data.slides; k++){
+            if(AreSame((double)absolutePosition, ((double)sliderDuration/(double)data.slides)*(double)k)){
+                add = false;
+                break;
+            }
+            //std::cout << absolutePosition << " " << ((double)sliderDuration/(double)data.slides)*(double)k << " " << k << std::endl;
+        }
+        absolutePosition = ((double)absolutePosition) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
+        absolutePosition  *= (double)100;
+        if(add)
+            tickPositions.push_back((int)absolutePosition);
+        //std::cout << tickPositions[i-1] << std::endl;
+    }
 }
 
 void Slider::update(){
@@ -509,11 +545,14 @@ void Slider::update(){
     else{
         repeat2 = false;
     }
-    
+
+    time = position;
+
     double absolutePosition = position;
     while(absolutePosition > (double)data.length){
         absolutePosition -= (double)data.length;
     }
+    
     if(gm->currentTime*1000 - data.time > 0){
         if ((int)((gm->currentTime*1000 - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
             position = (double)data.length - (absolutePosition + 1.0f); 
@@ -524,21 +563,9 @@ void Slider::update(){
     if (is_hit_at_first || gm->currentTime*1000 > data.time + gm->gameFile.p100Final)
         state = false;
     if(gm->currentTime*1000 > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
-        int ticks = 0;
-        
-        float sliderDuration = ((float)(data.length/100) * (float)(data.timing.beatLength) / (float)((float)gm->sliderSpeed * (float)data.timing.sliderSpeedOverride) * (float)data.slides);
-
-        ticks = (float)sliderDuration / ((float)data.timing.beatLength/(float)gm->slidertickrate);
-
-        if((float)data.timing.beatLength*(float)data.slides == (float)sliderDuration)
-            ticks-=data.slides;
-
-        if(ticks < 0)
-            ticks = 0;
-
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && Global.Key1D)
             is_hit_at_end = true;
-        std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
+        //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
 
         data.time = gm->currentTime*1000;
         data.point = 0;
@@ -616,6 +643,18 @@ void Slider::render(){
         DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width, Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width , Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width , renderColor);
+    }
+
+    for(int i = 0; i < tickPositions.size(); i++){
+        if(tickPositions[i] > (int)time && (int) time > 0){
+            double absolutePosition = tickPositions[i];
+            while(absolutePosition > (double)data.length){
+                absolutePosition -= (double)data.length;
+            }
+            absolutePosition = std::max((double)0,absolutePosition);
+            absolutePosition = std::min((int)absolutePosition, static_cast<int>(renderPoints.size()-1));
+            DrawCircleV(ScaleCords(renderPoints[(int)absolutePosition]), Scale(6) , RED);
+        }
     }
 }
 

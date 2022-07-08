@@ -103,7 +103,11 @@ class Slider : public HitObject{
         int curRepeat = 0;
         Vector2 extraPosition;
     private:
-        int tickCount;
+        double sliderDuration;
+        double currentDuration;
+        double time;
+        int ticks;
+        std::vector<int> tickPositions;
         float timer;
         std::vector<Vector2> edgePoints; 
         RenderTexture2D sliderTexture;

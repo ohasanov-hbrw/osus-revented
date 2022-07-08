@@ -99,6 +99,7 @@ void GameManager::update(){
 			objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject.effects;
 			objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject.sliderSpeedOverride;
 			objects[objects.size()-1]->data.index = objects.size()-1;
+			objects[objects.size()-1]->init();
 			gameFile.hitObjects.pop_back();
 		}
 		else
