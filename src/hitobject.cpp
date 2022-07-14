@@ -496,7 +496,7 @@ void Slider::init(){
 
 
     ticks = 0;
-    sliderDuration = ((double)(data.length/100) * (double)(data.timing.beatLength) / (double)((double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride) * (double)data.slides);
+    sliderDuration = (double)(data.length/100) * (double)(data.timing.beatLength) / (double)((double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride);
     currentDuration = 0.0f;
     while(true){
         currentDuration += (double)data.timing.beatLength / (double)gm->slidertickrate;
@@ -508,22 +508,33 @@ void Slider::init(){
     }
     if(ticks < 0)
         ticks = 0;
+
+    std::vector<int> indices;
+
     for(int i = 1; i <= ticks; i++){
-        //std::cout << (double)(i) * (double)((double)data.timing.beatLength / (double)gm->slidertickrate) << std::endl;
         double absolutePosition = ((double)(i) * (double)((double)data.timing.beatLength / (double)gm->slidertickrate));
         bool add = true;
-        for(int k = 1; k <= (int)data.slides; k++){
-            if(AreSame((double)absolutePosition, ((double)sliderDuration/(double)data.slides)*(double)k)){
-                add = false;
-                break;
-            }
-            //std::cout << absolutePosition << " " << ((double)sliderDuration/(double)data.slides)*(double)k << " " << k << std::endl;
-        }
+        if(AreSame((double)absolutePosition, (double)sliderDuration))
+            add = false;
         absolutePosition = ((double)absolutePosition) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
         absolutePosition  *= (double)100;
         if(add)
-            tickPositions.push_back((int)absolutePosition);
-        //std::cout << tickPositions[i-1] << std::endl;
+            indices.push_back((int)absolutePosition);
+    }
+
+    ticks = indices.size();
+
+    for(int i = 0; i < data.slides; i++){
+        if(i % 2 == 0){
+            for(int j = 0; j < indices.size(); j++){
+                tickPositions.push_back((int)indices[j] + (int)((double)i * data.length));
+            }
+        }
+        else{
+            for(int j = indices.size() - 1; j >= 0; j--){
+                tickPositions.push_back((data.length - (int)indices[j]) + (int)((double)i * data.length));
+            }
+        }
     }
 }
 
@@ -566,7 +577,11 @@ void Slider::update(){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && Global.Key1D)
             is_hit_at_end = true;
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
-
+        std::cout << ticks << std::endl;
+        for(int i = 0; i < tickPositions.size(); i++){
+            std::cout << tickPositions[i] << " - ";
+        }
+        std::cout << std::endl << data.length << std::endl;
         data.time = gm->currentTime*1000;
         data.point = 0;
         gm->clickCombo = 0;
@@ -648,8 +663,13 @@ void Slider::render(){
     for(int i = 0; i < tickPositions.size(); i++){
         if(tickPositions[i] > (int)time && (int) time > 0){
             double absolutePosition = tickPositions[i];
+            int k = 0;
             while(absolutePosition > (double)data.length){
                 absolutePosition -= (double)data.length;
+                k++;
+            }
+            if(k % 2 == 1){
+                absolutePosition = data.length - absolutePosition;
             }
             absolutePosition = std::max((double)0,absolutePosition);
             absolutePosition = std::min((int)absolutePosition, static_cast<int>(renderPoints.size()-1));
