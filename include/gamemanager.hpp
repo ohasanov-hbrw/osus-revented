@@ -24,6 +24,7 @@ class GameManager{
 		Texture2D hit100;
 		Texture2D hit300;
 		Texture2D sliderb;
+		Texture2D sliderscorepoint;
 		Texture2D sliderfollow;
 		Texture2D reverseArrow;
 		Texture2D sliderin;

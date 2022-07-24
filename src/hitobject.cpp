@@ -207,13 +207,13 @@ void Circle::dead_render(){
     if(data.point != 0)
         DrawTextureCenter(gm->selectCircle, data.x, data.y, scale*gm->circlesize/gm->selectCircle.width , renderColor);
     if(data.point == 0)
-        DrawTextureCenter(gm->hit0, data.x, data.y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
+        DrawTextureCenter(gm->hit0, data.x, data.y, (gm->circlesize/gm->hit0.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 1)
-        DrawTextureCenter(gm->hit50, data.x, data.y, (gm->circlesize/gm->hit50.width)*0.5f , Fade(WHITE,clampedFade));
+        DrawTextureCenter(gm->hit50, data.x, data.y, (gm->circlesize/gm->hit50.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 2)
-        DrawTextureCenter(gm->hit100, data.x, data.y, (gm->circlesize/gm->hit100.width)*0.5f , Fade(WHITE,clampedFade));
+        DrawTextureCenter(gm->hit100, data.x, data.y, (gm->circlesize/gm->hit100.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 3)
-        DrawTextureCenter(gm->hit300, data.x, data.y, (gm->circlesize/gm->hit300.width)*0.5f , Fade(WHITE,clampedFade));
+        DrawTextureCenter(gm->hit300, data.x, data.y, (gm->circlesize/gm->hit300.width)*0.7f , Fade(WHITE,clampedFade));
 }
 
 //just gives more time to render the "dead" Circle 
@@ -528,14 +528,17 @@ void Slider::init(){
         if(i % 2 == 0){
             for(int j = 0; j < indices.size(); j++){
                 tickPositions.push_back((int)indices[j] + (int)((double)i * data.length));
+                tickclicked.push_back(-1);
             }
         }
         else{
             for(int j = indices.size() - 1; j >= 0; j--){
                 tickPositions.push_back((data.length - (int)indices[j]) + (int)((double)i * data.length));
+                tickclicked.push_back(-1);
             }
         }
     }
+    //std::cout << "Init finished" << std::endl;
 }
 
 void Slider::update(){
@@ -571,20 +574,28 @@ void Slider::update(){
             position = absolutePosition + 1.0f; 
     }
     position = std::max((double)0,position);
-    if (is_hit_at_first || gm->currentTime*1000 > data.time + gm->gameFile.p100Final)
+    if (is_hit_at_first || gm->currentTime*1000 > data.time + gm->gameFile.p50Final)
         state = false;
+    if(!state and !is_hit_at_first){
+        gm->clickCombo = 0;
+    }
+    if((gm->currentTime*1000 - data.time > 0 or !state)){
+        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize))
+            inSlider = true;
+        else
+            inSlider = false;
+    }
+    else{
+        inSlider = false;
+    }
     if(gm->currentTime*1000 > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && Global.Key1D)
             is_hit_at_end = true;
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
-        std::cout << ticks << std::endl;
-        for(int i = 0; i < tickPositions.size(); i++){
-            std::cout << tickPositions[i] << " - ";
-        }
-        std::cout << std::endl << data.length << std::endl;
         data.time = gm->currentTime*1000;
         data.point = 0;
-        gm->clickCombo = 0;
+        //gm->clickCombo = 0;
+        std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << std::endl;
         gm->destroyHitObject(data.index);
     }
 }
@@ -646,8 +657,39 @@ void Slider::render(){
         }
         if(curRepeat%2 == 0)
             angle+=180;
+        for(int i = 0; i < tickPositions.size(); i++){
+            if(tickPositions[i] <= (int)time && (int) time > 0){
+                if(tickclicked[i] == -1){
+                    if(inSlider){
+                        tickclicked[i] = 1;
+                        ticknumber++;
+                        gm->clickCombo++;
+                    }
+                    else{
+                        tickclicked[i] = 0;
+                        gm->clickCombo = 0;
+                    }
+                }
+            }
+            if(tickPositions[i] > (int)time && (int) time > 0){
+                double absolutePosition = tickPositions[i];
+                int k = 0;
+                while(absolutePosition > (double)data.length){
+                    absolutePosition -= (double)data.length;
+                    k++;
+                }
+                if(k % 2 == 1){
+                    absolutePosition = data.length - absolutePosition;
+                }
+                absolutePosition = std::max((double)0,absolutePosition);
+                absolutePosition = std::min((int)absolutePosition, static_cast<int>(renderPoints.size()-1));
+                //DrawCircleV(ScaleCords(renderPoints[(int)absolutePosition]), Scale(6) , RED);
+                Vector2 pos = renderPoints[(int)absolutePosition];
+                DrawTextureCenter(gm->sliderscorepoint, pos.x, pos.y, (gm->circlesize/gm->sliderscorepoint.width)/3.5f , WHITE);
+            }
+        }
         DrawTextureRotate(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, gm->circlesize/gm->sliderb.width , angle, Fade(WHITE,clampedFade));
-        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize))
+        if(inSlider)
             DrawTextureRotate(gm->sliderfollow, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderfollow.width)*2 , angle, Fade(WHITE,clampedFade));
     }
 
@@ -658,23 +700,6 @@ void Slider::render(){
         DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width, Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width , Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width , renderColor);
-    }
-
-    for(int i = 0; i < tickPositions.size(); i++){
-        if(tickPositions[i] > (int)time && (int) time > 0){
-            double absolutePosition = tickPositions[i];
-            int k = 0;
-            while(absolutePosition > (double)data.length){
-                absolutePosition -= (double)data.length;
-                k++;
-            }
-            if(k % 2 == 1){
-                absolutePosition = data.length - absolutePosition;
-            }
-            absolutePosition = std::max((double)0,absolutePosition);
-            absolutePosition = std::min((int)absolutePosition, static_cast<int>(renderPoints.size()-1));
-            DrawCircleV(ScaleCords(renderPoints[(int)absolutePosition]), Scale(6) , RED);
-        }
     }
 }
 
@@ -697,6 +722,7 @@ void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
     if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000){
         UnloadRenderTexture(sliderTexture);
+        
         gm->destroyDeadHitObject(data.index);
     }
 }

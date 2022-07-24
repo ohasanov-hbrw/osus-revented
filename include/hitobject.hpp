@@ -102,12 +102,17 @@ class Slider : public HitObject{
         int calPos;
         int curRepeat = 0;
         Vector2 extraPosition;
+        bool earlyhit = false;
+        
     private:
         double sliderDuration;
         double currentDuration;
         double time;
         int ticks;
         std::vector<int> tickPositions;
+        bool inSlider = false;
+        std::vector<int> tickclicked;
+        int ticknumber = 0;
         float timer;
         std::vector<Vector2> edgePoints; 
         RenderTexture2D sliderTexture;

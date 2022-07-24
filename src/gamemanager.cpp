@@ -111,59 +111,34 @@ void GameManager::update(){
 	int susSize = objects.size();
 	bool stop = true;
 	for(int i = susSize-1; i >= 0; i--){
-		if((std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final)){
-			if ((Global.Key1P or Global.Key2P) && stop && i == 0){
-				if (objects[i]->data.type != 2){
-					if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
-						if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
-							objects[i]->data.point = 0;
-							clickCombo = 0;
-						}
-						else if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p100Final){
-							objects[i]->data.point = 1;
-							score+= 50 + (50 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
-							clickCombo++;
-						}
-						else if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p300Final){
-							objects[i]->data.point = 2;
-							score+= 100 + (100 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
-							clickCombo++;
-						}
-						else{
-							objects[i]->data.point = 3;
-							score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
-							clickCombo++;
-						}
-						objects[i]->data.time = currentTime*1000;
-						destroyHitObject(i);
-						newSize = objects.size();
-						i--;
-						stop = false;
+		//if((std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final)){
+		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
+			if (objects[i]->data.type != 2){
+				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
+					if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
+						objects[i]->data.point = 0;
+						clickCombo = 0;
+					}
+					else if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p100Final){
+						objects[i]->data.point = 1;
+						score+= 50 + (50 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						clickCombo++;
+					}
+					else if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p300Final){
+						objects[i]->data.point = 2;
+						score+= 100 + (100 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						clickCombo++;
 					}
 					else{
-						objects[i]->data.index = i;
-						objects[i]->update();
-						newSize = objects.size();
-						if(newSize != oldSize){
-							i--;
-							oldSize = newSize;
-						}
+						objects[i]->data.point = 3;
+						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						clickCombo++;
 					}
-				}
-				else if (objects[i]->data.type == 2){
-					if(Slider* tempslider = dynamic_cast<Slider*>(objects[i]))
-						if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && currentTime*1000 < tempslider->data.time + gameFile.p50Final){
-        					tempslider->is_hit_at_first = true;
-							stop = false;
-						}
-        			//this cursed else train is nothing to worry about...
-    				objects[i]->data.index = i;
-					objects[i]->update();
+					objects[i]->data.time = currentTime*1000;
+					destroyHitObject(i);
 					newSize = objects.size();
-					if(newSize != oldSize){
-						i--;
-						oldSize = newSize;
-					}
+					i--;
+					stop = false;
 				}
 				else{
 					objects[i]->data.index = i;
@@ -173,6 +148,30 @@ void GameManager::update(){
 						i--;
 						oldSize = newSize;
 					}
+				}
+			}
+			else if (objects[i]->data.type == 2){
+				if(Slider* tempslider = dynamic_cast<Slider*>(objects[i]))
+					if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && currentTime*1000 < tempslider->data.time + gameFile.p50Final){
+						if(std::abs(currentTime*1000 - tempslider->data.time) > gameFile.p50Final){
+							tempslider->is_hit_at_first = true;
+							stop = false;
+							tempslider->earlyhit = true;
+							clickCombo = 0;
+						}
+						else{
+							tempslider->is_hit_at_first = true;
+							stop = false;
+							clickCombo++;
+						}
+					}
+				//this cursed else train is nothing to worry about...
+				objects[i]->data.index = i;
+				objects[i]->update();
+				newSize = objects.size();
+				if(newSize != oldSize){
+					i--;
+					oldSize = newSize;
 				}
 			}
 			else{
@@ -194,6 +193,16 @@ void GameManager::update(){
 				oldSize = newSize;
 			}
 		}
+		//}
+		/*else{
+			objects[i]->data.index = i;
+			objects[i]->update();
+			newSize = objects.size();
+			if(newSize != oldSize){
+				i--;
+				oldSize = newSize;
+			}
+		}*/
 	}
 	//also update the dead objects
 	for(size_t i = 0; i < dead_objects.size(); i++){
@@ -220,7 +229,8 @@ void GameManager::render(){
 	for(int i = dead_objects.size() - 1; i >= 0; i--){
 		dead_objects[i]->dead_render();
 	}
-	DrawCNumbersCenter(score, 320, 15, 0.5f, GREEN);
+	DrawCNumbersCenter(score, 320, 10, 0.4f, GREEN);
+	DrawCNumbersCenter(clickCombo, 320, 25, 0.4f, GREEN);
 	//render the points and the combo
 	
 }
@@ -320,6 +330,8 @@ void GameManager::loadGame(std::string filename){
 				hit50 = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("hit0", 0) == 0)
 				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderscorepoint", 0) == 0)
+				sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
 				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("sliderb0", 0) == 0)
@@ -369,6 +381,8 @@ void GameManager::loadGame(std::string filename){
 				hit50 = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("hit0", 0) == 0)
 				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderscorepoint", 0) == 0)
+				sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
 				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("sliderb0", 0) == 0)
@@ -408,6 +422,8 @@ void GameManager::loadGame(std::string filename){
 	SetTextureFilter(sliderb, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&sliderin);
 	SetTextureFilter(sliderin, TEXTURE_FILTER_TRILINEAR );
+	GenTextureMipmaps(&sliderscorepoint);
+	SetTextureFilter(sliderscorepoint, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&sliderout);
 	SetTextureFilter(sliderout, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&reverseArrow);
@@ -425,6 +441,7 @@ void GameManager::unloadGame(){
 	UnloadTexture(hitCircleOverlay);
 	UnloadTexture(selectCircle);
 	UnloadTexture(hitCircle);
+	UnloadTexture(sliderscorepoint);
 	UnloadTexture(approachCircle);
 	UnloadTexture(hit300);
 	UnloadTexture(hit100);
