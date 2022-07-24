@@ -523,21 +523,24 @@ void Slider::init(){
     }
 
     ticks = indices.size();
-
     for(int i = 0; i < data.slides; i++){
         if(i % 2 == 0){
+            reverseclicked.push_back(-1);
             for(int j = 0; j < indices.size(); j++){
                 tickPositions.push_back((int)indices[j] + (int)((double)i * data.length));
                 tickclicked.push_back(-1);
             }
         }
         else{
+            reverseclicked.push_back(-1);
             for(int j = indices.size() - 1; j >= 0; j--){
                 tickPositions.push_back((data.length - (int)indices[j]) + (int)((double)i * data.length));
                 tickclicked.push_back(-1);
             }
         }
     }
+    reverseclicked.pop_back();
+
     //std::cout << "Init finished" << std::endl;
 }
 
@@ -595,7 +598,7 @@ void Slider::update(){
         data.time = gm->currentTime*1000;
         data.point = 0;
         //gm->clickCombo = 0;
-        std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << std::endl;
+        std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << " Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f<< std::endl;
         gm->destroyHitObject(data.index);
     }
 }
@@ -645,7 +648,6 @@ void Slider::render(){
 
     calPos = position;
     calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
-
     if((gm->currentTime*1000 - data.time > 0 or !state) and renderPoints.size() > 0){
         if(calPos == 0){
             angle = atan2(renderPoints[calPos].y- renderPoints[calPos+1].y, renderPoints[calPos].x - renderPoints[calPos+1].x);
@@ -657,6 +659,19 @@ void Slider::render(){
         }
         if(curRepeat%2 == 0)
             angle+=180;
+        if(curRepeat > 0){
+            if(reverseclicked[curRepeat-1] == -1){
+                if(inSlider){
+                    reverseclicked[curRepeat-1] = 1;
+                    reversenumber++;
+                    gm->clickCombo++;
+                }
+                else{
+                    reverseclicked[curRepeat-1] = 0;
+                    gm->clickCombo = 0;
+                }
+            }
+        }
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){
                 if(tickclicked[i] == -1){

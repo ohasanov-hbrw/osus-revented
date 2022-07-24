@@ -112,7 +112,9 @@ class Slider : public HitObject{
         std::vector<int> tickPositions;
         bool inSlider = false;
         std::vector<int> tickclicked;
+        std::vector<int> reverseclicked;
         int ticknumber = 0;
+        int reversenumber = 0;
         float timer;
         std::vector<Vector2> edgePoints; 
         RenderTexture2D sliderTexture;
