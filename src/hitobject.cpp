@@ -256,6 +256,7 @@ void Slider::init(){
         //gets the total length of the calculated lines
         for(size_t i = 0; i < lineLengths.size(); i++)
             totalLength+=lineLengths[i];
+        
         //the calculated length is pretty different from the beatmap so we scale the calculations for that
         
         //add the render points to a vector
@@ -294,7 +295,7 @@ void Slider::init(){
         float totalCalculatedLength = 0;
         for(size_t i = 0; i < edgePoints.size(); i++){
             tempEdges.push_back(edgePoints[i]);
-            if((edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y) || i == edgePoints.size()-1){
+            if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
                 currentResolution = 0;
                 for(float j = 0; j < 1; j += 1.0f / 100.0f){
                     if(currentResolution > 100) break;
@@ -311,16 +312,16 @@ void Slider::init(){
                 tempRender.clear();
             }
         }
+        //std::cout << totalCalculatedLength << " vs " << data.length << std::endl;
         tempEdges.clear();
         tempRender.clear();
         int curveIndex = 0;
         for(size_t i = 0; i < edgePoints.size(); i++){
             tempEdges.push_back(edgePoints[i]);
-            if((edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y) || i == edgePoints.size()-1){
+            if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
                 std::vector<float> tValues;
                 currentResolution = 0;
                 float tempResolution = curveLengths[curveIndex];
-
                 std::vector<Vector2> samples;
                 std::vector<int> indices;
                 std::vector<float> lengths;
@@ -330,8 +331,12 @@ void Slider::init(){
                     samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
                     lengths.push_back(distance(samples[k], samples[k-1]) + lengths[k-1]);
                 }
-                for(int k = 1; k < tempResolution + 1; k++)
-                    lengths[k] /= lengths[tempResolution];
+                float maxlen = 1;
+                for(int k = 0; k < lengths.size(); k++){
+                    maxlen = std::max(lengths[k], maxlen);
+                }
+                for(int k = 0; k < lengths.size(); k++)
+                    lengths[k] /= lengths[maxlen];
                 indices.push_back(0);
                 for(int k = 1; k < tempResolution + 1; k++){
                     float s = (float)k / tempResolution;
@@ -510,18 +515,18 @@ void Slider::init(){
         ticks = 0;
 
     std::vector<int> indices;
-
-    for(int i = 1; i <= ticks; i++){
-        double absolutePosition = ((double)(i) * (double)((double)data.timing.beatLength / (double)gm->slidertickrate));
-        bool add = true;
-        if(AreSame((double)absolutePosition, (double)sliderDuration))
-            add = false;
-        absolutePosition = ((double)absolutePosition) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
-        absolutePosition  *= (double)100;
-        if(add)
-            indices.push_back((int)absolutePosition);
+    if(data.timing.renderTicks){
+        for(int i = 1; i <= ticks; i++){
+            double absolutePosition = ((double)(i) * (double)((double)data.timing.beatLength / (double)gm->slidertickrate));
+            bool add = true;
+            if(AreSame((double)absolutePosition, (double)sliderDuration))
+                add = false;
+            absolutePosition = ((double)absolutePosition) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
+            absolutePosition  *= (double)100;
+            if(add)
+                indices.push_back((int)absolutePosition);
+        }
     }
-
     ticks = indices.size();
     for(int i = 0; i < data.slides; i++){
         if(i % 2 == 0){
@@ -540,7 +545,7 @@ void Slider::init(){
         }
     }
     reverseclicked.pop_back();
-
+    //std::cout << " Slider length is " << data.length << " and we have " << renderPoints.size() << " render points" << std::endl;
     //std::cout << "Init finished" << std::endl;
 }
 
@@ -582,6 +587,10 @@ void Slider::update(){
     if(!state and !is_hit_at_first){
         gm->clickCombo = 0;
     }
+    calPos = position;
+    calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
+    /*if(data.length == 7105)
+        std::cout << renderPoints[calPos].x << " " << renderPoints[calPos].y << "\n";*/
     if((gm->currentTime*1000 - data.time > 0 or !state)){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize))
             inSlider = true;
@@ -646,8 +655,6 @@ void Slider::render(){
     if(repeat2 && position > 0)
         DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/gm->reverseArrow.width)*0.5f, angle, Fade(WHITE, clampedFade));
 
-    calPos = position;
-    calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
     if((gm->currentTime*1000 - data.time > 0 or !state) and renderPoints.size() > 0){
         if(calPos == 0){
             angle = atan2(renderPoints[calPos].y- renderPoints[calPos+1].y, renderPoints[calPos].x - renderPoints[calPos+1].x);

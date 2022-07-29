@@ -60,9 +60,10 @@ class GameManager{
 		std::vector<HitObject*> objects;
 		std::vector<HitObject*> dead_objects;
 		float clip(float value, float min, float max);
-		timingSettings timingSettingsForHitObject;
+		std::vector<timingSettings> timingSettingsForHitObject;
 		int index;
 		float circlesize = 54.48*2.0f;
+		double verytempbeat;
 	private:
 		static GameManager* inst_;
 		void init();

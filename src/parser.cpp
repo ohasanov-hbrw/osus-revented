@@ -148,7 +148,11 @@ GameFile Parser::parse(std::string filename){
 						std::vector<std::string> tempVector;
 						tempVector = parseSeperatedLists(subLine, ',');
 						tempTimingPoint.time = std::stoi(tempVector[0]);
-						tempTimingPoint.beatLength = std::stod(tempVector[1]);
+						tempTimingPoint.beatLength = -100;
+						if(tempVector[1] != "NaN")
+							tempTimingPoint.beatLength = std::stod(tempVector[1]);
+						else
+							tempTimingPoint.renderTicks = false;
 						tempTimingPoint.meter = std::stoi(tempVector[2]);
 						tempTimingPoint.sampleSet = std::stoi(tempVector[3]);
 						tempTimingPoint.sampleIndex = std::stoi(tempVector[4]);

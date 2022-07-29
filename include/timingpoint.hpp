@@ -12,4 +12,5 @@ struct TimingPoint
     int effects;
     double beatLength;
     bool uninherited;
+    bool renderTicks = true;
 };

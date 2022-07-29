@@ -15,7 +15,6 @@
 Globals Global;
 
 int main() {
-
     for(int i = 0; i < Global.GamePath.size(); i++) {
         if (Global.GamePath[i] == '\\')
             Global.GamePath[i] = '/';

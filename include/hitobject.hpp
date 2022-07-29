@@ -15,6 +15,7 @@ struct catmullRomSegment
 };
 
 struct timingSettings{
+    int time;
     double beatLength;
     float meter;
     float sampleSet;
@@ -23,6 +24,7 @@ struct timingSettings{
     bool uninherited;
     int effects;
     double sliderSpeedOverride = 1;
+    bool renderTicks = true;
 };
 
 struct HitObjectData{

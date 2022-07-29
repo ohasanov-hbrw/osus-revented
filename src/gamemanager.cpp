@@ -41,7 +41,7 @@ void GameManager::init(){
 	//hide the cursor because we have a custom one
 	
 	//load all the textures (can also do this in load_game)
-    timingSettingsForHitObject.sliderSpeedOverride = 1;
+    
 
 }
 
@@ -52,25 +52,33 @@ void GameManager::update(){
 	//get the mouse position and state
 	
 	//currently not used that much but it will be
+	//timingSettingsForHitObject.clear();
 	int timingSize = gameFile.timingPoints.size();
 	for(int i = timingSize-1; i >= 0; i--){
 		if(gameFile.timingPoints[i].time - gameFile.preempt <= currentTime*1000){
-			time = gameFile.timingPoints[i].time;
+			timingSettings tempTiming;
+			tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
+			tempTiming.sliderSpeedOverride = 1;
+			tempTiming.time = gameFile.timingPoints[i].time;
 			double tempBeatLength;
 			tempBeatLength = gameFile.timingPoints[i].beatLength;
 			//std::cout << "beatLength: " << tempBeatLength << std::endl;
-			if(tempBeatLength > 0)
-				timingSettingsForHitObject.beatLength = tempBeatLength;
-			timingSettingsForHitObject.meter = gameFile.timingPoints[i].meter;
-			timingSettingsForHitObject.sampleSet = gameFile.timingPoints[i].sampleSet;
-			timingSettingsForHitObject.sampleIndex = gameFile.timingPoints[i].sampleIndex;
-			timingSettingsForHitObject.volume = gameFile.timingPoints[i].volume;
-			timingSettingsForHitObject.uninherited = gameFile.timingPoints[i].uninherited;
-			timingSettingsForHitObject.effects = gameFile.timingPoints[i].effects;
-			//calculate the slider speed
-			if(tempBeatLength < 0){
-				timingSettingsForHitObject.sliderSpeedOverride = (100 / tempBeatLength * (-1));
+			if(tempBeatLength >= 0){
+				tempTiming.beatLength = tempBeatLength;
+				verytempbeat = tempBeatLength;
+				tempTiming.sliderSpeedOverride = 1;
 			}
+			if(tempBeatLength < 0){
+				tempTiming.sliderSpeedOverride = (100 / tempBeatLength * (-1));
+				tempTiming.beatLength = verytempbeat;
+			}
+			tempTiming.meter = gameFile.timingPoints[i].meter;
+			tempTiming.sampleSet = gameFile.timingPoints[i].sampleSet;
+			tempTiming.sampleIndex = gameFile.timingPoints[i].sampleIndex;
+			tempTiming.volume = gameFile.timingPoints[i].volume;
+			tempTiming.uninherited = gameFile.timingPoints[i].uninherited;
+			tempTiming.effects = gameFile.timingPoints[i].effects;
+			timingSettingsForHitObject.push_back(tempTiming);
 			gameFile.timingPoints.pop_back();
 		}
 		else
@@ -90,17 +98,31 @@ void GameManager::update(){
 			if(gameFile.comboColours.size()) objects[objects.size()-1]->data.colour = gameFile.comboColours[currentComboIndex];
 			objects[objects.size()-1]->data.comboNumber = combo;
 			combo++;
-			objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject.beatLength;
-			objects[objects.size()-1]->data.timing.meter = timingSettingsForHitObject.meter;
-			objects[objects.size()-1]->data.timing.sampleSet = timingSettingsForHitObject.sampleSet;
-			objects[objects.size()-1]->data.timing.sampleIndex = timingSettingsForHitObject.sampleIndex;
-			objects[objects.size()-1]->data.timing.volume = timingSettingsForHitObject.volume;
-			objects[objects.size()-1]->data.timing.uninherited = timingSettingsForHitObject.uninherited;
-			objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject.effects;
-			objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject.sliderSpeedOverride;
+			int index = 0;
+			for(int amog = 0; amog < timingSettingsForHitObject.size(); amog++){
+				if(timingSettingsForHitObject[amog].time > gameFile.hitObjects[i].time)
+					break;
+				index = amog;
+			}
+			
+			objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
+			objects[objects.size()-1]->data.timing.meter = timingSettingsForHitObject[index].meter;
+			objects[objects.size()-1]->data.timing.sampleSet = timingSettingsForHitObject[index].sampleSet;
+			objects[objects.size()-1]->data.timing.sampleIndex = timingSettingsForHitObject[index].sampleIndex;
+			objects[objects.size()-1]->data.timing.volume = timingSettingsForHitObject[index].volume;
+			objects[objects.size()-1]->data.timing.uninherited = timingSettingsForHitObject[index].uninherited;
+			objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject[index].effects;
+			objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject[index].sliderSpeedOverride;
 			objects[objects.size()-1]->data.index = objects.size()-1;
+			objects[objects.size()-1]->data.timing.renderTicks = timingSettingsForHitObject[index].renderTicks;
+			/*std::cout << "Time:" << timingSettingsForHitObject[index].time << " Beat:" << objects[objects.size()-1]->data.timing.beatLength <<
+			" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
+			" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;*/
 			objects[objects.size()-1]->init();
 			gameFile.hitObjects.pop_back();
+			for(int amog = 0; amog < index - 1; amog++){
+				timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
+			}
 		}
 		else
 			break;
