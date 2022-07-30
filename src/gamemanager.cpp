@@ -360,6 +360,20 @@ void GameManager::loadGame(std::string filename){
 				sliderb = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("reversearrow", 0) == 0)
 				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-circle", 0) == 0){
+				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
+				//renderSpinnerCircle = true;
+			}
+			else if(files[i].rfind("spinner-metre", 0) == 0){
+				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
+				//renderSpinnerMetre = true;
+			}
+			else if(files[i].rfind("spinner-bottom", 0) == 0)
+				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-top", 0) == 0)
+				spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-approachcircle", 0) == 0)
+				spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
 			else{
 				for(int j = 0; j < 10; j++){
 					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
@@ -369,6 +383,10 @@ void GameManager::loadGame(std::string filename){
 			}
 		}
 	}
+
+	renderSpinnerCircle = false;
+	renderSpinnerMetre = false;
+
 	files.clear();
 	Global.Path = "resources/skin/";
 	files = ls(".png");
@@ -411,6 +429,20 @@ void GameManager::loadGame(std::string filename){
 				sliderb = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("reversearrow", 0) == 0)
 				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-circle", 0) == 0){
+				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
+				renderSpinnerCircle = true;
+			}
+			else if(files[i].rfind("spinner-metre", 0) == 0){
+				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
+				renderSpinnerMetre = true;
+			}
+			else if(files[i].rfind("spinner-bottom", 0) == 0)
+				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-top", 0) == 0)
+				spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-approachcircle", 0) == 0)
+				spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
 			else{
 				for(int j = 0; j < 10; j++){
 					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
@@ -473,6 +505,11 @@ void GameManager::unloadGame(){
 	UnloadTexture(sliderin);
 	UnloadTexture(sliderout);
 	UnloadTexture(reverseArrow);
+	UnloadTexture(spinnerBottom);
+	UnloadTexture(spinnerTop);
+	UnloadTexture(spinnerCircle);
+	UnloadTexture(spinnerApproachCircle);
+	UnloadTexture(spinnerMetre);
 	for(int i = 0; i < 10; i++){
 		UnloadTexture(numbers[i]);
 	}
@@ -493,7 +530,7 @@ void GameManager::spawnHitObject(HitObjectData data){
 
 	}
 	else if(data.type == 3){
-		temp = new Circle(data);
+		temp = new Spinner(data);
 		objects.push_back(temp);
 	}
 	else {

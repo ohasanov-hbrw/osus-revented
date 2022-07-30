@@ -14,6 +14,8 @@ class GameManager{
 		void render();
 		float windowScale = 2.0f;
 		int skip = 1;
+		bool renderSpinnerCircle = false;
+		bool renderSpinnerMetre = false;
 		Texture2D hitCircle;
 		Texture2D hitCircleOverlay;
 		Texture2D approachCircle;
@@ -30,6 +32,11 @@ class GameManager{
 		Texture2D sliderin;
 		Texture2D sliderout;
 		Texture2D numbers[10];
+		Texture2D spinnerBottom;
+		Texture2D spinnerTop;
+		Texture2D spinnerCircle;
+		Texture2D spinnerApproachCircle;
+		Texture2D spinnerMetre;
 		Music backgroundMusic;
 		double currentTime;
 		double currentTimeTemp = -1;

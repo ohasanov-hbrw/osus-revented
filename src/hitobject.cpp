@@ -516,7 +516,7 @@ void Slider::init(){
         ticks = 0;
 
     std::vector<int> indices;
-    if(data.timing.renderTicks){
+    if(true || data.timing.renderTicks){
         for(int i = 1; i <= ticks; i++){
             double absolutePosition = ((double)(i) * (double)((double)data.timing.beatLength / (double)gm->slidertickrate));
             bool add = true;
@@ -709,6 +709,7 @@ void Slider::render(){
                 }
             }
         }
+        int ticksrendered = 0;
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){
                 if(tickclicked[i] == -1){
@@ -723,7 +724,7 @@ void Slider::render(){
                     }
                 }
             }
-            if(tickPositions[i] > (int)time && (int) time > 0){
+            if(tickPositions[i] > (int)time && (int) time > 0 && ticksrendered < 10){
                 double absolutePosition = tickPositions[i];
                 int k = 0;
                 while(absolutePosition > (double)data.length){
@@ -737,7 +738,9 @@ void Slider::render(){
                 absolutePosition = std::min((int)absolutePosition, static_cast<int>(renderPoints.size()-1));
                 //DrawCircleV(ScaleCords(renderPoints[(int)absolutePosition]), Scale(6) , RED);
                 Vector2 pos = renderPoints[(int)absolutePosition];
-                DrawTextureCenter(gm->sliderscorepoint, pos.x, pos.y, (gm->circlesize/gm->sliderscorepoint.width)/3.5f , WHITE);
+
+                DrawTextureCenter(gm->sliderscorepoint, pos.x, pos.y, (gm->circlesize/gm->sliderscorepoint.width)/3.5f , Fade(WHITE,clip((((10 - (float)ticksrendered) / 10)),0,1)));
+                ticksrendered++;
             }
         }
         DrawTextureRotate(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, gm->circlesize/gm->sliderb.width , angle, Fade(WHITE,clampedFade));
@@ -781,4 +784,58 @@ void Slider::dead_update(){
 
 void Slider::render_combo(){
     
+}
+
+//creates a circle
+Spinner::Spinner(HitObjectData data){
+    this->data = data;
+    init();
+}
+
+//initilizes a circle
+void Spinner::init(){}
+
+//the main code that runs for every circle on screen, the collision and point manager is in the GamerManager
+void Spinner::update(){
+    GameManager* gm = GameManager::getInstance();
+    //the circle is not clickable after some time so we check that
+    if(gm->currentTime*1000 > data.endTime){
+        data.time = gm->currentTime*1000;
+        data.point = 0;
+        gm->clickCombo = 0;
+        gm->destroyHitObject(data.index);
+    }
+}
+
+//renders the Circle
+void Spinner::render(){
+    GameManager* gm = GameManager::getInstance();
+    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
+}
+
+//renders the "dead" Circle
+void Spinner::dead_render(){
+    GameManager* gm = GameManager::getInstance();
+    float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
+    if(data.point == 0)
+        DrawTextureCenter(gm->hit0, data.x, data.y, (gm->circlesize/gm->hit0.width)*0.7f , Fade(WHITE,clampedFade));
+    else if(data.point == 1)
+        DrawTextureCenter(gm->hit50, data.x, data.y, (gm->circlesize/gm->hit50.width)*0.7f , Fade(WHITE,clampedFade));
+    else if(data.point == 2)
+        DrawTextureCenter(gm->hit100, data.x, data.y, (gm->circlesize/gm->hit100.width)*0.7f , Fade(WHITE,clampedFade));
+    else if(data.point == 3)
+        DrawTextureCenter(gm->hit300, data.x, data.y, (gm->circlesize/gm->hit300.width)*0.7f , Fade(WHITE,clampedFade));
+}
+
+//just gives more time to render the "dead" Circle 
+void Spinner::dead_update(){
+    GameManager* gm = GameManager::getInstance();
+    //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
+    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000){
+        gm->destroyDeadHitObject(data.index);
+    }
+}
+
+//renders the combo number on top of the circle, NEED TO FIX THE DIGITS
+void Spinner::render_combo(){
 }

@@ -122,3 +122,16 @@ class Slider : public HitObject{
         RenderTexture2D sliderTexture;
         float minX = static_cast<float>(INT_MAX), minY = static_cast<float>(INT_MAX), maxX = INT_MIN, maxY = INT_MIN;
 };
+
+class Spinner : public HitObject{
+    public:
+        Spinner(HitObjectData data);
+        void init() override; 
+        void render() override;
+        void render_combo() override;
+        void update() override;
+        void dead_update() override;
+        void dead_render() override;
+    private:
+
+};
