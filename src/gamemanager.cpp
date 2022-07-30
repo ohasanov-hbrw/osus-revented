@@ -134,6 +134,9 @@ void GameManager::update(){
 	bool stop = true;
 	for(int i = susSize-1; i >= 0; i--){
 		//if((std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final)){
+		if(i == 0){
+			objects[i]->data.touch = true;
+		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
@@ -163,7 +166,7 @@ void GameManager::update(){
 					stop = false;
 				}
 				else{
-					objects[i]->data.index = i;
+					objects[i]->data.touch = true;
 					objects[i]->update();
 					newSize = objects.size();
 					if(newSize != oldSize){
@@ -290,7 +293,7 @@ void GameManager::loadGame(std::string filename){
 		gameFile.preempt = 1200 + 600 * (5 - std::stoi(gameFile.configDifficulty["ApproachRate"])) / 5;
 		gameFile.fade_in = 800 + 400 * (5 - std::stoi(gameFile.configDifficulty["ApproachRate"])) / 5;
 	}
-	else if(std::stoi(gameFile.configDifficulty["ApproachRate"]) < 5){
+	else if(std::stoi(gameFile.configDifficulty["ApproachRate"]) > 5){
 		gameFile.preempt = 1200 - 750 * (std::stoi(gameFile.configDifficulty["ApproachRate"]) - 5) / 5;
 		gameFile.fade_in = 800 - 500 * (std::stoi(gameFile.configDifficulty["ApproachRate"]) - 5) / 5;
 	}
@@ -298,13 +301,24 @@ void GameManager::loadGame(std::string filename){
 		gameFile.preempt = 1200;
 		gameFile.fade_in = 800;
 	}
+	float od = std::stoi(gameFile.configDifficulty["OverallDifficulty"]);
+	if(od < 5){
+		spinsPerSecond = 5.0f - 2.0f * (5.0f - od) / 5.0f;
+	}
+	else if(od > 5){
+		spinsPerSecond = 5.0f - 2.0f * (od - 5.0f) / 5.0f;
+	}
+	else{
+		spinsPerSecond = 5.0f;
+	}
 	gameFile.p300Final = gameFile.p300 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p300Change;
 	gameFile.p100Final = gameFile.p100 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p100Change;
 	gameFile.p50Final = gameFile.p50 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p50Change;
 	//debug, just say what the name of the music file is and load it
 	std::cout << (Global.Path + '/' + gameFile.configGeneral["AudioFilename"]) << std::endl;
 	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
-	
+	score = 0;
+	clickCombo = 0;
     //these are not used right now, USE THEM
 	float hpdrainrate = std::stof(gameFile.configDifficulty["HPDrainRate"]);
 	circlesize = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
@@ -388,7 +402,7 @@ void GameManager::loadGame(std::string filename){
 	renderSpinnerMetre = false;
 
 	files.clear();
-	Global.Path = "resources/skin/";
+	//Global.Path = "resources/skin/";
 	files = ls(".png");
 
 	std::sort(files.begin(), files.end(), []

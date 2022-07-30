@@ -52,6 +52,7 @@ struct HitObjectData{
     bool useDefaultHitSound;
     std::vector<int> colour;
     timingSettings timing;
+    bool touch = false;
 };
 
 class HitObject{
@@ -132,6 +133,16 @@ class Spinner : public HitObject{
         void update() override;
         void dead_update() override;
         void dead_render() override;
+        float renderAngle = 0;
+        float totalAngle = 0;
+        float neededAngle = 0;
+        float lastAngle = 0;
+        int startRotation = 0;
+        int rotation = 0;
+        bool first = false;
+        int extra = 1;
+        bool hit = false;
     private:
+
 
 };
