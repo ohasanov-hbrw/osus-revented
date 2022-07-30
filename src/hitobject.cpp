@@ -624,7 +624,6 @@ void Slider::update(){
         if(AreSame(succ,100.0f))
             data.point = 3;
         if(data.point == 0){
-            gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
             gm->clickCombo = 0;
         }
         else if(data.point == 1){
