@@ -306,7 +306,7 @@ void Slider::init(){
                 float tempLength = 0;
                 for(size_t i = 1; i < tempRender.size(); i += 1)
                     tempLength += std::sqrt(std::pow(std::abs(tempRender[i-1].x - tempRender[i].x),2) + std::pow(std::abs(tempRender[i-1].y - tempRender[i].y),2));
-                curveLengths.push_back(tempLength);
+                curveLengths.push_back(tempLength + 1);
                 totalCalculatedLength += tempLength;
                 tempEdges.clear();
                 tempRender.clear();
@@ -358,6 +358,7 @@ void Slider::init(){
                 if(i != edgePoints.size()-1 && renderPoints.size() > 1)
                     renderPoints.pop_back();
                 curveIndex++;
+                
                 tempEdges.clear();
             }
         }
