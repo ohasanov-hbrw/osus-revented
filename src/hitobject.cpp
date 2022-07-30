@@ -601,14 +601,44 @@ void Slider::update(){
     else{
         inSlider = false;
     }
-    if(gm->currentTime*1000 > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
-        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && Global.Key1D)
+    float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
+    if(gm->currentTime*1000 > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
+        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && (Global.Key1D || Global.Key2D))
             is_hit_at_end = true;
+    }
+    if(gm->currentTime*1000 > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
+        
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
         data.time = gm->currentTime*1000;
         data.point = 0;
         //gm->clickCombo = 0;
-        std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << " Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f<< std::endl;
+        //std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << " Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f<< std::endl;
+        
+        float succ = ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f;
+        if(AreSame(succ,0))
+            data.point = 0;
+        if(succ > 0.0f)
+            data.point = 1;
+        if(succ >= 50.0f)
+            data.point = 2;
+        if(AreSame(succ,100.0f))
+            data.point = 3;
+        if(data.point == 0){
+            gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+            gm->clickCombo = 0;
+        }
+        else if(data.point == 1){
+            gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+            gm->clickCombo++;
+        }
+        else if(data.point == 2){
+            gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+            gm->clickCombo++;
+        }
+        else if(data.point == 3){
+            gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+            gm->clickCombo++;
+        }
         gm->destroyHitObject(data.index);
     }
 }
