@@ -140,6 +140,23 @@ void GameManager::update(){
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
+                    switch(objects[i]->data.hitSound) {
+                        case 1: {
+                            PlaySound(hitCircleHS.normal);
+                        } break;
+                        case 2: {
+                            PlaySound(hitCircleHS.whistle);
+                        } break;
+                        case 4: {
+                            PlaySound(hitCircleHS.finish);
+                        } break;
+                        case 8: {
+                            PlaySound(hitCircleHS.clap);
+                        } break;
+                        default: {
+                            PlaySound(hitCircleHS.normal);
+                        } break;
+                    }
 					if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
 						objects[i]->data.point = 0;
 						clickCombo = 0;
@@ -466,6 +483,33 @@ void GameManager::loadGame(std::string filename){
 			}
 		}
 	}
+
+	files.clear();
+	//Global.Path = "resources/skin/";
+	files = ls(".wav");
+
+	std::sort(files.begin(), files.end(), []
+    (const std::string& first, const std::string& second){
+        return first.size() < second.size();
+    });
+	std::reverse(files.begin(), files.end());
+    for(const auto& file : files) {
+        auto final_path = (Global.Path + file);
+        if(file == "drum-hitclap.wav") {
+            hitCircleHS.clap = LoadSound(final_path.c_str());
+        }
+        else if(file == "drum-hitfinish.wav") {
+            hitCircleHS.finish = LoadSound(final_path.c_str());
+        }
+        else if(file == "drum-hitnormal.wav") {
+            hitCircleHS.normal = LoadSound(final_path.c_str());
+        }
+        else if(file == "drum-hitwhistle.wav") {
+            hitCircleHS.whistle = LoadSound(final_path.c_str());
+        }
+    }
+
+
 	sliderin = LoadTexture("resources/sliderin.png");
 	sliderout = LoadTexture("resources/sliderout.png");
 

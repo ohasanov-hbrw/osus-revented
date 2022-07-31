@@ -2,6 +2,13 @@
 #include "parser.hpp"
 #include <raylib.h>
 
+struct HitSound {
+    Sound normal;
+    Sound whistle;
+    Sound finish;
+    Sound clap;
+};
+
 class GameManager{
 	public:
 		static GameManager* getInstance();
@@ -13,6 +20,7 @@ class GameManager{
 		void destroyDeadHitObject(int index);
 		void render();
 		float windowScale = 2.0f;
+        HitSound hitCircleHS;
 		int skip = 1;
 		bool renderSpinnerCircle = false;
 		bool renderSpinnerMetre = false;
