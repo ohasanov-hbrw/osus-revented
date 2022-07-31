@@ -248,161 +248,31 @@ void Slider::init(){
     for(size_t i = 0; i < data.curvePoints.size(); i++)
         edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
     //if the "curve" is linear calculate the points needed to render the slider
-    if(data.curveType == 'L'){
-        //a linear "curve" consists of different sized lines so we calculate them here
-        std::vector<float> lineLengths;
-        for(size_t i = 0; i < edgePoints.size()-1; i++)
-            lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)));
-        //gets the total length of the calculated lines
-        for(size_t i = 0; i < lineLengths.size(); i++)
-            totalLength+=lineLengths[i];
-        
-        //the calculated length is pretty different from the beatmap so we scale the calculations for that
-        
-        //add the render points to a vector
-
-        float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
-       
-        float hipotenus = data.length - totalLength;
-        float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-        float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-        extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (angle/abs(angle))};
-        edgePoints[edgePoints.size()-1] = extraPosition;
-        totalLength-=lineLengths[lineLengths.size()-1];
-        lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
-        totalLength+=lineLengths[lineLengths.size()-1];
-        lengthScale = totalLength/data.length;
-
-        for(size_t i = 0; i < edgePoints.size()-1; i++)
-            for(float j = 0; j < lineLengths[i]; j += lengthScale)
-                renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/lineLengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/lineLengths[i]});
-        renderPoints.push_back(edgePoints[edgePoints.size()-1]);
-        //this is an inside joke, but yeah if we add more points than needed, we just delete them (doesn't happen that much)
-        while(!false){
-            if(renderPoints.size() <= data.length) break;
-            renderPoints.pop_back();
+    if(edgePoints.size() == 1){
+        for(int k = 0; k < data.length; k++){
+            renderPoints.push_back(edgePoints[0]);
         }
-        //std::cout << "Ldata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
     }
-    else if(data.curveType == 'B'){
-        //for the bezier curves we do the calculations in another function
-        Vector2 edges[edgePoints.size()];
-        for(size_t i = 0; i < edgePoints.size(); i++)
-            edges[i] = edgePoints[i];
-        std::vector<Vector2> tempEdges;
-        std::vector<Vector2> tempRender;
-        std::vector<float> curveLengths;
-        float totalCalculatedLength = 0;
-        for(size_t i = 0; i < edgePoints.size(); i++){
-            tempEdges.push_back(edgePoints[i]);
-            if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
-                currentResolution = 0;
-                for(float j = 0; j < 1; j += 1.0f / 100.0f){
-                    if(currentResolution > 100) break;
-                    currentResolution++;
-                    Vector2 tmp = getBezierPoint(tempEdges, tempEdges.size(), j);
-                    tempRender.push_back(tmp);
-                }
-                float tempLength = 0;
-                for(size_t i = 1; i < tempRender.size(); i += 1)
-                    tempLength += std::sqrt(std::pow(std::abs(tempRender[i-1].x - tempRender[i].x),2) + std::pow(std::abs(tempRender[i-1].y - tempRender[i].y),2));
-                curveLengths.push_back(tempLength + 1);
-                totalCalculatedLength += tempLength;
-                tempEdges.clear();
-                tempRender.clear();
-            }
-        }
-        //std::cout << totalCalculatedLength << " vs " << data.length << std::endl;
-        tempEdges.clear();
-        tempRender.clear();
-        int curveIndex = 0;
-        for(size_t i = 0; i < edgePoints.size(); i++){
-            tempEdges.push_back(edgePoints[i]);
-            if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
-                std::vector<float> tValues;
-                currentResolution = 0;
-                float tempResolution = curveLengths[curveIndex];
-                std::vector<Vector2> samples;
-                std::vector<int> indices;
-                std::vector<float> lengths;
-                lengths.push_back(0);
-                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
-                for(int k = 1; k < tempResolution + 1; k++){
-                    samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
-                    lengths.push_back(distance(samples[k], samples[k-1]) + lengths[k-1]);
-                }
-                float maxlen = 1;
-                for(int k = 0; k < lengths.size(); k++){
-                    maxlen = std::max(lengths[k], maxlen);
-                }
-                for(int k = 0; k < lengths.size(); k++)
-                    lengths[k] /= lengths[maxlen];
-                indices.push_back(0);
-                for(int k = 1; k < tempResolution + 1; k++){
-                    float s = (float)k / tempResolution;
-                    int j = Search(lengths,s,0,lengths.size()-1);
-                    indices.push_back(j);
-                }
-                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                for(float s = 0; s < 1; s += 1.0f / tempResolution){
-                    currentResolution++;
-                    if(currentResolution > tempResolution) break;
-                    if(s == 1){
-                        renderPoints.push_back(samples[samples.size() - 1]);
-                        continue;
-                    }
-                    int i = (int)(s * (float)indices.size());
-                    int t = indices[i];
-                    renderPoints.push_back(lerp(samples[t], samples[t+1], s * ((float)indices.size()) - (float)i));
-                }
-                if(i != edgePoints.size()-1 && renderPoints.size() > 1)
-                    renderPoints.pop_back();
-                curveIndex++;
-                
-                tempEdges.clear();
-            }
-        }
-        if(renderPoints.size() < data.length){
-            float angle = atan2(renderPoints[renderPoints.size()-1].y - renderPoints[renderPoints.size()-2].y, renderPoints[renderPoints.size()-1].x - renderPoints[renderPoints.size()-2].x) * 180 / 3.14159265;
-            float hipotenus = data.length - totalLength;
-            float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-            float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-            extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/abs(angle))};
-            int lerploc = renderPoints.size() - 1;
-            int res = 0;
-            for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {
-                res++;
-                if(res > hipotenus) break;
-                renderPoints.push_back(lerp(renderPoints[lerploc], extraPosition, i));
-            }
-        }
-        while(!false){
-            if(renderPoints.size() <= data.length)
-                break;
-            renderPoints.pop_back();
-        }
-        //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
-    }
-    else if(data.curveType == 'P'){
-        std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
-        float inf = std::numeric_limits<float>::infinity();
-        if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
+    else{
+        if(data.curveType == 'L'){
+            //a linear "curve" consists of different sized lines so we calculate them here
             std::vector<float> lineLengths;
             for(size_t i = 0; i < edgePoints.size()-1; i++)
                 lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)));
             //gets the total length of the calculated lines
             for(size_t i = 0; i < lineLengths.size(); i++)
                 totalLength+=lineLengths[i];
+            
             //the calculated length is pretty different from the beatmap so we scale the calculations for that
             
             //add the render points to a vector
-
+            
             float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
         
             float hipotenus = data.length - totalLength;
             float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
             float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-            extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y + ydiff};
+            extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (angle/abs(angle))};
             edgePoints[edgePoints.size()-1] = extraPosition;
             totalLength-=lineLengths[lineLengths.size()-1];
             lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
@@ -418,63 +288,201 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
+        
+            //std::cout << "Ldata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
         }
-        else{
-            Vector2 center = circleData.first;
-            int radius = circleData.second;
-            float degree1 = atan2(edgePoints[0].y - center.y , edgePoints[0].x - center.x) * RAD2DEG;
-            float degree2 = atan2(edgePoints[1].y - center.y , edgePoints[1].x - center.x) * RAD2DEG;
-            float degree3 = atan2(edgePoints[2].y - center.y , edgePoints[2].x - center.x) * RAD2DEG;
-            degree1 = degree1 < 0 ? degree1 + 360 : degree1;
-            degree2 = degree2 < 0 ? degree2 + 360 : degree2;
-            degree3 = degree3 < 0 ? degree3 + 360 : degree3;
-            bool clockwise = !orientation(edgePoints[0], edgePoints[1], edgePoints[2]);
-            float angle = (((data.length * 360) / radius ) / 3.14159265 ) / 2;
-            int a = 0;
-            if(clockwise){
-                degree1 = degree1 < degree3 ? degree1 + 360 : degree1;
-                degree2 = degree2 < degree3 ? degree2 + 360 : degree2;
-                for(float i = degree1; i > degree1 - angle; i-=angle/data.length){
-                    if(a > data.length){
-                        renderPoints.pop_back();
-                        break;
+        else if(data.curveType == 'B'){
+            //for the bezier curves we do the calculations in another function
+            Vector2 edges[edgePoints.size()];
+            for(size_t i = 0; i < edgePoints.size(); i++)
+                edges[i] = edgePoints[i];
+            std::vector<Vector2> tempEdges;
+            std::vector<Vector2> tempRender;
+            std::vector<float> curveLengths;
+            float totalCalculatedLength = 0;
+            for(size_t i = 0; i < edgePoints.size(); i++){
+                tempEdges.push_back(edgePoints[i]);
+                if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
+                    currentResolution = 0;
+                    for(float j = 0; j < 1; j += 1.0f / 100.0f){
+                        if(currentResolution > 100) break;
+                        currentResolution++;
+                        Vector2 tmp = getBezierPoint(tempEdges, tempEdges.size(), j);
+                        tempRender.push_back(tmp);
                     }
-                    Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
-                    renderPoints.push_back(tempPoint);
-                    a++;
+                    float tempLength = 0;
+                    for(size_t i = 1; i < tempRender.size(); i += 1)
+                        tempLength += std::sqrt(std::pow(std::abs(tempRender[i-1].x - tempRender[i].x),2) + std::pow(std::abs(tempRender[i-1].y - tempRender[i].y),2));
+                    curveLengths.push_back(tempLength + 1);
+                    totalCalculatedLength += tempLength;
+                    tempEdges.clear();
+                    tempRender.clear();
+                }
+            }
+            //std::cout << totalCalculatedLength << " vs " << data.length << std::endl;
+            tempEdges.clear();
+            tempRender.clear();
+            int curveIndex = 0;
+            for(size_t i = 0; i < edgePoints.size(); i++){
+                tempEdges.push_back(edgePoints[i]);
+                if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
+                    std::vector<float> tValues;
+                    currentResolution = 0;
+                    float tempResolution = curveLengths[curveIndex];
+                    std::vector<Vector2> samples;
+                    std::vector<int> indices;
+                    std::vector<float> lengths;
+                    lengths.push_back(0);
+                    samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
+                    for(int k = 1; k < tempResolution + 1; k++){
+                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
+                        lengths.push_back(distance(samples[k], samples[k-1]) + lengths[k-1]);
+                    }
+                    float maxlen = 1;
+                    for(int k = 0; k < lengths.size(); k++){
+                        maxlen = std::max(lengths[k], maxlen);
+                    }
+                    for(int k = 0; k < lengths.size(); k++)
+                        lengths[k] /= lengths[maxlen];
+                    indices.push_back(0);
+                    for(int k = 1; k < tempResolution + 1; k++){
+                        float s = (float)k / tempResolution;
+                        int j = Search(lengths,s,0,lengths.size()-1);
+                        indices.push_back(j);
+                    }
+                    samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                    for(float s = 0; s < 1; s += 1.0f / tempResolution){
+                        currentResolution++;
+                        if(currentResolution > tempResolution) break;
+                        if(s == 1){
+                            renderPoints.push_back(samples[samples.size() - 1]);
+                            continue;
+                        }
+                        int i = (int)(s * (float)indices.size());
+                        int t = indices[i];
+                        renderPoints.push_back(lerp(samples[t], samples[t+1], s * ((float)indices.size()) - (float)i));
+                    }
+                    if(i != edgePoints.size()-1 && renderPoints.size() > 1)
+                        renderPoints.pop_back();
+                    curveIndex++;
+                    
+                    tempEdges.clear();
+                }
+            }
+            if(renderPoints.size() < data.length){
+                float angle = atan2(renderPoints[renderPoints.size()-1].y - renderPoints[renderPoints.size()-2].y, renderPoints[renderPoints.size()-1].x - renderPoints[renderPoints.size()-2].x) * 180 / 3.14159265;
+                float hipotenus = data.length - totalLength;
+                float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+                float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
+                extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/abs(angle))};
+                int lerploc = renderPoints.size() - 1;
+                int res = 0;
+                for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {
+                    res++;
+                    if(res > hipotenus) break;
+                    renderPoints.push_back(lerp(renderPoints[lerploc], extraPosition, i));
+                }
+            }
+            while(!false){
+                if(renderPoints.size() <= data.length)
+                    break;
+                renderPoints.pop_back();
+            }
+            //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
+        }
+        else if(data.curveType == 'P'){
+            std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
+            float inf = std::numeric_limits<float>::infinity();
+            if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
+                std::vector<float> lineLengths;
+                for(size_t i = 0; i < edgePoints.size()-1; i++)
+                    lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)));
+                //gets the total length of the calculated lines
+                for(size_t i = 0; i < lineLengths.size(); i++)
+                    totalLength+=lineLengths[i];
+                //the calculated length is pretty different from the beatmap so we scale the calculations for that
+                
+                //add the render points to a vector
+
+                float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
+            
+                float hipotenus = data.length - totalLength;
+                float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+                float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
+                extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y + ydiff};
+                edgePoints[edgePoints.size()-1] = extraPosition;
+                totalLength-=lineLengths[lineLengths.size()-1];
+                lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
+                totalLength+=lineLengths[lineLengths.size()-1];
+                lengthScale = totalLength/data.length;
+
+                for(size_t i = 0; i < edgePoints.size()-1; i++)
+                    for(float j = 0; j < lineLengths[i]; j += lengthScale)
+                        renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/lineLengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/lineLengths[i]});
+                renderPoints.push_back(edgePoints[edgePoints.size()-1]);
+                //this is an inside joke, but yeah if we add more points than needed, we just delete them (doesn't happen that much)
+                while(!false){
+                    if(renderPoints.size() <= data.length) break;
+                    renderPoints.pop_back();
                 }
             }
             else{
-                degree2 = degree2 < degree1 ? degree2 + 360 : degree2;
-                degree3 = degree3 < degree1 ? degree3 + 360 : degree3;
-                for(float i = degree1; i < degree1 + angle; i+=angle/data.length){
-                    if(a > data.length){
-                        renderPoints.pop_back();
-                        break;
+                Vector2 center = circleData.first;
+                int radius = circleData.second;
+                float degree1 = atan2(edgePoints[0].y - center.y , edgePoints[0].x - center.x) * RAD2DEG;
+                float degree2 = atan2(edgePoints[1].y - center.y , edgePoints[1].x - center.x) * RAD2DEG;
+                float degree3 = atan2(edgePoints[2].y - center.y , edgePoints[2].x - center.x) * RAD2DEG;
+                degree1 = degree1 < 0 ? degree1 + 360 : degree1;
+                degree2 = degree2 < 0 ? degree2 + 360 : degree2;
+                degree3 = degree3 < 0 ? degree3 + 360 : degree3;
+                bool clockwise = !orientation(edgePoints[0], edgePoints[1], edgePoints[2]);
+                float angle = (((data.length * 360) / radius ) / 3.14159265 ) / 2;
+                int a = 0;
+                if(clockwise){
+                    degree1 = degree1 < degree3 ? degree1 + 360 : degree1;
+                    degree2 = degree2 < degree3 ? degree2 + 360 : degree2;
+                    for(float i = degree1; i > degree1 - angle; i-=angle/data.length){
+                        if(a > data.length){
+                            renderPoints.pop_back();
+                            break;
+                        }
+                        Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
+                        renderPoints.push_back(tempPoint);
+                        a++;
                     }
-                    Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
-                    renderPoints.push_back(tempPoint);
-                    a++;
                 }
-                //std::reverse(renderPoints.begin(), renderPoints.end());
+                else{
+                    degree2 = degree2 < degree1 ? degree2 + 360 : degree2;
+                    degree3 = degree3 < degree1 ? degree3 + 360 : degree3;
+                    for(float i = degree1; i < degree1 + angle; i+=angle/data.length){
+                        if(a > data.length){
+                            renderPoints.pop_back();
+                            break;
+                        }
+                        Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
+                        renderPoints.push_back(tempPoint);
+                        a++;
+                    }
+                    //std::reverse(renderPoints.begin(), renderPoints.end());
+                }
+                while(renderPoints.size() > data.length){
+                    renderPoints.pop_back();
+                }
+                //std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
             }
-            while(renderPoints.size() > data.length){
+            
+        }
+        else if(data.curveType == 'C'){
+            renderPoints = interpolate(edgePoints, data.length);
+            while(!false){
+                if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
-            //std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
+            //std::cout << "Cdata: " << data.length << " calculated: " << -1 << std::endl;
         }
-        
-    }
-    else if(data.curveType == 'C'){
-        renderPoints = interpolate(edgePoints, data.length);
-        while(!false){
-            if(renderPoints.size() <= data.length) break;
-            renderPoints.pop_back();
+        else{
+            std::__throw_invalid_argument("Invalid Slider type!");
         }
-        //std::cout << "Cdata: " << data.length << " calculated: " << -1 << std::endl;
-    }
-    else{
-        std::__throw_invalid_argument("Invalid Slider type!");
     }
     for(size_t i = 0; i < renderPoints.size(); i++){
         minX = std::min(minX, renderPoints[i].x);
