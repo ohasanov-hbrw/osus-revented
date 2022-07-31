@@ -419,7 +419,7 @@ void GameManager::loadGame(std::string filename){
 	renderSpinnerMetre = false;
 
 	files.clear();
-	//Global.Path = "resources/skin/";
+	Global.Path = "resources/skin/";
 	files = ls(".png");
 
 	std::sort(files.begin(), files.end(), []
