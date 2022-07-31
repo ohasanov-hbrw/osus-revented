@@ -120,6 +120,7 @@ void GameManager::update(){
 			" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;*/
 			objects[objects.size()-1]->init();
 			gameFile.hitObjects.pop_back();
+			spawnedHitObjects++;
 			for(int amog = 0; amog < index - 1; amog++){
 				timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
 			}
@@ -279,6 +280,12 @@ void GameManager::render(){
 
 void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
+	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
+		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
+		if(IsKeyPressed(KEY_S)){
+			SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
+		}
+	}
 	if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
 		stop = true;
 	if(stop && currentTime < 1.0f)
@@ -293,6 +300,7 @@ void GameManager::run(){
 			currentTime += GetFrameTime();
 		}
 	}
+	
 	GameManager::update();
 
 }
@@ -300,23 +308,24 @@ void GameManager::run(){
 //load the beatmap
 void GameManager::loadGame(std::string filename){
 	//create a parser and parse the file
+	spawnedHitObjects = 0;
 	Parser parser = Parser();
 	gameFile = parser.parse(filename);
 	//reverse the hitobject array because we need it reversed for it to make sense (and make it faster because pop_back)
 	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
 	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
 	//calculate all the variables for the game (these may be a bit wrong but they feel right)
-	if(std::stoi(gameFile.configDifficulty["ApproachRate"]) < 5){
-		gameFile.preempt = 1200 + 600 * (5 - std::stoi(gameFile.configDifficulty["ApproachRate"])) / 5;
-		gameFile.fade_in = 800 + 400 * (5 - std::stoi(gameFile.configDifficulty["ApproachRate"])) / 5;
+	if(std::stof(gameFile.configDifficulty["ApproachRate"]) < 5.0f){
+		gameFile.preempt = 1200.0f + 600.0f * (5.0f - std::stof(gameFile.configDifficulty["ApproachRate"])) / 5.0f;
+		gameFile.fade_in = 800.0f + 400.0f * (5.0f - std::stof(gameFile.configDifficulty["ApproachRate"])) / 5.0f;
 	}
-	else if(std::stoi(gameFile.configDifficulty["ApproachRate"]) > 5){
-		gameFile.preempt = 1200 - 750 * (std::stoi(gameFile.configDifficulty["ApproachRate"]) - 5) / 5;
-		gameFile.fade_in = 800 - 500 * (std::stoi(gameFile.configDifficulty["ApproachRate"]) - 5) / 5;
+	else if(std::stof(gameFile.configDifficulty["ApproachRate"]) > 5.0f){
+		gameFile.preempt = 1200.0f - 750.0f * (std::stof(gameFile.configDifficulty["ApproachRate"]) - 5.0f) / 5;
+		gameFile.fade_in = 800.0f - 500.0f * (std::stof(gameFile.configDifficulty["ApproachRate"]) - 5.0f) / 5.0f;
 	}
 	else{
-		gameFile.preempt = 1200;
-		gameFile.fade_in = 800;
+		gameFile.preempt = 1200.0f;
+		gameFile.fade_in = 800.0f;
 	}
 	float od = std::stoi(gameFile.configDifficulty["OverallDifficulty"]);
 	if(od < 5){

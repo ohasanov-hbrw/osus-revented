@@ -80,6 +80,7 @@ class GameManager{
 		float circlesize = 54.48*2.0f;
 		double verytempbeat;
 		float spinsPerSecond = 5.0f;
+		int spawnedHitObjects = 0;
 	private:
 		static GameManager* inst_;
 		void init();

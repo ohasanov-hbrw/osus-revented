@@ -5,6 +5,7 @@ Parser::Parser(){}
 //this here is just a dumb parser, nothing to document here tbh
 GameFile Parser::parse(std::string filename){
 	GameFile gameFile;
+	gameFile.configGeneral["AudioLeadIn"] = "0";
 	gameFile.configDifficulty["SliderMultiplier"] = "1";
 	gameFile.configDifficulty["HPDrainRate"] = "5";
 	gameFile.configDifficulty["CircleSize"] = "5";
