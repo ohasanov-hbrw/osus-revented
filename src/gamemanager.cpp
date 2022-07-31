@@ -485,7 +485,7 @@ void GameManager::loadGame(std::string filename){
 	}
 
 	files.clear();
-	//Global.Path = "resources/skin/";
+	Global.Path = "resources/skin/";
 	files = ls(".wav");
 
 	std::sort(files.begin(), files.end(), []
