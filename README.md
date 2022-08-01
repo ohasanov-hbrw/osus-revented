@@ -18,10 +18,10 @@ To actually build the game follow the steps below:
 
 2 - create a directory called "build"
 
-3 - run ```./makelinuxall.sh``` or ```./makewindowsall.sh```
+3 - run ```./linuxmakeall.sh``` or ```./windowsmakeall.sh```
 
 
-When you just want to run the game, use ```./makelinuxfast``` or ```./makewindowsfast.sh```, or just move the executable to the parent directory and just run it like every other binary executable!
+When you just want to run the game, use ```./linuxmakefast``` or ```./windowsmakefast.sh```, or just move the executable to the parent directory and just run it like every other binary executable!
 
 
 Expect to see many bugs and slowdowns, as this is a "Work In Progress" project, but we hope that we can make it better and for that we need your support!
