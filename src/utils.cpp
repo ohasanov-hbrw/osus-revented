@@ -185,9 +185,9 @@ void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
     //I will need to fix this function but currently it works good enough
     GameManager* gm = GameManager::getInstance();
     int digits = log10(n) + 1;
-    int i = (digits - 1) * 9;
+    int i = (digits - 1) * 18;
     for(int k = 0; k < digits; k++){
-        DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x - i + k * 18 * s * 2, y, s, color);
+        DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x - (float)i * s + k * 18 * s * 2, y, s, color);
     }
 }
 

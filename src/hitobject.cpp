@@ -177,7 +177,8 @@ void Circle::render(){
     float approachScale = 3*(1-(gm->currentTime*1000 - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
         approachScale = 1;
-    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
+    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
+    clampedFade = clip(clampedFade, 0.0f, 1.0f);
     Color renderColor;
     if(data.colour.size() > 2)
         renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
@@ -194,9 +195,9 @@ void Circle::render(){
 //renders the "dead" Circle
 void Circle::dead_render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
+    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/1.5f);
     float clampedFade2 = (gm->gameFile.fade_in/6.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/6.0f);
-    float scale = (gm->currentTime*1000 + gm->gameFile.fade_in/4.0f - data.time) / (gm->gameFile.fade_in/4.0f);
+    float scale = (gm->currentTime*1000 + gm->gameFile.fade_in/3.0f - data.time) / (gm->gameFile.fade_in/3.0f);
     scale = clip(scale,1,2);
     Color renderColor;
     if(data.colour.size() > 2)
@@ -657,7 +658,7 @@ void Slider::render(){
     float approachScale = 3*(1-(gm->currentTime*1000 - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
         approachScale = 1;
-    float clampedFade = clip((gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in, 0, 0.7f);
+    float clampedFade = clip((gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in, 0, 0.7f);
     Color renderColor;
 
     DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade), gm->circlesize);
@@ -758,7 +759,8 @@ void Slider::render(){
             DrawTextureRotate(gm->sliderfollow, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderfollow.width)*2 , angle, Fade(WHITE,clampedFade));
     }
 
-    clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
+    clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
+    clampedFade = clip(clampedFade, 0.0f, 1.0f);
 
     if(state){
         DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width , renderColor);
@@ -770,8 +772,8 @@ void Slider::render(){
 
 void Slider::dead_render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
-    float clampedFade2 = (gm->gameFile.fade_in/8.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/8.0f);
+    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/1.5f);
+    float clampedFade2 = (gm->gameFile.fade_in/6.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/6.0f);
     DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade2), gm->circlesize);
     if(data.point == 0)
         DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
@@ -899,7 +901,8 @@ void Spinner::update(){
 //renders the Circle
 void Spinner::render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.fade_in) / gm->gameFile.fade_in;
+    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
+    clampedFade = clip(clampedFade, 0.0f, 1.0f);
     Color spinnerColor = WHITE;
     if(!data.touch)
         spinnerColor = BLACK;
@@ -915,7 +918,7 @@ void Spinner::render(){
 //renders the "dead" Circle
 void Spinner::dead_render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
+    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/1.5f);
     if(data.point == 0)
         DrawTextureCenter(gm->hit0, data.x, data.y, (gm->circlesize/gm->hit0.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 1)
@@ -930,7 +933,7 @@ void Spinner::dead_render(){
 void Spinner::dead_update(){
     GameManager* gm = GameManager::getInstance();
     //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
-    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000){
+    if (data.time+gm->gameFile.fade_in/1.5f < gm->currentTime*1000){
         gm->destroyDeadHitObject(data.index);
     }
 }

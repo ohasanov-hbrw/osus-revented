@@ -81,6 +81,7 @@ class GameManager{
 		double verytempbeat;
 		float spinsPerSecond = 5.0f;
 		int spawnedHitObjects = 0;
+		bool startMusic = false;
 	private:
 		static GameManager* inst_;
 		void init();

@@ -72,6 +72,7 @@ int main() {
     GenTextureMipmaps(&Global.cursor);
     GenTextureMipmaps(&Global.DefaultFont.texture);
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
+    
     HideCursor();
     initMouseTrail();
 

@@ -5,6 +5,7 @@
 #include "utils.hpp"
 #include "gamemanager.hpp"
 #include "zip.h"
+#include "fastrender.hpp"
 
 PlayMenu::PlayMenu() {
     description = TextBox({320,140}, {520,40}, {240,98,161,255}, "Select a Beatmap\n    to play!", WHITE, 15, 50);
@@ -164,6 +165,38 @@ void Game::init() {
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
 
+    float timer = 0;
+    while(timer < 4.0f){
+        timer += GetFrameTime();
+
+        GetScale();
+        GetMouse();
+        GetKeys();
+
+        updateMouseTrail();
+        updateUpDown();
+
+        std::string message;
+        if(timer < 2.0f)
+            message = "Loaded Game";
+        else if(timer < 2.5f)
+            message = "3!";
+        else if(timer < 3.0f)
+            message = "2!";
+        else if(timer < 3.5f)
+            message = "1!";
+        else if(timer < 4.0f)
+            message = "GO!";
+        
+        BeginDrawing();
+        ClearBackground(Global.Background);
+        DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+        DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+        renderMouse();
+        DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
+        DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 15), ScaleCordY(220)}, Scale(40), Scale(1), WHITE);
+        EndDrawing();
+    }
 }
 void Game::update() {
     Global.gameManager->run();
