@@ -142,6 +142,7 @@ class Spinner : public HitObject{
         bool first = false;
         int extra = 1;
         bool hit = false;
+        float addedAngle = 0;
     private:
 
 

@@ -195,7 +195,7 @@ void Circle::render(){
 void Circle::dead_render(){
     GameManager* gm = GameManager::getInstance();
     float clampedFade = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/2.0f);
-    float clampedFade2 = (gm->gameFile.fade_in/8.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/8.0f);
+    float clampedFade2 = (gm->gameFile.fade_in/6.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/6.0f);
     float scale = (gm->currentTime*1000 + gm->gameFile.fade_in/4.0f - data.time) / (gm->gameFile.fade_in/4.0f);
     scale = clip(scale,1,2);
     Color renderColor;
@@ -839,8 +839,12 @@ void Spinner::update(){
                     first = false;
                 }
                 if(startRotation == rotation && !first){
-                    totalAngle += std::abs(angle - lastAngle);
-                    renderAngle += rotation * std::abs(angle - lastAngle);
+                    addedAngle = std::abs(angle - lastAngle);
+                    /*if(addedAngle > ((477.0f * 360.0f) / (60.0f * 1000.0f)) * ((float)GetFrameTime() * 1000.0f)){
+                        addedAngle = ((477.0f * 360.0f) / (60.0f * 1000.0f)) * ((float)GetFrameTime() * 1000.0f);
+                    }*/
+                    totalAngle += addedAngle;
+                    renderAngle += rotation * addedAngle;
                     
                 }
                 if(!first)
@@ -906,7 +910,6 @@ void Spinner::render(){
     if(extra > 1){
         DrawCNumbersCenter((extra - 1) * 1000, 320, 400, 1, spinnerColor);
     }
-    
 }
 
 //renders the "dead" Circle
