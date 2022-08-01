@@ -154,7 +154,7 @@ Circle::Circle(HitObjectData data){
 
 //initilizes a circle
 void Circle::init(){
-    std::cout << data.hitSound << std::endl;
+    //std::cout << data.hitSound << std::endl;
 }
 
 //the main code that runs for every circle on screen, the collision and point manager is in the GamerManager

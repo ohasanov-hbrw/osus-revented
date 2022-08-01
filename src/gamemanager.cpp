@@ -177,6 +177,7 @@ void GameManager::update(){
 						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
 					}
+					std::cout << "Press offset: " << currentTime*1000 - objects[i]->data.time << std::endl;
 					objects[i]->data.time = currentTime*1000;
 					destroyHitObject(i);
 					newSize = objects.size();
@@ -305,9 +306,9 @@ void GameManager::run(){
 			currentTime += GetFrameTime();
 		}
 	}
-	
+	currentTime += Global.offset / 1000.0f;
 	GameManager::update();
-
+	currentTime -= Global.offset / 1000.0f;
 }
 
 //load the beatmap
@@ -346,7 +347,7 @@ void GameManager::loadGame(std::string filename){
 	gameFile.p100Final = gameFile.p100 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p100Change;
 	gameFile.p50Final = gameFile.p50 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p50Change;
 	//debug, just say what the name of the music file is and load it
-	std::cout << (Global.Path + '/' + gameFile.configGeneral["AudioFilename"]) << std::endl;
+	//std::cout << (Global.Path + '/' + gameFile.configGeneral["AudioFilename"]) << std::endl;
 	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
 	score = 0;
 	clickCombo = 0;
@@ -355,7 +356,7 @@ void GameManager::loadGame(std::string filename){
 	circlesize = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
 	slidertickrate = std::stof(gameFile.configDifficulty["SliderTickRate"]);
 	circlesize *= 2.0f;
-	std::cout << circlesize << std::endl;
+	//std::cout << circlesize << std::endl;
 	float overalldifficulty = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
 	//more difficulty stuff, may also be wrong
 	difficultyMultiplier = ((hpdrainrate + circlesize + overalldifficulty + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
