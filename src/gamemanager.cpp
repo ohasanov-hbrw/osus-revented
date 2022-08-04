@@ -137,7 +137,9 @@ void GameManager::update(){
 					break;
 				index = amog;
 			}
-			
+		
+            // o şejkilde lişğaksda başka ne uzun biliyor musun bence benim akıllığım terinde
+            // -ömer 2022
 			objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
 			objects[objects.size()-1]->data.timing.meter = timingSettingsForHitObject[index].meter;
 			objects[objects.size()-1]->data.timing.sampleSet = timingSettingsForHitObject[index].sampleSet;
@@ -557,18 +559,45 @@ void GameManager::loadGame(std::string filename){
         }
     }
 
+    timingSettings tempTiming;
+    std::vector<timingSettings> times;
+    int amogus;
+    for(int i =  gameFile.timingPoints.size()-1; i >= 0; i--){
+        tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
+        tempTiming.sliderSpeedOverride = 1;
+        tempTiming.time = gameFile.timingPoints[i].time;
+        double tempBeatLength;
+        tempBeatLength = gameFile.timingPoints[i].beatLength;
+        if(tempBeatLength >= 0){
+            tempTiming.beatLength = tempBeatLength;
+            amogus = tempBeatLength;
+            tempTiming.sliderSpeedOverride = 1;
+        }
+        if(tempBeatLength < 0){
+            tempTiming.sliderSpeedOverride = (100 / tempBeatLength * (-1));
+            tempTiming.beatLength = amogus;
+        }
+        tempTiming.meter = gameFile.timingPoints[i].meter;
+        tempTiming.sampleSet = gameFile.timingPoints[i].sampleSet;
+        tempTiming.sampleIndex = gameFile.timingPoints[i].sampleIndex;
+        tempTiming.volume = gameFile.timingPoints[i].volume;
+        tempTiming.uninherited = gameFile.timingPoints[i].uninherited;
+        tempTiming.effects = gameFile.timingPoints[i].effects;
+        times.push_back(tempTiming);
+    }
     //for (const auto& hitobject : gameFile.hitObjects) {
     //    if (hitobject.type != 2 or hitobject.type != 3) {
     //        std::string hitSound, sampleSet, index;
     //        if (hitobject.hitSound == 0 or hitobject.hitSound == 1) {
-    //            hitSound += "normal";
+    //            hitSound = "normal";
     //        } else if (hitobject.hitSound == 2) {
-    //            hitSound += "whistle";
+    //            hitSound = "whistle";
     //        } else if (hitobject.hitSound == 4) {
-    //            hitSound += "finish";
+    //            hitSound = "finish";
     //        } else if (hitobject.hitSound == 8) {
-    //            hitSound += "clap";
+    //            hitSound = "clap";
     //        } else {
+    //            assert(false);
     //        }
 
     //        if (hitSound == "normal") {
@@ -585,6 +614,13 @@ void GameManager::loadGame(std::string filename){
     //        index = hitobject.index != 0 ? std::to_string(static_cast<int>(hitobject.index)) : std::to_string(static_cast<int>(hitobject.timing.sampleIndex));
 
     //        std::cout << sampleSet + "-hit" + hitSound + index + ".wav\n";
+    //    }
+    //}
+    
+    //for (const auto& a : times) {
+    //    for (int i = gameFile.hitObjects.size() - 1; i >= 0; i--) {
+    //        const auto& hitobject = gameFile.hitObjects[i];
+    //        std::cout << hitobject.time << std::endl;
     //    }
     //}
 

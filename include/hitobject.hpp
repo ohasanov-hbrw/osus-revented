@@ -68,6 +68,7 @@ class HitObject{
         virtual void dead_render(){}
         HitObjectData data;
         float x,y;
+    Music id;
     private:
         
 };
