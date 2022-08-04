@@ -191,3 +191,8 @@ void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
     }
 }
 
+std::string getSampleSetFromInt(int s) {
+    if (s == 1) return "normal"; 
+    else if (s == 2) return "soft"; 
+    else if (s == 3) return "drum"; 
+}

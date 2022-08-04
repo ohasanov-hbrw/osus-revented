@@ -1,5 +1,6 @@
 #pragma once
 #include "raylib.h"
+#include <string>
 #include <vector>
 #define RAYMATH_IMPLEMENTATION
 //extern "C" {
@@ -57,6 +58,8 @@ Vector2 vectorize(float);
 float distance(Vector2 &, Vector2 &);
 //Binary search algorithm
 int Search(std::vector<float>, float,int,int);
+
+std::string getSampleSetFromInt(int);
 
 //Add extra operators because raylib sucks
 inline Vector2 operator + (Vector2 p0, Vector2 p1){

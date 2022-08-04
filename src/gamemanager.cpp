@@ -1,8 +1,10 @@
 #include "gamemanager.hpp"
 #include <algorithm>
 #include <cstdint>
+#include <cassert>
 #include <iostream>
 #include <iomanip>
+#include <string>
 #include <vector>
 #include <math.h>
 #include <hitobject.hpp>
@@ -177,7 +179,6 @@ void GameManager::update(){
 						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
 					}
-					std::cout << "Press offset: " << currentTime*1000 - objects[i]->data.time << std::endl;
 					objects[i]->data.time = currentTime*1000;
 					destroyHitObject(i);
 					newSize = objects.size();
@@ -317,6 +318,7 @@ void GameManager::loadGame(std::string filename){
 	spawnedHitObjects = 0;
 	Parser parser = Parser();
 	gameFile = parser.parse(filename);
+    std::cout << gameFile.hitObjects.size() << " " << gameFile.timingPoints.size() << std::endl;
 	//reverse the hitobject array because we need it reversed for it to make sense (and make it faster because pop_back)
 	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
 	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
@@ -524,6 +526,36 @@ void GameManager::loadGame(std::string filename){
         }
     }
 
+    //for (const auto& hitobject : gameFile.hitObjects) {
+    //    if (hitobject.type != 2 or hitobject.type != 3) {
+    //        std::string hitSound, sampleSet, index;
+    //        if (hitobject.hitSound == 0 or hitobject.hitSound == 1) {
+    //            hitSound += "normal";
+    //        } else if (hitobject.hitSound == 2) {
+    //            hitSound += "whistle";
+    //        } else if (hitobject.hitSound == 4) {
+    //            hitSound += "finish";
+    //        } else if (hitobject.hitSound == 8) {
+    //            hitSound += "clap";
+    //        } else {
+    //        }
+
+    //        if (hitSound == "normal") {
+    //            if (hitobject.normalSet == 0) sampleSet = getSampleSetFromInt(hitobject.timing.sampleSet);
+    //            else sampleSet = getSampleSetFromInt(hitobject.normalSet);
+    //        } else {
+    //            if (hitobject.additionSet == 0) {
+    //                if (hitobject.normalSet == 0) sampleSet = getSampleSetFromInt(hitobject.timing.sampleSet);
+    //                else sampleSet = getSampleSetFromInt(hitobject.normalSet);
+    //            } 
+    //            else sampleSet = getSampleSetFromInt(hitobject.additionSet);
+    //        }
+
+    //        index = hitobject.index != 0 ? std::to_string(static_cast<int>(hitobject.index)) : std::to_string(static_cast<int>(hitobject.timing.sampleIndex));
+
+    //        std::cout << sampleSet + "-hit" + hitSound + index + ".wav\n";
+    //    }
+    //}
 
 	sliderin = LoadTexture("resources/sliderin.png");
 	sliderout = LoadTexture("resources/sliderout.png");
@@ -594,21 +626,18 @@ void GameManager::spawnHitObject(HitObjectData data){
 	HitObject *temp;
 	if(data.type == 1){
 		temp = new Circle(data);
-		objects.push_back(temp);
 	}
 	else if(data.type == 2){
 		temp = new Slider(data);
-		objects.push_back(temp);
-
 	}
 	else if(data.type == 3){
 		temp = new Spinner(data);
-		objects.push_back(temp);
 	}
 	else {
 		temp = new Circle(data);
-		objects.push_back(temp);
 	}
+
+    objects.push_back(temp);
 }
 
 void GameManager::destroyHitObject(int index){
