@@ -55,10 +55,10 @@ void GameManager::update(){
 	
 	//currently not used that much but it will be
 	//timingSettingsForHitObject.clear();
+	timingSettings tempTiming;
 	int timingSize = gameFile.timingPoints.size();
 	for(int i = timingSize-1; i >= 0; i--){
 		if(gameFile.timingPoints[i].time - gameFile.preempt <= currentTime*1000){
-			timingSettings tempTiming;
 			tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
 			tempTiming.sliderSpeedOverride = 1;
 			tempTiming.time = gameFile.timingPoints[i].time;
@@ -85,6 +85,37 @@ void GameManager::update(){
 		}
 		else
 			break;
+	}
+
+	if(timingSettingsForHitObject.size() == 0){
+		int i = gameFile.timingPoints.size() - 1;
+		if(gameFile.timingPoints.size() == 0){
+			std::cout << "what the fuck" << std::endl;
+		}
+		else{
+			tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
+			tempTiming.sliderSpeedOverride = 1;
+			tempTiming.time = gameFile.timingPoints[i].time;
+			double tempBeatLength;
+			tempBeatLength = gameFile.timingPoints[i].beatLength;
+			if(tempBeatLength >= 0){
+				tempTiming.beatLength = tempBeatLength;
+				verytempbeat = tempBeatLength;
+				tempTiming.sliderSpeedOverride = 1;
+			}
+			if(tempBeatLength < 0){
+				tempTiming.sliderSpeedOverride = (100 / tempBeatLength * (-1));
+				tempTiming.beatLength = verytempbeat;
+			}
+			tempTiming.meter = gameFile.timingPoints[i].meter;
+			tempTiming.sampleSet = gameFile.timingPoints[i].sampleSet;
+			tempTiming.sampleIndex = gameFile.timingPoints[i].sampleIndex;
+			tempTiming.volume = gameFile.timingPoints[i].volume;
+			tempTiming.uninherited = gameFile.timingPoints[i].uninherited;
+			tempTiming.effects = gameFile.timingPoints[i].effects;
+			timingSettingsForHitObject.push_back(tempTiming);
+			gameFile.timingPoints.pop_back();
+		}
 	}
 	
 	//spawn the hitobjects when their time comes
