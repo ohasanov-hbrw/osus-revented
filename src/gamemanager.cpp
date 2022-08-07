@@ -195,6 +195,13 @@ void GameManager::update(){
 						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
 					}
+					PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
+					if(objects[i]->data.PlayAddition){
+						PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
+					}
+					if(objects[i]->data.PlayCustom){
+						PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
+					}
 					objects[i]->data.time = currentTime*1000;
 					destroyHitObject(i);
 					newSize = objects.size();
@@ -225,6 +232,8 @@ void GameManager::update(){
 							stop = false;
 							clickCombo++;
 						}
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
 					}
 				//this cursed else train is nothing to worry about...
 				objects[i]->data.index = i;

@@ -614,9 +614,13 @@ void Slider::update(){
     }
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
     if(gm->currentTime*1000 > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
-        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && (Global.Key1D || Global.Key2D))
+        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && (Global.Key1D || Global.Key2D)){
             is_hit_at_end = true;
+            PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
+			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
+        }
     }
+    
     if(gm->currentTime*1000 > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
         
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
@@ -650,6 +654,24 @@ void Slider::update(){
             gm->clickCombo++;
         }
         gm->destroyHitObject(data.index);
+
+    }
+    else{
+        if(curRepeat > 0){
+            if(reverseclicked[curRepeat-1] == -1){
+                if(inSlider){
+                    reverseclicked[curRepeat-1] = 1;
+                    reversenumber++;
+                    gm->clickCombo++;
+                    PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
+			        PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
+                }
+                else{
+                    reverseclicked[curRepeat-1] = 0;
+                    gm->clickCombo = 0;
+                }
+            }
+        }
     }
 }
 
@@ -707,19 +729,6 @@ void Slider::render(){
         }
         if(curRepeat%2 == 0)
             angle+=180;
-        if(curRepeat > 0){
-            if(reverseclicked[curRepeat-1] == -1){
-                if(inSlider){
-                    reverseclicked[curRepeat-1] = 1;
-                    reversenumber++;
-                    gm->clickCombo++;
-                }
-                else{
-                    reverseclicked[curRepeat-1] = 0;
-                    gm->clickCombo = 0;
-                }
-            }
-        }
         int ticksrendered = 0;
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){
