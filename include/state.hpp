@@ -24,7 +24,7 @@ private:
     std::string temp;
 public:
     PlayMenu();
-
+    std::string lastPos = "";
     void init() override;
     void render() override;
     void update() override;

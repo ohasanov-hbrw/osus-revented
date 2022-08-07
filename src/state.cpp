@@ -13,6 +13,7 @@ PlayMenu::PlayMenu() {
     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 15);
     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 15);
     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 15);
+    
 }
 
 void PlayMenu::init() {
@@ -46,12 +47,14 @@ void PlayMenu::update() {
                 dir_list.objects[dir_list.selectedindex].text.pop_back();
                 if(Global.Path.size() == 1) Global.Path.pop_back();
                 Global.Path += '/' + dir_list.objects[dir_list.selectedindex].text;
+                lastPos = dir_list.objects[dir_list.selectedindex].text;
                 auto dir = ls(".osu");
                 dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
                 dir_list.init();
             }
             else{
                 Global.selectedPath = Global.Path + '/' + dir_list.objects[dir_list.selectedindex].text;
+                Global.CurrentLocation = "beatmaps/" + lastPos + "/";
                 Global.CurrentState.reset(new Game());
                 Global.CurrentState->init();
             }

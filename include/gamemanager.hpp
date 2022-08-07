@@ -2,11 +2,14 @@
 #include "parser.hpp"
 #include <raylib.h>
 
+struct dbool
+{
+    bool value = false;
+};
+
 struct HitSound {
-    Sound normal;
-    Sound whistle;
-    Sound finish;
-    Sound clap;
+    std::map<std::string, Sound> data;
+	std::map<std::string, dbool> loaded;
 };
 
 class GameManager{
@@ -82,6 +85,8 @@ class GameManager{
 		float spinsPerSecond = 5.0f;
 		int spawnedHitObjects = 0;
 		bool startMusic = false;
+
+		HitSound SoundFiles;
 	private:
 		static GameManager* inst_;
 		void init();

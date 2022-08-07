@@ -29,6 +29,7 @@ struct Globals {
     std::string BeatmapLocation = std::filesystem::current_path().string() + "/beatmaps";
     std::string GamePath = std::filesystem::current_path().string();
     std::string selectedPath = "";
+    std::string CurrentLocation = std::filesystem::current_path().string();
     int MouseTrailSize = 150;
 
     float FrameTimeCounterWheel = 0.f;
@@ -48,6 +49,8 @@ struct Globals {
     GameManager *gameManager = GameManager::getInstance();
 
     Globals() = default;
+
+    
 };
 
 extern Globals Global;

@@ -45,7 +45,7 @@ struct HitObjectData{
     int additionSet;
     int index;
     int volume;
-    std::string filename;
+    std::string filename = "";
     bool startingACombo;
     int skipComboColours = 0;
     int comboNumber;
@@ -53,6 +53,11 @@ struct HitObjectData{
     std::vector<int> colour;
     timingSettings timing;
     bool touch = false;
+    bool PlayAddition = false;
+    bool PlayCustom = false;
+    std::string CustomSound;
+    std::string AdditionSound;
+    std::string NormalSound;
 };
 
 class HitObject{
