@@ -58,6 +58,8 @@ struct HitObjectData{
     std::string CustomSound;
     std::string AdditionSound;
     std::string NormalSound;
+    std::vector<std::string> EdgeNormalSound;
+    std::vector<std::string> EdgeAdditionSound;
 };
 
 class HitObject{
