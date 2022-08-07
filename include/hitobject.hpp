@@ -55,10 +55,10 @@ struct HitObjectData{
     bool touch = false;
     bool PlayAddition = false;
     bool PlayCustom = false;
-    std::string CustomSound;
-    std::string AdditionSound;
-    std::string NormalSound;
-    std::vector<std::string> EdgeNormalSound;
+    std::string CustomSound = "";
+    std::string AdditionSound = "";
+    std::string NormalSound = "";
+    std::vector<std::string> EdgeNormalSound ;
     std::vector<std::string> EdgeAdditionSound;
 };
 
@@ -114,6 +114,7 @@ class Slider : public HitObject{
         int curRepeat = 0;
         Vector2 extraPosition;
         bool earlyhit = false;
+        bool playtick = false;
         
     private:
         double sliderDuration;

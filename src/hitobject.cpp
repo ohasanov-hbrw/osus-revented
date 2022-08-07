@@ -260,11 +260,16 @@ void Slider::init(){
         if(data.curveType == 'L'){
             //a linear "curve" consists of different sized lines so we calculate them here
             std::vector<float> lineLengths;
-            for(size_t i = 0; i < edgePoints.size()-1; i++)
+            for(size_t i = 0; i < edgePoints.size()-1; i++){
+                /*if(64989 == data.time or 65340 == data.time or 65691 == data.time){
+                    std::cout << "Line " << std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)) << "\n";
+                }*/
                 lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)));
+            }
             //gets the total length of the calculated lines
             for(size_t i = 0; i < lineLengths.size(); i++)
                 totalLength+=lineLengths[i];
+            
             
             //the calculated length is pretty different from the beatmap so we scale the calculations for that
             
@@ -274,11 +279,21 @@ void Slider::init(){
         
             float hipotenus = data.length - totalLength;
             float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-            float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-            extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (angle/abs(angle))};
+            float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
+            int ything = 1;
+            if(angle < 0.0f){
+                ything = -1;
+            }
+            else if(angle == 0.0f){
+                ything = 0;
+            }
+            extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (float)ything};
             edgePoints[edgePoints.size()-1] = extraPosition;
             totalLength-=lineLengths[lineLengths.size()-1];
             lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
+            /*if(64989 == data.time or 65340 == data.time or 65691 == data.time){
+                std::cout << "LineNew " << extraPosition.x << " " << extraPosition.y << "\n";
+            }*/
             totalLength+=lineLengths[lineLengths.size()-1];
             lengthScale = totalLength/data.length;
 
@@ -287,6 +302,9 @@ void Slider::init(){
                     renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/lineLengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/lineLengths[i]});
             renderPoints.push_back(edgePoints[edgePoints.size()-1]);
             //this is an inside joke, but yeah if we add more points than needed, we just delete them (doesn't happen that much)
+            /*if(64989 == data.time or 65340 == data.time or 65691 == data.time){
+                std::cout << "wa: " << totalLength << " " << edgePoints.size() << " " << lineLengths.size() << " " << data.curvePoints[0].first << " " << data.curvePoints[0].second << std::endl;
+            }*/
             while(!false){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
@@ -557,6 +575,9 @@ void Slider::init(){
         }
     }
     reverseclicked.pop_back();
+    /*if(64989 == data.time or 65340 == data.time or 65691 == data.time){
+        std::cout << "what: " << data.type << " " << data.length << " " << data.slides << " " << data.curvePoints.size() << " " << renderPoints.size() << std::endl;
+    }*/
     //std::cout << " Slider length is " << data.length << " and we have " << renderPoints.size() << " render points" << std::endl;
     //std::cout << "Init finished" << std::endl;
 }
@@ -565,6 +586,7 @@ void Slider::update(){
     GameManager* gm = GameManager::getInstance();
     position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
     
+
     position *= (double)100;
     curRepeat = std::max(0,(int)(position / data.length));
     if((int)(std::max((double)0, position) + data.length) < (int)(data.length*data.slides)){
@@ -616,8 +638,6 @@ void Slider::update(){
     if(gm->currentTime*1000 > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && (Global.Key1D || Global.Key2D)){
             is_hit_at_end = true;
-            PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
-			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
         }
     }
     
@@ -653,6 +673,14 @@ void Slider::update(){
             gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
             gm->clickCombo++;
         }
+        if(is_hit_at_end){
+            PlaySoundMulti(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
+			PlaySoundMulti(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
+        }
+
+        
+
+
         gm->destroyHitObject(data.index);
 
     }
@@ -663,8 +691,8 @@ void Slider::update(){
                     reverseclicked[curRepeat-1] = 1;
                     reversenumber++;
                     gm->clickCombo++;
-                    PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
-			        PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
+                    PlaySoundMulti(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
+			        PlaySoundMulti(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
                 }
                 else{
                     reverseclicked[curRepeat-1] = 0;
@@ -672,6 +700,10 @@ void Slider::update(){
                 }
             }
         }
+    }
+    if(playtick){
+        PlaySoundMulti(gm->SoundFiles.data[data.NormalSound]);
+        playtick = false;
     }
 }
 
@@ -737,6 +769,7 @@ void Slider::render(){
                         tickclicked[i] = 1;
                         ticknumber++;
                         gm->clickCombo++;
+                        playtick = true;
                     }
                     else{
                         tickclicked[i] = 0;

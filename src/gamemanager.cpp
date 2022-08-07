@@ -122,6 +122,7 @@ void GameManager::update(){
 	int size = gameFile.hitObjects.size();	
 	for(int i = size-1; i >= 0; i--){
 		if(gameFile.hitObjects[i].time - gameFile.preempt <= currentTime*1000){
+			
 			spawnHitObject(gameFile.hitObjects[i]);
 			if(objects[objects.size()-1]->data.startingACombo){
 				currentComboIndex++;
@@ -137,7 +138,7 @@ void GameManager::update(){
 					break;
 				index = amog;
 			}
-		
+
             // o şejkilde lişğaksda başka ne uzun biliyor musun bence benim akıllığım terinde
             // -ömer 2022
 			objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
@@ -232,8 +233,8 @@ void GameManager::update(){
 							stop = false;
 							clickCombo++;
 						}
-						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
-						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
+						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
 					}
 				//this cursed else train is nothing to worry about...
 				objects[i]->data.index = i;
@@ -332,8 +333,10 @@ void GameManager::run(){
 			currentTime += GetFrameTime();
 		}
 	}
+	//currentTime += 6400;
 	currentTime += Global.offset / 1000.0f;
 	GameManager::update();
+	//currentTime -= 6400;
 	currentTime -= Global.offset / 1000.0f;
 }
 
@@ -557,6 +560,7 @@ void GameManager::loadGame(std::string filename){
         tempTiming.effects = gameFile.timingPoints[i].effects;
         times.push_back(tempTiming);
     }
+	reverse(times.begin(), times.end());
 
 	int defaultSampleSet = 0;
 	if(gameFile.configGeneral["SampleSet"] == "Soft"){
@@ -575,6 +579,8 @@ void GameManager::loadGame(std::string filename){
 	std::vector<std::string> skinSounds = ls(".wav");
 	Global.Path = lastPath + '/';
 	std::vector<std::string> beatmapSounds = ls(".wav");
+	std::vector<std::string> beatmapSoundsOgg = ls(".ogg");
+	std::cout << beatmapSoundsOgg.size() << std::endl;
 
 	int TimingPointIndex = gameFile.timingPoints.size() - 1;
 	int HitObjectIndex = gameFile.hitObjects.size() - 1;
@@ -583,6 +589,7 @@ void GameManager::loadGame(std::string filename){
 			if(times[amog].time > gameFile.hitObjects[HitObjectIndex].time)
 				break;
 			TimingPointIndex = amog;
+			
 		}
 
 		int defaultSampleSetForObject = 0;
@@ -662,6 +669,7 @@ void GameManager::loadGame(std::string filename){
 
 		std::string tempNoIndex = NormalFileName + ".wav";
 		std::string temp = NormalFileName + HitSoundIndex + ".wav";
+		std::string tempogg = NormalFileName + HitSoundIndex + ".ogg";
 		if(SoundFiles.loaded[temp].value == false){
 			for(int i = 0; i < defaultSounds.size(); i++){
 				if(defaultSounds[i] == tempNoIndex){
@@ -678,6 +686,12 @@ void GameManager::loadGame(std::string filename){
 			for(int i = 0; i < beatmapSounds.size(); i++){
 				if(beatmapSounds[i] == temp){
 					SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+					SoundFiles.loaded[temp].value = true;
+				}
+			}
+			for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+				if(beatmapSoundsOgg[i] == tempogg){
+					SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
@@ -707,6 +721,7 @@ void GameManager::loadGame(std::string filename){
 
 		tempNoIndex = AdditionFilename + ".wav";
 		temp = AdditionFilename + HitSoundIndex + ".wav";
+		tempogg = AdditionFilename + HitSoundIndex + ".ogg";
 		if(SoundFiles.loaded[temp].value == false){
 			for(int i = 0; i < defaultSounds.size(); i++){
 				if(defaultSounds[i] == tempNoIndex){
@@ -726,6 +741,12 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
+			for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+				if(beatmapSoundsOgg[i] == tempogg){
+					SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+					SoundFiles.loaded[temp].value = true;
+				}
+			}
 			if(SoundFiles.loaded[temp].value == true){
 				std::cout << "loaded "  << temp << std::endl;
 			}
@@ -741,6 +762,12 @@ void GameManager::loadGame(std::string filename){
 						SoundFiles.loaded[temp].value = true;
 					}
 				}
+				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+					if(beatmapSoundsOgg[i] == temp){
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
+				}
 				if(SoundFiles.loaded[temp].value == true){
 					std::cout << "loaded "  << temp << std::endl;
 				}
@@ -749,31 +776,80 @@ void GameManager::loadGame(std::string filename){
 
 
 		//SLIDERS ---------------------------------------------------------------------------------------------------------------------------
-		if(gameFile.hitObjects[HitObjectIndex].edgeSounds.size() > 0){
-			for(int i = 0; i < gameFile.hitObjects[HitObjectIndex].edgeSounds.size(); i++){
+		if(gameFile.hitObjects[HitObjectIndex].type == 2){
+			if(NormalSetForObject == 0)
+				NormalFileName = "normal-slidertick";
+			else if(NormalSetForObject == 1)
+				NormalFileName = "soft-slidertick";
+			else
+				NormalFileName = "drum-slidertick";
+
+			tempNoIndex = NormalFileName + ".wav";
+			temp = NormalFileName + HitSoundIndex + ".wav";
+			tempogg = NormalFileName + HitSoundIndex + ".ogg";
+			if(SoundFiles.loaded[temp].value == false){
+				for(int i = 0; i < defaultSounds.size(); i++){
+					if(defaultSounds[i] == tempNoIndex){
+						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
+				}
+				for(int i = 0; i < skinSounds.size(); i++){
+					if(skinSounds[i] == tempNoIndex){
+						SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
+				}
+				for(int i = 0; i < beatmapSounds.size(); i++){
+					if(beatmapSounds[i] == temp){
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
+				}
+				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+					if(beatmapSoundsOgg[i] == tempogg){
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
+				}
+				if(SoundFiles.loaded[temp].value == true){
+					std::cout << "loaded "  << temp << std::endl;
+				}
+			}
+			gameFile.hitObjects[HitObjectIndex].NormalSound = temp;
+			for(int i = 0; i < gameFile.hitObjects[HitObjectIndex].slides + 1; i++){
 				NormalSetForObject = 0;
 				AdditionSetForObject = 0;
 				HitSoundForObject = 0;
 				//SampleIndexForObject = 0;
-
-				if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 1)
-					NormalSetForObject = 0;
-				else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 2)
-					NormalSetForObject = 1;
-				else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 3)
-					NormalSetForObject = 2;
-				else
+				/*if(i > gameFile.hitObjects[HitObjectIndex].edgeSets.size() - 1 && i > 0){
+					gameFile.hitObjects[HitObjectIndex].edgeSets.push_back(gameFile.hitObjects[HitObjectIndex].edgeSets[i - 1]);
+				}*/
+				if(i < gameFile.hitObjects[HitObjectIndex].edgeSets.size()){
+					if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 1)
+						NormalSetForObject = 0;
+					else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 2)
+						NormalSetForObject = 1;
+					else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 3)
+						NormalSetForObject = 2;
+					else
+						NormalSetForObject = defaultSampleSetForObject;
+					
+					if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 1)
+						AdditionSetForObject = 0;
+					else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 2)
+						AdditionSetForObject = 1;
+					else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 3)
+						AdditionSetForObject = 2;
+					else
+						AdditionSetForObject = NormalSetForObject;
+				}
+				else{
 					NormalSetForObject = defaultSampleSetForObject;
-				
-				if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 1)
-					AdditionSetForObject = 0;
-				else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 2)
-					AdditionSetForObject = 1;
-				else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 3)
-					AdditionSetForObject = 2;
-				else
 					AdditionSetForObject = NormalSetForObject;
-				
+				}
+
+				if(i < gameFile.hitObjects[HitObjectIndex].edgeSounds.size()){
 				if(gameFile.hitObjects[HitObjectIndex].edgeSounds[i] == 2)
 					HitSoundForObject = 1;
 				else if(gameFile.hitObjects[HitObjectIndex].edgeSounds[i] == 4)
@@ -782,7 +858,10 @@ void GameManager::loadGame(std::string filename){
 					HitSoundForObject = 3;
 				else
 					HitSoundForObject = 0;
-
+				}
+				else{
+					HitSoundForObject = 0;
+				}
 				if(NormalSetForObject == 0)
 					NormalFileName = "normal-hitnormal";
 				else if(NormalSetForObject == 1)
@@ -792,6 +871,7 @@ void GameManager::loadGame(std::string filename){
 
 				tempNoIndex = NormalFileName + ".wav";
 				temp = NormalFileName + HitSoundIndex + ".wav";
+				tempogg = NormalFileName + HitSoundIndex + ".ogg";
 				if(SoundFiles.loaded[temp].value == false){
 					for(int i = 0; i < defaultSounds.size(); i++){
 						if(defaultSounds[i] == tempNoIndex){
@@ -808,6 +888,12 @@ void GameManager::loadGame(std::string filename){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
 							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
+						}
+					}
+					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+						if(beatmapSoundsOgg[i] == tempogg){
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
@@ -837,6 +923,7 @@ void GameManager::loadGame(std::string filename){
 
 				tempNoIndex = AdditionFilename + ".wav";
 				temp = AdditionFilename + HitSoundIndex + ".wav";
+				tempogg = AdditionFilename + HitSoundIndex + ".ogg";
 				if(SoundFiles.loaded[temp].value == false){
 					for(int i = 0; i < defaultSounds.size(); i++){
 						if(defaultSounds[i] == tempNoIndex){
@@ -856,6 +943,12 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
+					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+						if(beatmapSoundsOgg[i] == tempogg){
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
+						}
+					}
 					if(SoundFiles.loaded[temp].value == true){
 						std::cout << "loaded "  << temp << std::endl;
 					}
@@ -863,6 +956,16 @@ void GameManager::loadGame(std::string filename){
 				gameFile.hitObjects[HitObjectIndex].EdgeAdditionSound.push_back(temp);
 			}
 		}
+		/*std::cout << gameFile.hitObjects[HitObjectIndex].slides << " - " << gameFile.hitObjects[HitObjectIndex].edgeSounds.size() << " - " << gameFile.hitObjects[HitObjectIndex].edgeSets.size() << std::endl;
+		for(int i = 0; i < gameFile.hitObjects[HitObjectIndex].edgeSounds.size(); i++){
+			std::cout << gameFile.hitObjects[HitObjectIndex].edgeSounds[i] << " ";
+		}
+		std::cout << "EdgeSounds\n";
+		for(int i = 0; i < gameFile.hitObjects[HitObjectIndex].edgeSets.size(); i++){
+			std::cout << gameFile.hitObjects[HitObjectIndex].edgeSets[i].first << ":" << gameFile.hitObjects[HitObjectIndex].edgeSets[i].second << " ";
+		}
+		std::cout << "EdgeSounds\n";*/
+
 	}
 	
 

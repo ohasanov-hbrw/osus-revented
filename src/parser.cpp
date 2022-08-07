@@ -281,7 +281,7 @@ GameFile Parser::parse(std::string filename){
 								std::vector<std::string> tempVectorEdgeSets;
 								tempVectorEdgeSets = parseSeperatedLists(tempVector[9], '|');
 
-								for(size_t i = 1; i < tempVectorEdgeSets.size(); i++){
+								for(size_t i = 0; i < tempVectorEdgeSets.size(); i++){
 									std::vector<std::string> tempVectorEdgeSetsCords;
 									tempVectorEdgeSetsCords = parseSeperatedLists(tempVectorEdgeSets[i], ':');
 									tempHitObject.edgeSets.push_back(std::make_pair(std::stoi(tempVectorEdgeSetsCords[0]), std::stoi(tempVectorEdgeSetsCords[1])));
