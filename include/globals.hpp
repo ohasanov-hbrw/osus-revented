@@ -15,7 +15,7 @@ struct Globals {
     int FPS = 480;
     int Width = 640;
     int Height = 480;
-    float offset = 0.0f;
+    float offset = -40.0f;
 
     Texture2D cursor;
     Texture2D cursorTrail;

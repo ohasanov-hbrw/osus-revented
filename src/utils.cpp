@@ -196,3 +196,21 @@ std::string getSampleSetFromInt(int s) {
     else if (s == 2) return "soft"; 
     else if (s == 3) return "drum"; 
 }
+
+void DrawSpinnerMeter(Texture2D tex, float per){
+    per = clip(per, 0.001f, 0.999f);
+    float x = 0;
+    float y = 0;
+    float ratio = (float)tex.width / (float)tex.height;
+    float defaultRatio = 640.0f / 480.0f;
+    if(defaultRatio > ratio){
+        x = 640.0f - 480.0f * ratio;
+    }
+    else{
+        y = 480.0f - 640.0f / ratio;
+    }
+    //std::cout << tex.height*(1.0f-per) << " " << tex.height*per << " " << 480.0f*(1.0f-per) << " " << (480.0f-y)*per << std::endl;
+    Rectangle source = {0,tex.height*(1.0f-per),tex.width, tex.height*per};
+    DrawTexturePro(tex, Rectangle{0,0,tex.width, tex.height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
+    DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,(480.0f-y)*(1.0f-per)+y/2.0f,640-x,(480.0f-y)*per}), Vector2{0,0}, 0, WHITE);
+}

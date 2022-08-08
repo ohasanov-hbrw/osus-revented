@@ -895,6 +895,12 @@ void Spinner::update(){
                 }
                 if(startRotation == rotation && !first){
                     addedAngle = std::abs(angle - lastAngle);
+                    if((angle > 120 and lastAngle < -120)) {
+                        addedAngle = std::abs(180 - angle) + std::abs(-180 - lastAngle);
+                    }
+                    if((angle < -120 and lastAngle > 120)){
+                        addedAngle = std::abs(-180 - angle) + std::abs(180 - lastAngle);
+                    }
                     /*if(addedAngle > ((477.0f * 360.0f) / (60.0f * 1000.0f)) * ((float)GetFrameTime() * 1000.0f)){
                         addedAngle = ((477.0f * 360.0f) / (60.0f * 1000.0f)) * ((float)GetFrameTime() * 1000.0f);
                     }*/
@@ -957,8 +963,10 @@ void Spinner::render(){
     float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
     Color spinnerColor = WHITE;
-    if(!data.touch)
+    if(!(data.touch and gm->currentTime*1000 > data.time))
         spinnerColor = BLACK;
+    if(gm->renderSpinnerMetre)
+        DrawSpinnerMeter(gm->spinnerMetre,totalAngle/neededAngle);
     DrawTextureRotate(gm->spinnerBottom, data.x, data.y, (310.0f/gm->spinnerBottom.width), 0, Fade(spinnerColor, clampedFade));
     DrawTextureRotate(gm->spinnerTop, data.x, data.y, (310.0f/gm->spinnerTop.width), renderAngle, Fade(spinnerColor, clampedFade));
     if(gm->renderSpinnerCircle)
@@ -966,6 +974,7 @@ void Spinner::render(){
     if(extra > 1){
         DrawCNumbersCenter((extra - 1) * 1000, 320, 400, 1, spinnerColor);
     }
+    
 }
 
 //renders the "dead" Circle

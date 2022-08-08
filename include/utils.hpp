@@ -48,6 +48,8 @@ void DrawTextureRotate(Texture2D, float, float, float, float, Color);
 //Draw a slider texture (exclusively for a slider object)
 void DrawTextureSlider(Texture2D, float, float, Color, float);
 
+void DrawSpinnerMeter(Texture2D, float);
+
 //Clip a number between two other numbers
 float clip( float, float, float);
 //Interpolate more points in between two points
