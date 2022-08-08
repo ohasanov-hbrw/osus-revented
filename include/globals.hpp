@@ -42,6 +42,7 @@ struct Globals {
     bool Key2D = false;
     bool Key1R = false;
     bool Key2R = false;
+    bool enableMouse = true;
     int Wheel = 0;
 
     std::shared_ptr<State> CurrentState = std::make_shared<MainMenu>();

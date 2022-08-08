@@ -186,10 +186,10 @@ void Circle::render(){
         renderColor =  Fade(Color{255,255,255}, clampedFade);
     
 
-    DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width , renderColor);
-    DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width, Fade(WHITE,clampedFade));
-    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width , Fade(WHITE,clampedFade));
-    DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width , renderColor);
+    DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
+    DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade));
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width*(gm->hitCircleOverlay.width/128.0f) , Fade(WHITE,clampedFade));
+    DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width*(gm->approachCircle.width/128.0f) , renderColor);
 }
 
 //renders the "dead" Circle
@@ -204,11 +204,11 @@ void Circle::dead_render(){
         renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
     else
         renderColor =  Fade(Color{255,255,255}, clampedFade2);
-    DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width , renderColor);
-    DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width, Fade(WHITE,clampedFade2));
-    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width , Fade(WHITE,clampedFade2));
+    DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
+    DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade2));
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f) , Fade(WHITE,clampedFade2));
     if(data.point != 0)
-        DrawTextureCenter(gm->selectCircle, data.x, data.y, scale*gm->circlesize/gm->selectCircle.width , renderColor);
+        DrawTextureCenter(gm->selectCircle, data.x, data.y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);
     if(data.point == 0)
         DrawTextureCenter(gm->hit0, data.x, data.y, (gm->circlesize/gm->hit0.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 1)
@@ -586,6 +586,11 @@ void Slider::update(){
     GameManager* gm = GameManager::getInstance();
     position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
     
+    int volume = data.volume;
+    if(volume == 0){
+        data.volume = data.timing.volume;
+        volume = data.volume;
+    }
 
     position *= (double)100;
     curRepeat = std::max(0,(int)(position / data.length));
@@ -634,6 +639,7 @@ void Slider::update(){
     else{
         inSlider = false;
     }
+
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
     if(gm->currentTime*1000 > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && (Global.Key1D || Global.Key2D)){
@@ -674,6 +680,8 @@ void Slider::update(){
             gm->clickCombo++;
         }
         if(is_hit_at_end){
+            SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
+            SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
             PlaySoundMulti(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
 			PlaySoundMulti(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
         }
@@ -691,6 +699,8 @@ void Slider::update(){
                     reverseclicked[curRepeat-1] = 1;
                     reversenumber++;
                     gm->clickCombo++;
+                    SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], (float)volume/100.0f);
+                    SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], (float)volume/100.0f);
                     PlaySoundMulti(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
 			        PlaySoundMulti(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
                 }
@@ -702,6 +712,7 @@ void Slider::update(){
         }
     }
     if(playtick){
+        SetSoundVolume(gm->SoundFiles.data[data.NormalSound], (float)volume/100.0f);
         PlaySoundMulti(gm->SoundFiles.data[data.NormalSound]);
         playtick = false;
     }
@@ -796,19 +807,19 @@ void Slider::render(){
                 ticksrendered++;
             }
         }
-        DrawTextureRotate(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, gm->circlesize/gm->sliderb.width , angle, Fade(WHITE,clampedFade));
+        DrawTextureRotate(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderb.width)*(gm->sliderb.width/128.0f), angle, Fade(WHITE,clampedFade));
         if(inSlider)
-            DrawTextureRotate(gm->sliderfollow, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderfollow.width)*2 , angle, Fade(WHITE,clampedFade));
+            DrawTextureRotate(gm->sliderfollow, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderfollow.width)*2*(gm->sliderfollow.width/256.0f) , angle, Fade(WHITE,clampedFade));
     }
 
     clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
 
     if(state){
-        DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width , renderColor);
-        DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width, Fade(WHITE,clampedFade));
-        DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width , Fade(WHITE,clampedFade));
-        DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width , renderColor);
+        DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
+        DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade));
+        DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width*(gm->hitCircleOverlay.width/128.0f) , Fade(WHITE,clampedFade));
+        DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width*(gm->approachCircle.width/128.0f) , renderColor);
     }
 }
 

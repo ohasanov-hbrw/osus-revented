@@ -196,12 +196,20 @@ void GameManager::update(){
 						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
 					}
-					PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
+					int volume = objects[i]->data.volume;
+					if(volume == 0){
+						objects[i]->data.volume = objects[i]->data.timing.volume;
+						volume = objects[i]->data.volume;
+					}
+					SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
+					PlaySoundMulti(SoundFiles.data[objects[i]->data.NormalSound]);
 					if(objects[i]->data.PlayAddition){
-						PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
+						PlaySoundMulti(SoundFiles.data[objects[i]->data.AdditionSound]);
 					}
 					if(objects[i]->data.PlayCustom){
-						PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
+						PlaySoundMulti(SoundFiles.data[objects[i]->data.CustomSound]);
 					}
 					objects[i]->data.time = currentTime*1000;
 					destroyHitObject(i);
@@ -233,6 +241,13 @@ void GameManager::update(){
 							stop = false;
 							clickCombo++;
 						}
+						int volume = tempslider->data.volume;
+						if(volume == 0){
+							tempslider->data.volume = tempslider->data.timing.volume;
+							volume = tempslider->data.volume;
+						}
+						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
 						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
 						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
 					}
@@ -439,11 +454,11 @@ void GameManager::loadGame(std::string filename){
 				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("spinner-circle", 0) == 0){
 				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
-				//renderSpinnerCircle = true;
+				renderSpinnerCircle = true;
 			}
 			else if(files[i].rfind("spinner-metre", 0) == 0){
 				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
-				//renderSpinnerMetre = true;
+				renderSpinnerMetre = true;
 			}
 			else if(files[i].rfind("spinner-bottom", 0) == 0)
 				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
@@ -461,8 +476,8 @@ void GameManager::loadGame(std::string filename){
 		}
 	}
 
-	renderSpinnerCircle = false;
-	renderSpinnerMetre = false;
+	bool temprenderSpinnerCircle = false;
+	bool temprenderSpinnerMetre = false;
 
 	files.clear();
 	Global.Path = "resources/skin/";
@@ -508,11 +523,11 @@ void GameManager::loadGame(std::string filename){
 				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("spinner-circle", 0) == 0){
 				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
-				renderSpinnerCircle = true;
+				temprenderSpinnerCircle = true;
 			}
 			else if(files[i].rfind("spinner-metre", 0) == 0){
 				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
-				renderSpinnerMetre = true;
+				temprenderSpinnerMetre = true;
 			}
 			else if(files[i].rfind("spinner-bottom", 0) == 0)
 				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
@@ -528,6 +543,12 @@ void GameManager::loadGame(std::string filename){
 				}
 			}
 		}
+	}
+	if(temprenderSpinnerCircle == true){
+		renderSpinnerCircle = true;
+	}
+	if(temprenderSpinnerMetre == true){
+		renderSpinnerMetre = true;
 	}
 
 	files.clear();

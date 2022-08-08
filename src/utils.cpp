@@ -55,27 +55,27 @@ void GetMouse(){
 
 void GetKeys(){
     //Get all of the keys an store this data into some variables
-    if(IsKeyPressed(KEY_Z) or IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    if(IsKeyPressed(KEY_Z) or (Global.enableMouse and IsMouseButtonPressed(MOUSE_BUTTON_LEFT)))
         Global.Key1P = true;
     else
         Global.Key1P = false;
-    if(IsKeyPressed(KEY_X) or IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+    if(IsKeyPressed(KEY_X) or (Global.enableMouse and IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)))
         Global.Key2P = true;
     else
         Global.Key2P = false;
-    if(IsKeyDown(KEY_Z) or IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    if(IsKeyDown(KEY_Z) or (Global.enableMouse and IsMouseButtonDown(MOUSE_BUTTON_LEFT)))
         Global.Key1D = true;
     else
         Global.Key1D = false;
-    if(IsKeyDown(KEY_X) or IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+    if(IsKeyDown(KEY_X) or (Global.enableMouse and IsMouseButtonDown(MOUSE_BUTTON_RIGHT)))
         Global.Key2D = true;
     else
         Global.Key2D = false;
-    if(IsKeyReleased(KEY_Z) or IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+    if(IsKeyReleased(KEY_Z) or (Global.enableMouse and IsMouseButtonReleased(MOUSE_BUTTON_LEFT)))
         Global.Key1R = true;
     else
         Global.Key1R = false;
-    if(IsKeyReleased(KEY_X) or IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
+    if(IsKeyReleased(KEY_X) or (Global.enableMouse and IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)))
         Global.Key2R = true;
     else
         Global.Key2R = false;

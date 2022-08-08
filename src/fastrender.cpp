@@ -20,7 +20,6 @@ void updateMouseTrail(){
 void renderMouse(){
     Vector2 LastPosition = {-10,-10};
     if(Global.MouseInFocus){
-        DrawTextureCenter(Global.cursor, Global.MousePosition.x, Global.MousePosition.y , 0.3f, WHITE);
         for(int i = 0; i <= Global.MouseTrailSize - 1; i++){
             if(MouseTrail[(indexTrail+i) % Global.MouseTrailSize].x != LastPosition.x or MouseTrail[(indexTrail+i) % Global.MouseTrailSize].y != LastPosition.y ){ 
                 LastPosition = MouseTrail[(indexTrail+i) % Global.MouseTrailSize];
@@ -29,5 +28,6 @@ void renderMouse(){
                 DrawTextureCenter(Global.cursorTrail, MouseTrail[(indexTrail+i) % Global.MouseTrailSize].x, MouseTrail[(indexTrail+i) % Global.MouseTrailSize].y , 0.3f, MouseTrailer);
             }
         }
+        DrawTextureCenter(Global.cursor, Global.MousePosition.x, Global.MousePosition.y , 0.3f, WHITE);
     }
 }

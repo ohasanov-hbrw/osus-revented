@@ -31,6 +31,7 @@ void PlayMenu::render() {
     close.render();
 }
 void PlayMenu::update() {
+    Global.enableMouse = true;
     dir_list.update();
     select.update();
     back.update();
@@ -91,6 +92,7 @@ void LoadMenu::render() {
     close.render();
 }
 void LoadMenu::update() {
+    Global.enableMouse = true;
     dir_list.update();
     select.update();
     back.update();
@@ -144,6 +146,7 @@ MainMenu::MainMenu() {
 }
 void MainMenu::init() {}
 void MainMenu::update() {
+    Global.enableMouse = true;
     play.update();
     load.update();
     if(play.action){
@@ -195,13 +198,15 @@ void Game::init() {
         ClearBackground(Global.Background);
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
-        renderMouse();
+        
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 15), ScaleCordY(220)}, Scale(40), Scale(1), WHITE);
+        renderMouse();
         EndDrawing();
     }
 }
 void Game::update() {
+    Global.enableMouse = false;
     Global.gameManager->run();
     if(IsKeyPressed(KEY_BACKSPACE)){
         Global.gameManager->unloadGame();
@@ -216,6 +221,7 @@ void Game::update() {
     }
 }
 void Game::render() {
+    Global.enableMouse = false;
     Global.gameManager->render();
     if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic))
         DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
