@@ -325,7 +325,7 @@ void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
 	if(startMusic){
 		PlayMusicStream(backgroundMusic);
-    	SetMusicVolume(backgroundMusic, 0.3f);
+    	SetMusicVolume(backgroundMusic, 0.6f);
 		startMusic = false;
 	}
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
@@ -361,8 +361,9 @@ void GameManager::loadGame(std::string filename){
 	spawnedHitObjects = 0;
 	Parser parser = Parser();
 	gameFile.configGeneral["SampleSet"] = "Normal";
+	std::cout << "Parsing game!" << std::endl;
 	gameFile = parser.parse(filename);
-    std::cout << gameFile.hitObjects.size() << " " << gameFile.timingPoints.size() << std::endl;
+    std::cout << "Found " << gameFile.hitObjects.size() << " HitObjects and " << gameFile.timingPoints.size() << " Timing Points!" << std::endl;
 	//reverse the hitobject array because we need it reversed for it to make sense (and make it faster because pop_back)
 	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
 	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
