@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #define RAYMATH_IMPLEMENTATION
+# define M_PI 3.14159265358979323846f
 //extern "C" {
     #include "raymath.h"
 //}
@@ -45,6 +46,8 @@ void DrawCNumbersCenter(int, float, float, float, Color);
 void DrawCNumbersLeft(int, float, float, float, Color);
 //Draw a centered, scaled and rotated Texture
 void DrawTextureRotate(Texture2D, float, float, float, float, Color);
+//max trigo
+void DrawTextureOnCircle(Texture2D, float, float, float, float, float, float, Color);
 //Draw a slider texture (exclusively for a slider object)
 void DrawTextureSlider(Texture2D, float, float, Color, float);
 

@@ -39,6 +39,7 @@ void PlayMenu::update() {
 
     if(close.action){
         Global.Path = temp;
+        Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
     }
 
@@ -56,6 +57,7 @@ void PlayMenu::update() {
             else{
                 Global.selectedPath = Global.Path + '/' + dir_list.objects[dir_list.selectedindex].text;
                 Global.CurrentLocation = "beatmaps/" + lastPos + "/";
+                Global.CurrentState->unload();
                 Global.CurrentState.reset(new Game());
                 Global.CurrentState->init();
             }
@@ -67,6 +69,9 @@ void PlayMenu::update() {
         dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
         dir_list.init();
     }
+}
+void PlayMenu::unload() {
+
 }
 
 LoadMenu::LoadMenu() {
@@ -99,6 +104,7 @@ void LoadMenu::update() {
     close.update();
     
     if(close.action){
+        Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
     }
 
@@ -139,28 +145,46 @@ void LoadMenu::update() {
         path = TextBox(path.position, path.size, path.color, Global.Path, path.textcolor, path.textsize, path.maxlength);
     }
 }
+void LoadMenu::unload() {
+
+}
 
 MainMenu::MainMenu() {
     play = Button({250,420}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
+    wip = Button({320,320}, {120,60}, {255,135,198,0}, "WIP", BLACK, 20);
     load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
 }
 void MainMenu::init() {}
 void MainMenu::update() {
     Global.enableMouse = true;
     play.update();
+    wip.update();
     load.update();
+    if(wip.action){
+        Global.CurrentState->unload();
+        Global.CurrentState.reset(new WIPMenu());
+        Global.CurrentState->init();
+    }
     if(play.action){
+        Global.CurrentState->unload();
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
     }
     else if(load.action){
+        Global.CurrentState->unload();
         Global.CurrentState.reset(new LoadMenu());
+        Global.CurrentState->init();
     }
 }
 void MainMenu::render() {
     DrawTextureCenter(Global.OsusLogo, 320, 200, 1/3.f, WHITE);
     play.render();
+    wip.render();
     load.render();
+}
+
+void MainMenu::unload() {
+
 }
 
 Game::Game() {
@@ -210,6 +234,7 @@ void Game::update() {
     Global.gameManager->run();
     if(IsKeyPressed(KEY_BACKSPACE)){
         Global.gameManager->unloadGame();
+        Global.CurrentState->unload();
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
     }
@@ -227,4 +252,50 @@ void Game::render() {
         DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
     else
         DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+}
+
+void Game::unload(){
+
+}
+
+WIPMenu::WIPMenu() {
+    
+}
+
+void WIPMenu::init(){
+    logo = LoadTexture("resources/osus.png");
+    menu = LoadTexture("resources/menu.png");
+}
+void WIPMenu::render(){
+    for(int i = 18; i >= 0; i--){
+        float tempAngle = angle + i * 20.0f;
+        DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle - 180.0f, WHITE);
+    }
+    DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
+}
+void WIPMenu::update(){
+    float clampaccel = 0;
+    accel += (float)GetFrameTime() * (float)(95 * -Global.Wheel);
+    if(accel > 60.0f)
+        accel = 60.0f;
+    if(accel < -60.0f)
+        accel = -60.0f;
+    accel += ((-accel) / 2.0f) * ((float)GetFrameTime() * 8.0f);
+    if(accel < 0.01f and accel > -0.01f)
+        accel = 0.0f;
+    float floatangle = ((int)angle) % 20;
+    if(floatangle >= 20.0f)
+        floatangle -= 20.0f;
+    if(floatangle >= 10.0f)
+        clampaccel = (float)GetFrameTime() * (float)(2.5f * (20.0f - floatangle));
+    else
+        clampaccel = -(float)GetFrameTime() * (float)(2.5f * (floatangle));
+    angle += accel;
+    angle += clampaccel;
+    if (angle < 0.0f)
+        angle += 360.0f;
+}
+void WIPMenu::unload(){
+    UnloadTexture(logo);
+    UnloadTexture(menu);
 }

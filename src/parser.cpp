@@ -3,6 +3,39 @@
 Parser::Parser(){}
 
 //this here is just a dumb parser, nothing to document here tbh
+GameFile Parser::parseMetadata(std::string filename){
+	std::ifstream ifs(filename);
+	std::string line;
+	GameFile gameFile;
+	if (ifs.is_open()){
+		while(std::getline(ifs, line)){
+			if(line[line.size()-1] == 13)
+				line.pop_back();
+			if(line[0] == '[' and line[line.size()-1] == ']'){
+				std::string header = line.substr(1);
+				header.pop_back();
+				if(header == "Metadata"){
+					std::string subLine;
+					while(std::getline(ifs, subLine)){
+						if(subLine.size() == 0)
+							break;
+						if(subLine[subLine.size()-1] == 13)
+							subLine.pop_back();
+						if(subLine.size() == 0)
+							break;
+						if(subLine[0] == '/' and subLine[1] == '/')
+							continue;
+						std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, false);
+						gameFile.configMetadata[keyValue.first] = keyValue.second;
+					}
+					break;
+				}
+			}
+		}
+	}
+	return gameFile;
+}
+
 GameFile Parser::parse(std::string filename){
 	GameFile gameFile;
 	gameFile.configGeneral["AudioLeadIn"] = "0";

@@ -6,6 +6,8 @@
 #include <gamemanager.hpp>
 #include <iostream>
 
+
+
 void updateUpDown(){
     //Get the current state of the mouse wheel
     Global.Wheel = GetMouseWheelMove();
@@ -213,4 +215,12 @@ void DrawSpinnerMeter(Texture2D tex, float per){
     Rectangle source = {0,tex.height*(1.0f-per),tex.width, tex.height*per};
     DrawTexturePro(tex, Rectangle{0,0,tex.width, tex.height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,(480.0f-y)*(1.0f-per)+y/2.0f,640-x,(480.0f-y)*per}), Vector2{0,0}, 0, WHITE);
+}
+
+void DrawTextureOnCircle(Texture2D tex, float x, float y, float rad, float s, float r, float ang, Color color){
+    ang = (ang * M_PI) / 180;
+    float xdiff = rad * cos(ang);
+    float ydiff = rad * sin(ang);
+
+    DrawTextureRotate(tex, x + xdiff, y + ydiff, s, r, color);
 }
