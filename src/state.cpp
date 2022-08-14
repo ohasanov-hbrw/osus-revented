@@ -165,7 +165,7 @@ void MainMenu::update() {
         Global.CurrentState.reset(new WIPMenu());
         Global.CurrentState->init();
     }
-    if(play.action){
+    else if(play.action){
         Global.CurrentState->unload();
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
@@ -263,6 +263,12 @@ WIPMenu::WIPMenu() {
 }
 
 void WIPMenu::init(){
+    std::string temp = Global.Path;
+    Global.Path = Global.BeatmapLocation + "/Songs/";
+    dir.clear();
+    dir = ls(".");
+    std::sort(dir.begin(), dir.end());
+    Global.Path = temp;
     logo = LoadTexture("resources/osus.png");
     menu = LoadTexture("resources/menu.png");
 	SetTextureFilter(logo, TEXTURE_FILTER_BILINEAR );
@@ -272,15 +278,15 @@ void WIPMenu::render(){
     int index = 0;
     float tempangle = angle;
     if(tempangle < 0)
-        tempangle -= 5;
+        tempangle -= 10;
     if(tempangle > 0)
-        tempangle += 5;
+        tempangle += 10;
     index = (tempangle) / 20;
     for(int i = 0; i < 18; i++){
         float tempAngle = angle - i * 20.0f;
         DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle - 180.0f, WHITE);
         Vector2 textpos = getPointOnCircle(610, 220, 300, tempAngle - 180.0f);
-        DrawTextLeft((std::to_string(index) + " <- cur | i -> " + std::to_string(i)).c_str(), textpos.x, textpos.y, 15, WHITE);
+        DrawTextLeft((std::to_string(index) + " " + std::to_string(i)).c_str(), textpos.x, textpos.y, 15, WHITE);
     }
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 }
@@ -308,6 +314,7 @@ void WIPMenu::update(){
         posangle += 360.0f;
 }
 void WIPMenu::unload(){
+    dir.clear();
     UnloadTexture(logo);
     UnloadTexture(menu);
 }

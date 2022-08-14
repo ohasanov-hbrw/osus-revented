@@ -91,6 +91,7 @@ public:
     float posangle = 0;
     int adjust = 0;
     float accel = 0;
+    std::vector<std::string> dir;
     void init() override;
     void render() override;
     void update() override;
