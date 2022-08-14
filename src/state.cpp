@@ -282,11 +282,27 @@ void WIPMenu::render(){
     if(tempangle > 0)
         tempangle += 10;
     index = (tempangle) / 20;
-    for(int i = 0; i < 18; i++){
+    for(int i = (tempangle) / 20 - 9; i < (tempangle) / 20 + 9; i++){
         float tempAngle = angle - i * 20.0f;
         DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle - 180.0f, WHITE);
         Vector2 textpos = getPointOnCircle(610, 220, 300, tempAngle - 180.0f);
-        DrawTextLeft((std::to_string(index) + " " + std::to_string(i)).c_str(), textpos.x, textpos.y, 15, WHITE);
+        while(tempAngle > 0.0f)
+            tempAngle -= 360.0f;
+        while(tempAngle < 0.0f)
+            tempAngle += 360.0f;
+        if(tempAngle < 0)
+            tempAngle -= 10;
+        if(tempAngle > 0)
+            tempAngle += 10;
+        int tempindex = (int)(tempAngle / 20) % 18;
+        if(tempindex > 9)
+            tempindex = 18 - tempindex;
+        else
+            tempindex = -tempindex;
+        index = (tempangle) / 20;
+        index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
+        DrawTextLeft((dir[(tempindex + index + dir.size()) % dir.size()]).c_str(), textpos.x, textpos.y, 15, WHITE);
+        DrawTextLeft((std::to_string((tempindex + index + dir.size()) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 20, 15, WHITE);
     }
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 }
