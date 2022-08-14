@@ -265,11 +265,22 @@ WIPMenu::WIPMenu() {
 void WIPMenu::init(){
     logo = LoadTexture("resources/osus.png");
     menu = LoadTexture("resources/menu.png");
+	SetTextureFilter(logo, TEXTURE_FILTER_BILINEAR );
+	//SetTextureFilter(menu, TEXTURE_FILTER_BILINEAR );
 }
 void WIPMenu::render(){
-    for(int i = 18; i >= 0; i--){
-        float tempAngle = angle + i * 20.0f;
+    int index = 0;
+    float tempangle = angle;
+    if(tempangle < 0)
+        tempangle -= 5;
+    if(tempangle > 0)
+        tempangle += 5;
+    index = (tempangle) / 20;
+    for(int i = 0; i < 18; i++){
+        float tempAngle = angle - i * 20.0f;
         DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle - 180.0f, WHITE);
+        Vector2 textpos = getPointOnCircle(610, 220, 300, tempAngle - 180.0f);
+        DrawTextLeft((std::to_string(index) + " <- cur | i -> " + std::to_string(i)).c_str(), textpos.x, textpos.y, 15, WHITE);
     }
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 }
@@ -283,7 +294,7 @@ void WIPMenu::update(){
     accel += ((-accel) / 2.0f) * ((float)GetFrameTime() * 8.0f);
     if(accel < 0.01f and accel > -0.01f)
         accel = 0.0f;
-    float floatangle = ((int)angle) % 20;
+    float floatangle = ((int)posangle) % 20;
     if(floatangle >= 20.0f)
         floatangle -= 20.0f;
     if(floatangle >= 10.0f)
@@ -292,8 +303,9 @@ void WIPMenu::update(){
         clampaccel = -(float)GetFrameTime() * (float)(2.5f * (floatangle));
     angle += accel;
     angle += clampaccel;
-    if (angle < 0.0f)
-        angle += 360.0f;
+    posangle = angle;
+    while(posangle < 0.0f)
+        posangle += 360.0f;
 }
 void WIPMenu::unload(){
     UnloadTexture(logo);

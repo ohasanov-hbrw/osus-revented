@@ -88,6 +88,7 @@ public:
     Texture2D logo;
     Texture2D menu;
     float angle = 0;
+    float posangle = 0;
     int adjust = 0;
     float accel = 0;
     void init() override;

@@ -216,11 +216,22 @@ void DrawSpinnerMeter(Texture2D tex, float per){
     DrawTexturePro(tex, Rectangle{0,0,tex.width, tex.height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,(480.0f-y)*(1.0f-per)+y/2.0f,640-x,(480.0f-y)*per}), Vector2{0,0}, 0, WHITE);
 }
-
+Vector2 getPointOnCircle(float x, float y, float radius, float angle){
+    angle= (angle * M_PI) / 180;
+    float xdiff = radius * cos(angle);
+    float ydiff = radius * sin(angle);
+    return Vector2{x + xdiff, y + ydiff};
+}
 void DrawTextureOnCircle(Texture2D tex, float x, float y, float rad, float s, float r, float ang, Color color){
-    ang = (ang * M_PI) / 180;
-    float xdiff = rad * cos(ang);
-    float ydiff = rad * sin(ang);
+    Vector2 pos = getPointOnCircle(x, y, rad, ang);
+    DrawTextureRotate(tex, pos.x, pos.y, s, r, color);
+}
 
-    DrawTextureRotate(tex, x + xdiff, y + ydiff, s, r, color);
+void DrawTextCenter(const char *text, float x, float y, float s, Color color){
+    Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
+    DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x - size.x / 2.0f, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
+}
+void DrawTextLeft(const char *text, float x, float y, float s, Color color){
+    Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
+    DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
 }

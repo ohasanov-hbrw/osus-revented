@@ -42,6 +42,9 @@ Rectangle GetRaylibOriginR(Rectangle);
 void DrawTextureCenter(Texture2D, float, float, float, Color);
 //Draw centered and scaled combo numbers
 void DrawCNumbersCenter(int, float, float, float, Color);
+//lmao
+void DrawTextCenter(const char *, float, float, float, Color);
+void DrawTextLeft(const char *, float, float, float, Color);
 //Draw scaled combo numbers from left to right
 void DrawCNumbersLeft(int, float, float, float, Color);
 //Draw a centered, scaled and rotated Texture
@@ -63,6 +66,8 @@ Vector2 vectorize(float);
 float distance(Vector2 &, Vector2 &);
 //Binary search algorithm
 int Search(std::vector<float>, float,int,int);
+
+Vector2 getPointOnCircle(float, float, float, float);
 
 std::string getSampleSetFromInt(int);
 
