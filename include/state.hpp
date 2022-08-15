@@ -83,7 +83,6 @@ public:
     WIPMenu();
     Parser parser = Parser();
     GameFile gameFile; // = parser.parse(filename);
-    std::vector<std::pair<std::string, std::string>> mainObjects;
     std::vector<std::pair<std::string, std::string>> subObjects;
     Texture2D logo;
     Texture2D menu;
@@ -96,7 +95,9 @@ public:
     float absMouseMovement = 0;
     bool moving = false;
     int selectedIndex = -1;
+    int selectedAngleIndex = -1;
     std::vector<std::string> dir;
+    std::vector<std::string> subDir;
     void init() override;
     void render() override;
     void update() override;

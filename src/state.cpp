@@ -284,8 +284,6 @@ void WIPMenu::render(){
     index = (tempangle) / 20;
     for(int i = (tempangle) / 20 - 9; i < (tempangle) / 20 + 9; i++){
         float tempAngle = angle - i * 20.0f;
-        DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle - 180.0f, WHITE);
-        Vector2 textpos = getPointOnCircle(610, 220, 300, tempAngle - 180.0f);
         while(tempAngle > 0.0f)
             tempAngle -= 360.0f;
         while(tempAngle < 0.0f)
@@ -301,10 +299,25 @@ void WIPMenu::render(){
             tempindex = -tempindex;
         index = (tempangle) / 20;
         index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
-        DrawTextLeft((dir[(tempindex + index + dir.size()) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
-        DrawTextLeft((std::to_string((tempindex + index + dir.size()) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
-        if(selectedIndex == (tempindex + index + dir.size()) % dir.size()){
-            DrawTextLeft("Selected!", textpos.x, textpos.y + 37, 7, GREEN);
+        
+        float tempAngle2 = angle - i * 20.0f;
+        
+        Vector2 textpos = getPointOnCircle(610, 220, 300, tempAngle2 - 180.0f);
+        if(selectedIndex != -1 and (i > selectedAngleIndex and i < selectedAngleIndex + subObjects.size())){
+            DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle2 - 180.0f, WHITE);
+        }
+        else{
+            int offset = 0;
+            if(i >= selectedAngleIndex + subObjects.size()){
+                offset = subObjects.size();
+            }
+            DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle2 - 180.0f, WHITE);
+            DrawTextLeft((dir[(tempindex + index + dir.size() + offset) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
+            DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
+            DrawTextLeft((std::to_string(i + offset)).c_str(), textpos.x, textpos.y + 37, 7, WHITE);
+            if(selectedIndex == (tempindex + index + dir.size() + offset) % dir.size()){
+                DrawTextLeft(("Selected index: " + std::to_string(selectedAngleIndex + offset)).c_str(), textpos.x, textpos.y + 49, 7, GREEN);
+            }
         }
     }
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
@@ -352,11 +365,39 @@ void WIPMenu::update(){
         }   
     }
     if(!moving and Global.Key1R and CheckCollisionPointRec(Global.MousePosition, Rectangle{305,198,210,81})){
-        std::cout << "selected index: " << index << std::endl;
-        if(selectedIndex == index)
+        if(selectedIndex == index){
             selectedIndex = -1;
+            subObjects.clear();
+            subDir.clear();
+        }
         else
             selectedIndex = index;
+        index = 0;
+        float tempangle = angle;
+        if(tempangle < 0)
+            tempangle -= 10;
+        if(tempangle > 0)
+            tempangle += 10;
+        index = (tempangle) / 20;
+        selectedAngleIndex = index;
+        if(selectedIndex != -1 and dir[selectedIndex][dir[selectedIndex].size() - 1] == '/'){
+            subObjects.clear();
+            std::string temp = Global.Path;
+            Global.Path = Global.BeatmapLocation + "/Songs/" + dir[selectedIndex];
+            std::string loc = dir[selectedIndex];
+            subDir.clear();
+            subDir = ls(".osu");
+            std::cout << "ls?" << std::endl;
+            std::sort(subDir.begin(), subDir.end());
+            for(int i = 0; i < subDir.size(); i++){
+                std::cout << subDir.size() << " " << subDir[i].size() << " " << i << std::endl;
+                if(subDir[i][subDir[i].size() - 1] != '/'){
+                    subObjects.push_back(std::make_pair(subDir[i], Global.Path + subDir[i]));
+                }
+            }
+            std::cout << "done?" << std::endl;
+            Global.Path = temp;
+        }
     }
     if(Global.Key1R){
         moving = false;
@@ -364,7 +405,7 @@ void WIPMenu::update(){
         mouseMovement = 0;
         absMouseMovement = 0;
     }
-    if(Global.MouseInFocus)
+    if(Global.MouseInFocus and CheckCollisionPointRec(Global.MousePosition, Rectangle{320,-2000,320,6000}))
         lastMouse = Global.MousePosition.y;
     angle += accel;
     if(!moving)
@@ -373,6 +414,8 @@ void WIPMenu::update(){
 }
 void WIPMenu::unload(){
     dir.clear();
+    subObjects.clear();
+    subDir.clear();
     UnloadTexture(logo);
     UnloadTexture(menu);
 }

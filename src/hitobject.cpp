@@ -868,7 +868,7 @@ void Spinner::update(){
     GameManager* gm = GameManager::getInstance();
     //the circle is not clickable after some time so we check that
     float angle = atan2(240 - Global.MousePosition.y, 320 - Global.MousePosition.x) * 180.0f / PI;
-    
+
     if(data.touch and gm->currentTime*1000 > data.time){
         if(Global.Key1P or Global.Key2P){
             first = true;
