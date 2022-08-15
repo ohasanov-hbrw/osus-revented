@@ -301,8 +301,11 @@ void WIPMenu::render(){
             tempindex = -tempindex;
         index = (tempangle) / 20;
         index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
-        DrawTextLeft((dir[(tempindex + index + dir.size()) % dir.size()]).c_str(), textpos.x, textpos.y, 15, WHITE);
-        DrawTextLeft((std::to_string((tempindex + index + dir.size()) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 20, 15, WHITE);
+        DrawTextLeft((dir[(tempindex + index + dir.size()) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
+        DrawTextLeft((std::to_string((tempindex + index + dir.size()) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
+        if(selectedIndex == (tempindex + index + dir.size()) % dir.size()){
+            DrawTextLeft("Selected!", textpos.x, textpos.y + 37, 7, GREEN);
+        }
     }
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 }
@@ -323,11 +326,52 @@ void WIPMenu::update(){
         clampaccel = (float)GetFrameTime() * (float)(2.5f * (20.0f - floatangle));
     else
         clampaccel = -(float)GetFrameTime() * (float)(2.5f * (floatangle));
-    angle += accel;
-    angle += clampaccel;
+    
     posangle = angle;
     while(posangle < 0.0f)
         posangle += 360.0f;
+    
+    int index = 0;
+    float tempangle = angle;
+    if(tempangle < 0)
+        tempangle -= 10;
+    if(tempangle > 0)
+        tempangle += 10;
+    index = (tempangle) / 20;
+    index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
+    index = index % dir.size();
+    
+    if(Global.Key1D and Global.MouseInFocus){
+        if(Global.MouseInFocus)
+            mouseMovement += Global.MousePosition.y - lastMouse;
+        if(Global.MouseInFocus)
+            absMouseMovement += std::abs(Global.MousePosition.y - lastMouse);
+        if(absMouseMovement > 0.5f){
+            angle += (Global.MousePosition.y - lastMouse) / -5.0f;
+            moving = true;
+            //std::cout << absMouseMovement << std::endl;
+        }
+            
+    }
+    if(!moving and Global.Key1R and CheckCollisionPointRec(Global.MousePosition, Rectangle{305,198,210,81})){
+        std::cout << "selected index: " << index << std::endl;
+        if(selectedIndex == index)
+            selectedIndex = -1;
+        else
+            selectedIndex = index;
+    }
+    if(Global.Key1R){
+        moving = false;
+        accel += (Global.MousePosition.y - lastMouse) / -10.0f;
+        mouseMovement = 0;
+        absMouseMovement = 0;
+    }
+    if(Global.MouseInFocus)
+        lastMouse = Global.MousePosition.y;
+    angle += accel;
+    if(!moving)
+        angle += clampaccel;
+
 }
 void WIPMenu::unload(){
     dir.clear();

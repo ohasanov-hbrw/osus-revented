@@ -91,6 +91,11 @@ public:
     float posangle = 0;
     int adjust = 0;
     float accel = 0;
+    float lastMouse = 0;
+    float mouseMovement = 0;
+    float absMouseMovement = 0;
+    bool moving = false;
+    int selectedIndex = -1;
     std::vector<std::string> dir;
     void init() override;
     void render() override;
