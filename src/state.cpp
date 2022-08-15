@@ -311,7 +311,7 @@ void WIPMenu::render(){
 }
 void WIPMenu::update(){
     float clampaccel = 0;
-    accel += (float)GetFrameTime() * (float)(95 * -Global.Wheel);
+    accel += (float)GetFrameTime() * (float)(100.0f * -Global.Wheel);
     if(accel > 60.0f)
         accel = 60.0f;
     if(accel < -60.0f)
@@ -341,7 +341,7 @@ void WIPMenu::update(){
     index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
     index = index % dir.size();
     
-    if(Global.Key1D and Global.MouseInFocus){
+    if(Global.Key1D and Global.MouseInFocus and CheckCollisionPointRec(Global.MousePosition, Rectangle{320,-2000,320,6000})){
         if(Global.MouseInFocus)
             mouseMovement += Global.MousePosition.y - lastMouse;
         if(Global.MouseInFocus)
@@ -349,9 +349,7 @@ void WIPMenu::update(){
         if(absMouseMovement > 0.5f){
             angle += (Global.MousePosition.y - lastMouse) / -5.0f;
             moving = true;
-            //std::cout << absMouseMovement << std::endl;
-        }
-            
+        }   
     }
     if(!moving and Global.Key1R and CheckCollisionPointRec(Global.MousePosition, Rectangle{305,198,210,81})){
         std::cout << "selected index: " << index << std::endl;
