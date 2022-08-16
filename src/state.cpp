@@ -266,6 +266,9 @@ void WIPMenu::init(){
     applyMouse = false;
     std::string temp = Global.Path;
     Global.Path = Global.BeatmapLocation + "/Songs/";
+    if(selectedIndex >= 0 and selectedIndex < dir.size()){
+        Global.Path = Global.BeatmapLocation + "/Songs/" + dir[selectedIndex];
+    }
     dir.clear();
     dir = ls(".");
     std::sort(dir.begin(), dir.end());
@@ -280,7 +283,6 @@ void WIPMenu::init(){
         //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
         float weirdSmooth = easeInOutCubic(time);
         angle = -250 + 255 * weirdSmooth;
-        std::cout << angle << std::endl;
         GetScale();
         GetMouse();
         GetKeys();
