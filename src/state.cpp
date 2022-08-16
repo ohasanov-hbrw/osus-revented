@@ -302,22 +302,14 @@ void WIPMenu::render(){
         
         float tempAngle2 = angle - i * 20.0f;
         
+        int offset = 0;
         Vector2 textpos = getPointOnCircle(610, 220, 300, tempAngle2 - 180.0f);
-        if(selectedIndex != -1 and (i > selectedAngleIndex and i < selectedAngleIndex + subObjects.size())){
-            DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle2 - 180.0f, WHITE);
-        }
-        else{
-            int offset = 0;
-            if(i >= selectedAngleIndex + subObjects.size()){
-                offset = subObjects.size();
-            }
-            DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle2 - 180.0f, WHITE);
-            DrawTextLeft((dir[(tempindex + index + dir.size() + offset) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
-            DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
-            DrawTextLeft((std::to_string(i + offset)).c_str(), textpos.x, textpos.y + 37, 7, WHITE);
-            if(selectedIndex == (tempindex + index + dir.size() + offset) % dir.size()){
-                DrawTextLeft(("Selected index: " + std::to_string(selectedAngleIndex + offset)).c_str(), textpos.x, textpos.y + 49, 7, GREEN);
-            }
+        DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle2 - 180.0f, WHITE);
+        DrawTextLeft((dir[(tempindex + index + dir.size() + offset) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
+        DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
+        DrawTextLeft((std::to_string(subObjects.size())).c_str(), textpos.x, textpos.y + 37, 7, WHITE);
+        if(selectedIndex == (tempindex + index + dir.size() + offset) % dir.size()){
+            DrawTextLeft(("Selected index: " + std::to_string(selectedIndex + offset)).c_str(), textpos.x, textpos.y + 49, 7, GREEN);
         }
     }
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
@@ -393,6 +385,7 @@ void WIPMenu::update(){
                 std::cout << subDir.size() << " " << subDir[i].size() << " " << i << std::endl;
                 if(subDir[i][subDir[i].size() - 1] != '/'){
                     subObjects.push_back(std::make_pair(subDir[i], Global.Path + subDir[i]));
+                    std::cout << subDir[i] << std::endl;
                 }
             }
             std::cout << "done?" << std::endl;
