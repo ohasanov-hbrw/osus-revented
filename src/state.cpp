@@ -272,6 +272,8 @@ void WIPMenu::init(){
     logo = LoadTexture("resources/osus.png");
     menu = LoadTexture("resources/menu.png");
 	SetTextureFilter(logo, TEXTURE_FILTER_BILINEAR );
+    
+
 	//SetTextureFilter(menu, TEXTURE_FILTER_BILINEAR );
 }
 void WIPMenu::render(){
