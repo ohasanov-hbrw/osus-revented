@@ -98,6 +98,7 @@ public:
     int selectedAngleIndex = -1;
     std::vector<std::string> dir;
     std::vector<std::string> subDir;
+    bool applyMouse = false;
     void init() override;
     void render() override;
     void update() override;

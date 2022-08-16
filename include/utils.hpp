@@ -87,3 +87,5 @@ inline Vector2 operator * (Vector2 p0, Vector2 p1){
 inline Vector2 operator / (Vector2 p0, Vector2 p1){
     return Vector2Divide(p0, p1);
 }
+
+float easeInOutCubic(float);

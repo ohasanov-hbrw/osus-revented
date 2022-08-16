@@ -235,3 +235,7 @@ void DrawTextLeft(const char *text, float x, float y, float s, Color color){
     Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
     DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
 }
+
+float easeInOutCubic(float x){
+    return x < 0.5f ? 4.0f * x * x * x : 1.0f - std::pow(-2.0f * x + 2.0f, 3) / 2.0f;
+}

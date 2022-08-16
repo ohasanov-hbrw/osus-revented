@@ -263,6 +263,7 @@ WIPMenu::WIPMenu() {
 }
 
 void WIPMenu::init(){
+    applyMouse = false;
     std::string temp = Global.Path;
     Global.Path = Global.BeatmapLocation + "/Songs/";
     dir.clear();
@@ -272,8 +273,68 @@ void WIPMenu::init(){
     logo = LoadTexture("resources/osus.png");
     menu = LoadTexture("resources/menu.png");
 	SetTextureFilter(logo, TEXTURE_FILTER_BILINEAR );
-    
 
+    float time = 0.2f;
+    while(time <= 1.0f){
+        time += GetFrameTime() * 1.0f;
+        //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
+        float weirdSmooth = easeInOutCubic(time);
+        angle = -250 + 255 * weirdSmooth;
+        std::cout << angle << std::endl;
+        GetScale();
+        GetMouse();
+        GetKeys();
+        updateMouseTrail();
+        updateUpDown();
+        update();
+        BeginDrawing();
+        ClearBackground(Global.Background);
+        int index = 0;
+        float tempangle = angle;
+        if(tempangle < 0)
+            tempangle -= 10;
+        if(tempangle > 0)
+            tempangle += 10;
+        index = (tempangle) / 20;
+        for(int i = (tempangle) / 20 - 9; i < (tempangle) / 20 + 9; i++){
+            float tempAngle = angle - i * 20.0f;
+            while(tempAngle > 0.0f)
+                tempAngle -= 360.0f;
+            while(tempAngle < 0.0f)
+                tempAngle += 360.0f;
+            if(tempAngle < 0)
+                tempAngle -= 10;
+            if(tempAngle > 0)
+                tempAngle += 10;
+            int tempindex = (int)(tempAngle / 20) % 18;
+            if(tempindex > 9)
+                tempindex = 18 - tempindex;
+            else
+                tempindex = -tempindex;
+            index = (tempangle) / 20;
+            index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
+            
+            float tempAngle2 = angle - i * 20.0f;
+            
+            int offset = 0;
+            Vector2 textpos = getPointOnCircle(610, 220, 300*weirdSmooth, tempAngle2 - 180.0f);
+            DrawTextureOnCircle(menu, 800, 240, 300*weirdSmooth, 0.4f, 0, tempAngle2 - 180.0f, WHITE);
+            DrawTextLeft((dir[(tempindex + index + dir.size() + offset) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
+            DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15*weirdSmooth, 7, WHITE);
+            DrawTextLeft((std::to_string(subObjects.size())).c_str(), textpos.x, textpos.y + 37*weirdSmooth, 7, WHITE);
+            if(selectedIndex == (tempindex + index + dir.size() + offset) % dir.size()){
+                DrawTextLeft(("Selected index: " + std::to_string(selectedIndex + offset)).c_str(), textpos.x, textpos.y + 49*weirdSmooth, 7, GREEN);
+            }
+        }
+        DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
+
+        DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+        DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+        renderMouse();
+        DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
+        EndDrawing();
+    }
+    applyMouse = true;
 	//SetTextureFilter(menu, TEXTURE_FILTER_BILINEAR );
 }
 void WIPMenu::render(){
@@ -318,14 +379,15 @@ void WIPMenu::render(){
 }
 void WIPMenu::update(){
     float clampaccel = 0;
-    accel += (float)GetFrameTime() * (float)(100.0f * -Global.Wheel);
-    if(accel > 60.0f)
-        accel = 60.0f;
-    if(accel < -60.0f)
-        accel = -60.0f;
-    accel += ((-accel) / 2.0f) * ((float)GetFrameTime() * 8.0f);
-    if(accel < 0.01f and accel > -0.01f)
-        accel = 0.0f;
+    if(applyMouse){
+        accel += (float)GetFrameTime() * (float)(100.0f * -Global.Wheel);
+        if(accel > 60.0f)
+            accel = 60.0f;
+        if(accel < -60.0f)
+            accel = -60.0f;
+        if(accel < 0.01f and accel > -0.01f)
+            accel = 0.0f;
+    }
     float floatangle = ((int)posangle) % 20;
     if(floatangle >= 20.0f)
         floatangle -= 20.0f;
@@ -354,7 +416,8 @@ void WIPMenu::update(){
         if(Global.MouseInFocus)
             absMouseMovement += std::abs(Global.MousePosition.y - lastMouse);
         if(absMouseMovement > 0.5f){
-            angle += (Global.MousePosition.y - lastMouse) / -5.0f;
+            if(applyMouse)
+                angle += (Global.MousePosition.y - lastMouse) / -5.0f;
             moving = true;
         }   
     }
@@ -396,15 +459,20 @@ void WIPMenu::update(){
     }
     if(Global.Key1R){
         moving = false;
-        accel += (Global.MousePosition.y - lastMouse) / -10.0f;
+        if(applyMouse)
+            accel += (Global.MousePosition.y - lastMouse) / -10.0f;
         mouseMovement = 0;
         absMouseMovement = 0;
     }
     if(Global.MouseInFocus and CheckCollisionPointRec(Global.MousePosition, Rectangle{320,-2000,320,6000}))
         lastMouse = Global.MousePosition.y;
+    //std::cout << accel << std::endl;
+    if(applyMouse)
+        accel += ((-accel) / 2.0f) * ((float)GetFrameTime() * 8.0f);
     angle += accel;
     if(!moving)
         angle += clampaccel;
+    
 
 }
 void WIPMenu::unload(){
