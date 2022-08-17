@@ -89,3 +89,4 @@ inline Vector2 operator / (Vector2 p0, Vector2 p1){
 }
 
 float easeInOutCubic(float);
+bool AreSame(double, double);

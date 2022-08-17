@@ -6,6 +6,8 @@
 #include "zip.h"
 #include "fastrender.hpp"
 
+
+
 PlayMenu::PlayMenu() {
     description = TextBox({320,140}, {520,40}, {240,98,161,255}, "Select a Beatmap\n    to play!", WHITE, 15, 50);
     bg = TextBox({320,240}, {530,290}, {240,98,161,255}, "", {240,98,161,255}, 15, 10);
@@ -262,6 +264,7 @@ WIPMenu::WIPMenu() {
 }
 
 void WIPMenu::init(){
+    //index = 0;
     applyMouse = false;
     std::string temp = Global.Path;
     Global.Path = Path;
@@ -277,7 +280,9 @@ void WIPMenu::init(){
     Global.Path = temp;
     logo = LoadTexture("resources/osus.png");
     menu = LoadTexture("resources/menu.png");
+    back = LoadTexture("resources/metadata.png");
 	SetTextureFilter(logo, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(back, TEXTURE_FILTER_BILINEAR );
     float time = 0.2f;
     while(time <= 1.0f){
         time += GetFrameTime() * 1.0f;
@@ -378,6 +383,10 @@ void WIPMenu::render(){
         DrawTextLeft((dir[dirNum]).c_str(), textpos.x, textpos.y, 9, WHITE);
         DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
     }
+    //if(renderMetadata){
+        DrawTextureCenter(back, 145, 240, 0.45f, Color{255,255,255,255 * easeInOutCubic(animtime)});
+    //float}
+
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 }
 void WIPMenu::update(){
@@ -505,6 +514,7 @@ void WIPMenu::update(){
                 }
                 applyMouse = true;
                 init();
+                index = 0;
             }
             else if(dir[selectedIndex] == "Back" and selectedIndex == 0 and CanGoBack){
                 Path.pop_back();
@@ -577,6 +587,7 @@ void WIPMenu::update(){
                 }
                 applyMouse = true;
                 init();
+                index = 0;
             }
             selectedIndex = -1;
         }
@@ -596,6 +607,23 @@ void WIPMenu::update(){
     angle += accel;
     if(!moving)
         angle += clampaccel;
+
+
+    if(AreSame(accel,0.0f) and AreSame(clampaccel,0.0f)){
+        renderMetadata = true;
+        if(dir[index] != "Back" and dir[index][dir[index].size() - 1] != '/'){
+            animtime += GetFrameTime() * 2.0f;
+            if(animtime > 1.0f)
+                animtime = 1.0f;
+        }
+    }
+    else{
+        renderMetadata = false;
+        animtime -= GetFrameTime() * 2.0f;
+        if(animtime < 0.0f)
+            animtime = 0.0f;
+    }
+
     if(IsKeyPressed(KEY_BACKSPACE) and CanGoBack){
         Path.pop_back();
         while(Path[Path.size()-1] != '/'){
@@ -674,5 +702,6 @@ void WIPMenu::unload(){
     dir.clear();
     subObjects.clear();
     UnloadTexture(logo);
+    UnloadTexture(back);
     UnloadTexture(menu);
 }

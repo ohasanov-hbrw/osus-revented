@@ -87,6 +87,7 @@ public:
     std::vector<std::pair<std::string, std::string>> subObjects;
     Texture2D logo;
     Texture2D menu;
+    Texture2D back;
     float angle = 0;
     float posangle = 0;
     int adjust = 0;
@@ -101,6 +102,9 @@ public:
     bool applyMouse = false;
     std::string Path = Global.BeatmapLocation  + "/";
     bool CanGoBack = false;
+    bool renderMetadata = false;
+    bool metadataAvailable = false;
+    float animtime = 0.0f;
     void init() override;
     void render() override;
     void update() override;

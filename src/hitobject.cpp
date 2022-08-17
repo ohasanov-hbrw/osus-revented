@@ -6,9 +6,9 @@
 #include "utils.hpp"
 #include <limits>
 
-bool AreSame(double a, double b) {
+/*bool AreSame(double a, double b) {
     return std::fabs(a - b) < 0.0001f;
-}
+}*/
 
 
 float interpolate(float *p, float *time, float t) {

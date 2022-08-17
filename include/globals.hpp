@@ -12,6 +12,7 @@ struct Globals {
     float Scale = 1.f;
     Vector2 ZeroPoint = {0.f, 0.f};
     Color Background = { 30, 0, 60, 255 };
+    //Color Background = {42,22,33,255};
     int skinNumberOverlap = 18;
     int FPS = 480;
     int Width = 640;
