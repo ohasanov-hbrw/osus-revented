@@ -1,7 +1,6 @@
 #include "state.hpp"
 #include "fs.hpp"
 #include <iostream>
-#include "globals.hpp"
 #include "utils.hpp"
 #include "gamemanager.hpp"
 #include "zip.h"
@@ -265,13 +264,15 @@ WIPMenu::WIPMenu() {
 void WIPMenu::init(){
     applyMouse = false;
     std::string temp = Global.Path;
-    Global.Path = Global.BeatmapLocation + "/Songs/";
-    if(selectedIndex >= 0 and selectedIndex < dir.size()){
-        Global.Path = Global.BeatmapLocation + "/Songs/" + dir[selectedIndex];
-    }
+    Global.Path = Path;
     dir.clear();
     dir = ls(".");
     std::sort(dir.begin(), dir.end());
+    CanGoBack = false;
+    if(Path != Global.BeatmapLocation + "/Songs/"){
+        dir.insert(dir.begin(), "Back");
+        CanGoBack = true;
+    }
     Global.Path = temp;
     logo = LoadTexture("resources/osus.png");
     menu = LoadTexture("resources/menu.png");
@@ -373,9 +374,9 @@ void WIPMenu::render(){
         DrawTextLeft((dir[(tempindex + index + dir.size() + offset) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
         DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
         DrawTextLeft((std::to_string(subObjects.size())).c_str(), textpos.x, textpos.y + 37, 7, WHITE);
-        if(selectedIndex == (tempindex + index + dir.size() + offset) % dir.size()){
+        /*if(selectedIndex == (tempindex + index + dir.size() + offset) % dir.size()){
             DrawTextLeft(("Selected index: " + std::to_string(selectedIndex + offset)).c_str(), textpos.x, textpos.y + 49, 7, GREEN);
-        }
+        }*/
     }
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 }
@@ -448,6 +449,9 @@ void WIPMenu::update(){
             subDir = ls(".osu");
             std::cout << "ls?" << std::endl;
             std::sort(subDir.begin(), subDir.end());
+            if(Global.Path != Global.BeatmapLocation + "/Songs/"){
+                subObjects.push_back(std::make_pair("Go Back", ""));
+            }
             for(int i = 0; i < subDir.size(); i++){
                 std::cout << subDir.size() << " " << subDir[i].size() << " " << i << std::endl;
                 if(subDir[i][subDir[i].size() - 1] != '/'){
@@ -458,6 +462,7 @@ void WIPMenu::update(){
             std::cout << "done?" << std::endl;
             Global.Path = temp;
         }
+
     }
     if(Global.Key1R){
         moving = false;

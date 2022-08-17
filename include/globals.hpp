@@ -5,7 +5,9 @@
 #include <filesystem>
 #include <memory>
 #include "state.hpp"
+
 #include "gamemanager.hpp"
+
 
 struct Globals {
     float Scale = 1.f;

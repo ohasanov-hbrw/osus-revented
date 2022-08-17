@@ -3,6 +3,7 @@
 #include "gui.hpp"
 #include "utils.hpp"
 #include "parser.hpp"
+//#include <globals.hpp>
 
 class State {
 public:
@@ -99,8 +100,11 @@ public:
     std::vector<std::string> dir;
     std::vector<std::string> subDir;
     bool applyMouse = false;
+    std::string Path = Global.BeatmapLocation + "/Songs/";
+    bool CanGoBack = false;
     void init() override;
     void render() override;
     void update() override;
     void unload() override;
 };
+
