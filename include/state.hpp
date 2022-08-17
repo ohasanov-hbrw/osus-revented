@@ -3,7 +3,7 @@
 #include "gui.hpp"
 #include "utils.hpp"
 #include "parser.hpp"
-//#include <globals.hpp>
+#include <globals.hpp>
 
 class State {
 public:

@@ -4,10 +4,9 @@
 #include <string.h>
 #include <filesystem>
 #include <memory>
-#include "state.hpp"
-
 #include "gamemanager.hpp"
 
+class State;
 
 struct Globals {
     float Scale = 1.f;
@@ -47,7 +46,7 @@ struct Globals {
     bool enableMouse = true;
     int Wheel = 0;
 
-    std::shared_ptr<State> CurrentState = std::make_shared<MainMenu>();
+    std::shared_ptr<State> CurrentState;
 
     GameManager *gameManager = GameManager::getInstance();
 

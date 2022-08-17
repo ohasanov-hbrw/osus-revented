@@ -15,6 +15,7 @@
 Globals Global;
 
 int main() {
+    Global.CurrentState = std::make_shared<MainMenu>();
     for(int i = 0; i < Global.GamePath.size(); i++) {
         if (Global.GamePath[i] == '\\')
             Global.GamePath[i] = '/';
