@@ -266,10 +266,11 @@ void WIPMenu::init(){
     std::string temp = Global.Path;
     Global.Path = Path;
     dir.clear();
-    dir = ls(".");
+    dir = ls(".osu");
+    //std::cout << "lsdone" << std::endl;
     std::sort(dir.begin(), dir.end());
     CanGoBack = false;
-    if(Path != Global.BeatmapLocation + "/Songs/"){
+    if(Path != Global.BeatmapLocation + "/"){
         dir.insert(dir.begin(), "Back");
         CanGoBack = true;
     }
@@ -277,7 +278,6 @@ void WIPMenu::init(){
     logo = LoadTexture("resources/osus.png");
     menu = LoadTexture("resources/menu.png");
 	SetTextureFilter(logo, TEXTURE_FILTER_BILINEAR );
-
     float time = 0.2f;
     while(time <= 1.0f){
         time += GetFrameTime() * 1.0f;
@@ -289,7 +289,6 @@ void WIPMenu::init(){
         GetKeys();
         updateMouseTrail();
         updateUpDown();
-        update();
         BeginDrawing();
         ClearBackground(Global.Background);
         int index = 0;
@@ -321,13 +320,13 @@ void WIPMenu::init(){
             
             int offset = 0;
             Vector2 textpos = getPointOnCircle(610, 220, 300*weirdSmooth, tempAngle2 - 180.0f);
-            DrawTextureOnCircle(menu, 800, 240, 300*weirdSmooth, 0.4f, 0, tempAngle2 - 180.0f, WHITE);
-            DrawTextLeft((dir[(tempindex + index + dir.size() + offset) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
+            int dirNum = (tempindex + index + dir.size() + offset) % dir.size();
+            Color temp = WHITE;
+            if(dir[dirNum] != "Back" and dir[dirNum][dir[dirNum].size() - 1] != '/')
+                temp = {255,135,198,255};
+            DrawTextureOnCircle(menu, 800, 240, 300*weirdSmooth, 0.4f, 0, tempAngle2 - 180.0f, temp);
+            DrawTextLeft((dir[dirNum]).c_str(), textpos.x, textpos.y, 9, WHITE);
             DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15*weirdSmooth, 7, WHITE);
-            DrawTextLeft((std::to_string(subObjects.size())).c_str(), textpos.x, textpos.y + 37*weirdSmooth, 7, WHITE);
-            if(selectedIndex == (tempindex + index + dir.size() + offset) % dir.size()){
-                DrawTextLeft(("Selected index: " + std::to_string(selectedIndex + offset)).c_str(), textpos.x, textpos.y + 49*weirdSmooth, 7, GREEN);
-            }
         }
         DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 
@@ -339,6 +338,7 @@ void WIPMenu::init(){
     }
     applyMouse = true;
 	//SetTextureFilter(menu, TEXTURE_FILTER_BILINEAR );
+
 }
 void WIPMenu::render(){
     int index = 0;
@@ -370,13 +370,13 @@ void WIPMenu::render(){
         
         int offset = 0;
         Vector2 textpos = getPointOnCircle(610, 220, 300, tempAngle2 - 180.0f);
-        DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle2 - 180.0f, WHITE);
-        DrawTextLeft((dir[(tempindex + index + dir.size() + offset) % dir.size()]).c_str(), textpos.x, textpos.y, 9, WHITE);
+        int dirNum = (tempindex + index + dir.size() + offset) % dir.size();
+        Color temp = WHITE;
+        if(dir[dirNum] != "Back" and dir[dirNum][dir[dirNum].size() - 1] != '/')
+            temp = {255,135,198,255};
+        DrawTextureOnCircle(menu, 800, 240, 300, 0.4f, 0, tempAngle2 - 180.0f, temp);
+        DrawTextLeft((dir[dirNum]).c_str(), textpos.x, textpos.y, 9, WHITE);
         DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
-        DrawTextLeft((std::to_string(subObjects.size())).c_str(), textpos.x, textpos.y + 37, 7, WHITE);
-        /*if(selectedIndex == (tempindex + index + dir.size() + offset) % dir.size()){
-            DrawTextLeft(("Selected index: " + std::to_string(selectedIndex + offset)).c_str(), textpos.x, textpos.y + 49, 7, GREEN);
-        }*/
     }
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 }
@@ -428,7 +428,6 @@ void WIPMenu::update(){
         if(selectedIndex == index){
             selectedIndex = -1;
             subObjects.clear();
-            subDir.clear();
         }
         else
             selectedIndex = index;
@@ -440,31 +439,149 @@ void WIPMenu::update(){
             tempangle += 10;
         index = (tempangle) / 20;
         selectedAngleIndex = index;
-        if(selectedIndex != -1 and dir[selectedIndex][dir[selectedIndex].size() - 1] == '/'){
-            subObjects.clear();
-            std::string temp = Global.Path;
-            Global.Path = Global.BeatmapLocation + "/Songs/" + dir[selectedIndex];
-            std::string loc = dir[selectedIndex];
-            subDir.clear();
-            subDir = ls(".osu");
-            std::cout << "ls?" << std::endl;
-            std::sort(subDir.begin(), subDir.end());
-            if(Global.Path != Global.BeatmapLocation + "/Songs/"){
-                subObjects.push_back(std::make_pair("Go Back", ""));
-            }
-            for(int i = 0; i < subDir.size(); i++){
-                std::cout << subDir.size() << " " << subDir[i].size() << " " << i << std::endl;
-                if(subDir[i][subDir[i].size() - 1] != '/'){
-                    subObjects.push_back(std::make_pair(subDir[i], Global.Path + subDir[i]));
-                    std::cout << subDir[i] << std::endl;
-                }
-            }
-            std::cout << "done?" << std::endl;
-            Global.Path = temp;
-        }
+        if(selectedIndex != -1){
+            Global.Key1R = false;
+            if(dir[selectedIndex].size() > 0 and dir[selectedIndex][dir[selectedIndex].size() - 1] == '/'){
+                Path += dir[selectedIndex];
+                applyMouse = false;
+                float time = 0.2f;
+                while(time <= 1.0f){
+                    time += GetFrameTime() * 1.0f;
+                    //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
+                    float weirdSmooth = easeInOutCubic(1.0f-time);
+                    angle = -250 + 250 * weirdSmooth;
+                    GetScale();
+                    GetMouse();
+                    GetKeys();
+                    updateMouseTrail();
+                    updateUpDown();
+                    BeginDrawing();
+                    ClearBackground(Global.Background);
+                    int index = 0;
+                    float tempangle = angle;
+                    if(tempangle < 0)
+                        tempangle -= 10;
+                    if(tempangle > 0)
+                        tempangle += 10;
+                    index = (tempangle) / 20;
+                    for(int i = (tempangle) / 20 - 9; i < (tempangle) / 20 + 9; i++){
+                        float tempAngle = angle - i * 20.0f;
+                        while(tempAngle > 0.0f)
+                            tempAngle -= 360.0f;
+                        while(tempAngle < 0.0f)
+                            tempAngle += 360.0f;
+                        if(tempAngle < 0)
+                            tempAngle -= 10;
+                        if(tempAngle > 0)
+                            tempAngle += 10;
+                        int tempindex = (int)(tempAngle / 20) % 18;
+                        if(tempindex > 9)
+                            tempindex = 18 - tempindex;
+                        else
+                            tempindex = -tempindex;
+                        index = (tempangle) / 20;
+                        index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
+                        
+                        float tempAngle2 = angle - i * 20.0f;
+                        
+                        int offset = 0;
+                        Vector2 textpos = getPointOnCircle(610, 220, 300*weirdSmooth, tempAngle2 - 180.0f);
+                        
+                        int dirNum = (tempindex + index + dir.size() + offset) % dir.size();
+                        Color temp = WHITE;
+                        if(dir[dirNum] != "Back" and dir[dirNum][dir[dirNum].size() - 1] != '/')
+                            temp = {255,135,198,255};
+                        DrawTextureOnCircle(menu, 800, 240, 300*weirdSmooth, 0.4f, 0, tempAngle2 - 180.0f, temp);
+                        DrawTextLeft((dir[dirNum]).c_str(), textpos.x, textpos.y, 9, WHITE);
+                        DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15*weirdSmooth, 7, WHITE);
+                    }
+                    DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 
+                    DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+                    DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+                    renderMouse();
+                    DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
+                    EndDrawing();
+                }
+                applyMouse = true;
+                init();
+            }
+            else if(dir[selectedIndex] == "Back" and selectedIndex == 0 and CanGoBack){
+                Path.pop_back();
+                while(Path[Path.size()-1] != '/'){
+                    Path.pop_back();
+                }
+                if(Path.size() <= (Global.BeatmapLocation + "/").size()){
+                    Path = Global.BeatmapLocation + "/";
+                }
+                selectedIndex = -1;
+                std::cout << Path << std::endl;
+                applyMouse = false;
+                float time = 0.2f;
+                while(time <= 1.0f){
+                    time += GetFrameTime() * 1.0f;
+                    //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
+                    float weirdSmooth = easeInOutCubic(1.0f-time);
+                    angle = -250 + 250 * weirdSmooth;
+                    GetScale();
+                    GetMouse();
+                    GetKeys();
+                    updateMouseTrail();
+                    updateUpDown();
+                    BeginDrawing();
+                    ClearBackground(Global.Background);
+                    int index = 0;
+                    float tempangle = angle;
+                    if(tempangle < 0)
+                        tempangle -= 10;
+                    if(tempangle > 0)
+                        tempangle += 10;
+                    index = (tempangle) / 20;
+                    for(int i = (tempangle) / 20 - 9; i < (tempangle) / 20 + 9; i++){
+                        float tempAngle = angle - i * 20.0f;
+                        while(tempAngle > 0.0f)
+                            tempAngle -= 360.0f;
+                        while(tempAngle < 0.0f)
+                            tempAngle += 360.0f;
+                        if(tempAngle < 0)
+                            tempAngle -= 10;
+                        if(tempAngle > 0)
+                            tempAngle += 10;
+                        int tempindex = (int)(tempAngle / 20) % 18;
+                        if(tempindex > 9)
+                            tempindex = 18 - tempindex;
+                        else
+                            tempindex = -tempindex;
+                        index = (tempangle) / 20;
+                        index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
+                        
+                        float tempAngle2 = angle - i * 20.0f;
+                        
+                        int offset = 0;
+                        Vector2 textpos = getPointOnCircle(610, 220, 300*weirdSmooth, tempAngle2 - 180.0f);
+                        int dirNum = (tempindex + index + dir.size() + offset) % dir.size();
+                        Color temp = WHITE;
+                        if(dir[dirNum] != "Back" and dir[dirNum][dir[dirNum].size() - 1] != '/')
+                            temp = {255,135,198,255};
+                        DrawTextureOnCircle(menu, 800, 240, 300*weirdSmooth, 0.4f, 0, tempAngle2 - 180.0f, temp);
+                        DrawTextLeft((dir[dirNum]).c_str(), textpos.x, textpos.y, 9, WHITE);
+                        DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15*weirdSmooth, 7, WHITE);
+                    }
+                    DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
+
+                    DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+                    DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+                    renderMouse();
+                    DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
+                    EndDrawing();
+                }
+                applyMouse = true;
+                init();
+            }
+            selectedIndex = -1;
+        }
     }
-    if(Global.Key1R){
+    if(Global.Key1R and Global.MouseInFocus and CheckCollisionPointRec(Global.MousePosition, Rectangle{320,-2000,320,6000})){
         moving = false;
         if(applyMouse)
             accel += (Global.MousePosition.y - lastMouse) / -10.0f;
@@ -479,13 +596,83 @@ void WIPMenu::update(){
     angle += accel;
     if(!moving)
         angle += clampaccel;
-    
+    if(IsKeyPressed(KEY_BACKSPACE) and CanGoBack){
+        Path.pop_back();
+        while(Path[Path.size()-1] != '/'){
+            Path.pop_back();
+        }
+        if(Path.size() <= (Global.BeatmapLocation + "/").size()){
+            Path = Global.BeatmapLocation + "/";
+        }
+        selectedIndex = -1;
+        std::cout << Path << std::endl;
+        applyMouse = false;
+        float time = 0.2f;
+        while(time <= 1.0f){
+            time += GetFrameTime() * 1.0f;
+            //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
+            float weirdSmooth = easeInOutCubic(1.0f-time);
+            angle = -250 + 250 * weirdSmooth;
+            GetScale();
+            GetMouse();
+            GetKeys();
+            updateMouseTrail();
+            updateUpDown();
+            BeginDrawing();
+            ClearBackground(Global.Background);
+            int index = 0;
+            float tempangle = angle;
+            if(tempangle < 0)
+                tempangle -= 10;
+            if(tempangle > 0)
+                tempangle += 10;
+            index = (tempangle) / 20;
+            for(int i = (tempangle) / 20 - 9; i < (tempangle) / 20 + 9; i++){
+                float tempAngle = angle - i * 20.0f;
+                while(tempAngle > 0.0f)
+                    tempAngle -= 360.0f;
+                while(tempAngle < 0.0f)
+                    tempAngle += 360.0f;
+                if(tempAngle < 0)
+                    tempAngle -= 10;
+                if(tempAngle > 0)
+                    tempAngle += 10;
+                int tempindex = (int)(tempAngle / 20) % 18;
+                if(tempindex > 9)
+                    tempindex = 18 - tempindex;
+                else
+                    tempindex = -tempindex;
+                index = (tempangle) / 20;
+                index += (std::abs(index / (int)dir.size()) + 1) * (int)dir.size();
+                
+                float tempAngle2 = angle - i * 20.0f;
+                
+                int offset = 0;
+                Vector2 textpos = getPointOnCircle(610, 220, 300*weirdSmooth, tempAngle2 - 180.0f);
+                int dirNum = (tempindex + index + dir.size() + offset) % dir.size();
+                Color temp = WHITE;
+                if(dir[dirNum] != "Back" and dir[dirNum][dir[dirNum].size() - 1] != '/')
+                    temp = {255,135,198,255};
+                DrawTextureOnCircle(menu, 800, 240, 300*weirdSmooth, 0.4f, 0, tempAngle2 - 180.0f, temp);
+                DrawTextLeft((dir[dirNum]).c_str(), textpos.x, textpos.y, 9, WHITE);
+                DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15*weirdSmooth, 7, WHITE);
+            }
+            DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
+
+            DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+            DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+            renderMouse();
+            DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
+            EndDrawing();
+        }
+        applyMouse = true;
+        init();
+    }
 
 }
 void WIPMenu::unload(){
     dir.clear();
     subObjects.clear();
-    subDir.clear();
     UnloadTexture(logo);
     UnloadTexture(menu);
 }

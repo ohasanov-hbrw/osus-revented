@@ -98,9 +98,8 @@ public:
     int selectedIndex = -1;
     int selectedAngleIndex = -1;
     std::vector<std::string> dir;
-    std::vector<std::string> subDir;
     bool applyMouse = false;
-    std::string Path = Global.BeatmapLocation + "/Songs/";
+    std::string Path = Global.BeatmapLocation  + "/";
     bool CanGoBack = false;
     void init() override;
     void render() override;
