@@ -5,6 +5,9 @@
 #include <globals.hpp>
 #include <gamemanager.hpp>
 #include <iostream>
+#include <ctype.h>
+#include <parser.hpp>
+
 
 
 
@@ -242,4 +245,80 @@ float easeInOutCubic(float x){
 
 bool AreSame(double a, double b) {
     return std::fabs(a - b) < 0.0001f;
+}
+
+std::vector<std::string> ParseNameFolder(std::string folder){
+    std::vector<std::string> output;
+    if(folder[folder.size() - 1] == '/'){
+        folder.pop_back();
+    }
+    int end = folder.size() - 1;
+    int begin = folder.size() - 1;
+    while(begin >= 0 and folder[begin] != '-')
+        begin--;
+    begin = std::max(0, begin);
+    if(folder[begin] == '-'){
+        output.push_back("");
+        for(int i = begin + 2; i <= end; i++)
+            output[output.size()-1].push_back(folder[i]);
+        end = std::max(0, begin - 2);
+        begin = std::max(0, begin - 2);
+        while(begin >= 0 and !isdigit(folder[begin]))
+            begin--;
+        begin = std::max(0, begin);
+        if(isdigit(folder[begin])){
+            output.push_back("");
+            for(int i = begin + 2; i <= end; i++)
+                output[output.size()-1].push_back(folder[i]);
+            end = std::max(0, begin);
+            begin = std::max(0, begin);
+            begin = 0;
+            if(isdigit(folder[begin])){
+                output.push_back("");
+                for(int i = begin; i <= end; i++)
+                    output[output.size()-1].push_back(folder[i]);
+                end = std::max(0, begin - 2);
+                begin = std::max(0, begin - 2);
+            }
+        }
+        else if (begin == 0){
+            output.push_back("");
+            for(int i = begin; i <= end; i++)
+                output[output.size()-1].push_back(folder[i]);
+            end = std::max(0, begin);
+            begin = std::max(0, begin);
+        }
+    }
+    else{
+        output.push_back(folder);
+    }
+    
+    if(output.size() > 0)
+        std::cout << output[0] << " - ";
+    if(output.size() > 1)
+        std::cout << output[1] << " - ";
+    if(output.size() > 2)
+        std::cout << output[2];
+    if(output.size() == 0){
+        std::cout << folder;
+        output.push_back(folder);
+    }
+    
+    std::cout << std::endl;
+    return output;
+}
+std::vector<std::string> ParseNameFile(std::string file){
+    std::vector<std::string> output;
+    Parser parser = Parser();
+    GameFile geym = parser.parseMetadata(file);
+    output.push_back(geym.configMetadata["Title"]);
+    output.push_back(geym.configMetadata["Artist"]);
+    output.push_back(geym.configMetadata["Creator"]);
+    output.push_back(geym.configMetadata["Version"]);
+    output.push_back(geym.configMetadata["BeatmapSetID"]);
+    for(int i = 0; i < output.size(); i++){
+        std::cout << output[i] << " - ";
+    }
+    std::cout << std::endl;
+    return output;
 }

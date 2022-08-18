@@ -383,9 +383,15 @@ void WIPMenu::render(){
         DrawTextLeft((dir[dirNum]).c_str(), textpos.x, textpos.y, 9, WHITE);
         DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
     }
-    //if(renderMetadata){
-        DrawTextureCenter(back, 145, 240, 0.45f, Color{255,255,255,255 * easeInOutCubic(animtime)});
-    //float}
+    
+    DrawTextureCenter(back, 145, 240, 0.45f, Color{255,255,255,255 * easeInOutCubic(animtime)});
+    if(TempMeta.size() == 5){
+        DrawTextLeft((TempMeta[0]).c_str(), 25, 55, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+        DrawTextLeft((TempMeta[1]).c_str(), 25, 70, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+        DrawTextLeft((TempMeta[2]).c_str(), 25, 85, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+        DrawTextLeft((TempMeta[3]).c_str(), 25, 100, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+        DrawTextLeft((TempMeta[4]).c_str(), 25, 115, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+    }
 
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
 }
@@ -450,8 +456,10 @@ void WIPMenu::update(){
         selectedAngleIndex = index;
         if(selectedIndex != -1){
             Global.Key1R = false;
+            int size = dir[selectedIndex].size();
             if(dir[selectedIndex].size() > 0 and dir[selectedIndex][dir[selectedIndex].size() - 1] == '/'){
                 Path += dir[selectedIndex];
+                ParseNameFolder(dir[selectedIndex]);
                 applyMouse = false;
                 float time = 0.2f;
                 while(time <= 1.0f){
@@ -589,6 +597,9 @@ void WIPMenu::update(){
                 init();
                 index = 0;
             }
+            else if(size >= 4 and dir[selectedIndex][size - 1] == 'u' and dir[selectedIndex][size - 2] == 's' and dir[selectedIndex][size - 3] == 'o' and dir[selectedIndex][size - 4] == '.'){
+                ParseNameFile(Path + dir[selectedIndex]);
+            }
             selectedIndex = -1;
         }
     }
@@ -610,8 +621,24 @@ void WIPMenu::update(){
 
 
     if(AreSame(accel,0.0f) and AreSame(clampaccel,0.0f)){
-        renderMetadata = true;
         if(dir[index] != "Back" and dir[index][dir[index].size() - 1] != '/'){
+            renderMetadata = true;
+            if(Metadata.size() == 0){
+                TempMeta.clear();
+                int size = dir[index].size();
+                std::vector<std::string> output;
+                if(size >= 4 and dir[index][size - 1] == 'u' and dir[index][size - 2] == 's' and dir[index][size - 3] == 'o' and dir[index][size - 4] == '.'){
+                    output = ParseNameFile(Path + dir[index]);
+                }
+                if(output.size() == 5){
+                    Metadata.push_back("Title: " + output[0]);
+                    Metadata.push_back("Artist: " + output[1]);
+                    Metadata.push_back("Creator: " + output[2]);
+                    Metadata.push_back("Ver. " + output[3]);
+                    Metadata.push_back("ID: " + output[4]);
+                    TempMeta = Metadata;
+                }
+            }
             animtime += GetFrameTime() * 2.0f;
             if(animtime > 1.0f)
                 animtime = 1.0f;
@@ -619,6 +646,8 @@ void WIPMenu::update(){
     }
     else{
         renderMetadata = false;
+        if(Metadata.size() > 0)
+            Metadata.clear();
         animtime -= GetFrameTime() * 2.0f;
         if(animtime < 0.0f)
             animtime = 0.0f;

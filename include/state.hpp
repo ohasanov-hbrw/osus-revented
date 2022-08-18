@@ -105,6 +105,8 @@ public:
     bool renderMetadata = false;
     bool metadataAvailable = false;
     float animtime = 0.0f;
+    std::vector<std::string> Metadata;
+    std::vector<std::string> TempMeta;
     void init() override;
     void render() override;
     void update() override;
