@@ -11,7 +11,7 @@
 #include "fs.hpp"
 #include "state.hpp"
 #include "zip.h"
-
+//hello from arch!
 Globals Global;
 
 int main() {
