@@ -4,3 +4,6 @@
 [submodule "vendor/zip"]
 	path = vendor/zip
 	url = https://github.com/kuba--/zip
+[submodule "SDL_mixer"]
+	path = SDL_mixer
+	url = git@github.com:libsdl-org/SDL_mixer.git
