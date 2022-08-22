@@ -19,6 +19,8 @@ files:
 deps:
 	cd vendor/raylib/src/ && $(MAKE)
 	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make
+	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make
+	cd SDL_mixer && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make
 run: $(name)
 	mkdir -p beatmaps
 	bin/$(name)
@@ -30,4 +32,4 @@ object/%.o: src/%.cpp
 	$(CC) -MMD -o $@ -c $< $(cflags)
 
 clean:
-	rm -rf vendor/raylib/src/*.o vendor/raylib/src/libraylib.a bin/$(name) $(objects) object/*.d vendor/zip/build vendor/raylib/src/external/glfw/build
+	rm -rf vendor/raylib/src/*.o vendor/raylib/src/libraylib.a bin/$(name) $(objects) object/*.d vendor/zip/build SDL_mixer/build vendor/raylib/src/external/glfw/build
