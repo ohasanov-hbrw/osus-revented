@@ -2,6 +2,10 @@
 #include "raylib.h"
 #include <string>
 #include <vector>
+#include <cstdio>
+#include <iostream>
+#include <ctime>
+
 #define RAYMATH_IMPLEMENTATION
 # define M_PI 3.14159265358979323846f
 //extern "C" {
@@ -93,3 +97,10 @@ bool AreSame(double, double);
 
 std::vector<std::string> ParseNameFolder(std::string);
 std::vector<std::string> ParseNameFile(std::string);
+
+void initTimer();
+void pauseTimer();
+void resumeTimer();
+unsigned long long int getTimer();
+void addOffsetTimer(unsigned long long int);
+void updateTimer();

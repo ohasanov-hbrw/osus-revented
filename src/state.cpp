@@ -240,19 +240,27 @@ void Game::update() {
         Global.CurrentState->init();
     }
     if(IsKeyPressed(KEY_SPACE)){
-        if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic))
+        if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
             PauseMusicStream(Global.gameManager->backgroundMusic);
-        else
+            pauseTimer();
+        }
+        else{
             ResumeMusicStream(Global.gameManager->backgroundMusic);
+            resumeTimer();
+        }
+        
     }
 }
 void Game::render() {
     Global.enableMouse = false;
     Global.gameManager->render();
-    if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic))
-        DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+    if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
+        DrawTextEx(Global.DefaultFont, TextFormat("Playing: %d/%.3f", (int)(GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("PlayC++: %d/%.3f", (int)Global.curTime, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("AudioDrift: %dms", ((int)Global.curTime - (int)(GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f))/1000), {ScaleCordX(5), ScaleCordY(60)}, Scale(15) , Scale(1), WHITE);
+    }
     else
-        DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
 }
 
 void Game::unload(){

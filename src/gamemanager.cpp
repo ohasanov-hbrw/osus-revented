@@ -317,6 +317,7 @@ void GameManager::render(){
 	}
 	DrawCNumbersCenter(score, 320, 10, 0.4f, GREEN);
 	DrawCNumbersCenter(clickCombo, 320, 25, 0.4f, GREEN);
+	DrawCNumbersCenter(clickCombo, 320, 25, 0.4f, GREEN);
 	//render the points and the combo
 	
 }
@@ -326,19 +327,26 @@ void GameManager::run(){
 	if(startMusic){
 		PlayMusicStream(backgroundMusic);
     	SetMusicVolume(backgroundMusic, 0.6f);
+		initTimer();
 		startMusic = false;
 	}
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
 		if(IsKeyPressed(KEY_S)){
 			SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
+
 		}
 	}
 	if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
 		stop = true;
-	if(stop && currentTime < 1.0f)
+	if(stop && currentTime < 1.0f){
 		StopMusicStream(backgroundMusic);
+	}
+	
 	UpdateMusicStream(backgroundMusic);
+	updateTimer();
+	Global.curTime = getTimer();
+	//std::cout << Global.curTime << std::endl;
 	if(currentTimeTemp != GetMusicTimePlayed(backgroundMusic) && IsMusicStreamPlaying(backgroundMusic)){
 		currentTimeTemp = GetMusicTimePlayed(backgroundMusic);
 		currentTime = currentTimeTemp;
@@ -350,6 +358,7 @@ void GameManager::run(){
 	}
 	//currentTime += 6400;
 	currentTime += Global.offset / 1000.0f;
+	//currentTime = Global.curTime/1000000.0f;
 	GameManager::update();
 	//currentTime -= 6400;
 	currentTime -= Global.offset / 1000.0f;

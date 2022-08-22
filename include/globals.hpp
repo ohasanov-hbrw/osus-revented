@@ -14,11 +14,17 @@ struct Globals {
     Color Background = { 30, 0, 60, 255 };
     //Color Background = {42,22,33,255};
     int skinNumberOverlap = 18;
-    int FPS = 480;
+    int FPS = 1440;
     int Width = 640;
     int Height = 480;
-    float offset = -65.0f;
+    float offset = 45.0f;
 
+    struct timespec ts1 = timespec{0,0}, ts2 = timespec{0,0};
+    bool paused = false;
+
+    unsigned long long int curTime = 0;
+    unsigned long long int startsTime = 0;
+    unsigned long long int pausedFor = 0;
     Texture2D cursor;
     Texture2D cursorTrail;
     bool MouseInFocus = false;

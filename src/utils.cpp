@@ -11,6 +11,7 @@
 
 
 
+
 void updateUpDown(){
     //Get the current state of the mouse wheel
     Global.Wheel = GetMouseWheelMove();
@@ -321,4 +322,52 @@ std::vector<std::string> ParseNameFile(std::string file){
     }
     std::cout << std::endl;
     return output;
+}
+
+void initTimer(){
+    //clock_settime(CLOCK_MONOTONIC, &Global.ts2);
+    clock_gettime(CLOCK_MONOTONIC, &Global.ts2);
+    unsigned long long int ans = 0;
+    ans = Global.ts2.tv_sec * 1000000;
+    ans += Global.ts2.tv_nsec / 1000;
+    Global.startsTime = ans;
+    Global.paused = false;
+    Global.pausedFor = 0;
+}
+
+void pauseTimer(){
+    clock_gettime(CLOCK_MONOTONIC, &Global.ts1);
+    clock_gettime(CLOCK_MONOTONIC, &Global.ts2);
+    Global.paused = true;
+}
+
+void resumeTimer(){
+    clock_gettime(CLOCK_MONOTONIC, &Global.ts1);
+    unsigned long long int ans1 = 0;
+    ans1 = Global.ts2.tv_sec * 1000000;
+    ans1 += Global.ts2.tv_nsec / 1000000;
+    unsigned long long int ans = 0;
+    ans = Global.ts1.tv_sec * 1000000;
+    ans += Global.ts1.tv_nsec / 1000;
+    Global.pausedFor += ans - ans1;
+    Global.paused = false;
+}
+
+unsigned long long int getTimer(){
+    timespec temp = Global.ts1;
+    unsigned long long int ans = 0;
+    ans = Global.ts1.tv_sec * 1000000;
+    ans += Global.ts1.tv_nsec / 1000;
+    return ans - Global.startsTime + Global.pausedFor;
+}
+
+void addOffsetTimer(unsigned long long int time){
+    //clock_settime(CLOCK_MONOTONIC, &time);
+    Global.pausedFor += time;
+}
+
+void updateTimer(){
+    if(!Global.paused){
+        clock_gettime(CLOCK_MONOTONIC, &Global.ts1);
+    }
 }
