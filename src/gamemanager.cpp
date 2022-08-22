@@ -343,10 +343,12 @@ void GameManager::run(){
 		StopMusicStream(backgroundMusic);
 	}
 	
-	UpdateMusicStream(backgroundMusic);
+	
 	updateTimer();
 	Global.curTime = getTimer();
-	//std::cout << Global.curTime << std::endl;
+	if(((Global.curTime - GetMusicTimePlayed(backgroundMusic) * 1000000.0f)/1000) < -100 or ((Global.curTime - GetMusicTimePlayed(backgroundMusic) * 1000000.0f)/1000) > 20)
+		SeekMusicStream(backgroundMusic, Global.curTime/1000000.0f);
+	UpdateMusicStream(backgroundMusic);
 	if(currentTimeTemp != GetMusicTimePlayed(backgroundMusic) && IsMusicStreamPlaying(backgroundMusic)){
 		currentTimeTemp = GetMusicTimePlayed(backgroundMusic);
 		currentTime = currentTimeTemp;
@@ -358,7 +360,7 @@ void GameManager::run(){
 	}
 	//currentTime += 6400;
 	currentTime += Global.offset / 1000.0f;
-	//currentTime = Global.curTime/1000000.0f;
+	currentTime = Global.curTime / 1000000.0f;
 	GameManager::update();
 	//currentTime -= 6400;
 	currentTime -= Global.offset / 1000.0f;
