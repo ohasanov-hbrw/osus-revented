@@ -18,9 +18,10 @@ files:
 
 deps:
 	cd vendor/raylib/src/ && $(MAKE)
-	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make
-	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make
-	cd SDL_mixer && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make
+	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make -j12
+	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make -j12
+	cd vendor/SDL_mixer && mkdir -p build && cd build && cmake .. -DBUILD_SHARED_LIBS=1 -DSDL2MIXER_CMD=OFF -DSDL2MIXER_FLAC=OFF -DSDL2MIXER_MOD=OFF -DSDL2MIXER_MIDI=OFF -DSDL2MIXER_OPUS=OFF && make -j12
+
 run: $(name)
 	mkdir -p beatmaps
 	bin/$(name)
