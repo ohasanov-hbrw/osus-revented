@@ -1,6 +1,6 @@
 CC = g++
 cflags = -std=c++17 -g -O2
-cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src
+cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound 
 ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl
 name = osus 
 
@@ -19,7 +19,6 @@ files:
 deps:
 	cd vendor/raylib/src/ && $(MAKE)
 	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make
-
 run: $(name)
 	mkdir -p beatmaps
 	bin/$(name)
