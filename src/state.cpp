@@ -255,9 +255,9 @@ void Game::render() {
     Global.enableMouse = false;
     Global.gameManager->render();
     if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
-        DrawTextEx(Global.DefaultFont, TextFormat("Playing: %d/%.3f", (int)(GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("Playing: %d/%.3f", (int)(Global.curTime2 * 1000000.0f), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
         DrawTextEx(Global.DefaultFont, TextFormat("PlayC++: %d/%.3f", (int)Global.curTime, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
-        DrawTextEx(Global.DefaultFont, TextFormat("AudioDrift: %dms", ((int)Global.curTime - (int)(GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f))/1000), {ScaleCordX(5), ScaleCordY(60)}, Scale(15) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("AudioDrift: %dms", ((int)Global.curTime - (int)(Global.curTime2 * 1000000.0f))/1000), {ScaleCordX(5), ScaleCordY(60)}, Scale(15) , Scale(1), WHITE);
     }
     else
         DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);

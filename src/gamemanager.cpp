@@ -335,11 +335,12 @@ void GameManager::run(){
 		if(IsKeyPressed(KEY_S)){
 			SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
 
+			addOffsetTimer(GetMusicTimePlayed(backgroundMusic) * 1000000.0f);
 		}
 	}
 	if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
 		stop = true;
-	if(stop && currentTime < 1.0f){
+	if(stop && Global.curTime2 < 1.0f){
 		StopMusicStream(backgroundMusic);
 	}
 	
@@ -351,19 +352,16 @@ void GameManager::run(){
 	UpdateMusicStream(backgroundMusic);
 	if(currentTimeTemp != GetMusicTimePlayed(backgroundMusic) && IsMusicStreamPlaying(backgroundMusic)){
 		currentTimeTemp = GetMusicTimePlayed(backgroundMusic);
-		currentTime = currentTimeTemp;
+		Global.curTime2 = currentTimeTemp;
 	}
 	else{
 		if(IsMusicStreamPlaying(backgroundMusic)){
-			currentTime += GetFrameTime();
+			Global.curTime2 += GetFrameTime();
 		}
 	}
-	//currentTime += 6400;
-	currentTime += Global.offset / 1000.0f;
 	currentTime = Global.curTime / 1000000.0f;
 	GameManager::update();
-	//currentTime -= 6400;
-	currentTime -= Global.offset / 1000.0f;
+	
 }
 
 //load the beatmap
