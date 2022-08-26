@@ -247,6 +247,7 @@ void Slider::init(){
     float resolution = data.length;
     float currentResolution = 0;
     float lengthScale, totalLength = 0;
+    //std::cout << "init: " << data.time << std::endl;
     //add every point from the beatmap 
     for(size_t i = 0; i < data.curvePoints.size(); i++)
         edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
@@ -321,13 +322,29 @@ void Slider::init(){
             std::vector<Vector2> tempRender;
             std::vector<float> curveLengths;
             float totalCalculatedLength = 0;
+            //std::cout << data.time << std::endl;
             for(size_t i = 0; i < edgePoints.size(); i++){
                 tempEdges.push_back(edgePoints[i]);
                 if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
                     currentResolution = 0;
-                    for(float j = 0; j < 1; j += 1.0f / 100.0f){
-                        if(currentResolution > 100) break;
+                    /*if(data.time == 165321){
+                        std::cout << tempEdges.size() << " amogus";
+                    }*/
+                    //std::cout << "temp " << tempEdges.size() << " ";
+                    //int num = (std::sqrt(std::pow(std::abs(tempEdges[0].x - tempEdges[tempEdges.size() - 1].x),2) + std::pow(std::abs(tempEdges[0].y - tempEdges[tempEdges.size() - 1].y),2))) / 2;
+                    //num = std::max(num, 3);
+                    
+                    int num = tempEdges.size();
+                    num = std::max(num, 3);
+                    num *= 2;
+                    //std::cout << num << std::endl;
+                    
+                    while(true){
+                        if(currentResolution > num)
+                            break;
                         currentResolution++;
+                        float j = (float)currentResolution / (float)num;
+
                         Vector2 tmp = getBezierPoint(tempEdges, tempEdges.size(), j);
                         tempRender.push_back(tmp);
                     }
@@ -340,6 +357,7 @@ void Slider::init(){
                     tempRender.clear();
                 }
             }
+            
             //std::cout << totalCalculatedLength << " vs " << data.length << std::endl;
             tempEdges.clear();
             tempRender.clear();
@@ -408,6 +426,20 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length)
                     break;
                 renderPoints.pop_back();
+            }
+            for(int i = 0; i < renderPoints.size(); i++){
+                if(renderPoints[i].x < -150){
+                    renderPoints[i].x = -150;
+                }
+                if(renderPoints[i].y < -150){
+                    renderPoints[i].y = -150;
+                }
+                if(renderPoints[i].x > 790){
+                    renderPoints[i].x = 790;
+                }
+                if(renderPoints[i].y > 630){
+                    renderPoints[i].y = 630;
+                }
             }
             //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
         }
@@ -517,11 +549,17 @@ void Slider::init(){
     ClearBackground(BLANK);
     BeginBlendMode(BLEND_ALPHA_PREMUL);
     if(renderPoints.size() > 0){
-        for(int i = 0; i < renderPoints.size(); i+=gm->skip)
-            DrawTextureEx(gm->sliderout, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderout.width))}, 0, gm->circlesize/gm->sliderout.width, WHITE);
+        for(int i = 0; i < renderPoints.size(); i+=gm->skip){
+            if(i < renderPoints.size() and renderPoints[i].x >= -150 and renderPoints[i].x <= 790 and renderPoints[i].y >= -150 and renderPoints[i].y <= 630){
+                DrawTextureEx(gm->sliderout, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderout.width))}, 0, gm->circlesize/gm->sliderout.width, WHITE);
+            }
+        }
         DrawTextureEx(gm->sliderout, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderout.width))}, 0, gm->circlesize/gm->sliderout.width, WHITE);
-        for(int i = 0; i < renderPoints.size(); i+=gm->skip)
-            DrawTextureEx(gm->sliderin, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderout.width))}, 0, gm->circlesize/gm->sliderin.width, WHITE);
+        for(int i = 0; i < renderPoints.size(); i+=gm->skip){
+            if(i < renderPoints.size() and renderPoints[i].x >= -150 and renderPoints[i].x <= 790 and renderPoints[i].y >= -150 and renderPoints[i].y <= 630){
+                DrawTextureEx(gm->sliderin, {renderPoints[i].x+1-minX, sliderTexture.texture.height - (renderPoints[i].y+1-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderout.width))}, 0, gm->circlesize/gm->sliderin.width, WHITE);
+            }
+        }
         DrawTextureEx(gm->sliderin, {renderPoints[renderPoints.size()-1].x+1-minX, sliderTexture.texture.height - (renderPoints[renderPoints.size()-1].y+1-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderout.width))}, 0, gm->circlesize/gm->sliderin.width, WHITE);
     }
     EndBlendMode();

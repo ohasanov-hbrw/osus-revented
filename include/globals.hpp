@@ -24,6 +24,9 @@ struct Globals {
 
     unsigned long long int curTime = 0;
     double curTime2 = 0;
+    double amogus;
+    double amogus2;
+    double amogus3;
     unsigned long long int startsTime = 0;
     unsigned long long int pausedFor = 0;
     Texture2D cursor;

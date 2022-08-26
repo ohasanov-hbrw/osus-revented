@@ -1,5 +1,5 @@
 CC = g++
-cflags = -std=c++17 -g -O2
+cflags = -std=c++17 -g -O3
 cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound 
 ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl
 name = osus 

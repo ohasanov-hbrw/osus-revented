@@ -347,9 +347,8 @@ void GameManager::run(){
 	
 	updateTimer();
 	Global.curTime = getTimer();
-	if(((Global.curTime - GetMusicTimePlayed(backgroundMusic) * 1000000.0f)/1000) < -100 or ((Global.curTime - GetMusicTimePlayed(backgroundMusic) * 1000000.0f)/1000) > 20)
-		SeekMusicStream(backgroundMusic, Global.curTime/1000000.0f);
-	UpdateMusicStream(backgroundMusic);
+	/*if(((Global.curTime - GetMusicTimePlayed(backgroundMusic) * 1000000.0f)/1000) < -100 or ((Global.curTime - GetMusicTimePlayed(backgroundMusic) * 1000000.0f)/1000) > 20)
+		SeekMusicStream(backgroundMusic, Global.curTime/1000000.0f);*/
 	if(currentTimeTemp != GetMusicTimePlayed(backgroundMusic) && IsMusicStreamPlaying(backgroundMusic)){
 		currentTimeTemp = GetMusicTimePlayed(backgroundMusic);
 		Global.curTime2 = currentTimeTemp;
@@ -359,14 +358,20 @@ void GameManager::run(){
 			Global.curTime2 += GetFrameTime();
 		}
 	}
-	currentTime = Global.curTime / 1000000.0f;
+	//std::cout << Global.curTime2 <<std::endl;
+	currentTime = Global.curTime2 * 1.0f;
+	currentTime -= 20.0f / 1000.0f;
 	GameManager::update();
-	
+	currentTime += 20.0f / 1000.0f;
+	UpdateMusicStream(backgroundMusic);
 }
 
 //load the beatmap
 void GameManager::loadGame(std::string filename){
 	//create a parser and parse the file
+	Global.amogus = 0;
+	Global.amogus2 = 0;
+	Global.amogus3 = 0;
 	spawnedHitObjects = 0;
 	Parser parser = Parser();
 	gameFile.configGeneral["SampleSet"] = "Normal";
@@ -728,6 +733,10 @@ void GameManager::loadGame(std::string filename){
 			}
 			if(SoundFiles.loaded[temp].value == true){
 				std::cout << "loaded "  << temp << std::endl;
+				if(SoundFiles.data[temp].frameCount == 0){
+					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+				}
+				std::cout << SoundFiles.data[temp].frameCount << std::endl;
 			}
 		}
 		gameFile.hitObjects[HitObjectIndex].NormalSound = temp;
@@ -780,6 +789,10 @@ void GameManager::loadGame(std::string filename){
 			}
 			if(SoundFiles.loaded[temp].value == true){
 				std::cout << "loaded "  << temp << std::endl;
+				if(SoundFiles.data[temp].frameCount == 0){
+					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+				}
+				std::cout << SoundFiles.data[temp].frameCount << std::endl;
 			}
 		}
 
@@ -801,6 +814,10 @@ void GameManager::loadGame(std::string filename){
 				}
 				if(SoundFiles.loaded[temp].value == true){
 					std::cout << "loaded "  << temp << std::endl;
+					if(SoundFiles.data[temp].frameCount == 0){
+						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+					}
+					std::cout << SoundFiles.data[temp].frameCount << std::endl;
 				}
 			}
 		}
@@ -845,6 +862,10 @@ void GameManager::loadGame(std::string filename){
 				}
 				if(SoundFiles.loaded[temp].value == true){
 					std::cout << "loaded "  << temp << std::endl;
+					if(SoundFiles.data[temp].frameCount == 0){
+						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+					}
+					std::cout << SoundFiles.data[temp].frameCount << std::endl;
 				}
 			}
 			gameFile.hitObjects[HitObjectIndex].NormalSound = temp;
@@ -930,6 +951,10 @@ void GameManager::loadGame(std::string filename){
 					}
 					if(SoundFiles.loaded[temp].value == true){
 						std::cout << "loaded "  << temp << std::endl;
+						if(SoundFiles.data[temp].frameCount == 0){
+							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+						}
+						std::cout << SoundFiles.data[temp].frameCount << std::endl;
 					}
 				}
 				gameFile.hitObjects[HitObjectIndex].EdgeNormalSound.push_back(temp);
@@ -982,6 +1007,10 @@ void GameManager::loadGame(std::string filename){
 					}
 					if(SoundFiles.loaded[temp].value == true){
 						std::cout << "loaded "  << temp << std::endl;
+						if(SoundFiles.data[temp].frameCount == 0){
+							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+						}
+						std::cout << SoundFiles.data[temp].frameCount << std::endl;
 					}
 				}
 				gameFile.hitObjects[HitObjectIndex].EdgeAdditionSound.push_back(temp);

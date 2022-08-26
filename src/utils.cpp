@@ -325,49 +325,70 @@ std::vector<std::string> ParseNameFile(std::string file){
 }
 
 void initTimer(){
-    //clock_settime(CLOCK_MONOTONIC, &Global.ts2);
-    clock_gettime(CLOCK_MONOTONIC, &Global.ts2);
-    unsigned long long int ans = 0;
-    ans = Global.ts2.tv_sec * 1000000;
-    ans += Global.ts2.tv_nsec / 1000;
-    Global.startsTime = ans;
-    Global.paused = false;
-    Global.pausedFor = 0;
+    
 }
 
 void pauseTimer(){
-    clock_gettime(CLOCK_MONOTONIC, &Global.ts1);
-    clock_gettime(CLOCK_MONOTONIC, &Global.ts2);
-    Global.paused = true;
+    
 }
 
 void resumeTimer(){
-    clock_gettime(CLOCK_MONOTONIC, &Global.ts1);
-    unsigned long long int ans1 = 0;
-    ans1 = Global.ts2.tv_sec * 1000000;
-    ans1 += Global.ts2.tv_nsec / 1000000;
-    unsigned long long int ans = 0;
-    ans = Global.ts1.tv_sec * 1000000;
-    ans += Global.ts1.tv_nsec / 1000;
-    Global.pausedFor += ans - ans1;
-    Global.paused = false;
+    
 }
 
+
 unsigned long long int getTimer(){
-    timespec temp = Global.ts1;
-    unsigned long long int ans = 0;
-    ans = Global.ts1.tv_sec * 1000000;
-    ans += Global.ts1.tv_nsec / 1000;
-    return ans - Global.startsTime + Global.pausedFor;
+    GameManager* gm = GameManager::getInstance();
+    if (false)
+		return GetMusicTimePlayed(gm->backgroundMusic) * 1000.0f  * 1000.0f;
+	else {
+		const double interpolationMultiplier = 1.0;
+		double returnPos = 0;
+		const double curPos = (double)GetMusicTimePlayed(gm->backgroundMusic) * 1000.0f;
+		const float speed = 1.0f;
+		const double realTime = GetTime() * 1000.0f;
+		const double interpolationDelta = (realTime - Global.amogus) * 1000.0f * speed;
+		const double interpolationDeltaLimit = ((realTime - Global.amogus2)*1000.0f < 1500 || speed < 1.0f ? 11 : 33) * interpolationMultiplier;
+		if (IsMusicStreamPlaying(gm->backgroundMusic)){
+			double newInterpolatedPos = Global.amogus3 + interpolationDelta;
+			double delta = newInterpolatedPos - curPos;
+			newInterpolatedPos -= delta / 8.0 / interpolationMultiplier;
+			delta = newInterpolatedPos - curPos;
+
+			if (std::abs(delta) > interpolationDeltaLimit * 2.0f){
+				Global.amogus3 = (double)curPos;
+			}
+			else if (delta < -interpolationDeltaLimit){
+				Global.amogus3 += interpolationDelta * 2.0f;
+				Global.amogus2 = realTime;
+			}
+			else if (delta < interpolationDeltaLimit){
+				Global.amogus3 = newInterpolatedPos;
+			}
+			else{
+				Global.amogus3 += interpolationDelta / 2.0f;
+				Global.amogus2 = realTime;
+			}
+			returnPos = Global.amogus3;
+		}
+		else{
+			returnPos = curPos;
+			Global.amogus = (unsigned long)returnPos;
+			Global.amogus2 = realTime;
+		}
+
+		Global.amogus = realTime; // this is more accurate than engine->getFrameTime() for the delta calculation, since it correctly handles all possible delays inbetween
+		return returnPos * 1000.0f;
+	}
+    return 0;
 }
 
 void addOffsetTimer(unsigned long long int time){
-    //clock_settime(CLOCK_MONOTONIC, &time);
     Global.pausedFor += time;
 }
 
 void updateTimer(){
     if(!Global.paused){
-        clock_gettime(CLOCK_MONOTONIC, &Global.ts1);
+        
     }
 }
