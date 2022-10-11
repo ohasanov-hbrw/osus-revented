@@ -360,9 +360,9 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = Global.curTime2 * 1.0f;
-	currentTime -= 20.0f / 1000.0f;
-	GameManager::update();
 	currentTime += 20.0f / 1000.0f;
+	GameManager::update();
+	currentTime -= 20.0f / 1000.0f;
 	UpdateMusicStream(backgroundMusic);
 }
 
@@ -412,7 +412,7 @@ void GameManager::loadGame(std::string filename){
 	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
 	score = 0;
 	clickCombo = 0;
-    //these are not used right now, USE THEM
+    //TODO: these are not used right now, USE THEM
 	float hpdrainrate = std::stof(gameFile.configDifficulty["HPDrainRate"]);
 	circlesize = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
 	slidertickrate = std::stof(gameFile.configDifficulty["SliderTickRate"]);
