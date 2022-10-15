@@ -361,9 +361,9 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = (float)getTimer() / 1000.0f;
-	//currentTime += 20.0f / 1000.0f;
+	currentTime += 20.0f / 1000.0f;
 	GameManager::update();
-	//currentTime -= 20.0f / 1000.0f;
+	currentTime -= 20.0f / 1000.0f;
 	
 }
 
