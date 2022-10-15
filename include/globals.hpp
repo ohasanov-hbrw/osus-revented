@@ -6,6 +6,15 @@
 #include <memory>
 #include "gamemanager.hpp"
 
+#define PLATFORM_DESKTOP
+
+#if defined(PLATFORM_DESKTOP)
+    #define GLSL_VERSION            330
+#else   // PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
+    #define GLSL_VERSION            100
+#endif
+
+
 class State;
 
 struct Globals {
@@ -56,6 +65,8 @@ struct Globals {
     bool Key2R = false;
     bool enableMouse = true;
     int Wheel = 0;
+
+    Shader shdrOutline;
 
     std::shared_ptr<State> CurrentState;
 

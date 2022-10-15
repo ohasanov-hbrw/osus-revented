@@ -1,3 +1,4 @@
+
 #include <math.h>
 #include <vector>
 #include <algorithm>
@@ -11,6 +12,11 @@
 #include "fs.hpp"
 #include "state.hpp"
 #include "zip.h"
+
+
+
+
+
 //hello from arch!
 Globals Global;
 
@@ -23,11 +29,15 @@ int main() {
     SetTraceLogLevel(LOG_WARNING);
     InitAudioDevice();
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");
+    Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", GLSL_VERSION));
+
+    
 
 
     std::string lastPath = Global.Path;
@@ -111,6 +121,7 @@ int main() {
 
     UnloadTexture(Global.OsusLogo);
     UnloadFont(Global.DefaultFont);
+    UnloadShader(Global.shdrOutline);
     CloseWindow();
 }
 

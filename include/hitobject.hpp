@@ -115,7 +115,8 @@ class Slider : public HitObject{
         Vector2 extraPosition;
         bool earlyhit = false;
         bool playtick = false;
-        
+        int last = 0;
+        int lastblack = 0;
     private:
         double sliderDuration;
         double currentDuration;
@@ -130,6 +131,9 @@ class Slider : public HitObject{
         float timer;
         std::vector<Vector2> edgePoints; 
         RenderTexture2D sliderTexture;
+
+        Shader shdrOutline;
+        
         float minX = static_cast<float>(INT_MAX), minY = static_cast<float>(INT_MAX), maxX = INT_MIN, maxY = INT_MIN;
 };
 
