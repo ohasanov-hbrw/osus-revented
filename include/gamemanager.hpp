@@ -85,7 +85,8 @@ class GameManager{
 		float spinsPerSecond = 5.0f;
 		int spawnedHitObjects = 0;
 		bool startMusic = false;
-
+		double TimerLast = 0;
+		double TimeLast = 0;
 		HitSound SoundFiles;
 	private:
 		static GameManager* inst_;

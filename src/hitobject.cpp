@@ -335,7 +335,7 @@ void Slider::init(){
                     //num = std::max(num, 3);
                     
                     int num = tempEdges.size();
-                    num = std::max(num, 3);
+                    num = std::max(num, 5);
                     num *= 2;
                     //std::cout << num << std::endl;
                     

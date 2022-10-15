@@ -328,8 +328,11 @@ void GameManager::run(){
 		PlayMusicStream(backgroundMusic);
     	SetMusicVolume(backgroundMusic, 0.6f);
 		initTimer();
+		UpdateMusicStream(backgroundMusic);
+		TimeLast = GetTime() * 1000.0;
 		startMusic = false;
 	}
+	UpdateMusicStream(backgroundMusic);
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
 		if(IsKeyPressed(KEY_S)){
@@ -361,7 +364,7 @@ void GameManager::run(){
 	//currentTime += 20.0f / 1000.0f;
 	GameManager::update();
 	//currentTime -= 20.0f / 1000.0f;
-	UpdateMusicStream(backgroundMusic);
+	
 }
 
 //load the beatmap

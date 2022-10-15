@@ -339,48 +339,21 @@ void resumeTimer(){
 
 unsigned long long int getTimer(){
     GameManager* gm = GameManager::getInstance();
-    if (false)
-		return GetMusicTimePlayed(gm->backgroundMusic) * 1000.0f;
-	else {
-		const double interpolationMultiplier = 1.0;
-		double returnPos = 0;
-		const double curPos = (double)GetMusicTimePlayed(gm->backgroundMusic) * 1000.0f;
-		const float speed = 1.0f;
-		const double realTime = GetTime() * 1000.0f;
-		const double interpolationDelta = (realTime - Global.amogus) * 1000.0f * speed;
-		const double interpolationDeltaLimit = ((realTime - Global.amogus2)*1000.0f < 1500 || speed < 1.0f ? 11 : 33) * interpolationMultiplier;
-		if (IsMusicStreamPlaying(gm->backgroundMusic)){
-			double newInterpolatedPos = Global.amogus3 + interpolationDelta;
-			double delta = newInterpolatedPos - curPos;
-			newInterpolatedPos -= delta / 8.0f / interpolationMultiplier;
-			delta = newInterpolatedPos - curPos;
-
-			if (std::abs(delta) > interpolationDeltaLimit * 2.0f){
-				Global.amogus3 = (double)curPos;
-			}
-			else if (delta < -interpolationDeltaLimit){
-				Global.amogus3 += interpolationDelta * 2.0f;
-				Global.amogus2 = realTime;
-			}
-			else if (delta < interpolationDeltaLimit){
-				Global.amogus3 = newInterpolatedPos;
-			}
-			else{
-				Global.amogus3 += interpolationDelta / 2.0f;
-				Global.amogus2 = realTime;
-			}
-			returnPos = Global.amogus3;
-		}
-		else{
-			returnPos = curPos;
-			Global.amogus = (unsigned long)returnPos;
-			Global.amogus2 = realTime;
-		}
-
-		Global.amogus = realTime; // this is more accurate than engine->getFrameTime() for the delta calculation, since it correctly handles all possible delays inbetween
-		return returnPos;
-	}
-    return 0;
+    double Time = 0;
+    if (IsMusicStreamPlaying(gm->backgroundMusic)){
+        Time = (double)GetMusicTimePlayed(gm->backgroundMusic) * 1000.0;
+        if(gm->TimerLast != Time){
+            gm->TimerLast = (double)GetMusicTimePlayed(gm->backgroundMusic) * 1000.0;
+            gm->TimeLast = GetTime() * 1000.0;
+        }
+        else{
+            Time += GetTime() * 1000.0 - gm->TimeLast;
+        }
+    }
+    else{
+        gm->TimeLast = GetTime() * 1000.0;
+    }
+    return Time;
 }
 
 void addOffsetTimer(unsigned long long int time){
