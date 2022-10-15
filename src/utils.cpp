@@ -340,7 +340,7 @@ void resumeTimer(){
 unsigned long long int getTimer(){
     GameManager* gm = GameManager::getInstance();
     if (false)
-		return GetMusicTimePlayed(gm->backgroundMusic) * 1000.0f  * 1000.0f;
+		return GetMusicTimePlayed(gm->backgroundMusic) * 1000.0f;
 	else {
 		const double interpolationMultiplier = 1.0;
 		double returnPos = 0;
@@ -352,7 +352,7 @@ unsigned long long int getTimer(){
 		if (IsMusicStreamPlaying(gm->backgroundMusic)){
 			double newInterpolatedPos = Global.amogus3 + interpolationDelta;
 			double delta = newInterpolatedPos - curPos;
-			newInterpolatedPos -= delta / 8.0 / interpolationMultiplier;
+			newInterpolatedPos -= delta / 8.0f / interpolationMultiplier;
 			delta = newInterpolatedPos - curPos;
 
 			if (std::abs(delta) > interpolationDeltaLimit * 2.0f){
@@ -378,7 +378,7 @@ unsigned long long int getTimer(){
 		}
 
 		Global.amogus = realTime; // this is more accurate than engine->getFrameTime() for the delta calculation, since it correctly handles all possible delays inbetween
-		return returnPos * 1000.0f;
+		return returnPos;
 	}
     return 0;
 }

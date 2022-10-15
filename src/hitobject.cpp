@@ -161,9 +161,9 @@ void Circle::init(){
 void Circle::update(){
     GameManager* gm = GameManager::getInstance();
     //the circle is not clickable after some time so we check that
-    if(gm->currentTime*1000 > data.time + gm->gameFile.p50Final){
+    if(gm->currentTime*1000.0f > data.time + gm->gameFile.p50Final){
         //this is needed for dead_update to work, maybe there is a smarter way to do that
-        data.time = gm->currentTime*1000;
+        data.time = gm->currentTime*1000.0f;
         data.point = 0;
         //resets the combo
         gm->clickCombo = 0;
@@ -174,10 +174,10 @@ void Circle::update(){
 //renders the Circle
 void Circle::render(){
     GameManager* gm = GameManager::getInstance();
-    float approachScale = 3*(1-(gm->currentTime*1000 - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    float approachScale = 3*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
         approachScale = 1;
-    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
+    float clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
     Color renderColor;
     if(data.colour.size() > 2)
@@ -195,9 +195,9 @@ void Circle::render(){
 //renders the "dead" Circle
 void Circle::dead_render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/1.5f);
-    float clampedFade2 = (gm->gameFile.fade_in/6.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/6.0f);
-    float scale = (gm->currentTime*1000 + gm->gameFile.fade_in/3.0f - data.time) / (gm->gameFile.fade_in/3.0f);
+    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.5f);
+    float clampedFade2 = (gm->gameFile.fade_in/6.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/6.0f);
+    float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/3.0f - data.time) / (gm->gameFile.fade_in/3.0f);
     scale = clip(scale,1,2);
     Color renderColor;
     if(data.colour.size() > 2)
@@ -223,7 +223,7 @@ void Circle::dead_render(){
 void Circle::dead_update(){
     GameManager* gm = GameManager::getInstance();
     //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
-    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000){
+    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000.0f){
         gm->destroyDeadHitObject(data.index);
     }
 }
@@ -652,14 +652,14 @@ void Slider::update(){
         absolutePosition -= (double)data.length;
     }
     
-    if(gm->currentTime*1000 - data.time > 0){
-        if ((int)((gm->currentTime*1000 - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
+    if(gm->currentTime*1000.0f - data.time > 0){
+        if ((int)((gm->currentTime*1000.0f - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
             position = (double)data.length - (absolutePosition + 1.0f); 
         else
             position = absolutePosition + 1.0f; 
     }
     position = std::max((double)0,position);
-    if (is_hit_at_first || gm->currentTime*1000 > data.time + gm->gameFile.p50Final)
+    if (is_hit_at_first || gm->currentTime*1000.0f > data.time + gm->gameFile.p50Final)
         state = false;
     if(!state and !is_hit_at_first){
         gm->clickCombo = 0;
@@ -668,7 +668,7 @@ void Slider::update(){
     calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
     /*if(data.length == 7105)
         std::cout << renderPoints[calPos].x << " " << renderPoints[calPos].y << "\n";*/
-    if((gm->currentTime*1000 - data.time > 0 or !state)){
+    if((gm->currentTime*1000.0f - data.time > 0 or !state)){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize))
             inSlider = true;
         else
@@ -679,16 +679,16 @@ void Slider::update(){
     }
 
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
-    if(gm->currentTime*1000 > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
+    if(gm->currentTime*1000.0f > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && (Global.Key1D || Global.Key2D)){
             is_hit_at_end = true;
         }
     }
     
-    if(gm->currentTime*1000 > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
+    if(gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
         
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
-        data.time = gm->currentTime*1000;
+        data.time = gm->currentTime*1000.0f;
         data.point = 0;
         //gm->clickCombo = 0;
         //std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << " Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f<< std::endl;
@@ -758,10 +758,10 @@ void Slider::update(){
 
 void Slider::render(){
     GameManager* gm = GameManager::getInstance();
-    float approachScale = 3*(1-(gm->currentTime*1000 - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    float approachScale = 3*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
         approachScale = 1;
-    float clampedFade = clip((gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in, 0, 0.7f);
+    float clampedFade = clip((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in, 0, 0.7f);
     Color renderColor;
 
     DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade), gm->circlesize);
@@ -799,7 +799,7 @@ void Slider::render(){
     if(repeat2 && position > 0)
         DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/gm->reverseArrow.width)*0.5f, angle, Fade(WHITE, clampedFade));
 
-    if((gm->currentTime*1000 - data.time > 0 or !state) and renderPoints.size() > 0){
+    if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
         if(calPos == 0){
             angle = atan2(renderPoints[calPos].y- renderPoints[calPos+1].y, renderPoints[calPos].x - renderPoints[calPos+1].x);
             angle = angle * 180 / PI + 180; 
@@ -850,7 +850,7 @@ void Slider::render(){
             DrawTextureRotate(gm->sliderfollow, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderfollow.width)*2*(gm->sliderfollow.width/256.0f) , angle, Fade(WHITE,clampedFade));
     }
 
-    clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
+    clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
 
     if(state){
@@ -863,8 +863,8 @@ void Slider::render(){
 
 void Slider::dead_render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/1.5f);
-    float clampedFade2 = (gm->gameFile.fade_in/6.0f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/6.0f);
+    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.5f);
+    float clampedFade2 = (gm->gameFile.fade_in/6.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/6.0f);
     DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade2), gm->circlesize);
     if(data.point == 0)
         DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
@@ -878,7 +878,7 @@ void Slider::dead_render(){
 
 void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
-    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000){
+    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000.0f){
         UnloadRenderTexture(sliderTexture);
         
         gm->destroyDeadHitObject(data.index);
@@ -907,7 +907,7 @@ void Spinner::update(){
     //the circle is not clickable after some time so we check that
     float angle = atan2(240 - Global.MousePosition.y, 320 - Global.MousePosition.x) * 180.0f / PI;
 
-    if(data.touch and gm->currentTime*1000 > data.time){
+    if(data.touch and gm->currentTime*1000.0f > data.time){
         if(Global.Key1P or Global.Key2P){
             first = true;
             lastAngle = angle;
@@ -962,8 +962,8 @@ void Spinner::update(){
         extra++;
         gm->score += 1000;
     }
-    if(gm->currentTime*1000 > data.endTime){
-        data.time = gm->currentTime*1000;
+    if(gm->currentTime*1000.0f > data.endTime){
+        data.time = gm->currentTime*1000.0f;
         data.point = 0;
         if(neededAngle < 360){
             data.point = 3;
@@ -998,10 +998,10 @@ void Spinner::update(){
 //renders the Circle
 void Spinner::render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->currentTime*1000 - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
+    float clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
     Color spinnerColor = WHITE;
-    if(!(data.touch and gm->currentTime*1000 > data.time))
+    if(!(data.touch and gm->currentTime*1000.0f > data.time))
         spinnerColor = BLACK;
     if(gm->renderSpinnerMetre)
         DrawSpinnerMeter(gm->spinnerMetre,totalAngle/neededAngle);
@@ -1018,7 +1018,7 @@ void Spinner::render(){
 //renders the "dead" Circle
 void Spinner::dead_render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000) / (gm->gameFile.fade_in/1.5f);
+    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.5f);
     if(data.point == 0)
         DrawTextureCenter(gm->hit0, data.x, data.y, (gm->circlesize/gm->hit0.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 1)
@@ -1033,7 +1033,7 @@ void Spinner::dead_render(){
 void Spinner::dead_update(){
     GameManager* gm = GameManager::getInstance();
     //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
-    if (data.time+gm->gameFile.fade_in/1.5f < gm->currentTime*1000){
+    if (data.time+gm->gameFile.fade_in/1.5f < gm->currentTime*1000.0f){
         gm->destroyDeadHitObject(data.index);
     }
 }

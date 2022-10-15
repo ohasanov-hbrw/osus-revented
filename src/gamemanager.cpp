@@ -58,7 +58,7 @@ void GameManager::update(){
 	timingSettings tempTiming;
 	int timingSize = gameFile.timingPoints.size();
 	for(int i = timingSize-1; i >= 0; i--){
-		if(gameFile.timingPoints[i].time - gameFile.preempt <= currentTime*1000){
+		if(gameFile.timingPoints[i].time - gameFile.preempt <= currentTime*1000.0f){
 			tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
 			tempTiming.sliderSpeedOverride = 1;
 			tempTiming.time = gameFile.timingPoints[i].time;
@@ -121,7 +121,7 @@ void GameManager::update(){
 	//spawn the hitobjects when their time comes
 	int size = gameFile.hitObjects.size();	
 	for(int i = size-1; i >= 0; i--){
-		if(gameFile.hitObjects[i].time - gameFile.preempt <= currentTime*1000){
+		if(gameFile.hitObjects[i].time - gameFile.preempt <= currentTime*1000.0f){
 			
 			spawnHitObject(gameFile.hitObjects[i]);
 			if(objects[objects.size()-1]->data.startingACombo){
@@ -177,16 +177,16 @@ void GameManager::update(){
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
-					if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p50Final){
+					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
 						objects[i]->data.point = 0;
 						clickCombo = 0;
 					}
-					else if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p100Final){
+					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final){
 						objects[i]->data.point = 1;
 						score+= 50 + (50 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
 					}
-					else if(std::abs(currentTime*1000 - objects[i]->data.time) > gameFile.p300Final){
+					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final){
 						objects[i]->data.point = 2;
 						score+= 100 + (100 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
@@ -211,7 +211,7 @@ void GameManager::update(){
 						SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
 						PlaySoundMulti(SoundFiles.data[objects[i]->data.CustomSound]);
 					}
-					objects[i]->data.time = currentTime*1000;
+					objects[i]->data.time = currentTime*1000.0f;
 					destroyHitObject(i);
 					newSize = objects.size();
 					i--;
@@ -229,8 +229,8 @@ void GameManager::update(){
 			}
 			else if (objects[i]->data.type == 2){
 				if(Slider* tempslider = dynamic_cast<Slider*>(objects[i]))
-					if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && currentTime*1000 < tempslider->data.time + gameFile.p50Final){
-						if(std::abs(currentTime*1000 - tempslider->data.time) > gameFile.p50Final){
+					if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
+						if(std::abs(currentTime*1000.0f - tempslider->data.time) > gameFile.p50Final){
 							tempslider->is_hit_at_first = true;
 							stop = false;
 							tempslider->earlyhit = true;
@@ -347,8 +347,6 @@ void GameManager::run(){
 	
 	updateTimer();
 	Global.curTime = getTimer();
-	/*if(((Global.curTime - GetMusicTimePlayed(backgroundMusic) * 1000000.0f)/1000) < -100 or ((Global.curTime - GetMusicTimePlayed(backgroundMusic) * 1000000.0f)/1000) > 20)
-		SeekMusicStream(backgroundMusic, Global.curTime/1000000.0f);*/
 	if(currentTimeTemp != GetMusicTimePlayed(backgroundMusic) && IsMusicStreamPlaying(backgroundMusic)){
 		currentTimeTemp = GetMusicTimePlayed(backgroundMusic);
 		Global.curTime2 = currentTimeTemp;
@@ -359,10 +357,10 @@ void GameManager::run(){
 		}
 	}
 	//std::cout << Global.curTime2 <<std::endl;
-	currentTime = Global.curTime2 * 1.0f;
-	currentTime += 20.0f / 1000.0f;
+	currentTime = (float)getTimer() / 1000.0f;
+	//currentTime += 20.0f / 1000.0f;
 	GameManager::update();
-	currentTime -= 20.0f / 1000.0f;
+	//currentTime -= 20.0f / 1000.0f;
 	UpdateMusicStream(backgroundMusic);
 }
 
