@@ -337,8 +337,6 @@ void GameManager::run(){
 		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
 		if(IsKeyPressed(KEY_S)){
 			SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
-
-			addOffsetTimer(GetMusicTimePlayed(backgroundMusic) * 1000000.0f);
 		}
 	}
 	if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
@@ -361,9 +359,9 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = (float)getTimer() / 1000.0f;
-	currentTime += 20.0f / 1000.0f;
+	currentTime += 23.0f / 1000.0f;
 	GameManager::update();
-	currentTime -= 20.0f / 1000.0f;
+	currentTime -= 23.0f / 1000.0f;
 	
 }
 

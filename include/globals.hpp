@@ -74,7 +74,7 @@ struct Globals {
 
     Globals() = default;
 
-    
+    float sliderTexSize = 1.0f;
 };
 
 extern Globals Global;

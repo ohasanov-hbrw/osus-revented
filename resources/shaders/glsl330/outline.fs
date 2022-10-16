@@ -16,8 +16,10 @@ uniform vec4 outlineColor;
 // Output fragment color
 out vec4 finalColor;
 
+
 void main()
 {
+    
     vec4 texel = texture(texture0, fragTexCoord);   // Get texel color
     vec2 texelScale = vec2(0.0);
     texelScale.x = outlineSize/textureSize.x;
@@ -37,5 +39,6 @@ void main()
     vec4 empty = finalColor;
     empty.a = 0;
     finalColor = mix(finalColor, empty, 1.0 - transparency);
+    
     //finalColor.a = outlineColor.a;
 }
