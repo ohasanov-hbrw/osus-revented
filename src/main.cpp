@@ -1,4 +1,4 @@
-
+#define _WIN32_WINNT 0x0501
 #include <math.h>
 #include <vector>
 #include <algorithm>
