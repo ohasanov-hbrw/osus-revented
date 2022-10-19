@@ -1,4 +1,8 @@
-#define _WIN32_WINNT 0x0501
+#define WINVER 0x0500
+#define _WIN32_WINNT 0x500
+
+#define GetTickCount64() GetTickCount()
+
 #include <math.h>
 #include <vector>
 #include <algorithm>
@@ -12,7 +16,6 @@
 #include "fs.hpp"
 #include "state.hpp"
 #include "zip.h"
-
 
 
 
@@ -35,7 +38,7 @@ int main() {
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");
-    Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", GLSL_VERSION));
+    Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", 330));
 
     
 

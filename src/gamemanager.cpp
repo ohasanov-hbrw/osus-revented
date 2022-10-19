@@ -325,10 +325,13 @@ void GameManager::render(){
 void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
 	if(startMusic){
+		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
     	SetMusicVolume(backgroundMusic, 0.6f);
 		initTimer();
+		std::cout << "started music" << std::endl;
 		UpdateMusicStream(backgroundMusic);
+		std::cout << "first update" << std::endl;
 		TimeLast = GetTime() * 1000.0;
 		startMusic = false;
 	}
@@ -1032,6 +1035,8 @@ void GameManager::loadGame(std::string filename){
 	sliderout = LoadTexture("resources/sliderout.png");
 
 	Global.Path = lastPath;
+
+	std::cout << "gen mipmaps" << std::endl;
 
 	GenTextureMipmaps(&hit0);
 	SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );

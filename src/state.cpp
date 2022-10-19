@@ -195,7 +195,7 @@ void Game::init() {
     std::cout << Global.selectedPath << std::endl;
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
-
+    std::cout << "done init" << std::endl;
     float timer = 0;
     while(timer < 4.0f){
         timer += GetFrameTime();

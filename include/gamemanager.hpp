@@ -24,7 +24,7 @@ class GameManager{
 		void render();
 		float windowScale = 2.0f;
         HitSound hitCircleHS;
-		int skip = 2;
+		int skip = 3;
 		bool renderSpinnerCircle = false;
 		bool renderSpinnerMetre = false;
 		Texture2D hitCircle;
