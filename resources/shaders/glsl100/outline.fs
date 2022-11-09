@@ -1,4 +1,4 @@
-#version 100
+#version 110
 
 precision mediump float;
 
