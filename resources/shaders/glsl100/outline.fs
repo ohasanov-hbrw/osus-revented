@@ -34,6 +34,6 @@ void main()
     
     gl_FragColor = mix(color, texel, texel.a);
     vec4 empty = gl_FragColor;
-    empty.a = 0;
+    empty.a = 0.0;
     gl_FragColor = mix(gl_FragColor, empty, 1.0 - transparency);
 }
