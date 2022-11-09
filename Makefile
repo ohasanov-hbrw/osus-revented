@@ -1,4 +1,4 @@
-CC = g++ -DGRAPHICS_API_OPENGL_11 +
+CC = g++ -DGRAPHICS_API_OPENGL_11 -DOPENGL_SPOOF
 cflags = -std=c++17 -g -O2
 cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound 
 ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl

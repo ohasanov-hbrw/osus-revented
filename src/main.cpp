@@ -3,10 +3,13 @@
 
 #define GetTickCount64() GetTickCount()
 
+#define OPENGL_SPOOF
+
 #include <math.h>
 #include <vector>
 #include <algorithm>
 #include <utils.hpp>
+#include "rlgl.h"
 #include "raylib.h"
 #include "globals.hpp"
 #include <iostream>
@@ -18,12 +21,11 @@
 #include "zip.h"
 
 
-
-
 //hello from arch!
 Globals Global;
 
 int main() {
+
     Global.CurrentState = std::make_shared<MainMenu>();
     for(int i = 0; i < Global.GamePath.size(); i++) {
         if (Global.GamePath[i] == '\\')
@@ -31,6 +33,10 @@ int main() {
     }
     SetTraceLogLevel(LOG_WARNING);
     InitAudioDevice();
+
+    std::cout << rlGetVersion() << std::endl;
+
+
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     //SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(Global.Width, Global.Height, "osus-revented");
@@ -84,7 +90,7 @@ int main() {
 
     GenTextureMipmaps(&Global.OsusLogo);
     GenTextureMipmaps(&Global.cursor);
-    GenTextureMipmaps(&Global.DefaultFont.texture);
+    GenTextureMipmaps(&Global.DefaultFont.texture); //OPENGL1.1 DOESNT SUPPORT THIS
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
     
     HideCursor();

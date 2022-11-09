@@ -1066,7 +1066,7 @@ void GameManager::loadGame(std::string filename){
 	SetTextureFilter(reverseArrow, TEXTURE_FILTER_TRILINEAR );
 	for(int i = 0; i < 10; i++){
 		GenTextureMipmaps(&numbers[i]);
-		SetTextureFilter(numbers[i], TEXTURE_FILTER_TRILINEAR );
+		SetTextureFilter(numbers[i], TEXTURE_FILTER_TRILINEAR );  //OPENGL1.1 DOESNT SUPPORT THIS
 	}
 	startMusic = true;
 	stop = false;
