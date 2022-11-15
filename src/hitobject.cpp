@@ -288,7 +288,7 @@ void Slider::init(){
             //std::cout << data.time << std::endl;
 
 
-            int curves = 0;
+            /*int curves = 0;
             for(size_t i = 0; i < edgePoints.size(); i++){
                 if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
                     curves++;
@@ -298,9 +298,6 @@ void Slider::init(){
                 tempEdges.push_back(edgePoints[i]);
                 if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
                     currentResolution = 0;
-                    /*if(data.time == 165321){
-                        std::cout << tempEdges.size() << " amogus";
-                    }*/
                     //std::cout << "temp " << tempEdges.size() << " ";
                     //int num = (std::sqrt(std::pow(std::abs(tempEdges[0].x - tempEdges[tempEdges.size() - 1].x),2) + std::pow(std::abs(tempEdges[0].y - tempEdges[tempEdges.size() - 1].y),2))) / 2;
                     //num = std::max(num, 3);
@@ -333,7 +330,7 @@ void Slider::init(){
                     tempEdges.clear();
                     //tempRender.clear();
                 }
-            }
+            }*/
             
             //std::cout << totalCalculatedLength << " vs " << data.length << std::endl;
             tempEdges.clear();
@@ -344,7 +341,7 @@ void Slider::init(){
                 if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
                     std::vector<float> tValues;
                     currentResolution = 0;
-                    float tempResolution = curveLengths[curveIndex];
+                    float tempResolution = data.lengths[curveIndex];
                     std::vector<Vector2> samples;
                     std::vector<int> indices;
                     std::vector<float> lengths;
@@ -424,33 +421,18 @@ void Slider::init(){
             std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
             float inf = std::numeric_limits<float>::infinity();
             if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
-                std::vector<float> lineLengths;
-                for(size_t i = 0; i < edgePoints.size()-1; i++)
-                    lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)));
-                //gets the total length of the calculated lines
-                for(size_t i = 0; i < lineLengths.size(); i++)
-                    totalLength+=lineLengths[i];
-                //the calculated length is pretty different from the beatmap so we scale the calculations for that
-                
-                //add the render points to a vector
-
-                float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
-            
-                float hipotenus = data.length - totalLength;
-                float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-                float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-                extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y + ydiff};
+                extraPosition = data.extraPos;
                 edgePoints[edgePoints.size()-1] = extraPosition;
-                totalLength-=lineLengths[lineLengths.size()-1];
-                lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
-                totalLength+=lineLengths[lineLengths.size()-1];
-                lengthScale = totalLength/data.length;
+                data.totalLength-=data.lengths[data.lengths.size()-1];
+                data.lengths[data.lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
+                data.totalLength+=data.lengths[data.lengths.size()-1];
+
+                lengthScale = data.totalLength/data.length;
 
                 for(size_t i = 0; i < edgePoints.size()-1; i++)
-                    for(float j = 0; j < lineLengths[i]; j += lengthScale)
-                        renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/lineLengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/lineLengths[i]});
+                    for(float j = 0; j < data.lengths[i]; j += lengthScale)
+                        renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
                 renderPoints.push_back(edgePoints[edgePoints.size()-1]);
-                //this is an inside joke, but yeah if we add more points than needed, we just delete them (doesn't happen that much)
                 while(!false){
                     if(renderPoints.size() <= data.length) break;
                     renderPoints.pop_back();
@@ -508,7 +490,6 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
-            //std::cout << "Cdata: " << data.length << " calculated: " << -1 << std::endl;
         }
         else{
             std::__throw_invalid_argument("Invalid Slider type!");

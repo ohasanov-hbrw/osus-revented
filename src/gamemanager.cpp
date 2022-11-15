@@ -368,6 +368,38 @@ void GameManager::run(){
 	
 }
 
+std::pair<Vector2, int> get2PerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
+    int x1 = p1.x;
+    int y1 = p1.y;
+    int x2 = p2.x;
+    int y2 = p2.y;
+    int x3 = p3.x;
+    int y3 = p3.y;
+    int a = x1 * (y2 - y3) - y1 * (x2 - x3) + x2 * y3 - x3 * y2;
+    int b = (x1 * x1 + y1 * y1) * (y3 - y2) + (x2 * x2 + y2 * y2) * (y1 - y3) + (x3 * x3 + y3 * y3) * (y2 - y1);
+    int c = (x1 * x1 + y1 * y1) * (x2 - x3) + (x2 * x2 + y2 * y2) * (x3 - x1) + (x3 * x3 + y3 * y3) * (x1 - x2);
+    float x = (float)-b / (2.0f * (float)a);
+    float y = (float)-c / (2.0f * (float)a);
+    return std::make_pair(Vector2{x,y}, sqrt((x - x1) * (x - x1) + (y - y1) *(y - y1)));
+}
+
+Vector2 get2BezierPoint(std::vector<Vector2> &points, int numPoints, float t){
+    Vector2* tmp = new Vector2[numPoints];
+    for(size_t i = 0; i < points.size(); i++){
+        tmp[i] = points[i];
+    }
+    int i = numPoints - 1;
+    while (i > 0) {
+        for (int k = 0; k < i; k++)
+            tmp[k] = Vector2{tmp[k].x + t *(tmp[k+1].x - tmp[k].x),tmp[k].y + t *(tmp[k+1].y - tmp[k].y)};
+        i--;
+    }
+    Vector2 answer = tmp[0];
+    delete[] tmp;
+    return answer;
+}
+
+
 //load the beatmap
 void GameManager::loadGame(std::string filename){
 	//create a parser and parse the file
@@ -401,7 +433,7 @@ void GameManager::loadGame(std::string filename){
         		edgePoints.push_back(Vector2{(float)gameFile.hitObjects[i].curvePoints[j].first, (float)gameFile.hitObjects[i].curvePoints[j].second});
 			if(gameFile.hitObjects[i].curveType == 'L'){
 				std::vector<float> lineLengths;
-				std::cout << "will calculate linear slider slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+				std::cout << "will calculate linear slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
 				for(size_t j = 0; j < edgePoints.size()-1; j++)
 					lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[j].x - edgePoints[j+1].x),2)+std::pow(std::abs(edgePoints[j].y - edgePoints[j+1].y),2)));
 				for(size_t j = 0; j < lineLengths.size(); j++)
@@ -417,20 +449,95 @@ void GameManager::loadGame(std::string filename){
 				else if(angle == 0.0f){
 					ything = 0;
 				}
+
 				Vector2 extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (float)ything};
 				
 				gameFile.hitObjects[i].totalLength = totalLength;
 				gameFile.hitObjects[i].lengths = lineLengths;
 				gameFile.hitObjects[i].extraPos = extraPosition;
-
-				gameFile.hitObjects[i].totalLength-=gameFile.hitObjects[i].lengths[gameFile.hitObjects[i].lengths.size()-1];
-            	gameFile.hitObjects[i].lengths[gameFile.hitObjects[i].lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - extraPosition.x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - extraPosition.y),2));
-            	gameFile.hitObjects[i].totalLength+=gameFile.hitObjects[i].lengths[gameFile.hitObjects[i].lengths.size()-1];
-				
-				
-				
-				
 			}
+			if(gameFile.hitObjects[i].curveType == 'P'){
+				std::pair<Vector2, float> circleData = get2PerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
+				float inf = std::numeric_limits<float>::infinity();
+            	if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
+					std::vector<float> lineLengths;
+					std::cout << "will calculate linear slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+					for(size_t j = 0; j < edgePoints.size()-1; j++)
+						lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[j].x - edgePoints[j+1].x),2)+std::pow(std::abs(edgePoints[j].y - edgePoints[j+1].y),2)));
+					for(size_t j = 0; j < lineLengths.size(); j++)
+						totalLength += lineLengths[j];
+					float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
+					float hipotenus = gameFile.hitObjects[i].length - totalLength;
+					float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+					float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
+					int ything = 1;
+					if(angle < 0.0f){
+						ything = -1;
+					}
+					else if(angle == 0.0f){
+						ything = 0;
+					}
+
+					Vector2 extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (float)ything};
+					
+					gameFile.hitObjects[i].totalLength = totalLength;
+					gameFile.hitObjects[i].lengths = lineLengths;
+					gameFile.hitObjects[i].extraPos = extraPosition;
+				}
+				else{
+					std::cout << "will NOT calculate perfect circle slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+				}
+			}
+			if(gameFile.hitObjects[i].curveType == 'B'){
+				std::cout << "will calculate bezier slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+				Vector2 edges[edgePoints.size()];
+				for(size_t j = 0; j < edgePoints.size(); j++)
+					edges[j] = edgePoints[j];
+				std::vector<Vector2> tempEdges;
+				std::vector<Vector2> tempRender;
+				std::vector<float> curveLengths;
+				float totalCalculatedLength = 0;
+				int curves = 0;
+				for(size_t j = 0; j < edgePoints.size(); j++){
+					if(j == edgePoints.size()-1 || (edgePoints[j].x == edgePoints[j+1].x && edgePoints[j].y == edgePoints[j+1].y)){
+						curves++;
+					}
+				}
+				for(size_t k = 0; k < edgePoints.size(); k++){
+					tempEdges.push_back(edgePoints[k]);
+					if(k == edgePoints.size()-1 || (edgePoints[k].x == edgePoints[k+1].x && edgePoints[k].y == edgePoints[k+1].y)){
+						currentResolution = 0;
+						int num = tempEdges.size();
+						num = std::max((int)(gameFile.hitObjects[i].length/curves), 10);
+						int m = 0;
+						float tempLength = 0;
+						Vector2 lasttmp;
+						while(true){
+							if(currentResolution > num)
+								break;
+							currentResolution++;
+							float j = (float)currentResolution / (float)num;
+							
+							Vector2 tmp = get2BezierPoint(tempEdges, tempEdges.size(), j);
+							if(m >= 1)
+								tempLength += std::sqrt(std::pow(lasttmp.x - tmp.x,2) + std::pow(lasttmp.y - tmp.y,2));
+							lasttmp = tmp;
+							m++;
+						}
+						curveLengths.push_back(tempLength + 1);
+						totalCalculatedLength += tempLength;
+						tempEdges.clear();
+					}
+				}
+				
+				gameFile.hitObjects[i].totalLength = totalCalculatedLength;
+				gameFile.hitObjects[i].lengths = curveLengths;
+
+				curveLengths.clear();
+				tempEdges.clear();
+				tempRender.clear();
+			}
+
 		}
 	}
 
@@ -1149,6 +1256,7 @@ void GameManager::unloadGame(){
 	for(int i = 0; i < 10; i++){
 		UnloadTexture(numbers[i]);
 	}
+	gameFile.hitObjects.clear();
 	objects.clear();
 	dead_objects.clear();
 }
