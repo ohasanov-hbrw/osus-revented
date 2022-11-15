@@ -285,54 +285,6 @@ void Slider::init(){
             std::vector<Vector2> tempRender;
             std::vector<float> curveLengths;
             float totalCalculatedLength = 0;
-            //std::cout << data.time << std::endl;
-
-
-            /*int curves = 0;
-            for(size_t i = 0; i < edgePoints.size(); i++){
-                if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
-                    curves++;
-                }
-            }
-            for(size_t i = 0; i < edgePoints.size(); i++){
-                tempEdges.push_back(edgePoints[i]);
-                if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
-                    currentResolution = 0;
-                    //std::cout << "temp " << tempEdges.size() << " ";
-                    //int num = (std::sqrt(std::pow(std::abs(tempEdges[0].x - tempEdges[tempEdges.size() - 1].x),2) + std::pow(std::abs(tempEdges[0].y - tempEdges[tempEdges.size() - 1].y),2))) / 2;
-                    //num = std::max(num, 3);
-                    
-                    int num = tempEdges.size();
-                    num = std::max((int)(data.length/curves), 10);
-                    //std::cout << num << std::endl;
-                    
-                    int i = 0;
-                    float tempLength = 0;
-                    Vector2 lasttmp;
-                    while(true){
-                        if(currentResolution > num)
-                            break;
-                        currentResolution++;
-                        float j = (float)currentResolution / (float)num;
-                        
-                        Vector2 tmp = getBezierPoint(tempEdges, tempEdges.size(), j);
-                        //tempRender.push_back(tmp);
-                        if(i >= 1)
-                            tempLength += std::sqrt(std::pow(lasttmp.x - tmp.x,2) + std::pow(lasttmp.y - tmp.y,2));
-                        lasttmp = tmp;
-                        i++;
-                    }
-                    
-                    //for(size_t i = 1; i < tempRender.size(); i += 1)
-                    //    tempLength += std::sqrt(std::pow(std::abs(tempRender[i-1].x - tempRender[i].x),2) + std::pow(std::abs(tempRender[i-1].y - tempRender[i].y),2));
-                    curveLengths.push_back(tempLength + 1);
-                    totalCalculatedLength += tempLength;
-                    tempEdges.clear();
-                    //tempRender.clear();
-                }
-            }*/
-            
-            //std::cout << totalCalculatedLength << " vs " << data.length << std::endl;
             tempEdges.clear();
             tempRender.clear();
             int curveIndex = 0;
