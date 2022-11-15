@@ -383,6 +383,61 @@ void GameManager::loadGame(std::string filename){
 	//reverse the hitobject array because we need it reversed for it to make sense (and make it faster because pop_back)
 	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
 	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
+
+
+	//---------------------------------------------------------------------------------------------------------------------------------------------------------
+	//--------------------------------------------------------------------|TEMPORARY TESTS|--------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	for(int i = 0; i < gameFile.hitObjects.size(); i++){
+		if(gameFile.hitObjects[i].type == 2){
+			std::vector<Vector2> edgePoints; 
+			edgePoints.push_back(Vector2{(float)gameFile.hitObjects[i].x, (float)gameFile.hitObjects[i].y});
+			float resolution = gameFile.hitObjects[i].length;
+    		float currentResolution = 0;
+    		float lengthScale, totalLength = 0;
+			
+			for(size_t j = 0; j < gameFile.hitObjects[i].curvePoints.size(); j++)
+        		edgePoints.push_back(Vector2{(float)gameFile.hitObjects[i].curvePoints[j].first, (float)gameFile.hitObjects[i].curvePoints[j].second});
+			if(gameFile.hitObjects[i].curveType == 'L'){
+				std::vector<float> lineLengths;
+				std::cout << "will calculate linear slider slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+				for(size_t j = 0; j < edgePoints.size()-1; j++)
+					lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[j].x - edgePoints[j+1].x),2)+std::pow(std::abs(edgePoints[j].y - edgePoints[j+1].y),2)));
+				for(size_t j = 0; j < lineLengths.size(); j++)
+					totalLength += lineLengths[j];
+				float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
+				float hipotenus = gameFile.hitObjects[i].length - totalLength;
+				float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+				float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
+				int ything = 1;
+				if(angle < 0.0f){
+					ything = -1;
+				}
+				else if(angle == 0.0f){
+					ything = 0;
+				}
+				Vector2 extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (float)ything};
+				
+				gameFile.hitObjects[i].totalLength = totalLength;
+				gameFile.hitObjects[i].lengths = lineLengths;
+				gameFile.hitObjects[i].extraPos = extraPosition;
+
+				gameFile.hitObjects[i].totalLength-=gameFile.hitObjects[i].lengths[gameFile.hitObjects[i].lengths.size()-1];
+            	gameFile.hitObjects[i].lengths[gameFile.hitObjects[i].lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - extraPosition.x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - extraPosition.y),2));
+            	gameFile.hitObjects[i].totalLength+=gameFile.hitObjects[i].lengths[gameFile.hitObjects[i].lengths.size()-1];
+				
+				
+				
+				
+			}
+		}
+	}
+
+
+
+
+
 	//calculate all the variables for the game (these may be a bit wrong but they feel right)
 	if(std::stof(gameFile.configDifficulty["ApproachRate"]) < 5.0f){
 		gameFile.preempt = 1200.0f + 600.0f * (5.0f - std::stof(gameFile.configDifficulty["ApproachRate"])) / 5.0f;

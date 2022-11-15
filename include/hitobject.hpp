@@ -60,6 +60,9 @@ struct HitObjectData{
     std::string NormalSound = "";
     std::vector<std::string> EdgeNormalSound ;
     std::vector<std::string> EdgeAdditionSound;
+    std::vector<float> lengths;
+    float totalLength;
+    Vector2 extraPos;
 };
 
 class HitObject{
@@ -107,6 +110,7 @@ class Slider : public HitObject{
         int demoPuan = 0;
         bool state = true;
         std::vector<Vector2> renderPoints; 
+        std::vector<Vector2> edgePoints; 
         double position = 0;
         bool repeat = false;
         bool repeat2 = false;
@@ -117,6 +121,7 @@ class Slider : public HitObject{
         bool playtick = false;
         int last = 0;
         int lastblack = 0;
+        
     private:
         double sliderDuration;
         double currentDuration;
@@ -129,7 +134,7 @@ class Slider : public HitObject{
         int ticknumber = 0;
         int reversenumber = 0;
         float timer;
-        std::vector<Vector2> edgePoints; 
+        
         RenderTexture2D sliderTexture;
 
         Shader shdrOutline;

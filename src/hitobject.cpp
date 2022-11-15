@@ -259,59 +259,22 @@ void Slider::init(){
     }
     else{
         if(data.curveType == 'L'){
-            //a linear "curve" consists of different sized lines so we calculate them here
-            std::vector<float> lineLengths;
-            for(size_t i = 0; i < edgePoints.size()-1; i++){
-                /*if(64989 == data.time or 65340 == data.time or 65691 == data.time){
-                    std::cout << "Line " << std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)) << "\n";
-                }*/
-                lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[i].x - edgePoints[i+1].x),2)+std::pow(std::abs(edgePoints[i].y - edgePoints[i+1].y),2)));
-            }
-            //gets the total length of the calculated lines
-            for(size_t i = 0; i < lineLengths.size(); i++)
-                totalLength+=lineLengths[i];
-            
-            
-            //the calculated length is pretty different from the beatmap so we scale the calculations for that
-            
-            //add the render points to a vector
-            
-            float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
-        
-            float hipotenus = data.length - totalLength;
-            float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-            float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
-            int ything = 1;
-            if(angle < 0.0f){
-                ything = -1;
-            }
-            else if(angle == 0.0f){
-                ything = 0;
-            }
-            extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (float)ything};
+            extraPosition = data.extraPos;
             edgePoints[edgePoints.size()-1] = extraPosition;
-            totalLength-=lineLengths[lineLengths.size()-1];
-            lineLengths[lineLengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
-            /*if(64989 == data.time or 65340 == data.time or 65691 == data.time){
-                std::cout << "LineNew " << extraPosition.x << " " << extraPosition.y << "\n";
-            }*/
-            totalLength+=lineLengths[lineLengths.size()-1];
-            lengthScale = totalLength/data.length;
+            data.totalLength-=data.lengths[data.lengths.size()-1];
+            data.lengths[data.lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
+            data.totalLength+=data.lengths[data.lengths.size()-1];
+
+            lengthScale = data.totalLength/data.length;
 
             for(size_t i = 0; i < edgePoints.size()-1; i++)
-                for(float j = 0; j < lineLengths[i]; j += lengthScale)
-                    renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/lineLengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/lineLengths[i]});
+                for(float j = 0; j < data.lengths[i]; j += lengthScale)
+                    renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
             renderPoints.push_back(edgePoints[edgePoints.size()-1]);
-            //this is an inside joke, but yeah if we add more points than needed, we just delete them (doesn't happen that much)
-            /*if(64989 == data.time or 65340 == data.time or 65691 == data.time){
-                std::cout << "wa: " << totalLength << " " << edgePoints.size() << " " << lineLengths.size() << " " << data.curvePoints[0].first << " " << data.curvePoints[0].second << std::endl;
-            }*/
             while(!false){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
-        
-            //std::cout << "Ldata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
         }
         else if(data.curveType == 'B'){
             //for the bezier curves we do the calculations in another function
