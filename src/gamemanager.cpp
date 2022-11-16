@@ -431,6 +431,9 @@ void GameManager::loadGame(std::string filename){
 			
 			for(size_t j = 0; j < gameFile.hitObjects[i].curvePoints.size(); j++)
         		edgePoints.push_back(Vector2{(float)gameFile.hitObjects[i].curvePoints[j].first, (float)gameFile.hitObjects[i].curvePoints[j].second});
+			
+			redoCalc:
+
 			if(gameFile.hitObjects[i].curveType == 'L'){
 				std::vector<float> lineLengths;
 				std::cout << "will calculate linear slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
@@ -457,35 +460,43 @@ void GameManager::loadGame(std::string filename){
 				gameFile.hitObjects[i].extraPos = extraPosition;
 			}
 			if(gameFile.hitObjects[i].curveType == 'P'){
-				std::pair<Vector2, float> circleData = get2PerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
-				float inf = std::numeric_limits<float>::infinity();
-            	if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
-					std::vector<float> lineLengths;
-					std::cout << "will calculate linear slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
-					for(size_t j = 0; j < edgePoints.size()-1; j++)
-						lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[j].x - edgePoints[j+1].x),2)+std::pow(std::abs(edgePoints[j].y - edgePoints[j+1].y),2)));
-					for(size_t j = 0; j < lineLengths.size(); j++)
-						totalLength += lineLengths[j];
-					float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
-					float hipotenus = gameFile.hitObjects[i].length - totalLength;
-					float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-					float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
-					int ything = 1;
-					if(angle < 0.0f){
-						ything = -1;
-					}
-					else if(angle == 0.0f){
-						ything = 0;
-					}
-
-					Vector2 extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (float)ything};
-					
-					gameFile.hitObjects[i].totalLength = totalLength;
-					gameFile.hitObjects[i].lengths = lineLengths;
-					gameFile.hitObjects[i].extraPos = extraPosition;
+				if(edgePoints[0].x == edgePoints[2].x and edgePoints[0].y == edgePoints[2].y){
+					gameFile.hitObjects[i].curveType = 'L';
+					goto redoCalc;
 				}
 				else{
-					std::cout << "will NOT calculate perfect circle slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+					std::pair<Vector2, float> circleData = get2PerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
+					float inf = std::numeric_limits<float>::infinity();
+					if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
+						std::vector<float> lineLengths;
+						std::cout << "will calculate linear slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+						for(size_t j = 0; j < edgePoints.size()-1; j++)
+							lineLengths.push_back(std::sqrt(std::pow(std::abs(edgePoints[j].x - edgePoints[j+1].x),2)+std::pow(std::abs(edgePoints[j].y - edgePoints[j+1].y),2)));
+						for(size_t j = 0; j < lineLengths.size(); j++)
+							totalLength += lineLengths[j];
+						float angle = atan2(edgePoints[edgePoints.size()-1].y - edgePoints[edgePoints.size()-2].y, edgePoints[edgePoints.size()-1].x - edgePoints[edgePoints.size()-2].x) * 180 / 3.14159265;
+						float hipotenus = gameFile.hitObjects[i].length - totalLength;
+						float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+						float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
+						int ything = 1;
+						if(angle < 0.0f){
+							ything = -1;
+						}
+						else if(angle == 0.0f){
+							ything = 0;
+						}
+
+						Vector2 extraPosition = {edgePoints[edgePoints.size()-1].x + xdiff, edgePoints[edgePoints.size()-1].y - ydiff * (float)ything};
+						
+						gameFile.hitObjects[i].curveType = 'L';
+
+						gameFile.hitObjects[i].totalLength = totalLength;
+						gameFile.hitObjects[i].lengths = lineLengths;
+						gameFile.hitObjects[i].extraPos = extraPosition;
+					}
+					else{
+						std::cout << "will NOT calculate perfect circle slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+					}
 				}
 			}
 			if(gameFile.hitObjects[i].curveType == 'B'){

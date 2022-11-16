@@ -275,6 +275,20 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
+            for(int i = 0; i < renderPoints.size(); i++){
+                if(renderPoints[i].x < -150){
+                    renderPoints[i].x = -150;
+                }
+                if(renderPoints[i].y < -150){
+                    renderPoints[i].y = -150;
+                }
+                if(renderPoints[i].x > 790){
+                    renderPoints[i].x = 790;
+                }
+                if(renderPoints[i].y > 630){
+                    renderPoints[i].y = 630;
+                }
+            }
         }
         else if(data.curveType == 'B'){
             //for the bezier curves we do the calculations in another function
@@ -310,11 +324,19 @@ void Slider::init(){
                     for(int k = 0; k < lengths.size(); k++)
                         lengths[k] /= lengths[maxlen];
                     indices.push_back(0);
-                    for(int k = 1; k < tempResolution + 1; k++){
-                        float s = (float)k / tempResolution;
+                    for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
+                        float s = (float)k / tempResolution * 2.0f;
+                        s = clip(s, 0.0f, 1.0f);
                         int j = Search(lengths,s,0,lengths.size()-1);
                         indices.push_back(j);
+                        //std::cout << "s " << s << std::endl;
                     }
+
+                    float s = 1.0f;
+                    int j = Search(lengths,s,0,lengths.size()-1);
+                    if(indices[indices.size() - 1] != j)
+                        indices.push_back(j);
+
                     samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
                     for(float s = 0; s < 1; s += 1.0f / tempResolution){
                         currentResolution++;
@@ -330,7 +352,7 @@ void Slider::init(){
                     if(i != edgePoints.size()-1 && renderPoints.size() > 1)
                         renderPoints.pop_back();
                     curveIndex++;
-                    
+                    indices.clear();
                     tempEdges.clear();
                 }
             }
@@ -433,6 +455,20 @@ void Slider::init(){
                     renderPoints.pop_back();
                 }
                 //std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
+                for(int i = 0; i < renderPoints.size(); i++){
+                    if(renderPoints[i].x < -150){
+                        renderPoints[i].x = -150;
+                    }
+                    if(renderPoints[i].y < -150){
+                        renderPoints[i].y = -150;
+                    }
+                    if(renderPoints[i].x > 790){
+                        renderPoints[i].x = 790;
+                    }
+                    if(renderPoints[i].y > 630){
+                        renderPoints[i].y = 630;
+                    }
+                }
             }
             
         }
@@ -442,10 +478,25 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
+            for(int i = 0; i < renderPoints.size(); i++){
+                if(renderPoints[i].x < -150){
+                    renderPoints[i].x = -150;
+                }
+                if(renderPoints[i].y < -150){
+                    renderPoints[i].y = -150;
+                }
+                if(renderPoints[i].x > 790){
+                    renderPoints[i].x = 790;
+                }
+                if(renderPoints[i].y > 630){
+                    renderPoints[i].y = 630;
+                }
+            }
         }
         else{
             std::__throw_invalid_argument("Invalid Slider type!");
         }
+
     }
     for(size_t i = 0; i < renderPoints.size(); i++){
         minX = std::min(minX, renderPoints[i].x);
@@ -453,6 +504,7 @@ void Slider::init(){
         maxX = std::max(maxX, renderPoints[i].x);
         maxY = std::max(maxY, renderPoints[i].y);
     }
+    std::cout << data.time << std::endl;
     sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+4)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+4)*Global.sliderTexSize);
     //start to draw on the texture
     /*BeginTextureMode(sliderTexture);

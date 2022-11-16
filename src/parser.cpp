@@ -318,6 +318,7 @@ GameFile Parser::parse(std::string filename){
 							std::vector<std::string> tempVectorCurvePoints;
 							tempVectorCurvePoints = parseSeperatedLists(tempVector[5], '|');
 							tempHitObject.curveType = tempVectorCurvePoints[0][0];
+
 							if(tempVectorCurvePoints.size()-1 == 1){
 								tempHitObject.curveType = 'L';
 							}
