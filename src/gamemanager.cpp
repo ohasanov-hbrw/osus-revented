@@ -432,6 +432,11 @@ void GameManager::loadGame(std::string filename){
 			for(size_t j = 0; j < gameFile.hitObjects[i].curvePoints.size(); j++)
         		edgePoints.push_back(Vector2{(float)gameFile.hitObjects[i].curvePoints[j].first, (float)gameFile.hitObjects[i].curvePoints[j].second});
 			
+			if(edgePoints.size() == 2 and gameFile.hitObjects[i].curveType == 'B'){
+				gameFile.hitObjects[i].curveType == 'L';
+			}
+
+
 			redoCalc:
 
 			if(gameFile.hitObjects[i].curveType == 'L'){
