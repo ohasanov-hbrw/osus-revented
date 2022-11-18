@@ -31,7 +31,7 @@ struct Globals {
     struct timespec ts1 = timespec{0,0}, ts2 = timespec{0,0};
     bool paused = false;
 
-    unsigned long long int curTime = 0;
+    double curTime = 0;
     double curTime2 = 0;
     double amogus;
     double amogus2;
@@ -75,6 +75,10 @@ struct Globals {
     Globals() = default;
 
     float sliderTexSize = 1.0f;
+
+
+
+
 };
 
 extern Globals Global;

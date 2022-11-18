@@ -101,6 +101,6 @@ std::vector<std::string> ParseNameFile(std::string);
 void initTimer();
 void pauseTimer();
 void resumeTimer();
-unsigned long long int getTimer();
+double getTimer();
 void addOffsetTimer(unsigned long long int);
 void updateTimer();

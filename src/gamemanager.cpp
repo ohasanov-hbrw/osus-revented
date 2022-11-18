@@ -378,13 +378,20 @@ void GameManager::run(){
 	if(startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
-    	SetMusicVolume(backgroundMusic, 0.6f);
+    	SetMusicVolume(backgroundMusic, 1.0f);
+		SeekMusicStream(backgroundMusic, 0.0f);
+		UpdateMusicStream(backgroundMusic);
 		initTimer();
 		std::cout << "started music" << std::endl;
-		UpdateMusicStream(backgroundMusic);
 		std::cout << "first update" << std::endl;
 		TimeLast = GetTime() * 1000.0;
 		startMusic = false;
+		double Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
+		double amog = getTimer();
+		Global.amogus2 = amog - Time;
+		std::cout << "time delay??? " << Global.amogus2 << std::endl;
+		std::cout << "Time:" << Time << std::endl;
+		std::cout << "amog?:" << amog << std::endl;
 	}
 	UpdateMusicStream(backgroundMusic);
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
@@ -429,10 +436,10 @@ void GameManager::run(){
 		}
 	}
 	//std::cout << Global.curTime2 <<std::endl;
-	currentTime = (float)getTimer() / 1000.0f;
-	currentTime += 0.0f / 1000.0f;
+	currentTime = (float)Time / 1000.0f;
+	currentTime += Global.amogus2 / 2000.0f;
 	GameManager::update();
-	currentTime -= 0.0f / 1000.0f;
+	currentTime -= Global.amogus2 / 2000.0f;
 	
 }
 

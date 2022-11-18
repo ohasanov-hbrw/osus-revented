@@ -325,7 +325,7 @@ std::vector<std::string> ParseNameFile(std::string file){
 }
 
 void initTimer(){
-    
+    Global.amogus = GetTime() * 1000.0f;
 }
 
 void pauseTimer(){
@@ -337,23 +337,8 @@ void resumeTimer(){
 }
 
 
-unsigned long long int getTimer(){
-    GameManager* gm = GameManager::getInstance();
-    double Time = 0;
-    if (IsMusicStreamPlaying(gm->backgroundMusic)){
-        Time = (double)GetMusicTimePlayed(gm->backgroundMusic) * 1000.0;
-        if(gm->TimerLast != Time){
-            gm->TimerLast = (double)GetMusicTimePlayed(gm->backgroundMusic) * 1000.0;
-            gm->TimeLast = GetTime() * 1000.0;
-        }
-        else{
-            Time += GetTime() * 1000.0 - gm->TimeLast;
-        }
-    }
-    else{
-        gm->TimeLast = GetTime() * 1000.0;
-    }
-    return Time;
+double getTimer(){
+    return GetTime() * 1000.0f - Global.amogus;
 }
 
 void addOffsetTimer(unsigned long long int time){

@@ -256,9 +256,6 @@ void Game::render() {
     Global.gameManager->render();
     if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
         DrawTextEx(Global.DefaultFont, TextFormat("Playing: %d/%.3f", (int)(Global.curTime2 * 1000000.0f), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
-        DrawTextEx(Global.DefaultFont, TextFormat("PlayC++: %d/%.3f", getTimer(), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
-        DrawTextEx(Global.DefaultFont, TextFormat("Timer: %dms", Global.curTime), {ScaleCordX(5), ScaleCordY(60)}, Scale(15) , Scale(1), WHITE);
-        DrawTextEx(Global.DefaultFont, TextFormat("CurTime?: %dms", (int)(Global.curTime2 * 1000000.0f)), {ScaleCordX(5), ScaleCordY(80)}, Scale(15) , Scale(1), WHITE);
     }
     else
         DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
