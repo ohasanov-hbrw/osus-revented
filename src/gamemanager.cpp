@@ -176,6 +176,7 @@ void GameManager::update(){
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
+
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
 						objects[i]->data.point = 0;
@@ -228,7 +229,7 @@ void GameManager::update(){
 				}
 			}
 			else if (objects[i]->data.type == 2){
-				if(Slider* tempslider = dynamic_cast<Slider*>(objects[i]))
+				if(Slider* tempslider = dynamic_cast<Slider*>(objects[i])){
 					if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
 						if(std::abs(currentTime*1000.0f - tempslider->data.time) > gameFile.p50Final){
 							tempslider->is_hit_at_first = true;
@@ -251,6 +252,7 @@ void GameManager::update(){
 						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
 						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
 					}
+				}
 				//this cursed else train is nothing to worry about...
 				objects[i]->data.index = i;
 				objects[i]->update();
@@ -271,6 +273,55 @@ void GameManager::update(){
 			}
 		}
 		else{
+			bool debugf = true;
+			if(debugf){
+				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
+				}
+				else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final){
+				}
+				else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final){
+				}
+				else if(objects[i]->data.point != 3 && currentTime*1000.0f > objects[i]->data.time){
+					if (objects[i]->data.type != 2){
+						objects[i]->data.point = 3;
+						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						clickCombo++;
+						int volume = objects[i]->data.volume;
+						if(volume == 0){
+							objects[i]->data.volume = objects[i]->data.timing.volume;
+							volume = objects[i]->data.volume;
+						}
+						SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
+						PlaySoundMulti(SoundFiles.data[objects[i]->data.NormalSound]);
+						if(objects[i]->data.PlayAddition){
+							SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
+							PlaySoundMulti(SoundFiles.data[objects[i]->data.AdditionSound]);
+						}
+						if(objects[i]->data.PlayCustom){
+							SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
+							PlaySoundMulti(SoundFiles.data[objects[i]->data.CustomSound]);
+						}
+						objects[i]->data.time = currentTime*1000.0f;
+						stop = false;
+					}
+					else if (objects[i]->data.type == 2){
+						Slider* tempslider = dynamic_cast<Slider*>(objects[i]);
+						tempslider->is_hit_at_first = true;
+						objects[i]->data.point = 3;
+						stop = false;
+						clickCombo++;
+						int volume = tempslider->data.volume;
+						if(volume == 0){
+							tempslider->data.volume = tempslider->data.timing.volume;
+							volume = tempslider->data.volume;
+						}
+						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
+						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
+						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+					}
+				}
+			}
 			objects[i]->data.index = i;
 			objects[i]->update();
 			newSize = objects.size();
@@ -350,7 +401,24 @@ void GameManager::run(){
 	
 	
 	updateTimer();
-	Global.curTime = getTimer();
+
+
+	double Time = 0;
+    if (IsMusicStreamPlaying(backgroundMusic)){
+        Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
+        if(TimerLast != Time){
+            TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
+            TimeLast = GetTime() * 1000.0;
+        }
+        else{
+            Time += GetTime() * 1000.0 - TimeLast;
+        }
+    }
+    else{
+        TimeLast = GetTime() * 1000.0;
+    }
+
+	Global.curTime = Time;
 	if(currentTimeTemp != GetMusicTimePlayed(backgroundMusic) && IsMusicStreamPlaying(backgroundMusic)){
 		currentTimeTemp = GetMusicTimePlayed(backgroundMusic);
 		Global.curTime2 = currentTimeTemp;
@@ -362,9 +430,9 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = (float)getTimer() / 1000.0f;
-	currentTime += 23.0f / 1000.0f;
+	currentTime += 0.0f / 1000.0f;
 	GameManager::update();
-	currentTime -= 23.0f / 1000.0f;
+	currentTime -= 0.0f / 1000.0f;
 	
 }
 

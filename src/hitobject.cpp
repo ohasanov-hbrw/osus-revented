@@ -679,7 +679,10 @@ void Slider::update(){
             gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
             gm->clickCombo++;
         }
-        if(is_hit_at_end){
+
+        bool debugf = true;
+
+        if(is_hit_at_end || debugf){
             SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
             SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
             PlaySoundMulti(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
@@ -694,8 +697,9 @@ void Slider::update(){
     }
     else{
         if(curRepeat > 0){
+            bool debugf = true;
             if(reverseclicked[curRepeat-1] == -1){
-                if(inSlider){
+                if(inSlider || debugf){
                     reverseclicked[curRepeat-1] = 1;
                     reversenumber++;
                     gm->clickCombo++;
@@ -829,10 +833,13 @@ void Slider::render(){
         if(curRepeat%2 == 0)
             angle+=180;
         int ticksrendered = 0;
+
+        bool debugf = true;
+
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){
                 if(tickclicked[i] == -1){
-                    if(inSlider){
+                    if(inSlider || debugf){
                         tickclicked[i] = 1;
                         ticknumber++;
                         gm->clickCombo++;
