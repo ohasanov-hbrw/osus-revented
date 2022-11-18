@@ -23,7 +23,7 @@ struct Globals {
     Color Background = { 30, 0, 60, 255 };
     //Color Background = {42,22,33,255};
     int skinNumberOverlap = 18;
-    int FPS = 1440;
+    int FPS = 144;
     int Width = 640;
     int Height = 480;
     float offset = 45.0f;

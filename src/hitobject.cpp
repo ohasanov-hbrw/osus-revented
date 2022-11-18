@@ -680,7 +680,7 @@ void Slider::update(){
             gm->clickCombo++;
         }
 
-        bool debugf = true;
+        bool debugf = false;
 
         if(is_hit_at_end || debugf){
             SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
@@ -697,7 +697,7 @@ void Slider::update(){
     }
     else{
         if(curRepeat > 0){
-            bool debugf = true;
+            bool debugf = false;
             if(reverseclicked[curRepeat-1] == -1){
                 if(inSlider || debugf){
                     reverseclicked[curRepeat-1] = 1;
@@ -834,7 +834,7 @@ void Slider::render(){
             angle+=180;
         int ticksrendered = 0;
 
-        bool debugf = true;
+        bool debugf = false;
 
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){

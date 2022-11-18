@@ -273,7 +273,7 @@ void GameManager::update(){
 			}
 		}
 		else{
-			bool debugf = true;
+			bool debugf = false;
 			if(debugf){
 				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
 				}
@@ -437,9 +437,9 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = (float)Time / 1000.0f;
-	currentTime += Global.amogus2 / 2000.0f;
+	currentTime += Global.amogus2 / 1700.0f;
 	GameManager::update();
-	currentTime -= Global.amogus2 / 2000.0f;
+	currentTime -= Global.amogus2 / 1700.0f;
 	
 }
 
