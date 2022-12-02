@@ -34,13 +34,11 @@ int main() {
     SetTraceLogLevel(LOG_WARNING);
     InitAudioDevice();
 
-    std::cout << rlGetVersion() << std::endl;
-
-
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     //SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
+    SetAudioStreamBufferSizeDefault(64);
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");

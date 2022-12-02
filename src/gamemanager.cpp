@@ -1309,8 +1309,7 @@ void GameManager::loadGame(std::string filename){
 	SetTextureFilter(hitCircle, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&sliderb);
 	SetTextureFilter(sliderb, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&sliderin);
-	SetTextureFilter(sliderin, TEXTURE_FILTER_TRILINEAR );
+	SetTextureFilter(sliderin, TEXTURE_FILTER_POINT );
 	GenTextureMipmaps(&sliderscorepoint);
 	SetTextureFilter(sliderscorepoint, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&sliderout);

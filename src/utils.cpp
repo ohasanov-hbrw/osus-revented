@@ -170,7 +170,7 @@ void DrawTextureCenter(Texture2D tex, float x, float y, float s, Color color){
 }
 void DrawTextureSlider(Texture2D tex, float x, float y, Color color, float s){
     //Same thing as the DrawTextureCenter() function above
-    DrawTextureEx(tex, ScaleCords({x-s/2.0f,y-s/2.0f}),0,Scale(1.0f), color);
+    DrawTextureEx(tex, ScaleCords({x-s/2.0f,y-s/2.0f}),0,Scale(1.0f/Global.sliderTexSize), color);
 }
 
 void DrawTextureRotate(Texture2D tex, float x, float y, float s, float r, Color color){
