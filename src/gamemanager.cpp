@@ -203,14 +203,14 @@ void GameManager::update(){
 						volume = objects[i]->data.volume;
 					}
 					SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
-					PlaySoundMulti(SoundFiles.data[objects[i]->data.NormalSound]);
+					PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
 					if(objects[i]->data.PlayAddition){
 						SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
-						PlaySoundMulti(SoundFiles.data[objects[i]->data.AdditionSound]);
+						PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
 					}
 					if(objects[i]->data.PlayCustom){
 						SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
-						PlaySoundMulti(SoundFiles.data[objects[i]->data.CustomSound]);
+						PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
 					}
 					objects[i]->data.time = currentTime*1000.0f;
 					destroyHitObject(i);
@@ -249,8 +249,8 @@ void GameManager::update(){
 						}
 						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
 						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
-						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
-						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
 					}
 				}
 				//this cursed else train is nothing to worry about...
@@ -292,14 +292,14 @@ void GameManager::update(){
 							volume = objects[i]->data.volume;
 						}
 						SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
-						PlaySoundMulti(SoundFiles.data[objects[i]->data.NormalSound]);
+						PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
 						if(objects[i]->data.PlayAddition){
 							SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
-							PlaySoundMulti(SoundFiles.data[objects[i]->data.AdditionSound]);
+							PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
 						}
 						if(objects[i]->data.PlayCustom){
 							SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
-							PlaySoundMulti(SoundFiles.data[objects[i]->data.CustomSound]);
+							PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
 						}
 						objects[i]->data.time = currentTime*1000.0f;
 						stop = false;
@@ -317,8 +317,8 @@ void GameManager::update(){
 						}
 						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
 						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
-						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
-						PlaySoundMulti(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
 					}
 				}
 			}

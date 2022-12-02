@@ -570,8 +570,8 @@ void Slider::update(){
         if(is_hit_at_end || debugf){
             SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
             SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
-            PlaySoundMulti(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
-			PlaySoundMulti(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
+            PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
+			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
         }
 
         
@@ -590,8 +590,8 @@ void Slider::update(){
                     gm->clickCombo++;
                     SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], (float)volume/100.0f);
                     SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], (float)volume/100.0f);
-                    PlaySoundMulti(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
-			        PlaySoundMulti(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
+                    PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
+			        PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
                 }
                 else{
                     reverseclicked[curRepeat-1] = 0;
@@ -602,7 +602,7 @@ void Slider::update(){
     }
     if(playtick){
         SetSoundVolume(gm->SoundFiles.data[data.NormalSound], (float)volume/100.0f);
-        PlaySoundMulti(gm->SoundFiles.data[data.NormalSound]);
+        PlaySound(gm->SoundFiles.data[data.NormalSound]);
         playtick = false;
     }
 }
