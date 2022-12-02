@@ -170,7 +170,7 @@ void DrawTextureCenter(Texture2D tex, float x, float y, float s, Color color){
 }
 void DrawTextureSlider(Texture2D tex, float x, float y, Color color, float s){
     //Same thing as the DrawTextureCenter() function above
-    DrawTextureEx(tex, ScaleCords({x-s/2.0f,y-s/2.0f}),0,Scale(1.0f/Global.sliderTexSize), color);
+    DrawTextureEx(tex, ScaleCords({x-s/2.0f-2.0f*Global.sliderTexSize,y-s/2.0f-2.0f*Global.sliderTexSize}),0,Scale(1.0f/Global.sliderTexSize), color);
 }
 
 void DrawTextureRotate(Texture2D tex, float x, float y, float s, float r, Color color){
@@ -180,9 +180,9 @@ void DrawTextureRotate(Texture2D tex, float x, float y, float s, float r, Color 
 
 int nthDigit(int v, int n){
     //Find the nth digit of a number... Dumb but this is probably one of the best ways :D
-    while ( n > 0 ) {
+    while(n > 0){
         v /= 10;
-        -- n;
+        n--;
     }
     return "0123456789"[v % 10] - '0';
 }
