@@ -375,7 +375,17 @@ void GameManager::render(){
 
 void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
-	if(startMusic){
+	double Time = 0;
+
+
+	if(Global.startTime < 0){
+		Global.amogus2 = 0;
+		Global.startTime += GetFrameTime() * 1000.0f;
+		Time = Global.startTime;
+		std::cout << Time << std::endl;
+	}
+
+	if(Global.startTime >= 0 and startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
     	SetMusicVolume(backgroundMusic, 1.0f);
@@ -410,7 +420,7 @@ void GameManager::run(){
 	updateTimer();
 
 
-	double Time = 0;
+	
     if (IsMusicStreamPlaying(backgroundMusic)){
         Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
         if(TimerLast != Time){
@@ -437,9 +447,9 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = (float)Time / 1000.0f;
-	currentTime += Global.amogus2 / 1700.0f;
+	currentTime += Global.amogus2 / 1000.0f;
 	GameManager::update();
-	currentTime -= Global.amogus2 / 1700.0f;
+	currentTime -= Global.amogus2 / 1000.0f;
 	
 }
 
@@ -599,7 +609,7 @@ void GameManager::loadGame(std::string filename){
 					if(k == edgePoints.size()-1 || (edgePoints[k].x == edgePoints[k+1].x && edgePoints[k].y == edgePoints[k+1].y)){
 						currentResolution = 0;
 						int num = tempEdges.size();
-						num = std::max((int)(gameFile.hitObjects[i].length/curves), 10);
+						num = std::max((int)(gameFile.hitObjects[i].length/curves), 50);
 						int m = 0;
 						float tempLength = 0;
 						Vector2 lasttmp;

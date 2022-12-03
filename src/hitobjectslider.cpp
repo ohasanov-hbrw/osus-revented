@@ -460,11 +460,6 @@ void Slider::init(){
         }
     }
     reverseclicked.pop_back();
-    /*if(64989 == data.time or 65340 == data.time or 65691 == data.time){
-        std::cout << "what: " << data.type << " " << data.length << " " << data.slides << " " << data.curvePoints.size() << " " << renderPoints.size() << std::endl;
-    }*/
-    //std::cout << " Slider length is " << data.length << " and we have " << renderPoints.size() << " render points" << std::endl;
-    //std::cout << "Init finished" << std::endl;
 }
 
 void Slider::update(){
@@ -620,11 +615,11 @@ void Slider::render(){
         BeginTextureMode(sliderTexture);
         //BeginBlendMode(BLEND_ALPHA_PREMUL);
         if(renderPoints.size() > 0){
-            for(int i = last; i < ((float)renderPoints.size() * (clampedFade * 2.0f)); i+=gm->skip){
+            for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
                 if(i < renderPoints.size() and renderPoints[i].x >= -150 and renderPoints[i].x <= 790 and renderPoints[i].y >= -150 and renderPoints[i].y <= 630){
                     DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4-minX)*Global.sliderTexSize,
                     (sliderTexture.texture.height - (renderPoints[i].y+4-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
-                    lastblack = std::max(i, 0);
+                    last = std::max(i, 0);
                 }
 
             }

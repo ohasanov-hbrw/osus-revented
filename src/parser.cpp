@@ -49,6 +49,9 @@ GameFile Parser::parse(std::string filename){
 	std::string line;
 	int lineNumber = 0;
 	if (ifs.is_open()){
+
+		std::cout << "file opened\n";
+
 		while(std::getline(ifs, line)){
 			
 			

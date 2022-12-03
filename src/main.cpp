@@ -38,7 +38,7 @@ int main() {
     //SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
-    SetAudioStreamBufferSizeDefault(64);
+    SetAudioStreamBufferSizeDefault(16);
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");

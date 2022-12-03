@@ -32,6 +32,7 @@ struct Globals {
     bool paused = false;
 
     double curTime = 0;
+    double startTime = -1;
     double curTime2 = 0;
     double amogus;
     double amogus2;
