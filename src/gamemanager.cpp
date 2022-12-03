@@ -384,7 +384,6 @@ void GameManager::run(){
 		Time = Global.startTime;
 		std::cout << Time << std::endl;
 	}
-
 	if(Global.startTime >= 0 and startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
