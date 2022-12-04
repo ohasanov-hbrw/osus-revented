@@ -88,6 +88,9 @@ class GameManager{
 		double TimerLast = 0;
 		double TimeLast = 0;
 		HitSound SoundFiles;
+
+		char *musicData;
+		long musicSize;
 	private:
 		static GameManager* inst_;
 		void init();

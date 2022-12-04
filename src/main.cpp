@@ -38,7 +38,8 @@ int main() {
     //SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(Global.Width, Global.Height, "osus-revented");
     SetWindowMinSize(320, 240);
-    SetAudioStreamBufferSizeDefault(16);
+    SetAudioStreamBufferSizeDefault(256);
+
     SetTargetFPS(Global.FPS);
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");
@@ -95,6 +96,28 @@ int main() {
     initMouseTrail();
 
     while(!WindowShouldClose()){
+
+
+        if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
+ 		{
+ 			int display = GetCurrentMonitor();
+ 
+            if (IsWindowFullscreen())
+                SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
+            else
+                SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
+ 			ToggleFullscreen();
+            if(!IsWindowFullscreen())
+                SetWindowSize(640, 480); 
+
+ 		}
+
+
+
+
+
+
+
         GetScale();
         GetMouse();
         GetKeys();

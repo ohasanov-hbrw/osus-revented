@@ -423,8 +423,11 @@ void GameManager::run(){
     if (IsMusicStreamPlaying(backgroundMusic)){
         Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
         if(TimerLast != Time){
+			std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
             TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
             TimeLast = GetTime() * 1000.0;
+			Global.amogus2 = -(Time - TimerLast);
+
         }
         else{
             Time += GetTime() * 1000.0 - TimeLast;
@@ -446,9 +449,9 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = (float)Time / 1000.0f;
-	currentTime += Global.amogus2 / 1000.0f;
+	currentTime += Global.amogus2 / 2000.0f;
 	GameManager::update();
-	currentTime -= Global.amogus2 / 1000.0f;
+	currentTime -= Global.amogus2 / 2000.0f;
 	
 }
 
@@ -673,7 +676,28 @@ void GameManager::loadGame(std::string filename){
 	gameFile.p50Final = gameFile.p50 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p50Change;
 	//debug, just say what the name of the music file is and load it
 	//std::cout << (Global.Path + '/' + gameFile.configGeneral["AudioFilename"]) << std::endl;
-	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
+
+
+
+
+	//backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
+
+
+
+
+	FILE *music = fopen((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str(), "rb");
+	fseek(music, 0, SEEK_END);
+	musicSize = ftell(music);
+	fseek(music, 0, SEEK_SET);  /* same as rewind(f); */
+
+	musicData = (char *)malloc(musicSize + 1);
+	fread(musicData, musicSize, 1, music);
+	fclose(music);
+
+	musicData[musicSize] = 0;
+
+	backgroundMusic = LoadMusicStreamFromMemory(GetFileExtension((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str()), (const unsigned char *)musicData, musicSize);
+
 	score = 0;
 	clickCombo = 0;
     //TODO: these are not used right now, USE THEM
@@ -1355,6 +1379,22 @@ void GameManager::unloadGame(){
 	for(int i = 0; i < 10; i++){
 		UnloadTexture(numbers[i]);
 	}
+
+	/*for(int i = 0; i < SoundFiles.data.size(); i++){
+		if(SoundFiles.loaded[i]){
+			UnloadSound(SoundFiles.data[i]);
+		}
+	}*/
+
+	for(auto& pair : SoundFiles.data) {
+    	UnloadSound(pair.second);
+  	}
+
+	UnloadMusicStream(backgroundMusic);
+	free(musicData);
+
+	SoundFiles.data.clear();
+	SoundFiles.loaded.clear();
 	gameFile.hitObjects.clear();
 	objects.clear();
 	dead_objects.clear();

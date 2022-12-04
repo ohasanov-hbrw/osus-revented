@@ -407,7 +407,10 @@ void Slider::init(){
         maxX = std::max(maxX, renderPoints[i].x);
         maxY = std::max(maxY, renderPoints[i].y);
     }
-    sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+8)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+8)*Global.sliderTexSize);
+
+
+
+    sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize);
     SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
     BeginTextureMode(sliderTexture);
     BeginBlendMode(BLEND_ALPHA_PREMUL);
@@ -617,8 +620,8 @@ void Slider::render(){
         if(renderPoints.size() > 0){
             for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
                 if(i < renderPoints.size() and renderPoints[i].x >= -150 and renderPoints[i].x <= 790 and renderPoints[i].y >= -150 and renderPoints[i].y <= 630){
-                    DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4-minX)*Global.sliderTexSize,
-                    (sliderTexture.texture.height - (renderPoints[i].y+4-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
+                    DrawTextureEx(gm->sliderin, {(renderPoints[i].x+8-minX)*Global.sliderTexSize,
+                    (sliderTexture.texture.height - (renderPoints[i].y+8-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
                     last = std::max(i, 0);
                 }
 
@@ -628,8 +631,8 @@ void Slider::render(){
         EndTextureMode();
     }
 
-    float outlineSize = ((14.0f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
-    float outlineColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };     // Normalized RED color 
+    float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
+    float outlineColor[4] = { 0.9f, 0.9f, 0.9f, 0.9f };     // Normalized RED color 
     float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
     
     // Get shader locations
@@ -646,7 +649,7 @@ void Slider::render(){
     //BeginBlendMode(BLEND_ALPHA_PREMUL);
 
     BeginShaderMode(Global.shdrOutline);
-    DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade), gm->circlesize);
+    DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade), gm->circlesize);
     EndShaderMode();
 
     /*//EndBlendMode();
