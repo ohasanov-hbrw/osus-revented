@@ -210,7 +210,7 @@ void Slider::init(){
                 if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
                     std::vector<float> tValues;
                     currentResolution = 0;
-                    float tempResolution = data.lengths[curveIndex];
+                    float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
                     std::vector<Vector2> samples;
                     std::vector<int> indices;
                     std::vector<float> lengths;
@@ -241,9 +241,9 @@ void Slider::init(){
                         indices.push_back(j);
 
                     samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                    for(float s = 0; s < 1; s += 1.0f / tempResolution){
+                    for(float s = 0; s < 1; s += 1.0f / data.lengths[curveIndex]){
                         currentResolution++;
-                        if(currentResolution > tempResolution) break;
+                        if(currentResolution > data.lengths[curveIndex]) break;
                         if(s == 1){
                             renderPoints.push_back(samples[samples.size() - 1]);
                             continue;
@@ -620,9 +620,12 @@ void Slider::render(){
         if(renderPoints.size() > 0){
             for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
                 if(i < renderPoints.size() and renderPoints[i].x > -150 and renderPoints[i].x < 790 and renderPoints[i].y > -150 and renderPoints[i].y < 630){
-                    DrawTextureEx(gm->sliderin, {(renderPoints[i].x+8-minX)*Global.sliderTexSize,
-                    (sliderTexture.texture.height - (renderPoints[i].y+8-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
-                    last = std::max(i, 0);
+                    if(!renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150]){
+                        DrawTextureEx(gm->sliderin, {(renderPoints[i].x+8-minX)*Global.sliderTexSize,
+                        (sliderTexture.texture.height - (renderPoints[i].y+8-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
+                        last = std::max(i, 0);
+                        renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150] = true;
+                    }
                 }
 
             }
@@ -813,7 +816,8 @@ void Slider::dead_update(){
     if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000.0f){
         UnloadRenderTexture(sliderTexture);
         //UnloadShader(shdrOutline);
-
+        renderedLocations.clear();
+        renderPoints.clear();
         gm->destroyDeadHitObject(data.index);
     }
 }

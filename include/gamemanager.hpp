@@ -89,6 +89,8 @@ class GameManager{
 		double TimeLast = 0;
 		HitSound SoundFiles;
 
+		
+
 		char *musicData;
 		long musicSize;
 	private:

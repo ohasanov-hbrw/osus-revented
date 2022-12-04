@@ -1358,6 +1358,7 @@ void GameManager::loadGame(std::string filename){
 }
 
 void GameManager::unloadGame(){
+	currentComboIndex = 0;
 	UnloadTexture(hitCircleOverlay);
 	UnloadTexture(selectCircle);
 	UnloadTexture(hitCircle);
