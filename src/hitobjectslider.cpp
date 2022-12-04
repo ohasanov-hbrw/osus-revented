@@ -619,7 +619,7 @@ void Slider::render(){
         //BeginBlendMode(BLEND_ALPHA_PREMUL);
         if(renderPoints.size() > 0){
             for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
-                if(i < renderPoints.size() and renderPoints[i].x >= -150 and renderPoints[i].x <= 790 and renderPoints[i].y >= -150 and renderPoints[i].y <= 630){
+                if(i < renderPoints.size() and renderPoints[i].x > -150 and renderPoints[i].x < 790 and renderPoints[i].y > -150 and renderPoints[i].y < 630){
                     DrawTextureEx(gm->sliderin, {(renderPoints[i].x+8-minX)*Global.sliderTexSize,
                     (sliderTexture.texture.height - (renderPoints[i].y+8-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
                     last = std::max(i, 0);
@@ -811,8 +811,9 @@ void Slider::dead_render(){
 void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
     if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000.0f){
-        //UnloadRenderTexture(sliderTexture);
+        UnloadRenderTexture(sliderTexture);
         //UnloadShader(shdrOutline);
+
         gm->destroyDeadHitObject(data.index);
     }
 }
