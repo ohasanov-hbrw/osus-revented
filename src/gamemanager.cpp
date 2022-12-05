@@ -427,6 +427,7 @@ void GameManager::run(){
             TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
             TimeLast = GetTime() * 1000.0;
 			Global.amogus2 = -(Time - TimerLast);
+			Global.amogus2 = -(Time - TimerLast)/2.0f;
 
         }
         else{
