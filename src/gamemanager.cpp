@@ -426,8 +426,8 @@ void GameManager::run(){
 			std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
             TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
             TimeLast = GetTime() * 1000.0;
-			Global.amogus2 = -(Time - TimerLast);
-			Global.amogus2 = -(Time - TimerLast)/2.0f;
+			Global.amogus2 = -(Time - TimerLast)/1.5f;
+			//Global.amogus2 = 0;
 
         }
         else{
@@ -450,9 +450,9 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = (float)Time / 1000.0f;
-	currentTime += Global.amogus2 / 2000.0f;
+	currentTime += Global.amogus2 / 1000.0f;
 	GameManager::update();
-	currentTime -= Global.amogus2 / 2000.0f;
+	currentTime -= Global.amogus2 / 1000.0f;
 	
 }
 
