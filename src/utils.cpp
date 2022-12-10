@@ -220,6 +220,23 @@ void DrawSpinnerMeter(Texture2D tex, float per){
     DrawTexturePro(tex, Rectangle{0,0,tex.width, tex.height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,(480.0f-y)*(1.0f-per)+y/2.0f,640-x,(480.0f-y)*per}), Vector2{0,0}, 0, WHITE);
 }
+
+void DrawSpinnerBack(Texture2D tex, Color color){
+    float x = 0;
+    float y = 0;
+    float ratio = (float)tex.width / (float)tex.height;
+    float defaultRatio = 640.0f / 480.0f;
+    if(defaultRatio > ratio){
+        x = 640.0f - 480.0f * ratio;
+    }
+    else{
+        y = 480.0f - 640.0f / ratio;
+    }
+    Rectangle source = {0,0,tex.width, tex.height};
+    DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,y/2.0f,640-x,(480.0f-y)}), Vector2{0,0}, 0, color);
+}
+
+
 Vector2 getPointOnCircle(float x, float y, float radius, float angle){
     angle= (angle * M_PI) / 180;
     float xdiff = radius * cos(angle);

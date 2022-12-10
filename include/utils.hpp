@@ -60,6 +60,8 @@ void DrawTextureSlider(Texture2D, float, float, Color, float);
 
 void DrawSpinnerMeter(Texture2D, float);
 
+void DrawSpinnerBack(Texture2D, Color);
+
 //Clip a number between two other numbers
 float clip( float, float, float);
 //Interpolate more points in between two points

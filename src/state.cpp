@@ -196,6 +196,9 @@ void Game::init() {
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
     Global.startTime = -700.0f;
+    Global.errorSum = 0;
+    Global.errorLast = 0;
+    Global.errorDiv = 0;
     std::cout << "done init" << std::endl;
     float timer = 0;
     while(timer < 4.0f){
@@ -257,9 +260,16 @@ void Game::render() {
     Global.gameManager->render();
     if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
         DrawTextEx(Global.DefaultFont, TextFormat("Playing: %d/%.3f", (int)(Global.curTime2 * 1000000.0f), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("Compensation: %.3f ms", Global.amogus2), {ScaleCordX(5), ScaleCordY(55)}, Scale(10) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %ld us", Global.errorLast), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
+        
     }
-    else
+    else{
         DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+        if(Global.errorDiv != 0)
+            DrawTextEx(Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
+    }
 }
 
 void Game::unload(){

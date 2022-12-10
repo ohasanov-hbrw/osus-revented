@@ -77,8 +77,9 @@ struct Globals {
 
     float sliderTexSize = 2.0f;
 
-
-
+    long long errorSum = 0;
+    long long errorLast = 0;
+    long long errorDiv = 0;
 
 };
 

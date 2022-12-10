@@ -186,16 +186,25 @@ void GameManager::update(){
 						objects[i]->data.point = 1;
 						score+= 50 + (50 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
+						Global.errorDiv++;
+						Global.errorLast = (long long)((currentTime*1000.0f - objects[i]->data.time) * 1000.0f);
+						Global.errorSum += Global.errorLast;
 					}
 					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final){
 						objects[i]->data.point = 2;
 						score+= 100 + (100 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
+						Global.errorDiv++;
+						Global.errorLast = (long long)((currentTime*1000.0f - objects[i]->data.time) * 1000.0f);
+						Global.errorSum += Global.errorLast;
 					}
 					else{
 						objects[i]->data.point = 3;
 						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
+						Global.errorDiv++;
+						Global.errorLast = (long long)((currentTime*1000.0f - objects[i]->data.time) * 1000.0f);
+						Global.errorSum += Global.errorLast;
 					}
 					int volume = objects[i]->data.volume;
 					if(volume == 0){
@@ -380,14 +389,16 @@ void GameManager::run(){
 
 	if(Global.startTime < 0){
 		Global.amogus2 = 0;
+		Global.amogus3 = 0.0f;
 		Global.startTime += GetFrameTime() * 1000.0f;
 		Time = Global.startTime;
 		std::cout << Time << std::endl;
 	}
+
 	if(Global.startTime >= 0 and startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
-    	SetMusicVolume(backgroundMusic, 1.0f);
+    	SetMusicVolume(backgroundMusic, 0.4f);
 		SeekMusicStream(backgroundMusic, 0.0f);
 		UpdateMusicStream(backgroundMusic);
 		initTimer();
@@ -397,7 +408,8 @@ void GameManager::run(){
 		startMusic = false;
 		double Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 		double amog = getTimer();
-		Global.amogus2 = amog - Time;
+		Global.amogus2 = 0.0f;
+		Global.amogus3 = 0.0f;
 		std::cout << "time delay??? " << Global.amogus2 << std::endl;
 		std::cout << "Time:" << Time << std::endl;
 		std::cout << "amog?:" << amog << std::endl;
@@ -423,10 +435,13 @@ void GameManager::run(){
     if (IsMusicStreamPlaying(backgroundMusic)){
         Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
         if(TimerLast != Time){
-			std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
+			//std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
+
+			Global.amogus2 = (Time - TimerLast)/4.0f;
+			Global.amogus3 = Time - TimerLast;
+
             TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
             TimeLast = GetTime() * 1000.0;
-			Global.amogus2 = -(Time - TimerLast)/1.5f;
 			//Global.amogus2 = 0;
 
         }
@@ -450,6 +465,7 @@ void GameManager::run(){
 	}
 	//std::cout << Global.curTime2 <<std::endl;
 	currentTime = (float)Time / 1000.0f;
+
 	currentTime += Global.amogus2 / 1000.0f;
 	GameManager::update();
 	currentTime -= Global.amogus2 / 1000.0f;
@@ -782,6 +798,7 @@ void GameManager::loadGame(std::string filename){
 
 	bool temprenderSpinnerCircle = false;
 	bool temprenderSpinnerMetre = false;
+	bool temprenderSpinnerBack = false;
 
 	files.clear();
 	Global.Path = "resources/skin/";
@@ -833,6 +850,10 @@ void GameManager::loadGame(std::string filename){
 				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
 				temprenderSpinnerMetre = true;
 			}
+			else if(files[i].rfind("spinner-background", 0) == 0){
+				spinnerBack = LoadTexture((Global.Path + files[i]).c_str());
+				temprenderSpinnerBack = true;
+			}
 			else if(files[i].rfind("spinner-bottom", 0) == 0)
 				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
 			else if(files[i].rfind("spinner-top", 0) == 0)
@@ -847,13 +868,119 @@ void GameManager::loadGame(std::string filename){
 				}
 			}
 		}
+
+		
 	}
+
+
+	Global.Path = lastPath + '/';
+	files = ls(".png");
+
+	std::sort(files.begin(), files.end(), []
+    (const std::string& first, const std::string& second){
+        return first.size() < second.size();
+    });
+	std::reverse(files.begin(), files.end());
+
+	if(!IsKeyDown(KEY_S)){
+		temprenderSpinnerCircle = false;
+		temprenderSpinnerMetre = false;
+		temprenderSpinnerBack = false;
+		for(int i = 0; i < files.size(); i++){
+			if(IsFileExtension(files[i].c_str(),".png")){
+				if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
+					hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("hitcircleselect.png", 0) == 0)
+					selectCircle = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("hitcircle", 0) == 0)
+					hitCircle = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("approachcircle", 0) == 0)
+					approachCircle = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("hit300k", 0) == 0)
+					;
+				else if(files[i].rfind("hit300", 0) == 0)
+					hit300 = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("hit100k", 0) == 0)
+					;
+				else if(files[i].rfind("hit100", 0) == 0)
+					hit100 = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("hit50k", 0) == 0)
+					;
+				else if(files[i].rfind("hit50", 0) == 0)
+					hit50 = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("hit0", 0) == 0)
+					hit0 = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("sliderscorepoint", 0) == 0)
+					sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("sliderfollowcircle", 0) == 0)
+					sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("sliderb0", 0) == 0)
+					sliderb = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("reversearrow", 0) == 0)
+					reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("spinner-circle", 0) == 0){
+					spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
+					renderSpinnerCircle = true;
+				}
+				else if(files[i].rfind("spinner-metre", 0) == 0){
+					spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
+					renderSpinnerMetre = true;
+				}
+				else if(files[i].rfind("spinner-background", 0) == 0){
+					spinnerBack = LoadTexture((Global.Path + files[i]).c_str());
+					temprenderSpinnerBack = true;
+				}
+				else if(files[i].rfind("spinner-bottom", 0) == 0)
+					spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("spinner-top", 0) == 0)
+					spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
+				else if(files[i].rfind("spinner-approachcircle", 0) == 0)
+					spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
+				else{
+					for(int j = 0; j < 10; j++){
+						if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
+							numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+
+
 	if(temprenderSpinnerCircle == true){
 		renderSpinnerCircle = true;
+		std::cout << "================================== RENDERING THE SPINNER CIRCLE ==================================\n";
+	}
+	else{
+		renderSpinnerCircle = false;
 	}
 	if(temprenderSpinnerMetre == true){
 		renderSpinnerMetre = true;
+		std::cout << "=================================== RENDERING THE SPINNER METRE ==================================\n";
 	}
+	else{
+		renderSpinnerMetre = false;
+	}
+	if(temprenderSpinnerBack == true){
+		renderSpinnerBack = true;
+		std::cout << "================================ RENDERING THE SPINNER BACKGROUND ================================\n";
+	}
+	else{
+		renderSpinnerBack = false;
+	}
+
+
+
+
+	
+
+
+
+
+
 
 	files.clear();
 	Global.Path = "resources/skin/";

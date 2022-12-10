@@ -27,6 +27,7 @@ class GameManager{
 		int skip = 3;
 		bool renderSpinnerCircle = false;
 		bool renderSpinnerMetre = false;
+		bool renderSpinnerBack = false;
 		Texture2D hitCircle;
 		Texture2D hitCircleOverlay;
 		Texture2D approachCircle;
@@ -48,6 +49,7 @@ class GameManager{
 		Texture2D spinnerCircle;
 		Texture2D spinnerApproachCircle;
 		Texture2D spinnerMetre;
+		Texture2D spinnerBack;
 		Music backgroundMusic;
 		double currentTime;
 		double currentTimeTemp = -1;

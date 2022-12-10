@@ -112,18 +112,25 @@ void Spinner::update(){
     }
 }
 
-//renders the Circle
+//renders the Spinner
 void Spinner::render(){
     GameManager* gm = GameManager::getInstance();
     float clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
     Color spinnerColor = WHITE;
-    if(!(data.touch and gm->currentTime*1000.0f > data.time))
+    if(!(data.touch and gm->currentTime*1000.0f > data.time)){
         spinnerColor = BLACK;
+        clampedFade /= 2.0f;
+    }
+    if(gm->renderSpinnerBack){
+        DrawSpinnerBack(gm->spinnerBack, Fade(WHITE, clampedFade / 2.0f));
+    }
     if(gm->renderSpinnerMetre)
         DrawSpinnerMeter(gm->spinnerMetre,totalAngle/neededAngle);
+    
     DrawTextureRotate(gm->spinnerBottom, data.x, data.y, (310.0f/gm->spinnerBottom.width), 0, Fade(spinnerColor, clampedFade));
     DrawTextureRotate(gm->spinnerTop, data.x, data.y, (310.0f/gm->spinnerTop.width), renderAngle, Fade(spinnerColor, clampedFade));
+    
     if(gm->renderSpinnerCircle)
         DrawTextureRotate(gm->spinnerCircle, data.x, data.y, (310.0f/gm->spinnerCircle.width), renderAngle, Fade(spinnerColor, clampedFade));
     if(extra > 1){
