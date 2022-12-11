@@ -11,6 +11,7 @@
 #include "globals.hpp"
 #include "utils.hpp"
 #include "fs.hpp"
+#include <sys/time.h>
 
 //for some reason the clamp function didnt work so here is a manual one
 float GameManager::clip(float value, float min, float max){
@@ -385,6 +386,9 @@ void GameManager::render(){
 void GameManager::run(){
 	//start playing the music and set the volume, it gets quite loud
 	double Time = 0;
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 
 
 	if(Global.startTime < 0){
@@ -404,8 +408,9 @@ void GameManager::run(){
 		initTimer();
 		std::cout << "started music" << std::endl;
 		std::cout << "first update" << std::endl;
-		TimeLast = GetTime() * 1000.0;
+		TimeLast = ms;
 		startMusic = false;
+		Global.startTime2 = ms;
 		double Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 		double amog = getTimer();
 		Global.amogus2 = 0.0f;
@@ -441,16 +446,20 @@ void GameManager::run(){
 			Global.amogus3 = Time - TimerLast;
 
             TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
-            TimeLast = GetTime() * 1000.0;
+            TimeLast = ms;
 			//Global.amogus2 = 0;
+
 
         }
         else{
-            Time += GetTime() * 1000.0 - TimeLast;
+            Time += ms - TimeLast;
         }
+
+
+		//Time = (double)(ms - Global.startTime2);
     }
     else{
-        TimeLast = GetTime() * 1000.0;
+        TimeLast = ms;
     }
 
 	Global.curTime = Time;
@@ -464,9 +473,10 @@ void GameManager::run(){
 		}
 	}
 	//std::cout << Global.curTime2 <<std::endl;
-	currentTime = (float)Time / 1000.0f;
+	currentTime = (double)Time / 1000.0f;
 
 	currentTime += Global.amogus2 / 1000.0f;
+	//currentTime = Time / 1000.0f;
 	GameManager::update();
 	currentTime -= Global.amogus2 / 1000.0f;
 	

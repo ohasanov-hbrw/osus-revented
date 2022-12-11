@@ -31,6 +31,7 @@ struct Globals {
     struct timespec ts1 = timespec{0,0}, ts2 = timespec{0,0};
     bool paused = false;
 
+    long int startTime2;
     double curTime = 0;
     double startTime = -1;
     double curTime2 = 0;
