@@ -17,7 +17,7 @@ class Slider : public HitObject{
         double position = 0;
         bool repeat = false;
         bool repeat2 = false;
-        int calPos;
+        int calPos = 0;
         int curRepeat = 0;
         Vector2 extraPosition;
         bool earlyhit = false;

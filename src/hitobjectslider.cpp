@@ -523,13 +523,17 @@ void Slider::update(){
         inSlider = false;
     }
 
+    //DEBUG
+
+    inSlider = true;
+    bool debugf = true;
+
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
     if(gm->currentTime*1000.0f > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
-        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize) && (Global.Key1D || Global.Key2D)){
+        if(inSlider && (Global.Key1D || Global.Key2D || debugf)){
             is_hit_at_end = true;
         }
     }
-    
     if(gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
         
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
@@ -688,7 +692,7 @@ void Slider::render(){
         angle = angle * 180 / PI + 180;
     }
     if(repeat && !(clampedBigFade < 0.7f))
-        DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/gm->reverseArrow.width)*0.5f, angle, Fade(WHITE, clampedFade));
+        DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/128.0f), angle, Fade(WHITE, clampedFade));
     
     index = renderPoints.size()-1;
     topla = -1;
@@ -706,7 +710,7 @@ void Slider::render(){
     else
         renderColor =  Fade(Color{255,255,255}, clampedFade);
     if(repeat2 && position > 0 && !(clampedBigFade < 0.7f))
-        DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/gm->reverseArrow.width)*0.5f, angle, Fade(WHITE, clampedFade));
+        DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/128.0f), angle, Fade(WHITE, clampedFade));
 
     if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
         if(calPos == 0){

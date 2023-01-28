@@ -179,11 +179,11 @@ void GameManager::update(){
 			if (objects[i]->data.type != 2){
 
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
-					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
+					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 0;
 						clickCombo = 0;
 					}
-					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final){
+					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 1;
 						score+= 50 + (50 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
@@ -191,7 +191,7 @@ void GameManager::update(){
 						Global.errorLast = (long long)((currentTime*1000.0f - objects[i]->data.time) * 1000.0f);
 						Global.errorSum += Global.errorLast;
 					}
-					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final){
+					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 2;
 						score+= 100 + (100 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
@@ -241,7 +241,7 @@ void GameManager::update(){
 			else if (objects[i]->data.type == 2){
 				if(Slider* tempslider = dynamic_cast<Slider*>(objects[i])){
 					if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
-						if(std::abs(currentTime*1000.0f - tempslider->data.time) > gameFile.p50Final){
+						if(std::abs(currentTime*1000.0f - tempslider->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 							tempslider->is_hit_at_first = true;
 							stop = false;
 							tempslider->earlyhit = true;
@@ -283,8 +283,9 @@ void GameManager::update(){
 			}
 		}
 		else{
-			bool debugf = false;
+			bool debugf = true;
 			if(debugf){
+				objects[i]->update();
 				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
 				}
 				else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final){
@@ -312,6 +313,9 @@ void GameManager::update(){
 							PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
 						}
 						objects[i]->data.time = currentTime*1000.0f;
+						destroyHitObject(i);
+						newSize = objects.size();
+						i--;
 						stop = false;
 					}
 					else if (objects[i]->data.type == 2){
@@ -329,29 +333,27 @@ void GameManager::update(){
 						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
 						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
 						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+						objects[i]->data.index = i;
+						objects[i]->update();
+						newSize = objects.size();
+						if(newSize != oldSize){
+							i--;
+							oldSize = newSize;
+						}
 					}
 				}
 			}
-			objects[i]->data.index = i;
-			objects[i]->update();
-			newSize = objects.size();
-			if(newSize != oldSize){
-				i--;
-				oldSize = newSize;
+			else{
+				objects[i]->data.index = i;
+				objects[i]->update();
+				newSize = objects.size();
+				if(newSize != oldSize){
+					i--;
+					oldSize = newSize;
+				}
 			}
 		}
-		//}
-		/*else{
-			objects[i]->data.index = i;
-			objects[i]->update();
-			newSize = objects.size();
-			if(newSize != oldSize){
-				i--;
-				oldSize = newSize;
-			}
-		}*/
 	}
-	//also update the dead objects
 	for(size_t i = 0; i < dead_objects.size(); i++){
 		dead_objects[i]->data.index = i;
 		dead_objects[i]->dead_update();
@@ -442,7 +444,7 @@ void GameManager::run(){
         if(TimerLast != Time){
 			//std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
 
-			Global.amogus2 = (Time - TimerLast)/4.0f;
+			Global.amogus2 = (Time - TimerLast)/1.5f;
 			Global.amogus3 = Time - TimerLast;
 
             TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
@@ -1139,22 +1141,25 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
+			
 			for(int i = 0; i < skinSounds.size(); i++){
 				if(skinSounds[i] == tempNoIndex){
 					SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
-			for(int i = 0; i < beatmapSounds.size(); i++){
-				if(beatmapSounds[i] == temp){
-					SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-					SoundFiles.loaded[temp].value = true;
+			if(!IsKeyDown(KEY_D)){
+				for(int i = 0; i < beatmapSounds.size(); i++){
+					if(beatmapSounds[i] == temp){
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
 				}
-			}
-			for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-				if(beatmapSoundsOgg[i] == tempogg){
-					SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-					SoundFiles.loaded[temp].value = true;
+				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+					if(beatmapSoundsOgg[i] == tempogg){
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
 				}
 			}
 			if(SoundFiles.loaded[temp].value == true){
@@ -1201,16 +1206,18 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
-			for(int i = 0; i < beatmapSounds.size(); i++){
-				if(beatmapSounds[i] == temp){
-					SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-					SoundFiles.loaded[temp].value = true;
+			if(!IsKeyDown(KEY_D)){
+				for(int i = 0; i < beatmapSounds.size(); i++){
+					if(beatmapSounds[i] == temp){
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
 				}
-			}
-			for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-				if(beatmapSoundsOgg[i] == tempogg){
-					SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-					SoundFiles.loaded[temp].value = true;
+				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+					if(beatmapSoundsOgg[i] == tempogg){
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
+					}
 				}
 			}
 			if(SoundFiles.loaded[temp].value == true){
@@ -1226,16 +1233,18 @@ void GameManager::loadGame(std::string filename){
 		if(gameFile.hitObjects[HitObjectIndex].PlayCustom == true){
 			temp = gameFile.hitObjects[HitObjectIndex].CustomSound;
 			if(SoundFiles.loaded[temp].value == false){
-				for(int i = 0; i < beatmapSounds.size(); i++){
-					if(beatmapSounds[i] == temp){
-						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
+				if(!IsKeyDown(KEY_F)){
+					for(int i = 0; i < beatmapSounds.size(); i++){
+						if(beatmapSounds[i] == temp){
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
+						}
 					}
-				}
-				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-					if(beatmapSoundsOgg[i] == temp){
-						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
+					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+						if(beatmapSoundsOgg[i] == temp){
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
+						}
 					}
 				}
 				if(SoundFiles.loaded[temp].value == true){
@@ -1274,16 +1283,18 @@ void GameManager::loadGame(std::string filename){
 						SoundFiles.loaded[temp].value = true;
 					}
 				}
-				for(int i = 0; i < beatmapSounds.size(); i++){
-					if(beatmapSounds[i] == temp){
-						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
+				if(!IsKeyDown(KEY_D)){
+					for(int i = 0; i < beatmapSounds.size(); i++){
+						if(beatmapSounds[i] == temp){
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
+						}
 					}
-				}
-				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-					if(beatmapSoundsOgg[i] == tempogg){
-						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
+					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+						if(beatmapSoundsOgg[i] == tempogg){
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
+						}
 					}
 				}
 				if(SoundFiles.loaded[temp].value == true){
@@ -1363,16 +1374,18 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
-					for(int i = 0; i < beatmapSounds.size(); i++){
-						if(beatmapSounds[i] == temp){
-							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
+					if(!IsKeyDown(KEY_D)){
+						for(int i = 0; i < beatmapSounds.size(); i++){
+							if(beatmapSounds[i] == temp){
+								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+								SoundFiles.loaded[temp].value = true;
+							}
 						}
-					}
-					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-						if(beatmapSoundsOgg[i] == tempogg){
-							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
+						for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+							if(beatmapSoundsOgg[i] == tempogg){
+								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+								SoundFiles.loaded[temp].value = true;
+							}
 						}
 					}
 					if(SoundFiles.loaded[temp].value == true){
@@ -1419,16 +1432,18 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
-					for(int i = 0; i < beatmapSounds.size(); i++){
-						if(beatmapSounds[i] == temp){
-							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
+					if(!IsKeyDown(KEY_D)){
+						for(int i = 0; i < beatmapSounds.size(); i++){
+							if(beatmapSounds[i] == temp){
+								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+								SoundFiles.loaded[temp].value = true;
+							}
 						}
-					}
-					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-						if(beatmapSoundsOgg[i] == tempogg){
-							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
+						for(int i = 0; i < beatmapSoundsOgg.size(); i++){
+							if(beatmapSoundsOgg[i] == tempogg){
+								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+								SoundFiles.loaded[temp].value = true;
+							}
 						}
 					}
 					if(SoundFiles.loaded[temp].value == true){
