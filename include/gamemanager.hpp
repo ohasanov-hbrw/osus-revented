@@ -12,6 +12,12 @@ struct HitSound {
 	std::map<std::string, dbool> loaded;
 };
 
+struct Background {
+    std::map<std::string, Texture2D> data;
+	std::map<std::string, Vector2> pos;
+	std::map<std::string, dbool> loaded;
+};
+
 class GameManager{
 	public:
 		static GameManager* getInstance();
@@ -91,6 +97,8 @@ class GameManager{
 		double TimeLast = 0;
 		HitSound SoundFiles;
 
+		Background backgroundTextures;
+		std::string currentBackgroundTexture = "";
 		
 
 		char *musicData;

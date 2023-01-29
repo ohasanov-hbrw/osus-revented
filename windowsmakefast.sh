@@ -1,1 +1,1 @@
-make run CC="x86_64-w64-mingw32-g++ --static -DGRAPHICS_API_OPENGL_33" name="osus.exe" ldflags="-lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -lwinmm -lgdi32 -lopengl32" -j12
+make run CC="x86_64-w64-mingw32-g++ --static -DGRAPHICS_API_OPENGL_33 -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG" name="osus.exe" ldflags="-lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -lwinmm -lgdi32 -lopengl32" -j12

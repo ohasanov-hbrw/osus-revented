@@ -98,7 +98,7 @@ int main() {
     while(!WindowShouldClose()){
 
 
-        if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
+        if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
  		{
  			int display = GetCurrentMonitor();
  
@@ -107,14 +107,10 @@ int main() {
             else
                 SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
  			ToggleFullscreen();
+            SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
             if(!IsWindowFullscreen())
                 SetWindowSize(640, 480); 
-
  		}
-
-
-
-
 
 
 
