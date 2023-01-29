@@ -22,7 +22,7 @@ deps:
 	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make -j12
 run: $(name)
 	mkdir -p beatmaps
-	bin/$(name)
+	bin/$(name) 
 
 $(name): $(objects)
 	$(CC) -o bin/$(name) $^ $(ldflags)

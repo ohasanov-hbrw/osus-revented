@@ -1,0 +1,87 @@
+# SCsub
+
+Import("env")
+import methods
+
+sources = [
+    "register_types.cpp",
+    "shinobu.cpp",
+    "shinobu_sound_player.cpp",
+    "shinobu_sound_source.cpp",
+    "shinobu_effects.cpp",
+    "shinobu_group.cpp",
+]
+
+module_env = env.Clone()
+module_env.Append(CPPDEFINES=["SHINOBU_DEBUG"])
+
+if methods.using_gcc(env) or methods.using_clang(env):
+    module_env.Append(CCFLAGS=["-Wno-null-conversion"])
+    module_env.Append(CCFLAGS=["-Wno-sign-compare"])
+    module_env.Append(CCFLAGS=["-Wno-unused-but-set-variable"])
+
+thirdparty_obj = []
+
+if env["builtin_libvorbis"]:
+    thirdparty_dir = "#thirdparty/libvorbis/"
+    module_env.Prepend(CPPPATH=[thirdparty_dir])
+
+    if ARGUMENTS.get("shinobu_shared", "no") == "yes":
+        thirdparty_sources = [
+            # "analysis.c",
+            # "barkmel.c",
+            "bitrate.c",
+            "block.c",
+            "codebook.c",
+            "envelope.c",
+            "floor0.c",
+            "floor1.c",
+            "info.c",
+            "lookup.c",
+            "lpc.c",
+            "lsp.c",
+            "mapping0.c",
+            "mdct.c",
+            "psy.c",
+            # "psytune.c",
+            "registry.c",
+            "res0.c",
+            "sharedbook.c",
+            "smallft.c",
+            "synthesis.c",
+            # "tone.c",
+            # "vorbisenc.c",
+            "vorbisfile.c",
+            "window.c",
+        ]
+        thirdparty_sources = [thirdparty_dir + file for file in thirdparty_sources]
+
+        # env_thirdparty = module_env.Clone()
+        # env_thirdparty.add_source_files(thirdparty_obj, thirdparty_sources)
+        sources += thirdparty_sources
+
+if env["builtin_libogg"]:
+    thirdparty_dir = "#thirdparty/libogg/"
+    module_env.Prepend(CPPPATH=[thirdparty_dir])
+
+    if ARGUMENTS.get("shinobu_shared", "no") == "yes":
+        thirdparty_sources = [
+            "bitwise.c",
+            "framing.c",
+        ]
+        thirdparty_sources = [thirdparty_dir + file for file in thirdparty_sources]
+
+        sources += thirdparty_sources
+
+
+if ARGUMENTS.get("shinobu_shared", "no") == "yes":
+    # Shared lib compilation
+    module_env.Append(CCFLAGS=["-fPIC"])
+    module_env["LIBS"] = []
+    shared_lib = module_env.SharedLibrary(target="#bin/shinobu", source=sources)
+    shared_lib_shim = shared_lib[0].name.rsplit(".", 1)[0]
+    env.Append(LIBS=[shared_lib_shim])
+    env.Append(LIBPATH=["#bin"])
+else:
+    # Static compilation
+    module_env.add_source_files(env.modules_sources, sources)
