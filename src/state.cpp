@@ -243,7 +243,7 @@ void Game::update() {
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
     }
-    if(IsKeyPressed(KEY_SPACE)){
+    /*if(IsKeyPressed(KEY_SPACE)){
         if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
             PauseMusicStream(Global.gameManager->backgroundMusic);
             pauseTimer();
@@ -253,7 +253,7 @@ void Game::update() {
             resumeTimer();
         }
         
-    }
+    }*/
 }
 void Game::render() {
     Global.enableMouse = false;

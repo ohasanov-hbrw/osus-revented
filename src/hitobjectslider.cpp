@@ -525,8 +525,8 @@ void Slider::update(){
 
     //DEBUG
 
-    inSlider = true;
-    bool debugf = true;
+    //inSlider = true;
+    bool debugf = false;
 
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
     if(gm->currentTime*1000.0f > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
@@ -730,7 +730,7 @@ void Slider::render(){
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){
                 if(tickclicked[i] == -1){
-                    if(inSlider || debugf){
+                    if((inSlider && (Global.Key1D || Global.Key2D)) || debugf){
                         tickclicked[i] = 1;
                         ticknumber++;
                         gm->clickCombo++;

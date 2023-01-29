@@ -212,15 +212,15 @@ void GameManager::update(){
 						objects[i]->data.volume = objects[i]->data.timing.volume;
 						volume = objects[i]->data.volume;
 					}
-					//SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
-					//PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
+					SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
+					PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
 					if(objects[i]->data.PlayAddition){
-						//SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
-						//PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
+						PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
 					}
 					if(objects[i]->data.PlayCustom){
-						//SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
-						//PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
+						PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
 					}
 					objects[i]->data.time = currentTime*1000.0f;
 					destroyHitObject(i);
@@ -257,10 +257,14 @@ void GameManager::update(){
 							tempslider->data.volume = tempslider->data.timing.volume;
 							volume = tempslider->data.volume;
 						}
-						//SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
-						//SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
-						//PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
-						//PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+						if(tempslider->data.PlayCustom){
+							SetSoundVolume(SoundFiles.data[tempslider->data.CustomSound], (float)volume/100.0f);
+							PlaySound(SoundFiles.data[tempslider->data.CustomSound]);
+						}
 					}
 				}
 				//this cursed else train is nothing to worry about...
@@ -283,7 +287,7 @@ void GameManager::update(){
 			}
 		}
 		else{
-			bool debugf = true;
+			bool debugf = false;
 			if(debugf){
 				objects[i]->update();
 				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
@@ -302,15 +306,15 @@ void GameManager::update(){
 							objects[i]->data.volume = objects[i]->data.timing.volume;
 							volume = objects[i]->data.volume;
 						}
-						//SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
-						//PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
+						PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
 						if(objects[i]->data.PlayAddition){
-							//SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
-							//PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
+							SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
+							PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
 						}
 						if(objects[i]->data.PlayCustom){
-							//SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
-							//PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
+							SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
+							PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
 						}
 						objects[i]->data.time = currentTime*1000.0f;
 						destroyHitObject(i);
@@ -329,10 +333,14 @@ void GameManager::update(){
 							tempslider->data.volume = tempslider->data.timing.volume;
 							volume = tempslider->data.volume;
 						}
-						//SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
-						//SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
-						//PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
-						//PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
+						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
+						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+						if(tempslider->data.PlayCustom){
+							SetSoundVolume(SoundFiles.data[tempslider->data.CustomSound], (float)volume/100.0f);
+							PlaySound(SoundFiles.data[tempslider->data.CustomSound]);
+						}
 						objects[i]->data.index = i;
 						objects[i]->update();
 						newSize = objects.size();
@@ -400,7 +408,7 @@ void GameManager::run(){
 		Time = Global.startTime;
 		//std::cout << Time << std::endl;
 	}
-	/*
+
 	if(Global.startTime >= 0 and startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
@@ -475,13 +483,13 @@ void GameManager::run(){
 		}
 	}
 	//std::cout << Global.curTime2 <<std::endl;
-	*/
-	//currentTime = (double)Time / 1000.0f;
+	currentTime = (double)Time / 1000.0f;
 
-	//currentTime += Global.amogus2 / 1000.0f;
+	currentTime += Global.amogus2 / 1000.0f;
 	//currentTime = Time / 1000.0f;
 	GameManager::update();
-	//currentTime -= Global.amogus2 / 1000.0f;
+	currentTime -= Global.amogus2 / 1000.0f;
+	
 }
 
 std::pair<Vector2, int> get2PerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
@@ -725,7 +733,7 @@ void GameManager::loadGame(std::string filename){
 
 	musicData[musicSize] = 0;
 
-	//backgroundMusic = LoadMusicStreamFromMemory(GetFileExtension((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str()), (const unsigned char *)musicData, musicSize);
+	backgroundMusic = LoadMusicStreamFromMemory(GetFileExtension((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str()), (const unsigned char *)musicData, musicSize);
 
 	score = 0;
 	clickCombo = 0;
@@ -737,7 +745,7 @@ void GameManager::loadGame(std::string filename){
 	//std::cout << circlesize << std::endl;
 	float overalldifficulty = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
 	//more difficulty stuff, may also be wrong
-	//difficultyMultiplier = ((hpdrainrate + circlesize + overalldifficulty + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
+	difficultyMultiplier = ((hpdrainrate + circlesize + overalldifficulty + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
 	if (gameFile.configDifficulty.find("SliderMultiplier") != gameFile.configDifficulty.end())
 		sliderSpeed = std::stof(gameFile.configDifficulty["SliderMultiplier"]);
 
@@ -1137,35 +1145,35 @@ void GameManager::loadGame(std::string filename){
 		if(SoundFiles.loaded[temp].value == false){
 			for(int i = 0; i < defaultSounds.size(); i++){
 				if(defaultSounds[i] == tempNoIndex){
-					//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-					//SoundFiles.loaded[temp].value = true;
+					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
+					SoundFiles.loaded[temp].value = true;
 				}
 			}
 			
 			for(int i = 0; i < skinSounds.size(); i++){
 				if(skinSounds[i] == tempNoIndex){
-					//SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-					//SoundFiles.loaded[temp].value = true;
+					SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
+					SoundFiles.loaded[temp].value = true;
 				}
 			}
 			if(!IsKeyDown(KEY_D)){
 				for(int i = 0; i < beatmapSounds.size(); i++){
 					if(beatmapSounds[i] == temp){
-						//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-						//SoundFiles.loaded[temp].value = true;
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
 					}
 				}
 				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
 					if(beatmapSoundsOgg[i] == tempogg){
-						//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-						//SoundFiles.loaded[temp].value = true;
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
 					}
 				}
 			}
 			if(SoundFiles.loaded[temp].value == true){
 				std::cout << "loaded "  << temp << std::endl;
 				if(SoundFiles.data[temp].frameCount == 0){
-					//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
 				}
 				std::cout << SoundFiles.data[temp].frameCount << std::endl;
 			}
@@ -1196,34 +1204,34 @@ void GameManager::loadGame(std::string filename){
 		if(SoundFiles.loaded[temp].value == false){
 			for(int i = 0; i < defaultSounds.size(); i++){
 				if(defaultSounds[i] == tempNoIndex){
-					//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-					//SoundFiles.loaded[temp].value = true;
+					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
+					SoundFiles.loaded[temp].value = true;
 				}
 			}
 			for(int i = 0; i < skinSounds.size(); i++){
 				if(skinSounds[i] == tempNoIndex){
-					//SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-					//SoundFiles.loaded[temp].value = true;
+					SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
+					SoundFiles.loaded[temp].value = true;
 				}
 			}
 			if(!IsKeyDown(KEY_D)){
 				for(int i = 0; i < beatmapSounds.size(); i++){
 					if(beatmapSounds[i] == temp){
-						//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-						//SoundFiles.loaded[temp].value = true;
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
 					}
 				}
 				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
 					if(beatmapSoundsOgg[i] == tempogg){
-						//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-						//SoundFiles.loaded[temp].value = true;
+						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
 					}
 				}
 			}
 			if(SoundFiles.loaded[temp].value == true){
 				std::cout << "loaded "  << temp << std::endl;
 				if(SoundFiles.data[temp].frameCount == 0){
-					//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
 				}
 				std::cout << SoundFiles.data[temp].frameCount << std::endl;
 			}
@@ -1236,21 +1244,21 @@ void GameManager::loadGame(std::string filename){
 				if(!IsKeyDown(KEY_F)){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
-							//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-							//SoundFiles.loaded[temp].value = true;
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
 						}
 					}
 					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
 						if(beatmapSoundsOgg[i] == temp){
-							//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-							//SoundFiles.loaded[temp].value = true;
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
 						}
 					}
 				}
 				if(SoundFiles.loaded[temp].value == true){
 					std::cout << "loaded "  << temp << std::endl;
 					if(SoundFiles.data[temp].frameCount == 0){
-						//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
 					}
 					std::cout << SoundFiles.data[temp].frameCount << std::endl;
 				}
@@ -1273,34 +1281,34 @@ void GameManager::loadGame(std::string filename){
 			if(SoundFiles.loaded[temp].value == false){
 				for(int i = 0; i < defaultSounds.size(); i++){
 					if(defaultSounds[i] == tempNoIndex){
-						//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-						//SoundFiles.loaded[temp].value = true;
+						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
 					}
 				}
 				for(int i = 0; i < skinSounds.size(); i++){
 					if(skinSounds[i] == tempNoIndex){
-						//SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-						//SoundFiles.loaded[temp].value = true;
+						SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
+						SoundFiles.loaded[temp].value = true;
 					}
 				}
 				if(!IsKeyDown(KEY_D)){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
-							//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-							//SoundFiles.loaded[temp].value = true;
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
 						}
 					}
 					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
 						if(beatmapSoundsOgg[i] == tempogg){
-							//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-							//SoundFiles.loaded[temp].value = true;
+							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
 						}
 					}
 				}
 				if(SoundFiles.loaded[temp].value == true){
 					std::cout << "loaded "  << temp << std::endl;
 					if(SoundFiles.data[temp].frameCount == 0){
-						//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
 					}
 					std::cout << SoundFiles.data[temp].frameCount << std::endl;
 				}
@@ -1364,34 +1372,34 @@ void GameManager::loadGame(std::string filename){
 				if(SoundFiles.loaded[temp].value == false){
 					for(int i = 0; i < defaultSounds.size(); i++){
 						if(defaultSounds[i] == tempNoIndex){
-							//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-							//SoundFiles.loaded[temp].value = true;
+							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
 						}
 					}
 					for(int i = 0; i < skinSounds.size(); i++){
 						if(skinSounds[i] == tempNoIndex){
-							//SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-							//SoundFiles.loaded[temp].value = true;
+							SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
 						}
 					}
 					if(!IsKeyDown(KEY_D)){
 						for(int i = 0; i < beatmapSounds.size(); i++){
 							if(beatmapSounds[i] == temp){
-								//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-								//SoundFiles.loaded[temp].value = true;
+								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+								SoundFiles.loaded[temp].value = true;
 							}
 						}
 						for(int i = 0; i < beatmapSoundsOgg.size(); i++){
 							if(beatmapSoundsOgg[i] == tempogg){
-								//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-								//SoundFiles.loaded[temp].value = true;
+								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+								SoundFiles.loaded[temp].value = true;
 							}
 						}
 					}
 					if(SoundFiles.loaded[temp].value == true){
 						std::cout << "loaded "  << temp << std::endl;
 						if(SoundFiles.data[temp].frameCount == 0){
-							//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
 						}
 						std::cout << SoundFiles.data[temp].frameCount << std::endl;
 					}
@@ -1422,34 +1430,34 @@ void GameManager::loadGame(std::string filename){
 				if(SoundFiles.loaded[temp].value == false){
 					for(int i = 0; i < defaultSounds.size(); i++){
 						if(defaultSounds[i] == tempNoIndex){
-							//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-							//SoundFiles.loaded[temp].value = true;
+							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
 						}
 					}
 					for(int i = 0; i < skinSounds.size(); i++){
 						if(skinSounds[i] == tempNoIndex){
-							//SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-							//SoundFiles.loaded[temp].value = true;
+							SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
+							SoundFiles.loaded[temp].value = true;
 						}
 					}
 					if(!IsKeyDown(KEY_D)){
 						for(int i = 0; i < beatmapSounds.size(); i++){
 							if(beatmapSounds[i] == temp){
-								//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-								//SoundFiles.loaded[temp].value = true;
+								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
+								SoundFiles.loaded[temp].value = true;
 							}
 						}
 						for(int i = 0; i < beatmapSoundsOgg.size(); i++){
 							if(beatmapSoundsOgg[i] == tempogg){
-								//SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-								//SoundFiles.loaded[temp].value = true;
+								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
+								SoundFiles.loaded[temp].value = true;
 							}
 						}
 					}
 					if(SoundFiles.loaded[temp].value == true){
 						std::cout << "loaded "  << temp << std::endl;
 						if(SoundFiles.data[temp].frameCount == 0){
-							//SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
+							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
 						}
 						std::cout << SoundFiles.data[temp].frameCount << std::endl;
 					}
@@ -1541,10 +1549,10 @@ void GameManager::unloadGame(){
 	}*/
 
 	for(auto& pair : SoundFiles.data) {
-    	//UnloadSound(pair.second);
+    	UnloadSound(pair.second);
   	}
 
-	//UnloadMusicStream(backgroundMusic);
+	UnloadMusicStream(backgroundMusic);
 	free(musicData);
 
 	SoundFiles.data.clear();
