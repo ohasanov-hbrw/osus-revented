@@ -398,7 +398,7 @@ void GameManager::run(){
 		Global.amogus3 = 0.0f;
 		Global.startTime += GetFrameTime() * 1000.0f;
 		Time = Global.startTime;
-		std::cout << Time << std::endl;
+		//std::cout << Time << std::endl;
 	}
 
 	if(Global.startTime >= 0 and startMusic){
