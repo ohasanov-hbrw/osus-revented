@@ -421,6 +421,10 @@ void GameManager::render(){
 	DrawCNumbersCenter(score, 320, 10, 0.4f, GREEN);
 	DrawCNumbersCenter(clickCombo, 320, 25, 0.4f, GREEN);
 	DrawCNumbersCenter(clickCombo, 320, 25, 0.4f, GREEN);
+
+	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
+		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
+	}
 	//render the points and the combo
 	
 }
@@ -463,7 +467,7 @@ void GameManager::run(){
 	}
 	UpdateMusicStream(backgroundMusic);
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
-		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
+		//DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
 		if(IsKeyPressed(KEY_S)){
 			SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
 		}
@@ -484,7 +488,8 @@ void GameManager::run(){
         if(TimerLast != Time){
 			//std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
 
-			Global.amogus2 = (Time - TimerLast)/2.0f;
+			//Global.amogus2 = (Time - TimerLast)/2.0f;
+			Global.amogus2 = 0;
 			Global.amogus3 = Time - TimerLast;
 
             TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
