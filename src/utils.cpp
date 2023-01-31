@@ -342,7 +342,10 @@ std::vector<std::string> ParseNameFile(std::string file){
 }
 
 void initTimer(){
-    Global.amogus = GetTime() * 1000.0f;
+    auto t0 = std::chrono::high_resolution_clock::now();        
+    auto nanosec = t0.time_since_epoch();
+    Global.amogus = nanosec.count() / 1000.0f;
+    //Global.amogus = GetTime() * 1000.0f;
 }
 
 void pauseTimer(){
@@ -355,7 +358,10 @@ void resumeTimer(){
 
 
 double getTimer(){
-    return GetTime() * 1000.0f - Global.amogus;
+    auto t0 = std::chrono::high_resolution_clock::now();        
+    auto nanosec = t0.time_since_epoch();
+
+    return nanosec.count() / 1000.0f - Global.amogus;
 }
 
 void addOffsetTimer(unsigned long long int time){

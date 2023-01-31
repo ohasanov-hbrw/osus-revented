@@ -507,6 +507,10 @@ void Slider::update(){
     if (is_hit_at_first || gm->currentTime*1000.0f > data.time + gm->gameFile.p50Final)
         state = false;
     if(!state and !is_hit_at_first){
+        if(gm->clickCombo > 30){
+            SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+            PlaySound(gm->SoundFiles.data["combobreak"]);
+        }
         gm->clickCombo = 0;
     }
     calPos = position;
@@ -552,6 +556,10 @@ void Slider::update(){
         if(AreSame(succ,100.0f))
             data.point = 3;
         if(data.point == 0){
+            if(gm->clickCombo > 30){
+                SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+                PlaySound(gm->SoundFiles.data["combobreak"]);
+            }
             gm->clickCombo = 0;
         }
         else if(data.point == 1){
@@ -597,6 +605,10 @@ void Slider::update(){
                 }
                 else{
                     reverseclicked[curRepeat-1] = 0;
+                    if(gm->clickCombo > 30){
+                        SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+                        PlaySound(gm->SoundFiles.data["combobreak"]);
+                    }
                     gm->clickCombo = 0;
                 }
             }
@@ -738,6 +750,10 @@ void Slider::render(){
                     }
                     else{
                         tickclicked[i] = 0;
+                        if(gm->clickCombo > 30){
+							SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+							PlaySound(gm->SoundFiles.data["combobreak"]);
+						}
                         gm->clickCombo = 0;
                     }
                 }

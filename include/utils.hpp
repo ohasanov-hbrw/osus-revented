@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <iostream>
 #include <ctime>
+#include <chrono>
 
 #define RAYMATH_IMPLEMENTATION
 # define M_PI 3.14159265358979323846f

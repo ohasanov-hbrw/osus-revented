@@ -262,7 +262,7 @@ void Game::render() {
         DrawTextEx(Global.DefaultFont, TextFormat("Playing: %d/%.3f", (int)(Global.curTime2 * 1000000.0f), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
         DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
         DrawTextEx(Global.DefaultFont, TextFormat("Compensation: %.3f ms", Global.amogus2), {ScaleCordX(5), ScaleCordY(55)}, Scale(10) , Scale(1), WHITE);
-        DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %ld us", Global.errorLast), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %.3f ms", Global.errorLast/1000.0f), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
         
     }
     else{

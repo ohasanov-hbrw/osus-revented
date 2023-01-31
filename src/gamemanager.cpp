@@ -199,6 +199,10 @@ void GameManager::update(){
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 0;
+						if(clickCombo > 30){
+							SetSoundVolume(SoundFiles.data["combobreak"], 50/100.0f);
+							PlaySound(SoundFiles.data["combobreak"]);
+						}
 						clickCombo = 0;
 					}
 					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final + Global.amogus2/2.0f){
@@ -263,6 +267,10 @@ void GameManager::update(){
 							tempslider->is_hit_at_first = true;
 							stop = false;
 							tempslider->earlyhit = true;
+							if(clickCombo > 30){
+								SetSoundVolume(SoundFiles.data["combobreak"], 50/100.0f);
+								PlaySound(SoundFiles.data["combobreak"]);
+							}
 							clickCombo = 0;
 						}
 						else{
@@ -1120,6 +1128,68 @@ void GameManager::loadGame(std::string filename){
 
 	SoundFiles.data.clear();
 	SoundFiles.loaded.clear();
+	
+	if(SoundFiles.loaded["combobreak"].value == false){
+		Global.Path = "resources/skin/";
+		std::vector<std::string> ComboBreak = ls(".mp3");
+		for(int i = 0; i < ComboBreak.size(); i++){
+			if(ComboBreak[i] == "combobreak.mp3"){
+				SoundFiles.data["combobreak"] = LoadSound(("resources/skin/" + ComboBreak[i]).c_str());
+				SoundFiles.loaded["combobreak"].value = true;
+				std::cout << "loaded combobreak.mp3 from skin\n";
+			}
+		}
+		ComboBreak = ls(".wav");
+		for(int i = 0; i < ComboBreak.size(); i++){
+			if(ComboBreak[i] == "combobreak.wav"){
+				SoundFiles.data["combobreak"] = LoadSound(("resources/skin/" + ComboBreak[i]).c_str());
+				SoundFiles.loaded["combobreak"].value = true;
+				std::cout << "loaded combobreak.wav from skin\n";
+			}
+		}
+		ComboBreak = ls(".ogg");
+		for(int i = 0; i < ComboBreak.size(); i++){
+			if(ComboBreak[i] == "combobreak.ogg"){
+				SoundFiles.data["combobreak"] = LoadSound(("resources/skin/" + ComboBreak[i]).c_str());
+				SoundFiles.loaded["combobreak"].value = true;
+				std::cout << "loaded combobreak.ogg from skin\n";
+			}
+		}
+	}
+
+	
+	if(SoundFiles.loaded["combobreak"].value == false){
+		Global.Path = "resources/default_skin/";
+		std::vector<std::string> ComboBreak = ls(".mp3");
+		for(int i = 0; i < ComboBreak.size(); i++){
+			if(ComboBreak[i] == "combobreak.mp3"){
+				SoundFiles.data["combobreak"] = LoadSound(("resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFiles.loaded["combobreak"].value = true;
+				std::cout << "loaded combobreak.mp3 from default skin\n";
+			}
+		}
+		ComboBreak = ls(".wav");
+		for(int i = 0; i < ComboBreak.size(); i++){
+			if(ComboBreak[i] == "combobreak.wav"){
+				SoundFiles.data["combobreak"] = LoadSound(("resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFiles.loaded["combobreak"].value = true;
+				std::cout << "loaded combobreak.wav from default skin\n";
+			}
+		}
+		ComboBreak = ls(".ogg");
+		for(int i = 0; i < ComboBreak.size(); i++){
+			if(ComboBreak[i] == "combobreak.ogg"){
+				SoundFiles.data["combobreak"] = LoadSound(("resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFiles.loaded["combobreak"].value = true;
+				std::cout << "loaded combobreak.ogg from default skin\n";
+			}
+		}
+	}
+
+
+
+
+
 	std::cout << filename << std::endl;
 	Global.Path = "resources/default_skin/";
 	std::vector<std::string> defaultSounds = ls(".wav");
