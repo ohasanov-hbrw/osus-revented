@@ -614,11 +614,45 @@ void Slider::update(){
             }
         }
     }
+
+
+
+    if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
+        int ticksrendered = 0;
+
+        bool debugf = false;
+
+        for(int i = 0; i < tickPositions.size(); i++){
+            if(tickPositions[i] <= (int)time && (int) time > 0){
+                if(tickclicked[i] == -1){
+                    if((inSlider && (Global.Key1D || Global.Key2D)) || debugf){
+                        tickclicked[i] = 1;
+                        ticknumber++;
+                        gm->clickCombo++;
+                        playtick = true;
+                    }
+                    else{
+                        tickclicked[i] = 0;
+                        if(gm->clickCombo > 30){
+							SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+							PlaySound(gm->SoundFiles.data["combobreak"]);
+						}
+                        gm->clickCombo = 0;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
     if(playtick){
         SetSoundVolume(gm->SoundFiles.data[data.NormalSound], (float)volume/100.0f);
         PlaySound(gm->SoundFiles.data[data.NormalSound]);
         playtick = false;
     }
+
 }
 
 void Slider::render(){
@@ -740,24 +774,6 @@ void Slider::render(){
         bool debugf = false;
 
         for(int i = 0; i < tickPositions.size(); i++){
-            if(tickPositions[i] <= (int)time && (int) time > 0){
-                if(tickclicked[i] == -1){
-                    if((inSlider && (Global.Key1D || Global.Key2D)) || debugf){
-                        tickclicked[i] = 1;
-                        ticknumber++;
-                        gm->clickCombo++;
-                        playtick = true;
-                    }
-                    else{
-                        tickclicked[i] = 0;
-                        if(gm->clickCombo > 30){
-							SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
-							PlaySound(gm->SoundFiles.data["combobreak"]);
-						}
-                        gm->clickCombo = 0;
-                    }
-                }
-            }
             if(tickPositions[i] > (int)time && (int) time > 0 && ticksrendered < 10){
                 double absolutePosition = tickPositions[i];
                 int k = 0;
@@ -770,9 +786,7 @@ void Slider::render(){
                 }
                 absolutePosition = std::max((double)0,absolutePosition);
                 absolutePosition = std::min((int)absolutePosition, static_cast<int>(renderPoints.size()-1));
-                //DrawCircleV(ScaleCords(renderPoints[(int)absolutePosition]), Scale(6) , RED);
                 Vector2 pos = renderPoints[(int)absolutePosition];
-
                 DrawTextureCenter(gm->sliderscorepoint, pos.x, pos.y, (gm->circlesize/gm->sliderscorepoint.width)/3.5f , Fade(WHITE,clip((((10 - (float)ticksrendered) / 10)),0,1)));
                 ticksrendered++;
             }

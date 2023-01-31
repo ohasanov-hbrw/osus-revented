@@ -46,8 +46,6 @@ int main() {
     Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", 330));
 
     
-
-
     std::string lastPath = Global.Path;
 	Global.Path = "resources/default_skin/";
 	std::vector<std::string> files = ls(".png");
@@ -96,8 +94,7 @@ int main() {
     initMouseTrail();
 
     while(!WindowShouldClose()){
-
-
+        //PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
         if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
  		{
  			int display = GetCurrentMonitor();
@@ -111,9 +108,6 @@ int main() {
             if(!IsWindowFullscreen())
                 SetWindowSize(640, 480); 
  		}
-
-
-
         GetScale();
         GetMouse();
         GetKeys();
@@ -135,12 +129,6 @@ int main() {
         renderMouse();
 
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
-        //DrawTextEx(Global.DefaultFont, TextFormat("Width: %d, Height: %d", GetScreenWidth(), GetScreenHeight()), {ScaleCordX(5), ScaleCordY(25)}, Scale(15), Scale(1), WHITE);
-        //DrawTextEx(Global.DefaultFont, TextFormat("Scale: %.3f", Global.Scale), {ScaleCordX(5), ScaleCordY(40)}, Scale(15), Scale(1), WHITE);
-        //DrawTextEx(Global.DefaultFont, TextFormat("MX: %.3f, MY: %.3f", Global.MousePosition.x, Global.MousePosition.y), {ScaleCordX(5), ScaleCordY(55)}, Scale(15), Scale(1), WHITE);
-        //DrawTextEx(Global.DefaultFont, TextFormat("MouseWheel: %.3f", GetMouseWheelMove()), {ScaleCordX(5), ScaleCordY(70)}, Scale(15) , Scale(1), WHITE);
-
-
         EndDrawing();
     }
 
