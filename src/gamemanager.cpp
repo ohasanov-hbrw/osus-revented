@@ -35,27 +35,11 @@ GameManager::GameManager(){
 
 //initilize the game manager
 void GameManager::init(){
-	//initilize the audio part of raylib
-	
-	//initilize the window
-	
-	//set the fps to the common number of 60
-	
-	//hide the cursor because we have a custom one
-	
-	//load all the textures (can also do this in load_game)
-    
 
 }
 
 //main game loop
 void GameManager::update(){
-	//update the music an  d get the time from it
-	
-	//get the mouse position and state
-	
-	//currently not used that much but it will be
-	//timingSettingsForHitObject.clear();
 	int eventSize = gameFile.events.size();
 	for(int i = eventSize-1; i >= 0; i--){
 		if(gameFile.events[i].startTime <= currentTime*1000.0f){
@@ -67,12 +51,6 @@ void GameManager::update(){
 		else
 			break;
 	}
-
-
-
-
-
-
 
 	timingSettings tempTiming;
 	int timingSize = gameFile.timingPoints.size();
@@ -396,16 +374,7 @@ void GameManager::update(){
 
 //main rendering loop
 void GameManager::render(){
-	//set the screen for drawing
-	
-	//currently the background is a set color but we can change that
-	
-	//draw the fps
-	
-	//this is the mouse scale... i think
-	
-	//render all the objects
-	
+
 	if(currentBackgroundTexture.length() > 0 && backgroundTextures.loaded[currentBackgroundTexture].value){
 		//std::cout << currentBackgroundTexture << std::endl;
 		DrawTextureCenter(backgroundTextures.data[currentBackgroundTexture], 320, 240, (double)std::max((double)GetScreenWidth()/(double)backgroundTextures.data[currentBackgroundTexture].width, (double)GetScreenHeight()/(double)backgroundTextures.data[currentBackgroundTexture].height) / (double)Global.Scale , WHITE);
@@ -562,6 +531,240 @@ Vector2 get2BezierPoint(std::vector<Vector2> &points, int numPoints, float t){
 
 
 //load the beatmap
+void GameManager::loadDefaultSkin(std::string filename){
+	std::vector<std::string> files;
+	files.clear();
+	Global.Path = "resources/default_skin/";
+	files = ls(".png");
+
+	std::sort(files.begin(), files.end(), []
+    (const std::string& first, const std::string& second){
+        return first.size() < second.size();
+    });
+	std::reverse(files.begin(), files.end());
+
+	for(int i = 0; i < files.size(); i++){
+		if(IsFileExtension(files[i].c_str(),".png")){
+			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
+				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircleselect.png", 0) == 0)
+				selectCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircle", 0) == 0)
+				hitCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("approachcircle", 0) == 0)
+				approachCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit300k", 0) == 0)
+				;
+			else if(files[i].rfind("hit300", 0) == 0)
+				hit300 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit100k", 0) == 0)
+				;
+			else if(files[i].rfind("hit100", 0) == 0)
+				hit100 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit50k", 0) == 0)
+				;
+			else if(files[i].rfind("hit50", 0) == 0)
+				hit50 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit0", 0) == 0)
+				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderscorepoint", 0) == 0)
+				sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
+				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderb0", 0) == 0)
+				sliderb = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("reversearrow", 0) == 0)
+				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-circle", 0) == 0){
+				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
+				renderSpinnerCircle = true;
+			}
+			else if(files[i].rfind("spinner-metre", 0) == 0){
+				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
+				renderSpinnerMetre = true;
+			}
+			else if(files[i].rfind("spinner-bottom", 0) == 0)
+				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-top", 0) == 0)
+				spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-approachcircle", 0) == 0)
+				spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else{
+				for(int j = 0; j < 10; j++){
+					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
+    					numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
+					}
+				}
+			}
+		}
+	}
+}
+
+void GameManager::loadDefaultSound(std::string filename){
+
+}
+
+void GameManager::loadGameSkin(std::string filename){
+	temprenderSpinnerCircle = false;
+	temprenderSpinnerMetre = false;
+	temprenderSpinnerBack = false;
+
+	std::vector<std::string> files;
+	files.clear();
+	Global.Path = "resources/skin/";
+	files = ls(".png");
+
+	std::sort(files.begin(), files.end(), []
+    (const std::string& first, const std::string& second){
+        return first.size() < second.size();
+    });
+	std::reverse(files.begin(), files.end());
+
+	for(int i = 0; i < files.size(); i++){
+		if(IsFileExtension(files[i].c_str(),".png")){
+			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
+				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircleselect.png", 0) == 0)
+				selectCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircle", 0) == 0)
+				hitCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("approachcircle", 0) == 0)
+				approachCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit300k", 0) == 0)
+				;
+			else if(files[i].rfind("hit300", 0) == 0)
+				hit300 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit100k", 0) == 0)
+				;
+			else if(files[i].rfind("hit100", 0) == 0)
+				hit100 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit50k", 0) == 0)
+				;
+			else if(files[i].rfind("hit50", 0) == 0)
+				hit50 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit0", 0) == 0)
+				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderscorepoint", 0) == 0)
+				sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
+				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderb0", 0) == 0)
+				sliderb = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("reversearrow", 0) == 0)
+				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-circle", 0) == 0){
+				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
+				temprenderSpinnerCircle = true;
+			}
+			else if(files[i].rfind("spinner-metre", 0) == 0){
+				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
+				temprenderSpinnerMetre = true;
+			}
+			else if(files[i].rfind("spinner-background", 0) == 0){
+				spinnerBack = LoadTexture((Global.Path + files[i]).c_str());
+				temprenderSpinnerBack = true;
+			}
+			else if(files[i].rfind("spinner-bottom", 0) == 0)
+				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-top", 0) == 0)
+				spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-approachcircle", 0) == 0)
+				spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else{
+				for(int j = 0; j < 10; j++){
+					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
+    					numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
+					}
+				}
+			}
+		}
+	}
+}
+
+void GameManager::loadGameSound(std::string filename){
+
+}
+
+void GameManager::loadBeatmapSkin(std::string filename){
+	std::vector<std::string> files;
+	files.clear();
+	Global.Path = lastPath + '/';
+	files = ls(".png");
+
+	std::sort(files.begin(), files.end(), []
+    (const std::string& first, const std::string& second){
+        return first.size() < second.size();
+    });
+	std::reverse(files.begin(), files.end());
+	temprenderSpinnerCircle = false;
+	temprenderSpinnerMetre = false;
+	temprenderSpinnerBack = false;
+	for(int i = 0; i < files.size(); i++){
+		if(IsFileExtension(files[i].c_str(),".png")){
+			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
+				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircleselect.png", 0) == 0)
+				selectCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hitcircle", 0) == 0)
+				hitCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("approachcircle", 0) == 0)
+				approachCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit300k", 0) == 0)
+				;
+			else if(files[i].rfind("hit300", 0) == 0)
+				hit300 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit100k", 0) == 0)
+				;
+			else if(files[i].rfind("hit100", 0) == 0)
+				hit100 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit50k", 0) == 0)
+				;
+			else if(files[i].rfind("hit50", 0) == 0)
+				hit50 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("hit0", 0) == 0)
+				hit0 = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderscorepoint", 0) == 0)
+				sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
+				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("sliderb0", 0) == 0)
+				sliderb = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("reversearrow", 0) == 0)
+				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-circle", 0) == 0){
+				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
+				renderSpinnerCircle = true;
+			}
+			else if(files[i].rfind("spinner-metre", 0) == 0){
+				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
+				renderSpinnerMetre = true;
+			}
+			else if(files[i].rfind("spinner-background", 0) == 0){
+				spinnerBack = LoadTexture((Global.Path + files[i]).c_str());
+				temprenderSpinnerBack = true;
+			}
+			else if(files[i].rfind("spinner-bottom", 0) == 0)
+				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-top", 0) == 0)
+				spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
+			else if(files[i].rfind("spinner-approachcircle", 0) == 0)
+				spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
+			else{
+				for(int j = 0; j < 10; j++){
+					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
+						numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
+					}
+				}
+			}
+		}
+	}
+}
+
+void GameManager::loadBeatmapSound(std::string filename){
+
+}
+
+
 void GameManager::loadGame(std::string filename){
 	//create a parser and parse the file
 	currentBackgroundTexture = "";
@@ -578,7 +781,7 @@ void GameManager::loadGame(std::string filename){
 	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
 	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
 
-	std::string lastPath = Global.Path;
+	lastPath = Global.Path;
 
 	//---------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------|LOADING BACKGROUNDS|------------------------------------------------------------------
@@ -838,222 +1041,14 @@ void GameManager::loadGame(std::string filename){
 		sliderSpeed = std::stof(gameFile.configDifficulty["SliderMultiplier"]);
 
 	
-	files.clear();
-	Global.Path = "resources/default_skin/";
-	files = ls(".png");
+	
 
-	std::sort(files.begin(), files.end(), []
-    (const std::string& first, const std::string& second){
-        return first.size() < second.size();
-    });
-	std::reverse(files.begin(), files.end());
+	
 
-	for(int i = 0; i < files.size(); i++){
-		if(IsFileExtension(files[i].c_str(),".png")){
-			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
-				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hitcircleselect.png", 0) == 0)
-				selectCircle = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hitcircle", 0) == 0)
-				hitCircle = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("approachcircle", 0) == 0)
-				approachCircle = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hit300k", 0) == 0)
-				;
-			else if(files[i].rfind("hit300", 0) == 0)
-				hit300 = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hit100k", 0) == 0)
-				;
-			else if(files[i].rfind("hit100", 0) == 0)
-				hit100 = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hit50k", 0) == 0)
-				;
-			else if(files[i].rfind("hit50", 0) == 0)
-				hit50 = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hit0", 0) == 0)
-				hit0 = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("sliderscorepoint", 0) == 0)
-				sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
-				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("sliderb0", 0) == 0)
-				sliderb = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("reversearrow", 0) == 0)
-				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("spinner-circle", 0) == 0){
-				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
-				renderSpinnerCircle = true;
-			}
-			else if(files[i].rfind("spinner-metre", 0) == 0){
-				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
-				renderSpinnerMetre = true;
-			}
-			else if(files[i].rfind("spinner-bottom", 0) == 0)
-				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("spinner-top", 0) == 0)
-				spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("spinner-approachcircle", 0) == 0)
-				spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
-			else{
-				for(int j = 0; j < 10; j++){
-					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
-    					numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
-					}
-				}
-			}
-		}
-	}
-
-	bool temprenderSpinnerCircle = false;
-	bool temprenderSpinnerMetre = false;
-	bool temprenderSpinnerBack = false;
-
-	files.clear();
-	Global.Path = "resources/skin/";
-	files = ls(".png");
-
-	std::sort(files.begin(), files.end(), []
-    (const std::string& first, const std::string& second){
-        return first.size() < second.size();
-    });
-	std::reverse(files.begin(), files.end());
-
-	for(int i = 0; i < files.size(); i++){
-		if(IsFileExtension(files[i].c_str(),".png")){
-			if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
-				hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hitcircleselect.png", 0) == 0)
-				selectCircle = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hitcircle", 0) == 0)
-				hitCircle = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("approachcircle", 0) == 0)
-				approachCircle = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hit300k", 0) == 0)
-				;
-			else if(files[i].rfind("hit300", 0) == 0)
-				hit300 = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hit100k", 0) == 0)
-				;
-			else if(files[i].rfind("hit100", 0) == 0)
-				hit100 = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hit50k", 0) == 0)
-				;
-			else if(files[i].rfind("hit50", 0) == 0)
-				hit50 = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("hit0", 0) == 0)
-				hit0 = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("sliderscorepoint", 0) == 0)
-				sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("sliderfollowcircle", 0) == 0)
-				sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("sliderb0", 0) == 0)
-				sliderb = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("reversearrow", 0) == 0)
-				reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("spinner-circle", 0) == 0){
-				spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
-				temprenderSpinnerCircle = true;
-			}
-			else if(files[i].rfind("spinner-metre", 0) == 0){
-				spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
-				temprenderSpinnerMetre = true;
-			}
-			else if(files[i].rfind("spinner-background", 0) == 0){
-				spinnerBack = LoadTexture((Global.Path + files[i]).c_str());
-				temprenderSpinnerBack = true;
-			}
-			else if(files[i].rfind("spinner-bottom", 0) == 0)
-				spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("spinner-top", 0) == 0)
-				spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
-			else if(files[i].rfind("spinner-approachcircle", 0) == 0)
-				spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
-			else{
-				for(int j = 0; j < 10; j++){
-					if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
-    					numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
-					}
-				}
-			}
-		}
-
-		
-	}
-
-
-	files.clear();
-	Global.Path = lastPath + '/';
-	files = ls(".png");
-
-	std::sort(files.begin(), files.end(), []
-    (const std::string& first, const std::string& second){
-        return first.size() < second.size();
-    });
-	std::reverse(files.begin(), files.end());
-
+	GameManager::loadDefaultSkin(filename); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
+	GameManager::loadGameSkin(filename); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
 	if(!IsKeyDown(KEY_S)){
-		temprenderSpinnerCircle = false;
-		temprenderSpinnerMetre = false;
-		temprenderSpinnerBack = false;
-		for(int i = 0; i < files.size(); i++){
-			if(IsFileExtension(files[i].c_str(),".png")){
-				if(files[i].rfind("hitcircleoverlay.png", 0) == 0)
-					hitCircleOverlay = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("hitcircleselect.png", 0) == 0)
-					selectCircle = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("hitcircle", 0) == 0)
-					hitCircle = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("approachcircle", 0) == 0)
-					approachCircle = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("hit300k", 0) == 0)
-					;
-				else if(files[i].rfind("hit300", 0) == 0)
-					hit300 = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("hit100k", 0) == 0)
-					;
-				else if(files[i].rfind("hit100", 0) == 0)
-					hit100 = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("hit50k", 0) == 0)
-					;
-				else if(files[i].rfind("hit50", 0) == 0)
-					hit50 = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("hit0", 0) == 0)
-					hit0 = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("sliderscorepoint", 0) == 0)
-					sliderscorepoint = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("sliderfollowcircle", 0) == 0)
-					sliderfollow = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("sliderb0", 0) == 0)
-					sliderb = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("reversearrow", 0) == 0)
-					reverseArrow = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("spinner-circle", 0) == 0){
-					spinnerCircle = LoadTexture((Global.Path + files[i]).c_str());
-					renderSpinnerCircle = true;
-				}
-				else if(files[i].rfind("spinner-metre", 0) == 0){
-					spinnerMetre = LoadTexture((Global.Path + files[i]).c_str());
-					renderSpinnerMetre = true;
-				}
-				else if(files[i].rfind("spinner-background", 0) == 0){
-					spinnerBack = LoadTexture((Global.Path + files[i]).c_str());
-					temprenderSpinnerBack = true;
-				}
-				else if(files[i].rfind("spinner-bottom", 0) == 0)
-					spinnerBottom = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("spinner-top", 0) == 0)
-					spinnerTop = LoadTexture((Global.Path + files[i]).c_str());
-				else if(files[i].rfind("spinner-approachcircle", 0) == 0)
-					spinnerApproachCircle = LoadTexture((Global.Path + files[i]).c_str());
-				else{
-					for(int j = 0; j < 10; j++){
-						if(files[i].rfind(("default-" + (std::to_string(j))).c_str(), 0) == 0){
-							numbers[j] = LoadTexture((Global.Path + files[i]).c_str());
-						}
-					}
-				}
-			}
-		}
+		GameManager::loadBeatmapSkin(filename); // LOADING THE BEATMAP SKIN USING A SEPERATE FUNCTION
 	}
 
 

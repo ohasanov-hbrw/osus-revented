@@ -25,6 +25,12 @@ class GameManager{
 		void run();
 		void unloadGame();
 		void loadGame(std::string filename);
+		void loadDefaultSkin(std::string filename);
+		void loadDefaultSound(std::string filename);
+		void loadGameSkin(std::string filename);
+		void loadGameSound(std::string filename);
+		void loadBeatmapSkin(std::string filename);
+		void loadBeatmapSound(std::string filename);
 		void destroyHitObject(int index);
 		void destroyDeadHitObject(int index);
 		void render();
@@ -97,8 +103,15 @@ class GameManager{
 		double TimeLast = 0;
 		HitSound SoundFiles;
 
+
 		Background backgroundTextures;
 		std::string currentBackgroundTexture = "";
+
+		bool temprenderSpinnerCircle = false;
+		bool temprenderSpinnerMetre = false;
+		bool temprenderSpinnerBack = false;
+
+		std::string lastPath;
 		
 
 		char *musicData;
