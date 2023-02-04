@@ -196,13 +196,11 @@ void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
         DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x - (float)i * s + k * 18 * s * 2, y, s, color);
     }
 }
-
 std::string getSampleSetFromInt(int s) {
     if (s == 1) return "normal"; 
     else if (s == 2) return "soft"; 
     else if (s == 3) return "drum"; 
 }
-
 void DrawSpinnerMeter(Texture2D tex, float per){
     per = clip(per, 0.001f, 0.999f);
     float x = 0;
@@ -220,7 +218,6 @@ void DrawSpinnerMeter(Texture2D tex, float per){
     DrawTexturePro(tex, Rectangle{0,0,tex.width, tex.height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,(480.0f-y)*(1.0f-per)+y/2.0f,640-x,(480.0f-y)*per}), Vector2{0,0}, 0, WHITE);
 }
-
 void DrawSpinnerBack(Texture2D tex, Color color){
     float x = 0;
     float y = 0;
@@ -235,8 +232,6 @@ void DrawSpinnerBack(Texture2D tex, Color color){
     Rectangle source = {0,0,tex.width, tex.height};
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,y/2.0f,640-x,(480.0f-y)}), Vector2{0,0}, 0, color);
 }
-
-
 Vector2 getPointOnCircle(float x, float y, float radius, float angle){
     angle= (angle * M_PI) / 180;
     float xdiff = radius * cos(angle);
@@ -247,7 +242,6 @@ void DrawTextureOnCircle(Texture2D tex, float x, float y, float rad, float s, fl
     Vector2 pos = getPointOnCircle(x, y, rad, ang);
     DrawTextureRotate(tex, pos.x, pos.y, s, r, color);
 }
-
 void DrawTextCenter(const char *text, float x, float y, float s, Color color){
     Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
     DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x - size.x / 2.0f, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
@@ -255,6 +249,16 @@ void DrawTextCenter(const char *text, float x, float y, float s, Color color){
 void DrawTextLeft(const char *text, float x, float y, float s, Color color){
     Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
     DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
+}
+
+void DrawCNumbersLeft(int n, float x, float y, float s, Color color){
+    //I will need to fix this function but currently it works good enough
+    GameManager* gm = GameManager::getInstance();
+    int digits = log10(n) + 1;
+    int i = (digits - 1) * 18;
+    for(int k = 0; k < digits; k++){
+        DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x + k * 18 * s * 2, y, s, color);
+    }
 }
 
 float easeInOutCubic(float x){

@@ -60,6 +60,8 @@ struct Globals {
 
     Texture2D OsusLogo;
 
+    double volume = 0.8f;
+
     bool Key1P = false;
     bool Key1D = false;
     bool Key2P = false;
@@ -85,6 +87,16 @@ struct Globals {
 
     std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
 
+
+
+
+    double CurrentInterpolatedTime = 0;
+    double LastOsuTime = 0;
+    double currentOsuTime = 0;
+
+    double avgSum = 0;
+    double avgNum = 0;
+    double avgTime = 0;
 };
 
 extern Globals Global;

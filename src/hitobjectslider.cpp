@@ -529,8 +529,11 @@ void Slider::update(){
 
     //DEBUG
 
-    //inSlider = true;
-    bool debugf = false;
+    
+    bool debugf = true;
+    if(debugf){
+        inSlider = true;
+    }
 
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
     if(gm->currentTime*1000.0f > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
@@ -575,7 +578,7 @@ void Slider::update(){
             gm->clickCombo++;
         }
 
-        bool debugf = false;
+        bool debugf = true;
 
         if(is_hit_at_end || debugf){
             SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
@@ -592,7 +595,7 @@ void Slider::update(){
     }
     else{
         if(curRepeat > 0){
-            bool debugf = false;
+            bool debugf = true;
             if(reverseclicked[curRepeat-1] == -1){
                 if(inSlider || debugf){
                     reverseclicked[curRepeat-1] = 1;
@@ -620,7 +623,7 @@ void Slider::update(){
     if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
         int ticksrendered = 0;
 
-        bool debugf = false;
+        bool debugf = true;
 
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){
@@ -771,7 +774,7 @@ void Slider::render(){
             angle+=180;
         int ticksrendered = 0;
 
-        bool debugf = false;
+        bool debugf = true;
 
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] > (int)time && (int) time > 0 && ticksrendered < 10){

@@ -173,7 +173,6 @@ void GameManager::update(){
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
-
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 0;
@@ -182,6 +181,8 @@ void GameManager::update(){
 							PlaySound(SoundFiles.data["combobreak"]);
 						}
 						clickCombo = 0;
+						Global.Key1P = false;
+						Global.Key2P = false;
 					}
 					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 1;
@@ -190,6 +191,8 @@ void GameManager::update(){
 						Global.errorDiv++;
 						Global.errorLast = (long long)((currentTime*1000.0f - objects[i]->data.time) * 1000.0f);
 						Global.errorSum += Global.errorLast;
+						Global.Key1P = false;
+						Global.Key2P = false;
 					}
 					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 2;
@@ -198,6 +201,8 @@ void GameManager::update(){
 						Global.errorDiv++;
 						Global.errorLast = (long long)((currentTime*1000.0f - objects[i]->data.time) * 1000.0f);
 						Global.errorSum += Global.errorLast;
+						Global.Key1P = false;
+						Global.Key2P = false;
 					}
 					else{
 						objects[i]->data.point = 3;
@@ -206,6 +211,8 @@ void GameManager::update(){
 						Global.errorDiv++;
 						Global.errorLast = (long long)((currentTime*1000.0f - objects[i]->data.time) * 1000.0f);
 						Global.errorSum += Global.errorLast;
+						Global.Key1P = false;
+						Global.Key2P = false;
 					}
 					int volume = objects[i]->data.volume;
 					if(volume == 0){
@@ -250,11 +257,15 @@ void GameManager::update(){
 								PlaySound(SoundFiles.data["combobreak"]);
 							}
 							clickCombo = 0;
+							Global.Key1P = false;
+							Global.Key2P = false;
 						}
 						else{
 							tempslider->is_hit_at_first = true;
 							stop = false;
 							clickCombo++;
+							Global.Key1P = false;
+							Global.Key2P = false;
 						}
 						int volume = tempslider->data.volume;
 						if(volume == 0){
@@ -291,7 +302,7 @@ void GameManager::update(){
 			}
 		}
 		else{
-			bool debugf = false;
+			bool debugf = true;
 			if(debugf){
 				objects[i]->update();
 				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
@@ -387,9 +398,9 @@ void GameManager::render(){
 	for(int i = dead_objects.size() - 1; i >= 0; i--){
 		dead_objects[i]->dead_render();
 	}
-	DrawCNumbersCenter(score, 320, 10, 0.4f, GREEN);
-	DrawCNumbersCenter(clickCombo, 320, 25, 0.4f, GREEN);
-	DrawCNumbersCenter(clickCombo, 320, 25, 0.4f, GREEN);
+	DrawCNumbersCenter(score, 320, 10, 0.4f, WHITE);
+	DrawCNumbersLeft(clickCombo, 15, 460, 0.6f, WHITE);
+
 
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
@@ -404,6 +415,7 @@ void GameManager::run(){
 	struct timeval tp;
 	gettimeofday(&tp, NULL);
 	long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+	//ms = getTimer() / 1000.0;
 
 
 	if(Global.startTime < 0){
@@ -417,13 +429,15 @@ void GameManager::run(){
 	if(Global.startTime >= 0 and startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
-    	SetMusicVolume(backgroundMusic, 0.4f);
+    	SetMusicVolume(backgroundMusic, Global.volume);
 		SeekMusicStream(backgroundMusic, 0.0f);
 		UpdateMusicStream(backgroundMusic);
 		initTimer();
 		std::cout << Global.amogus << std::endl;
 		std::cout << "started music" << std::endl;
 		std::cout << "first update" << std::endl;
+		Global.CurrentInterpolatedTime = 0;
+		Global.LastOsuTime = 0;
 		TimeLast = ms;
 		startMusic = false;
 		Global.startTime2 = ms;
@@ -435,6 +449,9 @@ void GameManager::run(){
 		std::cout << "time delay??? " << Global.amogus2 << std::endl;
 		std::cout << "Time:" << Time << std::endl;
 		std::cout << "amog?:" << amog << std::endl;
+		Global.avgSum = 0;
+    	Global.avgNum = 0;
+    	Global.avgTime = 0;
 	}
 	UpdateMusicStream(backgroundMusic);
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
@@ -456,8 +473,10 @@ void GameManager::run(){
 	
     if (IsMusicStreamPlaying(backgroundMusic)){
         Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
-        if(!AreSame(TimerLast, Time)){
+		if(!AreSame(TimerLast, Time)){
 			//std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
+
+			//std::cout << std::setprecision(16) << "Last: " << TimerLast << " Time: " << Time << "\n"; 
 
 			//Global.amogus2 = (Time - TimerLast)/2.0f;
 			Global.amogus2 = 0;
@@ -472,7 +491,6 @@ void GameManager::run(){
         else{
             Time += ms - TimeLast;
         }
-		//Time = (double)(ms - Global.startTime2);
     }
     else{
         TimeLast = ms;
@@ -491,19 +509,36 @@ void GameManager::run(){
 			Global.curTime2 += GetFrameTime();
 		}
 	}
-	//std::cout << Global.curTime2 <<std::endl;
+
+	double LastInterpolatedTime = Global.currentOsuTime;
+
+	bool IsInterpolating;
+
+	if (IsMusicStreamPlaying(backgroundMusic)){
+		if (GetMusicTimePlayed(backgroundMusic) * 1000.0 != 0)
+			IsInterpolating = true;
+		double ElapsedTime = getTimer() - Global.LastOsuTime;
+		Global.LastOsuTime = getTimer();
+		Global.CurrentInterpolatedTime += ElapsedTime;
+		if (!IsInterpolating || std::abs(GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) > 8){
+			Global.CurrentInterpolatedTime = ElapsedTime < 0 ? GetMusicTimePlayed(backgroundMusic) * 1000.0: std::max(LastInterpolatedTime, GetMusicTimePlayed(backgroundMusic) * 1000.0);
+			IsInterpolating = false;
+			std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
+		}
+		else{
+			Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 8;
+			Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
+		}
+    }
+
+	Global.currentOsuTime = IsMusicStreamPlaying(backgroundMusic) ? Global.CurrentInterpolatedTime : GetMusicTimePlayed(backgroundMusic);
+
 	currentTime = (double)Time / 1000.0;
-	/*if(IsMusicStreamPlaying(backgroundMusic)){
-		currentTime = getTimer() / 1000.0;
-	}*/
-	currentTime += Global.amogus2 / 1000.0;
-	//currentTime = Time / 1000.0f;
+	if(IsMusicStreamPlaying(backgroundMusic)){
+		currentTime = Global.currentOsuTime / 1000.0;
+	}
+
 	GameManager::update();
-	currentTime -= Global.amogus2 / 1000.0;
-
-	if(Time > 500 && Time < 1000)
-		std::cout << getTimer() - Global.curTime2 * 1000.0 << "\n";
-
 	
 }
 
@@ -812,28 +847,46 @@ void GameManager::loadGame(std::string filename){
 
 	for(int i = 0; i < (int)gameFile.events.size(); i++){
 		if(gameFile.events[i].eventType == 0){
-			std::cout << "Time: " << gameFile.events[i].startTime << "ms - Filename: " << gameFile.events[i].filename << std::endl;
+			std::cout << "Time: " << gameFile.events[i].startTime << "ms - Filename: " << gameFile.events[i].filename << '.' << std::endl;
 			if(gameFile.events[i].startTime == 0){
 				gameFile.events[i].startTime -= 7000;
 				std::cout << "Time changed to: " << gameFile.events[i].startTime << std::endl;
 			}
 		}
 	}
+	
 
 	std::cout << "Found this many files: " << files.size() << std::endl;
 	for(int i = 0; i < files.size(); i++){
+		std::cout << files[i] << std::endl;
+	}
+
+	for(int i = 0; i < files.size(); i++){
 		for(int j = 0; j < (int)gameFile.events.size(); j++){
-			if(files[i].rfind(gameFile.events[j].filename, 0) == 0){
-				std::cout << "WHAT DA HEEEEEEEEEELLLLLLLLLLLLL" << std::endl;
-				Image image = LoadImage((Global.Path + files[i]).c_str());
-				backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(image);
-				UnloadImage(image); 
-				backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
-				if(backgroundTextures.data[gameFile.events[j].filename].width != 0){
-					backgroundTextures.loaded[gameFile.events[j].filename].value = true;
-					std::cout << "Loaded: Background with filename: " << gameFile.events[j].filename << std::endl;
-					GenTextureMipmaps(&backgroundTextures.data[gameFile.events[j].filename]);
-					SetTextureFilter(backgroundTextures.data[gameFile.events[j].filename], TEXTURE_FILTER_TRILINEAR );
+			if(gameFile.events[j].eventType == 0){
+				std::cout << "attempting to load a background\n";
+				int t = gameFile.events[j].filename.size() - 1;
+				while(gameFile.events[j].filename[t] == ' ' and t >= 0){
+					gameFile.events[j].filename.pop_back();
+					t--;
+				}
+				t = 0;
+				while(gameFile.events[j].filename[t] == ' ' and gameFile.events[j].filename.size() > 0){
+					gameFile.events[j].filename.erase(gameFile.events[j].filename.begin());
+				}
+				std::cout << "finding function returned: " << files[i].rfind(gameFile.events[j].filename, 0) << " for: " << gameFile.events[j].filename << " and " << files[i] << std::endl;
+				if(files[i].rfind(gameFile.events[j].filename, 0) == 0){
+					std::cout << "WHAT DA HEEEEEEEEEELLLLLLLLLLLLL" << std::endl;
+					Image image = LoadImage((Global.Path + files[i]).c_str());
+					backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(image);
+					UnloadImage(image); 
+					backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+					if(backgroundTextures.data[gameFile.events[j].filename].width != 0){
+						backgroundTextures.loaded[gameFile.events[j].filename].value = true;
+						std::cout << "Loaded: Background with filename: " << gameFile.events[j].filename << std::endl;
+						GenTextureMipmaps(&backgroundTextures.data[gameFile.events[j].filename]);
+						SetTextureFilter(backgroundTextures.data[gameFile.events[j].filename], TEXTURE_FILTER_TRILINEAR );
+					}
 				}
 			}
 		}
