@@ -38,6 +38,7 @@ struct Globals {
     double amogus;
     double amogus2;
     double amogus3;
+    double amogus4;
     unsigned long long int startsTime = 0;
     unsigned long long int pausedFor = 0;
     Texture2D cursor;
@@ -81,6 +82,8 @@ struct Globals {
     long long errorSum = 0;
     long long errorLast = 0;
     long long errorDiv = 0;
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
 
 };
 

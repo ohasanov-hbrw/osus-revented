@@ -421,6 +421,7 @@ void GameManager::run(){
 		SeekMusicStream(backgroundMusic, 0.0f);
 		UpdateMusicStream(backgroundMusic);
 		initTimer();
+		std::cout << Global.amogus << std::endl;
 		std::cout << "started music" << std::endl;
 		std::cout << "first update" << std::endl;
 		TimeLast = ms;
@@ -428,6 +429,7 @@ void GameManager::run(){
 		Global.startTime2 = ms;
 		double Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 		double amog = getTimer();
+		Global.amogus4 = getTimer();
 		Global.amogus2 = 0.0f;
 		Global.amogus3 = 0.0f;
 		std::cout << "time delay??? " << Global.amogus2 << std::endl;
@@ -454,7 +456,7 @@ void GameManager::run(){
 	
     if (IsMusicStreamPlaying(backgroundMusic)){
         Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
-        if(TimerLast != Time){
+        if(!AreSame(TimerLast, Time)){
 			//std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
 
 			//Global.amogus2 = (Time - TimerLast)/2.0f;
@@ -470,15 +472,16 @@ void GameManager::run(){
         else{
             Time += ms - TimeLast;
         }
-
-
 		//Time = (double)(ms - Global.startTime2);
     }
     else{
         TimeLast = ms;
     }
 
+
 	Global.curTime = Time;
+
+	
 	if(currentTimeTemp != GetMusicTimePlayed(backgroundMusic) && IsMusicStreamPlaying(backgroundMusic)){
 		currentTimeTemp = GetMusicTimePlayed(backgroundMusic);
 		Global.curTime2 = currentTimeTemp;
@@ -489,12 +492,18 @@ void GameManager::run(){
 		}
 	}
 	//std::cout << Global.curTime2 <<std::endl;
-	currentTime = (double)Time / 1000.0f;
-
-	currentTime += Global.amogus2 / 1000.0f;
+	currentTime = (double)Time / 1000.0;
+	/*if(IsMusicStreamPlaying(backgroundMusic)){
+		currentTime = getTimer() / 1000.0;
+	}*/
+	currentTime += Global.amogus2 / 1000.0;
 	//currentTime = Time / 1000.0f;
 	GameManager::update();
-	currentTime -= Global.amogus2 / 1000.0f;
+	currentTime -= Global.amogus2 / 1000.0;
+
+	if(Time > 500 && Time < 1000)
+		std::cout << getTimer() - Global.curTime2 * 1000.0 << "\n";
+
 	
 }
 

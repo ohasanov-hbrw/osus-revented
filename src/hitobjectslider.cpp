@@ -809,13 +809,13 @@ void Slider::render(){
 
 void Slider::dead_render(){
     GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->gameFile.fade_in/1.5f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.5f);
-    float clampedFade2 = (gm->gameFile.fade_in/6.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/6.0f);
+    float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
+    float clampedFade2 = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/2.0f);
     clampedFade2 = clip(clampedFade2, 0.0f, 0.7f);
 
 
     float outlineSize = 4.0 * gm->circlesize/gm->sliderin.width;
-    float outlineColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };     // Normalized RED color 
+    float outlineColor[4] = { 1.0f, 1.0f, 1.0f, clampedFade2 };     // Normalized RED color 
     float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
     
     // Get shader locations
@@ -847,7 +847,7 @@ void Slider::dead_render(){
 
 void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
-    if (data.time+gm->gameFile.fade_in/2.0f < gm->currentTime*1000.0f){
+    if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
         UnloadRenderTexture(sliderTexture);
         //UnloadShader(shdrOutline);
         renderedLocations.clear();
