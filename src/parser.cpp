@@ -328,10 +328,18 @@ GameFile Parser::parse(std::string filename){
 							if(tempVectorCurvePoints.size()-1 >= 3 && tempHitObject.curveType == 'P'){
 								tempHitObject.curveType = 'B';
 							}
+							
 							for(size_t i = 1; i < tempVectorCurvePoints.size(); i++){
 								std::vector<std::string> tempVectorCurvePointCords;
 								tempVectorCurvePointCords = parseSeperatedLists(tempVectorCurvePoints[i], ':');
 								tempHitObject.curvePoints.push_back(std::make_pair(std::stoi(tempVectorCurvePointCords[0])+64, std::stoi(tempVectorCurvePointCords[1])+48));
+							}
+
+							if(tempHitObject.curveType == 'P' and tempHitObject.curvePoints.size() == 2 and (
+								(tempHitObject.curvePoints[0].first == tempHitObject.curvePoints[1].first and tempHitObject.curvePoints[0].second == tempHitObject.curvePoints[1].second) or 
+								(tempHitObject.curvePoints[0].first == tempHitObject.x and tempHitObject.curvePoints[0].second == tempHitObject.y) or 
+								(tempHitObject.curvePoints[1].first == tempHitObject.x and tempHitObject.curvePoints[1].second == tempHitObject.y))){
+								tempHitObject.curveType = 'L';
 							}
 
 							tempHitObject.slides = std::stoi(tempVector[6]);

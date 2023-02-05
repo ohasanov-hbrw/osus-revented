@@ -145,6 +145,7 @@ std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
 void Slider::init(){
     GameManager* gm = GameManager::getInstance();
     //these is the points that we get from the beatmap file
+    double startTime = getTimer();
     edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
     //the resolution is the number of total points
     float resolution = data.length;
@@ -411,6 +412,7 @@ void Slider::init(){
 
 
     sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize);
+    
     SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
     BeginTextureMode(sliderTexture);
     BeginBlendMode(BLEND_ALPHA_PREMUL);
@@ -463,6 +465,8 @@ void Slider::init(){
         }
     }
     reverseclicked.pop_back();
+
+    std::cout << "Init slider at time " << data.time << " with the size of " << sliderTexture.texture.width << " and " << sliderTexture.texture.height << " in " << getTimer() - startTime << " miliseconds" << "\n";
 }
 
 void Slider::update(){

@@ -259,16 +259,19 @@ void Game::render() {
     Global.enableMouse = false;
     Global.gameManager->render();
     if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
-        DrawTextEx(Global.DefaultFont, TextFormat("Playing: %d/%.3f", (int)(Global.curTime2 * 1000000.0f), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
-        DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
-        DrawTextEx(Global.DefaultFont, TextFormat("Timer: %.3f ms", getTimer()), {ScaleCordX(5), ScaleCordY(55)}, Scale(10) , Scale(1), WHITE);
-        DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %.3f ms", Global.errorLast/1000.0f), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
+        DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+        //DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
+        //DrawTextEx(Global.DefaultFont, TextFormat("Timer: %.3f ms", getTimer()), {ScaleCordX(5), ScaleCordY(55)}, Scale(10) , Scale(1), WHITE);
+        //DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %.3f ms", Global.errorLast/1000.0f), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
         //DrawTextEx(Global.DefaultFont, TextFormat("Avg Time Difference in the First Second: %.3f ms", Global.avgTime), {ScaleCordX(5), ScaleCordY(75)}, Scale(10) , Scale(1), WHITE);
     }
     else{
         DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
         if(Global.errorDiv != 0)
             DrawTextEx(Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
+    }
+    if(GetMusicTimeLength(Global.gameManager->backgroundMusic) != 0){
+        DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
     }
 }
 
