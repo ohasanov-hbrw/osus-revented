@@ -302,7 +302,7 @@ void GameManager::update(){
 			}
 		}
 		else{
-			bool debugf = true;
+			bool debugf = false;
 			if(debugf){
 				objects[i]->update();
 				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
@@ -947,7 +947,7 @@ void GameManager::loadGame(std::string filename){
 				gameFile.hitObjects[i].extraPos = extraPosition;
 			}
 			if(gameFile.hitObjects[i].curveType == 'P'){
-				if(edgePoints[0].x == edgePoints[2].x and edgePoints[0].y == edgePoints[2].y){
+				if((edgePoints[0].x == edgePoints[2].x and edgePoints[0].y == edgePoints[2].y) or (edgePoints[1].x == edgePoints[2].x and edgePoints[1].y == edgePoints[2].y) or (edgePoints[0].x == edgePoints[1].x and edgePoints[0].y == edgePoints[1].y)){
 					gameFile.hitObjects[i].curveType = 'L';
 					goto redoCalc;
 				}

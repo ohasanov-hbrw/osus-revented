@@ -335,12 +335,12 @@ GameFile Parser::parse(std::string filename){
 								tempHitObject.curvePoints.push_back(std::make_pair(std::stoi(tempVectorCurvePointCords[0])+64, std::stoi(tempVectorCurvePointCords[1])+48));
 							}
 
-							if(tempHitObject.curveType == 'P' and tempHitObject.curvePoints.size() == 2 and (
+							/*if(tempHitObject.curveType == 'P' and tempHitObject.curvePoints.size() == 2 and (
 								(tempHitObject.curvePoints[0].first == tempHitObject.curvePoints[1].first and tempHitObject.curvePoints[0].second == tempHitObject.curvePoints[1].second) or 
 								(tempHitObject.curvePoints[0].first == tempHitObject.x and tempHitObject.curvePoints[0].second == tempHitObject.y) or 
 								(tempHitObject.curvePoints[1].first == tempHitObject.x and tempHitObject.curvePoints[1].second == tempHitObject.y))){
 								tempHitObject.curveType = 'L';
-							}
+							}*/
 
 							tempHitObject.slides = std::stoi(tempVector[6]);
 							tempHitObject.length = std::stoi(tempVector[7]);
