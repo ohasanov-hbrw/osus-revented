@@ -53,7 +53,8 @@ public:
     int textsize;
     int maxlength;
     bool hover = false;
-    
+    bool action = false;
+
     void init();
     void render() override;
     void update() override;

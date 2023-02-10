@@ -44,7 +44,7 @@ void PlayMenu::update() {
         Global.CurrentState.reset(new MainMenu());
     }
 
-    if(select.action){
+    if(select.action or dir_list.action){
         if(dir_list.objects.size() > 0 and dir_list.objects[dir_list.selectedindex].text.size() > 0){
             if(dir_list.objects[dir_list.selectedindex].text[dir_list.objects[dir_list.selectedindex].text.size()-1] == '/'){
                 dir_list.objects[dir_list.selectedindex].text.pop_back();
@@ -109,7 +109,7 @@ void LoadMenu::update() {
         Global.CurrentState.reset(new MainMenu());
     }
 
-    if(select.action){
+    if(select.action or dir_list.action){
         if(dir_list.objects.size() > 0 and dir_list.objects[dir_list.selectedindex].text.size() > 0){
             if(dir_list.objects[dir_list.selectedindex].text[dir_list.objects[dir_list.selectedindex].text.size()-1] == '/'){
                 dir_list.objects[dir_list.selectedindex].text.pop_back();

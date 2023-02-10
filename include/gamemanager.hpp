@@ -36,7 +36,7 @@ class GameManager{
 		void render();
 		float windowScale = 2.0f;
         HitSound hitCircleHS;
-		int skip = 3;
+		int skip = 2;
 		bool renderSpinnerCircle = false;
 		bool renderSpinnerMetre = false;
 		bool renderSpinnerBack = false;

@@ -170,6 +170,7 @@ void SelectableList::render() {
 }
 
 void SelectableList::update() {
+    action = false;
     renderindex2 = renderindex1 + std::min((int)size.y/objectsize, (int)objects.size());
     bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
     mouseSelect = false;
@@ -192,7 +193,10 @@ void SelectableList::update() {
         //std::cout << renderindex2 - renderindex1 << " out of max " << (int)size.y/objectsize << " and currently on " << renderindex1 + (int)((Global.MousePosition.y -  this->getRect().y) / objectsize) << std::endl;
         mouseSelectIndex = renderindex1 + (int)((Global.MousePosition.y -  this->getRect().y) / objectsize);
         mouseSelect = true;
-        if(Global.Key1D){
+        if(selectedindex == mouseSelectIndex and Global.Key1P){
+            action = true;
+        }
+        if(Global.Key1P){
             selectedindex = mouseSelectIndex;
         }
     }

@@ -474,19 +474,11 @@ void GameManager::run(){
     if (IsMusicStreamPlaying(backgroundMusic)){
         Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 		if(!AreSame(TimerLast, Time)){
-			//std::cout << "update in " << Time - TimerLast << " milliseconds" << std::endl;
-
-			//std::cout << std::setprecision(16) << "Last: " << TimerLast << " Time: " << Time << "\n"; 
-
-			//Global.amogus2 = (Time - TimerLast)/2.0f;
-			Global.amogus2 = 0;
+			Global.amogus2 = std::abs((Time - TimerLast) / 1.5f);
 			Global.amogus3 = Time - TimerLast;
 
             TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
             TimeLast = ms;
-			//Global.amogus2 = 0;
-
-
         }
         else{
             Time += ms - TimeLast;
@@ -1711,11 +1703,19 @@ void GameManager::loadGame(std::string filename){
 	SetTextureFilter(hitCircle, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&sliderb);
 	SetTextureFilter(sliderb, TEXTURE_FILTER_TRILINEAR );
-	SetTextureFilter(sliderin, TEXTURE_FILTER_POINT );
+
+
+	SetTextureFilter(sliderin, TEXTURE_FILTER_POINT);
+	SetTextureFilter(sliderout, TEXTURE_FILTER_POINT);
+
 	GenTextureMipmaps(&sliderscorepoint);
 	SetTextureFilter(sliderscorepoint, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&sliderout);
-	SetTextureFilter(sliderout, TEXTURE_FILTER_TRILINEAR );
+	
+	/*GenTextureMipmaps(&sliderout);
+	SetTextureFilter(sliderout, TEXTURE_FILTER_TRILINEAR );*/
+	
+	
+
 	GenTextureMipmaps(&reverseArrow);
 	SetTextureFilter(reverseArrow, TEXTURE_FILTER_TRILINEAR );
 	for(int i = 0; i < 10; i++){
