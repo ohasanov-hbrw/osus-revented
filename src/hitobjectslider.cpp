@@ -589,10 +589,6 @@ void Slider::update(){
             PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
 			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
         }
-
-        
-
-
         gm->destroyHitObject(data.index);
 
     }

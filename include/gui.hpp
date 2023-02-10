@@ -52,6 +52,8 @@ public:
     std::string subtext;
     int textsize;
     int maxlength;
+    bool hover = false;
+    
     void init();
     void render() override;
     void update() override;
@@ -78,6 +80,8 @@ public:
     int selectedindex = 0;
     int renderindex1 = 0;
     int renderindex2 = 0;
+    bool mouseSelect = false;
+    int mouseSelectIndex = 0;
 };
 
 class ErrorDialogue {

@@ -86,6 +86,15 @@ void TextBox::render() {
         else
             DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
     }
+    else if(hover){
+        Color tempColor = this->color;
+        tempColor.r = (this->color.r * 2 + textcolor.r) / 3;
+        tempColor.g = (this->color.g * 2 + textcolor.g) / 3;
+        tempColor.b = (this->color.b * 2 + textcolor.b) / 3;
+        tempColor.a = (this->color.a * 2 + textcolor.a) / 3;
+        DrawRectangleRec(ScaleRect(this->getRect()), tempColor);
+        DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+    }
     else {
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
         DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
@@ -141,16 +150,18 @@ void SelectableList::render() {
     bg.render();
     bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
     for(int i = renderindex1; i < renderindex2; i++){
+        if(mouseSelect and i == mouseSelectIndex){
+            objects[i].hover = true;
+        }
         if(selectedindex == i){
             objects[i].focused = true;
-            //objects[i].color = textcolor;
-            //objects[i].textcolor = color;
         }
         objects[i].render();
         if(selectedindex == i){
             objects[i].focused = false;
-            //objects[i].color = color;
-            //objects[i].textcolor = textcolor;
+        }
+        if(mouseSelect and i == mouseSelectIndex){
+            objects[i].hover = false;
         }
     }
 
@@ -161,6 +172,7 @@ void SelectableList::render() {
 void SelectableList::update() {
     renderindex2 = renderindex1 + std::min((int)size.y/objectsize, (int)objects.size());
     bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    mouseSelect = false;
     if (hover){   
         selectedindex -= Global.Wheel;
         if(selectedindex >= (int)objects.size()){
@@ -176,6 +188,12 @@ void SelectableList::update() {
         if(selectedindex < renderindex1){
             renderindex1 = selectedindex;
             renderindex2 = renderindex1 + std::min((int)size.y/objectsize, (int)objects.size());
+        }
+        //std::cout << renderindex2 - renderindex1 << " out of max " << (int)size.y/objectsize << " and currently on " << renderindex1 + (int)((Global.MousePosition.y -  this->getRect().y) / objectsize) << std::endl;
+        mouseSelectIndex = renderindex1 + (int)((Global.MousePosition.y -  this->getRect().y) / objectsize);
+        mouseSelect = true;
+        if(Global.Key1D){
+            selectedindex = mouseSelectIndex;
         }
     }
     for(int i = renderindex1; i < renderindex2; i++){
