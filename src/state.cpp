@@ -5,6 +5,8 @@
 #include "gamemanager.hpp"
 #include "zip.h"
 #include "fastrender.hpp"
+#include "rlgl.h"
+#include "raylib.h"
 
 
 
@@ -18,6 +20,7 @@ PlayMenu::PlayMenu() {
 }
 
 void PlayMenu::init() {
+    Global.LastFrameTime = getTimer();
     temp = Global.Path;
     Global.Path = Global.BeatmapLocation;
     auto dir = ls(".osu");
@@ -86,7 +89,10 @@ LoadMenu::LoadMenu() {
     path = TextBox({195,360}, {270,40}, {240,98,161,255}, Global.Path, WHITE, 8, 40);
 }
 
-void LoadMenu::init() {}
+void LoadMenu::init() {
+    Global.LastFrameTime = getTimer();
+    Global.FrameTime = 0.5;
+}
 
 void LoadMenu::render() {
     bg.render();
@@ -155,7 +161,10 @@ MainMenu::MainMenu() {
     wip = Button({320,320}, {120,60}, {255,135,198,0}, "WIP", BLACK, 20);
     load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
 }
-void MainMenu::init() {}
+void MainMenu::init() {
+    Global.LastFrameTime = getTimer();
+    Global.FrameTime = 0.5;
+}
 void MainMenu::update() {
     Global.enableMouse = true;
     play.update();
@@ -192,6 +201,7 @@ Game::Game() {
     
 }
 void Game::init() {
+    Global.LastFrameTime = getTimer();
     std::cout << Global.selectedPath << std::endl;
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
@@ -202,27 +212,31 @@ void Game::init() {
     std::cout << "done init" << std::endl;
     float timer = 0;
     while(timer < 4.0f){
-        timer += GetFrameTime();
-
-        GetScale();
-        GetMouse();
-        GetKeys();
-
-        updateMouseTrail();
-        updateUpDown();
-
         std::string message;
-        if(timer < 2.0f)
-            message = "Loaded Game";
-        else if(timer < 2.5f)
-            message = "3!";
-        else if(timer < 3.0f)
-            message = "2!";
-        else if(timer < 3.5f)
-            message = "1!";
-        else if(timer < 4.0f)
-            message = "GO!";
-        
+        Global.LastFrameTime = getTimer();
+        double Timer = 0;
+        while(Timer < 10){
+            Global.FrameTime = getTimer() - Global.LastFrameTime;
+            Global.LastFrameTime = getTimer();
+            PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
+            GetScale();
+            GetMouse();
+            GetKeys();
+            updateMouseTrail();
+            updateUpDown();
+            if(timer < 2.0f)
+                message = "Loaded Game";
+            else if(timer < 2.5f)
+                message = "3!";
+            else if(timer < 3.0f)
+                message = "2!";
+            else if(timer < 3.5f)
+                message = "1!";
+            else if(timer < 4.0f)
+                message = "GO!";
+            Timer += Global.FrameTime;
+            timer += Global.FrameTime / 1000.0;
+        }
         BeginDrawing();
         ClearBackground(Global.Background);
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
@@ -231,8 +245,11 @@ void Game::init() {
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 15), ScaleCordY(220)}, Scale(40), Scale(1), WHITE);
         renderMouse();
-        EndDrawing();
+        rlDrawRenderBatchActive();
+        SwapScreenBuffer();
     }
+    Global.LastFrameTime = getTimer();
+    Global.FrameTime = 0.5;
 }
 void Game::update() {
     Global.enableMouse = false;
@@ -744,6 +761,10 @@ void WIPMenu::update(){
         }
         applyMouse = true;
         init();
+    }
+    if(IsKeyPressed(KEY_BACKSPACE) and !CanGoBack){
+        Global.CurrentState->unload();
+        Global.CurrentState.reset(new MainMenu());
     }
 
 }

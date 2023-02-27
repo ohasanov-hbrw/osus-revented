@@ -43,6 +43,9 @@ class Slider : public HitObject{
         RenderTexture2D sliderTexture;
 
         Shader shdrOutline;
+
+        bool textureReady = false;
+        bool textureLoaded = false;
         
         float minX = static_cast<float>(INT_MAX), minY = static_cast<float>(INT_MAX), maxX = INT_MIN, maxY = INT_MIN;
 };

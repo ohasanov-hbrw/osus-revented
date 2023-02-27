@@ -50,7 +50,7 @@ struct Globals {
     Font DefaultFont;
 
     std::string Path = std::filesystem::current_path().string();
-    std::string BeatmapLocation = std::filesystem::current_path().string() + "/beatmaps";
+    std::string BeatmapLocation = /*"C:/Users/renot/AppData/Local/osu!/Songs";*/ std::filesystem::current_path().string() + "/beatmaps";
     std::string GamePath = std::filesystem::current_path().string();
     std::string selectedPath = "";
     std::string CurrentLocation = std::filesystem::current_path().string();
@@ -70,6 +70,9 @@ struct Globals {
     bool Key2R = false;
     bool enableMouse = true;
     int Wheel = 0;
+
+    double LastFrameTime;
+    double FrameTime;
 
     Shader shdrOutline;
 

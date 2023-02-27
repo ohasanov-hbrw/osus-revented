@@ -417,15 +417,13 @@ void GameManager::run(){
 	long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 	//ms = getTimer() / 1000.0;
 
-
 	if(Global.startTime < 0){
 		Global.amogus2 = 0;
 		Global.amogus3 = 0.0f;
-		Global.startTime += GetFrameTime() * 1000.0f;
+		Global.startTime += Global.FrameTime;
 		Time = Global.startTime;
 		//std::cout << Time << std::endl;
 	}
-
 	if(Global.startTime >= 0 and startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
@@ -452,85 +450,76 @@ void GameManager::run(){
 		Global.avgSum = 0;
     	Global.avgNum = 0;
     	Global.avgTime = 0;
+
+		Global.LastFrameTime = getTimer();
 	}
-	UpdateMusicStream(backgroundMusic);
-	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
-		//DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
-		if(IsKeyPressed(KEY_S)){
-			SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
+	if(true){
+		UpdateMusicStream(backgroundMusic);
+		if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
+			//DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
+			if(IsKeyPressed(KEY_S)){
+				SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
+			}
 		}
-	}
-	if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
-		stop = true;
-	if(stop && Global.curTime2 < 1.0f){
-		StopMusicStream(backgroundMusic);
-	}
-	
-	
-	updateTimer();
-
-
-	
-    if (IsMusicStreamPlaying(backgroundMusic)){
-        Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
-		if(!AreSame(TimerLast, Time)){
-			Global.amogus2 = std::abs((Time - TimerLast) / 1.5f);
-			Global.amogus3 = Time - TimerLast;
-
-            TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
-            TimeLast = ms;
-        }
-        else{
-            Time += ms - TimeLast;
-        }
-    }
-    else{
-        TimeLast = ms;
-    }
-
-
-	Global.curTime = Time;
-
-	
-	if(currentTimeTemp != GetMusicTimePlayed(backgroundMusic) && IsMusicStreamPlaying(backgroundMusic)){
-		currentTimeTemp = GetMusicTimePlayed(backgroundMusic);
-		Global.curTime2 = currentTimeTemp;
-	}
-	else{
-		if(IsMusicStreamPlaying(backgroundMusic)){
-			Global.curTime2 += GetFrameTime();
+		if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
+			stop = true;
+		if(stop && Global.curTime2 < 1.0f){
+			StopMusicStream(backgroundMusic);
 		}
-	}
+		
+		
+		if (IsMusicStreamPlaying(backgroundMusic)){
+			Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
+			if(!AreSame(TimerLast, Time)){
+				Global.amogus2 = std::abs((Time - TimerLast) / 1.5f);
+				Global.amogus3 = Time - TimerLast;
 
-	double LastInterpolatedTime = Global.currentOsuTime;
-
-	bool IsInterpolating;
-
-	if (IsMusicStreamPlaying(backgroundMusic)){
-		if (GetMusicTimePlayed(backgroundMusic) * 1000.0 != 0)
-			IsInterpolating = true;
-		double ElapsedTime = getTimer() - Global.LastOsuTime;
-		Global.LastOsuTime = getTimer();
-		Global.CurrentInterpolatedTime += ElapsedTime;
-		if (!IsInterpolating || std::abs(GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) > 8){
-			Global.CurrentInterpolatedTime = ElapsedTime < 0 ? GetMusicTimePlayed(backgroundMusic) * 1000.0: std::max(LastInterpolatedTime, GetMusicTimePlayed(backgroundMusic) * 1000.0);
-			IsInterpolating = false;
-			std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
+				TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
+				TimeLast = ms;
+			}
+			else{
+				Time += ms - TimeLast;
+			}
 		}
 		else{
-			Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 8;
-			Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
+			TimeLast = ms;
 		}
-    }
 
-	Global.currentOsuTime = IsMusicStreamPlaying(backgroundMusic) ? Global.CurrentInterpolatedTime : GetMusicTimePlayed(backgroundMusic);
 
-	currentTime = (double)Time / 1000.0;
-	if(IsMusicStreamPlaying(backgroundMusic)){
-		currentTime = Global.currentOsuTime / 1000.0;
+		Global.curTime = Time;
+		double LastInterpolatedTime = Global.currentOsuTime;
+
+		bool IsInterpolating;
+
+		if (IsMusicStreamPlaying(backgroundMusic)){
+			if (GetMusicTimePlayed(backgroundMusic) * 1000.0 != 0)
+				IsInterpolating = true;
+			double ElapsedTime = getTimer() - Global.LastOsuTime;
+			Global.LastOsuTime = getTimer();
+			Global.CurrentInterpolatedTime += ElapsedTime;
+			if (!IsInterpolating || std::abs(GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) > 8){
+				Global.CurrentInterpolatedTime = ElapsedTime < 0 ? GetMusicTimePlayed(backgroundMusic) * 1000.0: std::max(LastInterpolatedTime, GetMusicTimePlayed(backgroundMusic) * 1000.0);
+				IsInterpolating = false;
+				std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
+			}
+			else{
+				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 8;
+				Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
+			}
+		}
+
+		Global.currentOsuTime = IsMusicStreamPlaying(backgroundMusic) ? Global.CurrentInterpolatedTime : GetMusicTimePlayed(backgroundMusic);
+
+		currentTime = (double)Time / 1000.0;
+		if(IsMusicStreamPlaying(backgroundMusic)){
+			currentTime = Global.currentOsuTime / 1000.0;
+		}
+
+		currentTime -= 2/1000.0f;
+		GameManager::update();
+		//std::cout << "called update at time " << currentTime << "\n";
+		currentTime += 2/1000.0f;
 	}
-
-	GameManager::update();
 	
 }
 

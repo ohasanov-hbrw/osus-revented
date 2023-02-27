@@ -409,8 +409,6 @@ void Slider::init(){
         maxY = std::max(maxY, renderPoints[i].y);
     }
 
-
-
     sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize);
     
     SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
