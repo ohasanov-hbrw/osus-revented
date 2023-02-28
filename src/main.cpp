@@ -24,6 +24,12 @@
 //hello from arch!
 Globals Global;
 
+
+void GameLoop(){
+    
+}
+
+
 int main() {
 
     Global.CurrentState = std::make_shared<MainMenu>();
@@ -97,37 +103,37 @@ int main() {
         avgFrameTime = 0;
         double Timer = 0;
         int num = 0;
-        while(Timer < 5 and Timer >= 0){
-            Global.FrameTime = getTimer() - Global.LastFrameTime;
-            //std::cout << Global.FrameTime << std::endl;
-            num++;
+        //while(Timer < 5 and Timer >= 0){
+        Global.FrameTime = getTimer() - Global.LastFrameTime;
+        //std::cout << Global.FrameTime << std::endl;
+        num++;
 
-            Global.LastFrameTime = getTimer();
-            PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
-            if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
-            {
-                int display = GetCurrentMonitor();
-                if (IsWindowFullscreen())
-                    SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-                else
-                    SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-                ToggleFullscreen();
+        Global.LastFrameTime = getTimer();
+        //PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
+        if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
+        {
+            int display = GetCurrentMonitor();
+            if (IsWindowFullscreen())
                 SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-                if(!IsWindowFullscreen())
-                    SetWindowSize(640, 480); 
-            }
-            GetScale();
-            GetMouse();
-            GetKeys();
-
-            updateMouseTrail();
-            updateUpDown();
-            Global.CurrentState->update();
-            while(getTimer() - Global.LastFrameTime < 0.5 and getTimer() - Global.LastFrameTime >= 0)
-                continue;
-            Timer += Global.FrameTime;
-            //std::cout << Timer << std::endl;
+            else
+                SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
+            ToggleFullscreen();
+            SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
+            if(!IsWindowFullscreen())
+                SetWindowSize(640, 480); 
         }
+        GetScale();
+        GetMouse();
+        GetKeys();
+
+        updateMouseTrail();
+        updateUpDown();
+        Global.CurrentState->update();
+            /*while(getTimer() - Global.LastFrameTime < 0.5 and getTimer() - Global.LastFrameTime >= 0)
+                continue;
+            Timer += Global.FrameTime;*/
+            //std::cout << Timer << std::endl;
+        //}
 
 
 
@@ -140,13 +146,14 @@ int main() {
         renderMouse();
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  1000.0/Timer), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, TextFormat("Rough MS per game loop: %.3f",  Timer/(double)num), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
-        rlDrawRenderBatchActive();
-        SwapScreenBuffer();
+        /*rlDrawRenderBatchActive();
+        SwapScreenBuffer();*/
+
         //std::cout << "drawing took: " << getTimer() - Global.LastFrameTime << "ms\n";        
         
-        //EndDrawing();
+        EndDrawing();
 
-
+        
 
     }
 

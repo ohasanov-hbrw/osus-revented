@@ -27,6 +27,11 @@ class Slider : public HitObject{
 
         std::vector<std::vector<bool>> renderedLocations = {std::vector<std::vector<bool>>(940, std::vector<bool>(780, false))};
         
+
+        bool textureReady = false;
+        bool textureLoaded = false;
+        
+
     private:
         double sliderDuration;
         double currentDuration;
@@ -44,8 +49,7 @@ class Slider : public HitObject{
 
         Shader shdrOutline;
 
-        bool textureReady = false;
-        bool textureLoaded = false;
+        
         
         float minX = static_cast<float>(INT_MAX), minY = static_cast<float>(INT_MAX), maxX = INT_MIN, maxY = INT_MIN;
 };

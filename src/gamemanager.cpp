@@ -152,6 +152,9 @@ void GameManager::update(){
 			" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
 			" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;*/
 			objects[objects.size()-1]->init();
+
+			//std::thread objectThread(std::bind(&HitObject::init, objects[objects.size()-1]));
+			//objectThread.join();
 			gameFile.hitObjects.pop_back();
 			spawnedHitObjects++;
 			for(int amog = 0; amog < index - 1; amog++){
@@ -1798,8 +1801,19 @@ void GameManager::destroyHitObject(int index){
 
 void GameManager::destroyDeadHitObject(int index){
 	//somehow "kill" the "dead" object
-	delete dead_objects[index];
-	dead_objects.erase(dead_objects.begin()+index);
+	if(dead_objects[index]->data.type == 2){
+		Slider* tempslider = dynamic_cast<Slider*>(dead_objects[index]);
+		if(tempslider->textureLoaded == false and tempslider->textureReady == true){
+			tempslider->renderedLocations.clear();
+        	tempslider->renderPoints.clear();
+			delete dead_objects[index];
+			dead_objects.erase(dead_objects.begin()+index);
+		}
+	}
+	else{
+		delete dead_objects[index];
+		dead_objects.erase(dead_objects.begin()+index);
+	}
 }
 
 void GameManager::render_points(){

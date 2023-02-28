@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <memory>
 #include "gamemanager.hpp"
+#include <thread>
+#include <functional>
 
 #define PLATFORM_DESKTOP
 
