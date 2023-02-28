@@ -26,7 +26,22 @@ Globals Global;
 
 
 void GameLoop(){
-    
+    //while(true){
+        //PollInputEvents();
+        Global.FrameTime = getTimer() - Global.LastFrameTime;
+        Global.LastFrameTime = getTimer();
+        
+        GetScale();
+        GetMouse();
+        GetKeys();
+
+        updateMouseTrail();
+        updateUpDown();
+        Global.CurrentState->update();
+        while(getTimer() - Global.LastFrameTime < 1 and getTimer() - Global.LastFrameTime >= 0)
+            continue;
+        std::cout << "one more logic frame done in " << getTimer() - Global.LastFrameTime << "ms\n";
+    //}
 }
 
 
@@ -88,9 +103,6 @@ int main() {
 	}
 	files.clear();
     Global.Path = lastPath;
-
-
-
     GenTextureMipmaps(&Global.OsusLogo);
     GenTextureMipmaps(&Global.cursor);
     GenTextureMipmaps(&Global.DefaultFont.texture); //OPENGL1.1 DOESNT SUPPORT THIS
@@ -99,64 +111,42 @@ int main() {
     HideCursor();
     initMouseTrail();
     Global.LastFrameTime = getTimer();
+    double lastFrame = getTimer();
+    //std::thread geym(GameLoop);
     while(!WindowShouldClose()){
-        avgFrameTime = 0;
-        double Timer = 0;
-        int num = 0;
-        //while(Timer < 5 and Timer >= 0){
-        Global.FrameTime = getTimer() - Global.LastFrameTime;
-        //std::cout << Global.FrameTime << std::endl;
-        num++;
-
-        Global.LastFrameTime = getTimer();
-        //PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
-        if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
-        {
-            int display = GetCurrentMonitor();
-            if (IsWindowFullscreen())
+        while(getTimer() - lastFrame < 1000.0/144.0 and getTimer() - lastFrame >= 0){
+            //PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
+            if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
+            {
+                int display = GetCurrentMonitor();
+                if (IsWindowFullscreen())
+                    SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
+                else
+                    SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
+                ToggleFullscreen();
                 SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            else
-                SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            ToggleFullscreen();
-            SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            if(!IsWindowFullscreen())
-                SetWindowSize(640, 480); 
+                if(!IsWindowFullscreen())
+                    SetWindowSize(640, 480); 
+            }
+            PollInputEvents();
+            GameLoop();
         }
-        GetScale();
-        GetMouse();
-        GetKeys();
-
-        updateMouseTrail();
-        updateUpDown();
-        Global.CurrentState->update();
-            /*while(getTimer() - Global.LastFrameTime < 0.5 and getTimer() - Global.LastFrameTime >= 0)
-                continue;
-            Timer += Global.FrameTime;*/
-            //std::cout << Timer << std::endl;
-        //}
-
-
-
-
+        lastFrame = getTimer();
         BeginDrawing();
         ClearBackground(Global.Background);
         Global.CurrentState->render();
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
         renderMouse();
-        DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  1000.0/Timer), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
-        DrawTextEx(Global.DefaultFont, TextFormat("Rough MS per game loop: %.3f",  Timer/(double)num), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
-        /*rlDrawRenderBatchActive();
-        SwapScreenBuffer();*/
-
-        //std::cout << "drawing took: " << getTimer() - Global.LastFrameTime << "ms\n";        
+        /*DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  1000.0/Timer), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
+        DrawTextEx(Global.DefaultFont, TextFormat("Rough MS per game loop: %.3f",  Timer/(double)num), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);*/
+        rlDrawRenderBatchActive();
+        SwapScreenBuffer();
         
-        EndDrawing();
-
         
 
     }
-
+    //geym.detach();
     UnloadTexture(Global.OsusLogo);
     UnloadFont(Global.DefaultFont);
     UnloadShader(Global.shdrOutline);
