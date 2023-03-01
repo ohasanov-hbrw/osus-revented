@@ -19,18 +19,33 @@
 #include "fs.hpp"
 #include "state.hpp"
 #include "zip.h"
+#include "../vendor/raylib/src/external/glfw/include/GLFW/glfw3.h"
+double Mx = 0;
+double My = 0;
+
+
+
 
 
 //hello from arch!
 Globals Global;
 
+static void cursorCall(GLFWwindow* window, double xpos, double ypos){
+    Mx = xpos;
+    My = ypos;
+    //std::cout << "callback\n";
+}
 
 void GameLoop(){
     //while(true){
         //PollInputEvents();
+        
         Global.FrameTime = getTimer() - Global.LastFrameTime;
         Global.LastFrameTime = getTimer();
         
+        Global.CallbackMouse.x = Mx;
+        Global.CallbackMouse.y = My;
+
         GetScale();
         GetMouse();
         GetKeys();
@@ -40,9 +55,32 @@ void GameLoop(){
         Global.CurrentState->update();
         while(getTimer() - Global.LastFrameTime < 1 and getTimer() - Global.LastFrameTime >= 0)
             continue;
-        std::cout << "one more logic frame done in " << getTimer() - Global.LastFrameTime << "ms\n";
+        //std::cout << "one more logic frame done in " << getTimer() - Global.LastFrameTime << "ms\n";
     //}
 }
+
+
+
+/*
+if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
+static void ErrorCallback(int error, const char *description);                             // GLFW3 Error Callback, runs on GLFW3 error
+// Window callbacks events
+static void WindowSizeCallback(GLFWwindow *window, int width, int height);                 // GLFW3 WindowSize Callback, runs when window is resized
+#if !defined(PLATFORM_WEB)
+static void WindowMaximizeCallback(GLFWwindow* window, int maximized);                     // GLFW3 Window Maximize Callback, runs when window is maximized
+#endif
+static void WindowIconifyCallback(GLFWwindow *window, int iconified);                      // GLFW3 WindowIconify Callback, runs when window is minimized/restored
+static void WindowFocusCallback(GLFWwindow *window, int focused);                          // GLFW3 WindowFocus Callback, runs when window get/lose focus
+static void WindowDropCallback(GLFWwindow *window, int count, const char **paths);         // GLFW3 Window Drop Callback, runs when drop files into window
+// Input callbacks events
+static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);  // GLFW3 Keyboard Callback, runs on key pressed
+static void CharCallback(GLFWwindow *window, unsigned int key);                            // GLFW3 Char Key Callback, runs on key pressed (get char value)
+static void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);     // GLFW3 Mouse Button Callback, runs on mouse button pressed
+static void MouseCursorPosCallback(GLFWwindow *window, double x, double y);                // GLFW3 Cursor Position Callback, runs on mouse move
+static void MouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset);       // GLFW3 Srolling Callback, runs on mouse wheel
+static void CursorEnterCallback(GLFWwindow *window, int enter);                            // GLFW3 Cursor Enter Callback, cursor enters client area
+#endif
+*/
 
 
 int main() {
@@ -112,7 +150,25 @@ int main() {
     initMouseTrail();
     Global.LastFrameTime = getTimer();
     double lastFrame = getTimer();
+    
+
+    //CORE.Window.handle;
+    int wx, wy;
+    GLFWwindow* window = (GLFWwindow*)GetWindowGL();
+    std::cout << "set window\n";
+    std::cout << window << "\n";
+    glfwGetWindowSize(window, &wx, &wy);
+    std::cout << "get window\n";
+    std::cout << wx << " " << wy << "\n";
+    glfwSetWindowTitle (window, "osus?");
+    std::cout << "set name\n";
+    //glfwSetCursorPosCallback(window, NULL);
+    std::cout << "set to null\n";
+    glfwSetCursorPosCallback(window, cursorCall);
+    std::cout << "set callback\n";
+
     //std::thread geym(GameLoop);
+
     while(!WindowShouldClose()){
         while(getTimer() - lastFrame < 1000.0/144.0 and getTimer() - lastFrame >= 0){
             //PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
@@ -130,6 +186,7 @@ int main() {
             }
             PollInputEvents();
             GameLoop();
+            //glfwPollEvents();
         }
         lastFrame = getTimer();
         BeginDrawing();
@@ -142,9 +199,7 @@ int main() {
         DrawTextEx(Global.DefaultFont, TextFormat("Rough MS per game loop: %.3f",  Timer/(double)num), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);*/
         rlDrawRenderBatchActive();
         SwapScreenBuffer();
-        
-        
-
+        //std::cout << Mx << " " << My << std::endl;
     }
     //geym.detach();
     UnloadTexture(Global.OsusLogo);

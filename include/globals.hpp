@@ -23,6 +23,10 @@ struct Globals {
     float Scale = 1.f;
     Vector2 ZeroPoint = {0.f, 0.f};
     Color Background = { 15, 0, 30, 255 };
+
+
+    Vector2 CallbackMouse = {0, 0};
+
     //Color Background = {42,22,33,255};
     int skinNumberOverlap = 18;
     int FPS = 1000;

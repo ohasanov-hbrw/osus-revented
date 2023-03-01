@@ -44,7 +44,7 @@ void GetScale(){
 
 void GetMouse(){
     //Get the mouse position and also check if it is in the game area
-    Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
+    Global.MouseInFocus = CheckCollisionPointRec(Global.CallbackMouse, (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
     if(!Global.MouseInFocus){
         Global.MousePosition = {0,0};
         //if it isnt in the game area, show the cursor
@@ -52,7 +52,7 @@ void GetMouse(){
             ShowCursor();
     }
     else {
-        Global.MousePosition = {(GetMouseX() - Global.ZeroPoint.x) / Global.Scale, (GetMouseY() - Global.ZeroPoint.y) / Global.Scale};
+        Global.MousePosition = {(Global.CallbackMouse.x - Global.ZeroPoint.x) / Global.Scale, (Global.CallbackMouse.y - Global.ZeroPoint.y) / Global.Scale};
         //if it is in the game area, hide the cursor
         if(!IsCursorHidden())
             HideCursor();
