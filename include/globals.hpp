@@ -27,6 +27,8 @@ struct Globals {
 
     Vector2 CallbackMouse = {0, 0};
 
+    int GameTextures = 0;
+
     //Color Background = {42,22,33,255};
     int skinNumberOverlap = 18;
     int FPS = 1000;

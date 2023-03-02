@@ -518,10 +518,10 @@ void GameManager::run(){
 			currentTime = Global.currentOsuTime / 1000.0;
 		}
 
-		currentTime -= 2/1000.0f;
+		//currentTime -= 2/1000.0f;
 		GameManager::update();
 		//std::cout << "called update at time " << currentTime << "\n";
-		currentTime += 2/1000.0f;
+		//currentTime += 2/1000.0f;
 	}
 	
 }
@@ -824,7 +824,7 @@ void GameManager::loadGame(std::string filename){
 	files.clear();
 	Global.Path = lastPath + '/';
 	files = ls(".png");
-	std::vector<std::string> files2 = ls(".jpg");
+	/*std::vector<std::string> files2 = ls(".jpg");
 	std::vector<std::string> files3 = ls(".jpeg");
 	files.insert(files.end(), files2.begin(), files2.end());
 	files.insert(files.end(), files3.begin(), files3.end());
@@ -874,18 +874,11 @@ void GameManager::loadGame(std::string filename){
 				}
 			}
 		}
-	}
+	}*/
 
 
 	std::reverse(gameFile.events.begin(),gameFile.events.end());
 
-
-
-
-
-	//---------------------------------------------------------------------------------------------------------------------------------------------------------
-	//--------------------------------------------------------------------|TEMPORARY TESTS|--------------------------------------------------------------------
-	//---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	for(int i = 0; i < gameFile.hitObjects.size(); i++){
 		if(gameFile.hitObjects[i].type == 2){
@@ -1090,12 +1083,12 @@ void GameManager::loadGame(std::string filename){
 	
 
 	
-
-	GameManager::loadDefaultSkin(filename); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
+	Global.GameTextures = 2;
+	/*GameManager::loadDefaultSkin(filename); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
 	GameManager::loadGameSkin(filename); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
 	if(!IsKeyDown(KEY_S)){
 		GameManager::loadBeatmapSkin(filename); // LOADING THE BEATMAP SKIN USING A SEPERATE FUNCTION
-	}
+	}*/
 
 
 
@@ -1670,14 +1663,15 @@ void GameManager::loadGame(std::string filename){
 	}
 	
 
-	sliderin = LoadTexture("resources/sliderin.png");
-	sliderout = LoadTexture("resources/sliderout.png");
+	
 
 	Global.Path = lastPath;
 
+	Global.GameTextures = 1;
+
 	std::cout << "gen mipmaps" << std::endl;
 
-	GenTextureMipmaps(&hit0);
+	/*GenTextureMipmaps(&hit0);
 	SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
 	GenTextureMipmaps(&hit50);
 	SetTextureFilter(hit50, TEXTURE_FILTER_TRILINEAR );
@@ -1703,8 +1697,8 @@ void GameManager::loadGame(std::string filename){
 	GenTextureMipmaps(&sliderscorepoint);
 	SetTextureFilter(sliderscorepoint, TEXTURE_FILTER_TRILINEAR );
 	
-	/*GenTextureMipmaps(&sliderout);
-	SetTextureFilter(sliderout, TEXTURE_FILTER_TRILINEAR );*/
+	//GenTextureMipmaps(&sliderout);
+	//SetTextureFilter(sliderout, TEXTURE_FILTER_TRILINEAR );
 	
 	
 
@@ -1713,60 +1707,23 @@ void GameManager::loadGame(std::string filename){
 	for(int i = 0; i < 10; i++){
 		GenTextureMipmaps(&numbers[i]);
 		SetTextureFilter(numbers[i], TEXTURE_FILTER_TRILINEAR );  //OPENGL1.1 DOESNT SUPPORT THIS
-	}
+	}*/
 	startMusic = true;
 	stop = false;
 }
 
 void GameManager::unloadGame(){
+	std::cout << "GameManager::unloadGame()" << std::endl;
 	currentComboIndex = 0;
-	UnloadTexture(hitCircleOverlay);
-	UnloadTexture(selectCircle);
-	UnloadTexture(hitCircle);
-	UnloadTexture(sliderscorepoint);
-	UnloadTexture(approachCircle);
-	UnloadTexture(hit300);
-	UnloadTexture(hit100);
-	UnloadTexture(hit50);
-	UnloadTexture(hit0);
-	UnloadTexture(sliderb);
-	UnloadTexture(sliderin);
-	UnloadTexture(sliderout);
-	UnloadTexture(reverseArrow);
-	UnloadTexture(spinnerBottom);
-	UnloadTexture(spinnerTop);
-	UnloadTexture(spinnerCircle);
-	UnloadTexture(spinnerApproachCircle);
-	UnloadTexture(spinnerMetre);
-	for(int i = 0; i < 10; i++){
-		UnloadTexture(numbers[i]);
-	}
-
-	/*for(int i = 0; i < SoundFiles.data.size(); i++){
-		if(SoundFiles.loaded[i]){
-			UnloadSound(SoundFiles.data[i]);
-		}
-	}*/
-
+	Global.GameTextures = -1;
+	
 	for(auto& pair : SoundFiles.data) {
     	UnloadSound(pair.second);
   	}
 
-
-
 	UnloadMusicStream(backgroundMusic);
 	free(musicData);
 
-	std::string key;
-	for(std::map<std::string, Texture2D>::iterator it = backgroundTextures.data.begin(); it != backgroundTextures.data.end(); ++it){
-		key = it->first;
-		std::cout << "Removed: " << it->first << "\n";
-		UnloadTexture(backgroundTextures.data[key]);
-	}
-
-	backgroundTextures.data.clear();
-	backgroundTextures.pos.clear();
-	backgroundTextures.loaded.clear();
 	SoundFiles.data.clear();
 	SoundFiles.loaded.clear();
 	gameFile.hitObjects.clear();

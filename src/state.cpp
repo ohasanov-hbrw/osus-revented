@@ -201,6 +201,7 @@ Game::Game() {
     
 }
 void Game::init() {
+    initDone = 0;
     Global.LastFrameTime = getTimer();
     std::cout << Global.selectedPath << std::endl;
     Global.gameManager->loadGame(Global.selectedPath);
@@ -210,85 +211,67 @@ void Game::init() {
     Global.errorLast = 0;
     Global.errorDiv = 0;
     std::cout << "done init" << std::endl;
-    float timer = 0;
-    while(timer < 4.0f){
-        std::string message;
-        Global.LastFrameTime = getTimer();
-        double Timer = 0;
-        while(Timer < 10){
-            Global.FrameTime = getTimer() - Global.LastFrameTime;
-            Global.LastFrameTime = getTimer();
-            PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
-            GetScale();
-            GetMouse();
-            GetKeys();
-            updateMouseTrail();
-            updateUpDown();
-            if(timer < 2.0f)
-                message = "Loaded Game";
-            else if(timer < 2.5f)
-                message = "3!";
-            else if(timer < 3.0f)
-                message = "2!";
-            else if(timer < 3.5f)
-                message = "1!";
-            else if(timer < 4.0f)
-                message = "GO!";
-            Timer += Global.FrameTime;
-            timer += Global.FrameTime / 1000.0;
+}
+void Game::update() {
+    if(initDone == 1){
+        Global.enableMouse = false;
+        Global.gameManager->run();
+        if(IsKeyPressed(KEY_BACKSPACE)){
+            Global.gameManager->unloadGame();
+            Global.CurrentState->unload();
+            Global.CurrentState.reset(new PlayMenu());
+            Global.CurrentState->init();
         }
-        BeginDrawing();
-        ClearBackground(Global.Background);
+    }
+    else{
+        if(initDone == 0 or Global.GameTextures != 0){
+            initStartTime = getTimer();
+            initDone = -1;
+        }
+        if(getTimer() - initStartTime > 4000.0f){
+            std::cout << "init done in " << getTimer() - initStartTime << " secs\n";
+            initDone = true;
+        }
+    }
+}
+void Game::render() {
+    if(initDone == 1){
+        Global.enableMouse = false;
+        Global.gameManager->render();
+        if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
+            DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+            //DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
+            //DrawTextEx(Global.DefaultFont, TextFormat("Timer: %.3f ms", getTimer()), {ScaleCordX(5), ScaleCordY(55)}, Scale(10) , Scale(1), WHITE);
+            //DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %.3f ms", Global.errorLast/1000.0f), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
+            //DrawTextEx(Global.DefaultFont, TextFormat("Avg Time Difference in the First Second: %.3f ms", Global.avgTime), {ScaleCordX(5), ScaleCordY(75)}, Scale(10) , Scale(1), WHITE);
+        }
+        else{
+            DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
+            if(Global.errorDiv != 0)
+                DrawTextEx(Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
+        }
+        if(GetMusicTimeLength(Global.gameManager->backgroundMusic) != 0){
+            DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
+        }
+    }
+    else{
+        std::string message;
+        if(getTimer() - initStartTime < 2000.0f)
+            message = "Loaded Game";
+        else if(getTimer() - initStartTime < 2500.0f)
+            message = "3!";
+        else if(getTimer() - initStartTime < 3000.0f)
+            message = "2!";
+        else if(getTimer() - initStartTime < 3500.0f)
+            message = "1!";
+        else if(getTimer() - initStartTime < 4000.0f)
+            message = "GO!";
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
         
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 15), ScaleCordY(220)}, Scale(40), Scale(1), WHITE);
         renderMouse();
-        rlDrawRenderBatchActive();
-        SwapScreenBuffer();
-    }
-    Global.LastFrameTime = getTimer();
-    Global.FrameTime = 0.5;
-}
-void Game::update() {
-    Global.enableMouse = false;
-    Global.gameManager->run();
-    if(IsKeyPressed(KEY_BACKSPACE)){
-        Global.gameManager->unloadGame();
-        Global.CurrentState->unload();
-        Global.CurrentState.reset(new PlayMenu());
-        Global.CurrentState->init();
-    }
-    /*if(IsKeyPressed(KEY_SPACE)){
-        if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
-            PauseMusicStream(Global.gameManager->backgroundMusic);
-            pauseTimer();
-        }
-        else{
-            ResumeMusicStream(Global.gameManager->backgroundMusic);
-            resumeTimer();
-        }
-        
-    }*/
-}
-void Game::render() {
-    Global.enableMouse = false;
-    Global.gameManager->render();
-    if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
-        DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
-        //DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
-        //DrawTextEx(Global.DefaultFont, TextFormat("Timer: %.3f ms", getTimer()), {ScaleCordX(5), ScaleCordY(55)}, Scale(10) , Scale(1), WHITE);
-        //DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %.3f ms", Global.errorLast/1000.0f), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
-        //DrawTextEx(Global.DefaultFont, TextFormat("Avg Time Difference in the First Second: %.3f ms", Global.avgTime), {ScaleCordX(5), ScaleCordY(75)}, Scale(10) , Scale(1), WHITE);
-    }
-    else{
-        DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
-        if(Global.errorDiv != 0)
-            DrawTextEx(Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
-    }
-    if(GetMusicTimeLength(Global.gameManager->backgroundMusic) != 0){
-        DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
     }
 }
 

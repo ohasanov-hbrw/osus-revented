@@ -9,7 +9,8 @@ class State {
 public:
     State() = default;
     virtual ~State() = default;
-
+    int initDone = 0;
+    double initStartTime = 0;
     virtual void init() = 0;
     virtual void render() = 0;
     virtual void update() = 0;
