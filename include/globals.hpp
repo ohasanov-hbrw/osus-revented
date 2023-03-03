@@ -108,6 +108,11 @@ struct Globals {
     double avgSum = 0;
     double avgNum = 0;
     double avgTime = 0;
+
+    int numberLines = -1;
+    int parsedLines = -1;
+
+    int loadingState = 0;
 };
 
 extern Globals Global;

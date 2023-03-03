@@ -715,7 +715,7 @@ void Slider::render(){
             if(draw and renderPoints.size() > 0){
                 //GenTextureMipmaps(&sliderTexture.texture);
                 SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR );
-                std::cout << "slider filter in use" << std::endl;
+                //std::cout << "slider filter in use" << std::endl;
             }
         }
         

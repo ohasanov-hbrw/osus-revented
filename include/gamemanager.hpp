@@ -31,6 +31,8 @@ class GameManager{
 		void loadGameSound(std::string filename);
 		void loadBeatmapSkin(std::string filename);
 		void loadBeatmapSound(std::string filename);
+		void loadGameTextures();
+		void unloadGameTextures();
 		void destroyHitObject(int index);
 		void destroyDeadHitObject(int index);
 		void render();

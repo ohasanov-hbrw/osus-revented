@@ -801,10 +801,14 @@ void GameManager::loadGame(std::string filename){
 	Global.amogus3 = 0;
 	spawnedHitObjects = 0;
 	Parser parser = Parser();
+	Global.loadingState = 5;
 	gameFile.configGeneral["SampleSet"] = "Normal";
 	std::cout << "Parsing game!" << std::endl;
 	gameFile = parser.parse(filename);
     std::cout << "Found " << gameFile.hitObjects.size() << " HitObjects and " << gameFile.timingPoints.size() << " Timing Points!" << std::endl;
+	Global.loadingState = 1;
+	Global.numberLines = -1;
+    Global.parsedLines = -1;
 	//reverse the hitobject array because we need it reversed for it to make sense (and make it faster because pop_back)
 	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
 	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
@@ -878,8 +882,7 @@ void GameManager::loadGame(std::string filename){
 
 
 	std::reverse(gameFile.events.begin(),gameFile.events.end());
-
-
+	double start = getTimer();
 	for(int i = 0; i < gameFile.hitObjects.size(); i++){
 		if(gameFile.hitObjects[i].type == 2){
 			std::vector<Vector2> edgePoints; 
@@ -1015,6 +1018,9 @@ void GameManager::loadGame(std::string filename){
 
 		}
 	}
+	std::cout << getTimer() - start << "ms -> The time it took for you to finish :)" << std::endl;
+	Global.loadingState = 2;
+	
 	//calculate all the variables for the game (these may be a bit wrong but they feel right)
 	if(std::stof(gameFile.configDifficulty["ApproachRate"]) < 5.0f){
 		gameFile.preempt = 1200.0f + 600.0f * (5.0f - std::stof(gameFile.configDifficulty["ApproachRate"])) / 5.0f;
@@ -1051,7 +1057,7 @@ void GameManager::loadGame(std::string filename){
 
 
 
-
+	
 	FILE *music = fopen((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str(), "rb");
 	fseek(music, 0, SEEK_END);
 	musicSize = ftell(music);
@@ -1064,7 +1070,7 @@ void GameManager::loadGame(std::string filename){
 	musicData[musicSize] = 0;
 
 	backgroundMusic = LoadMusicStreamFromMemory(GetFileExtension((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str()), (const unsigned char *)musicData, musicSize);
-
+	Global.loadingState = 6;
 	score = 0;
 	clickCombo = 0;
     //TODO: these are not used right now, USE THEM
@@ -1123,7 +1129,7 @@ void GameManager::loadGame(std::string filename){
 
 
 
-
+	
 
 	files.clear();
 	Global.Path = "resources/skin/";
@@ -1168,6 +1174,8 @@ void GameManager::loadGame(std::string filename){
 	SoundFiles.data.clear();
 	SoundFiles.loaded.clear();
 	
+	Global.loadingState = 3;
+
 	if(SoundFiles.loaded["combobreak"].value == false){
 		Global.Path = "resources/skin/";
 		std::vector<std::string> ComboBreak = ls(".mp3");
@@ -1226,8 +1234,7 @@ void GameManager::loadGame(std::string filename){
 	}
 
 
-
-
+	Global.loadingState = 4;
 
 	std::cout << filename << std::endl;
 	Global.Path = "resources/default_skin/";
@@ -1241,7 +1248,10 @@ void GameManager::loadGame(std::string filename){
 
 	int TimingPointIndex = gameFile.timingPoints.size() - 1;
 	int HitObjectIndex = gameFile.hitObjects.size() - 1;
+	Global.numberLines = gameFile.hitObjects.size();
+    Global.parsedLines = 0;
 	for(; HitObjectIndex >= 0; HitObjectIndex--){
+		Global.parsedLines++;
 		for(int amog = TimingPointIndex; amog >= 0; amog--){
 			if(times[amog].time > gameFile.hitObjects[HitObjectIndex].time)
 				break;
@@ -1663,13 +1673,11 @@ void GameManager::loadGame(std::string filename){
 	}
 	
 
-	
+	Global.loadingState = 7;
 
 	Global.Path = lastPath;
-
 	Global.GameTextures = 1;
-
-	std::cout << "gen mipmaps" << std::endl;
+	std::cout << "mark text for loading" << std::endl;
 
 	/*GenTextureMipmaps(&hit0);
 	SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
@@ -1723,6 +1731,9 @@ void GameManager::unloadGame(){
 
 	UnloadMusicStream(backgroundMusic);
 	free(musicData);
+
+	Global.numberLines = -1;
+    Global.parsedLines = -1;
 
 	SoundFiles.data.clear();
 	SoundFiles.loaded.clear();
@@ -1781,4 +1792,144 @@ void GameManager::render_points(){
 void GameManager::render_combo(){
 	//garbage digit finder code but it works, NO IT DOESNT WORK WITH SOME SKINS
     
+}
+
+void GameManager::loadGameTextures(){
+	sliderin = LoadTexture("resources/sliderin.png");
+    sliderout = LoadTexture("resources/sliderout.png");
+    loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
+    loadGameSkin(Global.selectedPath); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
+    if(!IsKeyDown(KEY_S)){
+        loadBeatmapSkin(Global.selectedPath); // LOADING THE BEATMAP SKIN USING A SEPERATE FUNCTION
+    }
+    GenTextureMipmaps(&hit0);
+    SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&hit50);
+    SetTextureFilter(hit50, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&hit100);
+    SetTextureFilter(hit100, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&hit300);
+    SetTextureFilter(hit300, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&approachCircle);
+    SetTextureFilter(approachCircle, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&selectCircle);
+    SetTextureFilter(selectCircle, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&hitCircleOverlay);
+    SetTextureFilter(hitCircleOverlay, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&hitCircle);
+    SetTextureFilter(hitCircle, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&sliderb);
+    SetTextureFilter(sliderb, TEXTURE_FILTER_TRILINEAR );
+
+
+    SetTextureFilter(sliderin, TEXTURE_FILTER_POINT);
+    SetTextureFilter(sliderout, TEXTURE_FILTER_POINT);
+
+    GenTextureMipmaps(&sliderscorepoint);
+    SetTextureFilter(sliderscorepoint, TEXTURE_FILTER_TRILINEAR );
+
+    GenTextureMipmaps(&reverseArrow);
+    SetTextureFilter(reverseArrow, TEXTURE_FILTER_TRILINEAR );
+    for(int i = 0; i < 10; i++){
+        GenTextureMipmaps(&numbers[i]);
+        SetTextureFilter(numbers[i], TEXTURE_FILTER_TRILINEAR );  //OPENGL1.1 DOESNT SUPPORT THIS
+    }
+
+    backgroundTextures.data.clear();
+	backgroundTextures.pos.clear();
+	backgroundTextures.loaded.clear();
+
+	std::vector<std::string> files;
+	files.clear();
+    
+	Global.Path = lastPath + '/';
+	files = ls(".png");
+	std::vector<std::string> files2 = ls(".jpg");
+	std::vector<std::string> files3 = ls(".jpeg");
+	files.insert(files.end(), files2.begin(), files2.end());
+	files.insert(files.end(), files3.begin(), files3.end());
+
+	for(int i = 0; i < (int)gameFile.events.size(); i++){
+		if(gameFile.events[i].eventType == 0){
+			std::cout << "Time: " << gameFile.events[i].startTime << "ms - Filename: " << gameFile.events[i].filename << '.' << std::endl;
+			if(gameFile.events[i].startTime == 0){
+				gameFile.events[i].startTime -= 7000;
+				std::cout << "Time changed to: " << gameFile.events[i].startTime << std::endl;
+			}
+		}
+	}
+	
+
+	std::cout << "Found this many files: " << files.size() << std::endl;
+	for(int i = 0; i < files.size(); i++){
+		std::cout << files[i] << std::endl;
+	}
+
+	for(int i = 0; i < files.size(); i++){
+		for(int j = 0; j < (int)gameFile.events.size(); j++){
+			if(gameFile.events[j].eventType == 0){
+				std::cout << "attempting to load a background\n";
+				int t = gameFile.events[j].filename.size() - 1;
+				while(gameFile.events[j].filename[t] == ' ' and t >= 0){
+					gameFile.events[j].filename.pop_back();
+					t--;
+				}
+				t = 0;
+				while(gameFile.events[j].filename[t] == ' ' and gameFile.events[j].filename.size() > 0){
+					gameFile.events[j].filename.erase(gameFile.events[j].filename.begin());
+				}
+				std::cout << "finding function returned: " << files[i].rfind(gameFile.events[j].filename, 0) << " for: " << gameFile.events[j].filename << " and " << files[i] << std::endl;
+				if(files[i].rfind(gameFile.events[j].filename, 0) == 0){
+					std::cout << "WHAT DA HEEEEEEEEEELLLLLLLLLLLLL" << std::endl;
+					Image image = LoadImage((Global.Path + files[i]).c_str());
+					backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(image);
+					UnloadImage(image); 
+					backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+					if(backgroundTextures.data[gameFile.events[j].filename].width != 0){
+						backgroundTextures.loaded[gameFile.events[j].filename].value = true;
+						std::cout << "Loaded: Background with filename: " << gameFile.events[j].filename << std::endl;
+						GenTextureMipmaps(&backgroundTextures.data[gameFile.events[j].filename]);
+						SetTextureFilter(backgroundTextures.data[gameFile.events[j].filename], TEXTURE_FILTER_TRILINEAR );
+					}
+				}
+			}
+		}
+	}
+
+    Global.GameTextures = 0;
+}
+void GameManager::unloadGameTextures(){
+	std::cout << "UnloadingTextures" << std::endl;
+    Global.GameTextures = 0;
+    UnloadTexture(hitCircleOverlay);
+    UnloadTexture(hitCircle);
+    UnloadTexture(sliderscorepoint);
+    UnloadTexture(approachCircle);
+    UnloadTexture(hit300);
+    UnloadTexture(hit100);
+    UnloadTexture(hit50);
+    UnloadTexture(hit0);
+    UnloadTexture(sliderb);
+    UnloadTexture(sliderin);
+    UnloadTexture(sliderout);
+    UnloadTexture(selectCircle);
+    UnloadTexture(reverseArrow);
+    UnloadTexture(spinnerBottom);
+    UnloadTexture(spinnerTop);
+    UnloadTexture(spinnerCircle);
+    UnloadTexture(spinnerApproachCircle);
+    UnloadTexture(spinnerMetre);
+    for(int i = 0; i < 10; i++){
+        UnloadTexture(numbers[i]);
+    }
+    std::string key;
+    for(std::map<std::string, Texture2D>::iterator it = backgroundTextures.data.begin(); it != backgroundTextures.data.end(); ++it){
+        key = it->first;
+        std::cout << "Removed: " << it->first << "\n";
+        UnloadTexture(backgroundTextures.data[key]);
+    }
+
+    backgroundTextures.data.clear();
+    backgroundTextures.pos.clear();
+    backgroundTextures.loaded.clear();
 }

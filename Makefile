@@ -1,6 +1,6 @@
 CC = g++ -DGRAPHICS_API_OPENGL_33 -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG
 cflags = -std=c++17 -g -O2
-cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound 
+cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound
 ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl
 name = osus 
 

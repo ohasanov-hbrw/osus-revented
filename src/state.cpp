@@ -204,6 +204,10 @@ void Game::init() {
     initDone = 0;
     Global.LastFrameTime = getTimer();
     std::cout << Global.selectedPath << std::endl;
+    Global.numberLines = -1;
+    Global.parsedLines = -1;
+    Global.loadingState = 0;
+    initDone = -2;
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
     Global.startTime = -700.0f;
@@ -254,24 +258,52 @@ void Game::render() {
             DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
         }
     }
-    else{
+    else if(initDone == -1){
         std::string message;
         if(getTimer() - initStartTime < 2000.0f)
-            message = "Loaded Game";
+            message = "Loaded Game!";
         else if(getTimer() - initStartTime < 2500.0f)
-            message = "3!";
+            message = "3...";
         else if(getTimer() - initStartTime < 3000.0f)
-            message = "2!";
+            message = "2...";
         else if(getTimer() - initStartTime < 3500.0f)
-            message = "1!";
+            message = "1...";
         else if(getTimer() - initStartTime < 4000.0f)
             message = "GO!";
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+        DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 7.5f), ScaleCordY(220)}, Scale(20), Scale(1), WHITE);
+    }
+    else if(initDone == -2){
+        std::string message;
+        message = "Loading Game...";
         
-        DrawTextEx(Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
-        DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 15), ScaleCordY(220)}, Scale(40), Scale(1), WHITE);
-        renderMouse();
+        if(Global.loadingState == 1){
+            //std::cout << "Precalculating HitObjects" << std::endl;
+            message = "Precalculating HitObjects";
+        }
+        else if(Global.loadingState == 2){
+            //std::cout << "Loading Background Music" << std::endl;
+            message = "Loading Background Music";
+        }
+        else if(Global.loadingState == 3){
+            //std::cout << "Loading ComboBreak Sound" << std::endl;
+            message = "Loading ComboBreak Sound";
+        }
+        else if(Global.loadingState == 4 and Global.numberLines > 0 and Global.parsedLines > 0){
+            //std::cout << "Loading Hit Sounds" << std::endl;
+            message = "Loading Hitsound " + std::to_string(Global.parsedLines) + " of " + std::to_string(Global.numberLines);
+        }
+        else if(Global.loadingState == 5 and Global.numberLines > 0 and Global.parsedLines > 0){
+            message = "Parsing line " + std::to_string(Global.parsedLines) + " of " + std::to_string(Global.numberLines);
+        }
+        else if(Global.loadingState == 6){
+            message = "Parsing Timing Points";
+        }
+        else if(Global.loadingState == 7){
+            message = "Loading Textures";
+        }
+        DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 7.5f), ScaleCordY(220)}, Scale(20), Scale(1), WHITE);
     }
 }
 

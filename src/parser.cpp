@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "globals.hpp"
 
 Parser::Parser(){}
 
@@ -45,20 +46,25 @@ GameFile Parser::parse(std::string filename){
 	gameFile.configDifficulty["OverallDifficulty"] = "5";
 	gameFile.configDifficulty["ApproachRate"] = "5";
 	gameFile.configDifficulty["SliderTickRate"] = "1";
+
+	int numLines = 0;
+	std::ifstream in(filename);
+	std::string unused;
+	while ( std::getline(in, unused) )
+		++numLines;
+	std::cout << numLines << std::endl;
+	Global.numberLines = numLines;
     std::ifstream ifs(filename);
 	std::string line;
 	int lineNumber = 0;
+	Global.parsedLines = 0;
 	if (ifs.is_open()){
-
 		std::cout << "file opened\n";
-
 		while(std::getline(ifs, line)){
-			
-			
-
 			if(line[line.size()-1] == 13)
 				line.pop_back();
 			lineNumber++;
+			Global.parsedLines++;
 			//std::cout << "Parsing line: " << lineNumber << " with the length: " << line.size() << " -> " << line << std::endl;
 			if(line[0] == '[' and line[line.size()-1] == ']'){
 				std::string header = line.substr(1);
@@ -66,6 +72,7 @@ GameFile Parser::parse(std::string filename){
 				if(header == "General"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
+						Global.parsedLines++;
 						if(subLine.size() == 0)
 							break;
 						if(subLine[subLine.size()-1] == 13)
@@ -84,6 +91,7 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "Editor"){
 					std::string subLine;
                     while(std::getline(ifs, subLine)){
+						Global.parsedLines++;
 						if(subLine.size() == 0)
 							break;
                         if(subLine[subLine.size()-1] == 13){
@@ -103,6 +111,7 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "Metadata"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
+						Global.parsedLines++;
 						if(subLine.size() == 0)
 							break;
 						lineNumber++;
@@ -123,6 +132,7 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "Difficulty"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
+						Global.parsedLines++;
 						if(subLine.size() == 0)
 							break;
 						if(subLine[subLine.size()-1] == 13)
@@ -139,6 +149,7 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "Events"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
+						Global.parsedLines++;
 						if(subLine.size() == 0)
 							break;
 						if(subLine[subLine.size()-1] == 13)
@@ -196,6 +207,7 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "TimingPoints"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
+						Global.parsedLines++;
 						if(subLine.size() == 0)
 							break;
 						if(subLine[subLine.size()-1] == 13)
@@ -226,6 +238,7 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "Colours"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
+						Global.parsedLines++;
 						if(subLine.size() == 0)
 							break;
 						if(subLine[subLine.size()-1] == 13)
@@ -252,6 +265,7 @@ GameFile Parser::parse(std::string filename){
 				else if(header == "HitObjects"){
 					std::string subLine;
 					while(std::getline(ifs, subLine)){
+						Global.parsedLines++;
 						if(subLine.size() == 0)
 							break;
 						if(subLine[subLine.size()-1] == 13)
