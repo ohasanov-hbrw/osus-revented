@@ -204,8 +204,8 @@ void Game::init() {
     initDone = 0;
     Global.LastFrameTime = getTimer();
     std::cout << Global.selectedPath << std::endl;
-    Global.numberLines = -1;
-    Global.parsedLines = -1;
+    Global.numberLines = 0;
+    Global.parsedLines = 0;
     Global.loadingState = 0;
     initDone = -2;
     Global.gameManager->loadGame(Global.selectedPath);
@@ -290,11 +290,11 @@ void Game::render() {
             //std::cout << "Loading ComboBreak Sound" << std::endl;
             message = "Loading ComboBreak Sound";
         }
-        else if(Global.loadingState == 4 and Global.numberLines > 0 and Global.parsedLines > 0){
+        else if(Global.loadingState == 4){
             //std::cout << "Loading Hit Sounds" << std::endl;
             message = "Loading Hitsound " + std::to_string(Global.parsedLines) + " of " + std::to_string(Global.numberLines);
         }
-        else if(Global.loadingState == 5 and Global.numberLines > 0 and Global.parsedLines > 0){
+        else if(Global.loadingState == 5){
             message = "Parsing line " + std::to_string(Global.parsedLines) + " of " + std::to_string(Global.numberLines);
         }
         else if(Global.loadingState == 6){

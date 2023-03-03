@@ -807,8 +807,8 @@ void GameManager::loadGame(std::string filename){
 	gameFile = parser.parse(filename);
     std::cout << "Found " << gameFile.hitObjects.size() << " HitObjects and " << gameFile.timingPoints.size() << " Timing Points!" << std::endl;
 	Global.loadingState = 1;
-	Global.numberLines = -1;
-    Global.parsedLines = -1;
+	Global.numberLines = gameFile.hitObjects.size();
+    Global.parsedLines = 0;
 	//reverse the hitobject array because we need it reversed for it to make sense (and make it faster because pop_back)
 	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
 	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
@@ -1248,7 +1248,6 @@ void GameManager::loadGame(std::string filename){
 
 	int TimingPointIndex = gameFile.timingPoints.size() - 1;
 	int HitObjectIndex = gameFile.hitObjects.size() - 1;
-	Global.numberLines = gameFile.hitObjects.size();
     Global.parsedLines = 0;
 	for(; HitObjectIndex >= 0; HitObjectIndex--){
 		Global.parsedLines++;
