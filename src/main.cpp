@@ -69,9 +69,8 @@ void GameLoop(){
 
 
 int main() {
-    //SDL_SetMainReady();
+    SDL_SetMainReady();
     
-    //SDL_Init(SDL_INIT_EVERYTHING);
     std::mutex locktite;
     Global.CurrentState = std::make_shared<MainMenu>();
     for(int i = 0; i < Global.GamePath.size(); i++) {
@@ -82,10 +81,8 @@ int main() {
     InitAudioDevice();
     
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    //SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(Global.Width, Global.Height, "osus-revented");
-    SetWindowMinSize(320, 240);
     SetAudioStreamBufferSizeDefault(128);
+    InitWindow("aa", 640, 480);
     
 
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");

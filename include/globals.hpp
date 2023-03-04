@@ -7,7 +7,7 @@
 #include "gamemanager.hpp"
 #include <thread>
 #include <functional>
-#include "SDL.h"
+#include "SDL2/SDL.h"
 
 #define PLATFORM_DESKTOP
 

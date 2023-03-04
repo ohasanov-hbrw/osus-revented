@@ -314,6 +314,8 @@
 #define FLAG_TOGGLE(n, f) ((n) ^= (f))
 #define FLAG_CHECK(n, f) ((n) & (f))
 
+#include "SDL2/SDL.h"
+
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
 //----------------------------------------------------------------------------------
@@ -339,7 +341,7 @@ typedef struct { unsigned int width; unsigned int height; } Size;
 typedef struct CoreData {
     struct {
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-        GLFWwindow *handle;                 // GLFW window handle (graphic device)
+        SDL_Window *handle;                 // GLFW window handle (graphic device)
 #endif
 #if defined(PLATFORM_RPI)
         EGL_DISPMANX_WINDOW_T handle;       // Native window handle (graphic device)
@@ -593,25 +595,6 @@ static void InitTimer(void);                            // Initialize timer (hi-
 static bool InitGraphicsDevice(int width, int height);  // Initialize graphics device
 static void SetupFramebuffer(int width, int height);    // Setup main framebuffer
 static void SetupViewport(int width, int height);       // Set viewport for a provided width and height
-
-#if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-static void ErrorCallback(int error, const char *description);                             // GLFW3 Error Callback, runs on GLFW3 error
-// Window callbacks events
-static void WindowSizeCallback(GLFWwindow *window, int width, int height);                 // GLFW3 WindowSize Callback, runs when window is resized
-#if !defined(PLATFORM_WEB)
-static void WindowMaximizeCallback(GLFWwindow* window, int maximized);                     // GLFW3 Window Maximize Callback, runs when window is maximized
-#endif
-static void WindowIconifyCallback(GLFWwindow *window, int iconified);                      // GLFW3 WindowIconify Callback, runs when window is minimized/restored
-static void WindowFocusCallback(GLFWwindow *window, int focused);                          // GLFW3 WindowFocus Callback, runs when window get/lose focus
-static void WindowDropCallback(GLFWwindow *window, int count, const char **paths);         // GLFW3 Window Drop Callback, runs when drop files into window
-// Input callbacks events
-static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);  // GLFW3 Keyboard Callback, runs on key pressed
-static void CharCallback(GLFWwindow *window, unsigned int key);                            // GLFW3 Char Key Callback, runs on key pressed (get char value)
-static void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);     // GLFW3 Mouse Button Callback, runs on mouse button pressed
-static void MouseCursorPosCallback(GLFWwindow *window, double x, double y);                // GLFW3 Cursor Position Callback, runs on mouse move
-static void MouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset);       // GLFW3 Srolling Callback, runs on mouse wheel
-static void CursorEnterCallback(GLFWwindow *window, int enter);                            // GLFW3 Cursor Enter Callback, cursor enters client area
-#endif
 
 #if defined(PLATFORM_ANDROID)
 static void AndroidCommandCallback(struct android_app *app, int32_t cmd);                  // Process Android activity lifecycle commands
@@ -917,8 +900,8 @@ void CloseWindow(void)
     rlglClose();                // De-init rlgl
 
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    glfwDestroyWindow(CORE.Window.handle);
-    glfwTerminate();
+    SDL_DestroyWindow(CORE.Window.handle);
+    SDL_Quit();
 #endif
 
 #if defined(_WIN32) && defined(SUPPORT_WINMM_HIGHRES_TIMER) && !defined(SUPPORT_BUSY_WAIT_LOOP)
@@ -1047,39 +1030,6 @@ void CloseWindow(void)
 }
 
 // Check if KEY_ESCAPE pressed or Close icon pressed
-bool WindowShouldClose(void)
-{
-#if defined(PLATFORM_WEB)
-    // Emterpreter-Async required to run sync code
-    // https://github.com/emscripten-core/emscripten/wiki/Emterpreter#emterpreter-async-run-synchronous-code
-    // By default, this function is never called on a web-ready raylib example because we encapsulate
-    // frame code in a UpdateDrawFrame() function, to allow browser manage execution asynchronously
-    // but now emscripten allows sync code to be executed in an interpreted way, using emterpreter!
-    emscripten_sleep(16);
-    return false;
-#endif
-
-#if defined(PLATFORM_DESKTOP)
-    if (CORE.Window.ready)
-    {
-        // While window minimized, stop loop execution
-        while (IsWindowState(FLAG_WINDOW_MINIMIZED) && !IsWindowState(FLAG_WINDOW_ALWAYS_RUN)) glfwWaitEvents();
-
-        CORE.Window.shouldClose = glfwWindowShouldClose(CORE.Window.handle);
-
-        // Reset close status for next frame
-        glfwSetWindowShouldClose(CORE.Window.handle, GLFW_FALSE);
-
-        return CORE.Window.shouldClose;
-    }
-    else return true;
-#endif
-
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
-    if (CORE.Window.ready) return CORE.Window.shouldClose;
-    else return true;
-#endif
-}
 
 // Check if window has been initialized successfully
 bool IsWindowReady(void)
@@ -1151,48 +1101,22 @@ bool IsWindowState(unsigned int flag)
 // Toggle fullscreen mode (only PLATFORM_DESKTOP)
 void ToggleFullscreen(void)
 {
-#if defined(PLATFORM_DESKTOP)
-    // TODO: glfwSetWindowMonitor() doesn't work properly (bugs)
     if (!CORE.Window.fullscreen)
     {
-        // Store previous window position (in case we exit fullscreen)
-        glfwGetWindowPos(CORE.Window.handle, &CORE.Window.position.x, &CORE.Window.position.y);
-
-        int monitorCount = 0;
-        int monitorIndex = GetCurrentMonitor();
-        GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-        // Use current monitor, so we correctly get the display the window is on
-        GLFWmonitor *monitor = (monitorIndex < monitorCount)? monitors[monitorIndex] : NULL;
-
-        if (monitor == NULL)
-        {
-            TRACELOG(LOG_WARNING, "GLFW: Failed to get monitor");
-
-            CORE.Window.fullscreen = false;
-            CORE.Window.flags &= ~FLAG_FULLSCREEN_MODE;
-
-            glfwSetWindowMonitor(CORE.Window.handle, NULL, 0, 0, CORE.Window.screen.width, CORE.Window.screen.height, GLFW_DONT_CARE);
-        }
-        else
-        {
-            CORE.Window.fullscreen = true;
-            CORE.Window.flags |= FLAG_FULLSCREEN_MODE;
-
-            glfwSetWindowMonitor(CORE.Window.handle, monitor, 0, 0, CORE.Window.screen.width, CORE.Window.screen.height, GLFW_DONT_CARE);
-        }
+        SDL_SetWindowFullscreen(CORE.Window.handle, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        CORE.Window.fullscreen = true;
+        CORE.Window.flags |= FLAG_FULLSCREEN_MODE;
     }
     else
     {
+        SDL_SetWindowFullscreen(CORE.Window.handle, 0);
         CORE.Window.fullscreen = false;
         CORE.Window.flags &= ~FLAG_FULLSCREEN_MODE;
 
-        glfwSetWindowMonitor(CORE.Window.handle, NULL, CORE.Window.position.x, CORE.Window.position.y, CORE.Window.screen.width, CORE.Window.screen.height, GLFW_DONT_CARE);
     }
 
     // Try to enable GPU V-Sync, so frames are limited to screen refresh rate (60Hz -> 60 FPS)
     // NOTE: V-Sync can be enabled by graphic driver configuration
-    if (CORE.Window.flags & FLAG_VSYNC_HINT) glfwSwapInterval(1);
 #endif
 #if defined(PLATFORM_WEB)
 /*
@@ -1270,261 +1194,15 @@ void ToggleFullscreen(void)
 // Set window state: maximized, if resizable (only PLATFORM_DESKTOP)
 void MaximizeWindow(void)
 {
-#if defined(PLATFORM_DESKTOP)
-    if (glfwGetWindowAttrib(CORE.Window.handle, GLFW_RESIZABLE) == GLFW_TRUE)
-    {
-        glfwMaximizeWindow(CORE.Window.handle);
-        CORE.Window.flags |= FLAG_WINDOW_MAXIMIZED;
-    }
-#endif
+    SDL_MaximizeWindow(Core.Window.handle);
+    CORE.Window.flags |= FLAG_WINDOW_MAXIMIZED;
 }
 
 // Set window state: minimized (only PLATFORM_DESKTOP)
 void MinimizeWindow(void)
 {
-#if defined(PLATFORM_DESKTOP)
-    // NOTE: Following function launches callback that sets appropiate flag!
-    glfwIconifyWindow(CORE.Window.handle);
-#endif
-}
-
-// Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
-void RestoreWindow(void)
-{
-#if defined(PLATFORM_DESKTOP)
-    if (glfwGetWindowAttrib(CORE.Window.handle, GLFW_RESIZABLE) == GLFW_TRUE)
-    {
-        // Restores the specified window if it was previously iconified (minimized) or maximized
-        glfwRestoreWindow(CORE.Window.handle);
-        CORE.Window.flags &= ~FLAG_WINDOW_MINIMIZED;
-        CORE.Window.flags &= ~FLAG_WINDOW_MAXIMIZED;
-    }
-#endif
-}
-
-// Set window configuration state using flags
-void SetWindowState(unsigned int flags)
-{
-#if defined(PLATFORM_DESKTOP)
-    // Check previous state and requested state to apply required changes
-    // NOTE: In most cases the functions already change the flags internally
-
-    // State change: FLAG_VSYNC_HINT
-    if (((CORE.Window.flags & FLAG_VSYNC_HINT) != (flags & FLAG_VSYNC_HINT)) && ((flags & FLAG_VSYNC_HINT) > 0))
-    {
-        glfwSwapInterval(1);
-        CORE.Window.flags |= FLAG_VSYNC_HINT;
-    }
-
-    // State change: FLAG_FULLSCREEN_MODE
-    if ((CORE.Window.flags & FLAG_FULLSCREEN_MODE) != (flags & FLAG_FULLSCREEN_MODE))
-    {
-        ToggleFullscreen();     // NOTE: Window state flag updated inside function
-    }
-
-    // State change: FLAG_WINDOW_RESIZABLE
-    if (((CORE.Window.flags & FLAG_WINDOW_RESIZABLE) != (flags & FLAG_WINDOW_RESIZABLE)) && ((flags & FLAG_WINDOW_RESIZABLE) > 0))
-    {
-        glfwSetWindowAttrib(CORE.Window.handle, GLFW_RESIZABLE, GLFW_TRUE);
-        CORE.Window.flags |= FLAG_WINDOW_RESIZABLE;
-    }
-
-    // State change: FLAG_WINDOW_UNDECORATED
-    if (((CORE.Window.flags & FLAG_WINDOW_UNDECORATED) != (flags & FLAG_WINDOW_UNDECORATED)) && (flags & FLAG_WINDOW_UNDECORATED))
-    {
-        glfwSetWindowAttrib(CORE.Window.handle, GLFW_DECORATED, GLFW_FALSE);
-        CORE.Window.flags |= FLAG_WINDOW_UNDECORATED;
-    }
-
-    // State change: FLAG_WINDOW_HIDDEN
-    if (((CORE.Window.flags & FLAG_WINDOW_HIDDEN) != (flags & FLAG_WINDOW_HIDDEN)) && ((flags & FLAG_WINDOW_HIDDEN) > 0))
-    {
-        glfwHideWindow(CORE.Window.handle);
-        CORE.Window.flags |= FLAG_WINDOW_HIDDEN;
-    }
-
-    // State change: FLAG_WINDOW_MINIMIZED
-    if (((CORE.Window.flags & FLAG_WINDOW_MINIMIZED) != (flags & FLAG_WINDOW_MINIMIZED)) && ((flags & FLAG_WINDOW_MINIMIZED) > 0))
-    {
-        //GLFW_ICONIFIED
-        MinimizeWindow();       // NOTE: Window state flag updated inside function
-    }
-
-    // State change: FLAG_WINDOW_MAXIMIZED
-    if (((CORE.Window.flags & FLAG_WINDOW_MAXIMIZED) != (flags & FLAG_WINDOW_MAXIMIZED)) && ((flags & FLAG_WINDOW_MAXIMIZED) > 0))
-    {
-        //GLFW_MAXIMIZED
-        MaximizeWindow();       // NOTE: Window state flag updated inside function
-    }
-
-    // State change: FLAG_WINDOW_UNFOCUSED
-    if (((CORE.Window.flags & FLAG_WINDOW_UNFOCUSED) != (flags & FLAG_WINDOW_UNFOCUSED)) && ((flags & FLAG_WINDOW_UNFOCUSED) > 0))
-    {
-        glfwSetWindowAttrib(CORE.Window.handle, GLFW_FOCUS_ON_SHOW, GLFW_FALSE);
-        CORE.Window.flags |= FLAG_WINDOW_UNFOCUSED;
-    }
-
-    // State change: FLAG_WINDOW_TOPMOST
-    if (((CORE.Window.flags & FLAG_WINDOW_TOPMOST) != (flags & FLAG_WINDOW_TOPMOST)) && ((flags & FLAG_WINDOW_TOPMOST) > 0))
-    {
-        glfwSetWindowAttrib(CORE.Window.handle, GLFW_FLOATING, GLFW_TRUE);
-        CORE.Window.flags |= FLAG_WINDOW_TOPMOST;
-    }
-
-    // State change: FLAG_WINDOW_ALWAYS_RUN
-    if (((CORE.Window.flags & FLAG_WINDOW_ALWAYS_RUN) != (flags & FLAG_WINDOW_ALWAYS_RUN)) && ((flags & FLAG_WINDOW_ALWAYS_RUN) > 0))
-    {
-        CORE.Window.flags |= FLAG_WINDOW_ALWAYS_RUN;
-    }
-
-    // The following states can not be changed after window creation
-
-    // State change: FLAG_WINDOW_TRANSPARENT
-    if (((CORE.Window.flags & FLAG_WINDOW_TRANSPARENT) != (flags & FLAG_WINDOW_TRANSPARENT)) && ((flags & FLAG_WINDOW_TRANSPARENT) > 0))
-    {
-        TRACELOG(LOG_WARNING, "WINDOW: Framebuffer transparency can only by configured before window initialization");
-    }
-
-    // State change: FLAG_WINDOW_HIGHDPI
-    if (((CORE.Window.flags & FLAG_WINDOW_HIGHDPI) != (flags & FLAG_WINDOW_HIGHDPI)) && ((flags & FLAG_WINDOW_HIGHDPI) > 0))
-    {
-        TRACELOG(LOG_WARNING, "WINDOW: High DPI can only by configured before window initialization");
-    }
-
-    // State change: FLAG_MSAA_4X_HINT
-    if (((CORE.Window.flags & FLAG_MSAA_4X_HINT) != (flags & FLAG_MSAA_4X_HINT)) && ((flags & FLAG_MSAA_4X_HINT) > 0))
-    {
-        TRACELOG(LOG_WARNING, "WINDOW: MSAA can only by configured before window initialization");
-    }
-
-    // State change: FLAG_INTERLACED_HINT
-    if (((CORE.Window.flags & FLAG_INTERLACED_HINT) != (flags & FLAG_INTERLACED_HINT)) && ((flags & FLAG_INTERLACED_HINT) > 0))
-    {
-        TRACELOG(LOG_WARNING, "RPI: Interlaced mode can only by configured before window initialization");
-    }
-#endif
-}
-
-// Clear window configuration state flags
-void ClearWindowState(unsigned int flags)
-{
-#if defined(PLATFORM_DESKTOP)
-    // Check previous state and requested state to apply required changes
-    // NOTE: In most cases the functions already change the flags internally
-
-    // State change: FLAG_VSYNC_HINT
-    if (((CORE.Window.flags & FLAG_VSYNC_HINT) > 0) && ((flags & FLAG_VSYNC_HINT) > 0))
-    {
-        glfwSwapInterval(0);
-        CORE.Window.flags &= ~FLAG_VSYNC_HINT;
-    }
-
-    // State change: FLAG_FULLSCREEN_MODE
-    if (((CORE.Window.flags & FLAG_FULLSCREEN_MODE) > 0) && ((flags & FLAG_FULLSCREEN_MODE) > 0))
-    {
-        ToggleFullscreen();     // NOTE: Window state flag updated inside function
-    }
-
-    // State change: FLAG_WINDOW_RESIZABLE
-    if (((CORE.Window.flags & FLAG_WINDOW_RESIZABLE) > 0) && ((flags & FLAG_WINDOW_RESIZABLE) > 0))
-    {
-        glfwSetWindowAttrib(CORE.Window.handle, GLFW_RESIZABLE, GLFW_FALSE);
-        CORE.Window.flags &= ~FLAG_WINDOW_RESIZABLE;
-    }
-
-    // State change: FLAG_WINDOW_UNDECORATED
-    if (((CORE.Window.flags & FLAG_WINDOW_UNDECORATED) > 0) && ((flags & FLAG_WINDOW_UNDECORATED) > 0))
-    {
-        glfwSetWindowAttrib(CORE.Window.handle, GLFW_DECORATED, GLFW_TRUE);
-        CORE.Window.flags &= ~FLAG_WINDOW_UNDECORATED;
-    }
-
-    // State change: FLAG_WINDOW_HIDDEN
-    if (((CORE.Window.flags & FLAG_WINDOW_HIDDEN) > 0) && ((flags & FLAG_WINDOW_HIDDEN) > 0))
-    {
-        glfwShowWindow(CORE.Window.handle);
-        CORE.Window.flags &= ~FLAG_WINDOW_HIDDEN;
-    }
-
-    // State change: FLAG_WINDOW_MINIMIZED
-    if (((CORE.Window.flags & FLAG_WINDOW_MINIMIZED) > 0) && ((flags & FLAG_WINDOW_MINIMIZED) > 0))
-    {
-        RestoreWindow();       // NOTE: Window state flag updated inside function
-    }
-
-    // State change: FLAG_WINDOW_MAXIMIZED
-    if (((CORE.Window.flags & FLAG_WINDOW_MAXIMIZED) > 0) && ((flags & FLAG_WINDOW_MAXIMIZED) > 0))
-    {
-        RestoreWindow();       // NOTE: Window state flag updated inside function
-    }
-
-    // State change: FLAG_WINDOW_UNFOCUSED
-    if (((CORE.Window.flags & FLAG_WINDOW_UNFOCUSED) > 0) && ((flags & FLAG_WINDOW_UNFOCUSED) > 0))
-    {
-        glfwSetWindowAttrib(CORE.Window.handle, GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
-        CORE.Window.flags &= ~FLAG_WINDOW_UNFOCUSED;
-    }
-
-    // State change: FLAG_WINDOW_TOPMOST
-    if (((CORE.Window.flags & FLAG_WINDOW_TOPMOST) > 0) && ((flags & FLAG_WINDOW_TOPMOST) > 0))
-    {
-        glfwSetWindowAttrib(CORE.Window.handle, GLFW_FLOATING, GLFW_FALSE);
-        CORE.Window.flags &= ~FLAG_WINDOW_TOPMOST;
-    }
-
-    // State change: FLAG_WINDOW_ALWAYS_RUN
-    if (((CORE.Window.flags & FLAG_WINDOW_ALWAYS_RUN) > 0) && ((flags & FLAG_WINDOW_ALWAYS_RUN) > 0))
-    {
-        CORE.Window.flags &= ~FLAG_WINDOW_ALWAYS_RUN;
-    }
-
-    // The following states can not be changed after window creation
-
-    // State change: FLAG_WINDOW_TRANSPARENT
-    if (((CORE.Window.flags & FLAG_WINDOW_TRANSPARENT) > 0) && ((flags & FLAG_WINDOW_TRANSPARENT) > 0))
-    {
-        TRACELOG(LOG_WARNING, "WINDOW: Framebuffer transparency can only by configured before window initialization");
-    }
-
-    // State change: FLAG_WINDOW_HIGHDPI
-    if (((CORE.Window.flags & FLAG_WINDOW_HIGHDPI) > 0) && ((flags & FLAG_WINDOW_HIGHDPI) > 0))
-    {
-        TRACELOG(LOG_WARNING, "WINDOW: High DPI can only by configured before window initialization");
-    }
-
-    // State change: FLAG_MSAA_4X_HINT
-    if (((CORE.Window.flags & FLAG_MSAA_4X_HINT) > 0) && ((flags & FLAG_MSAA_4X_HINT) > 0))
-    {
-        TRACELOG(LOG_WARNING, "WINDOW: MSAA can only by configured before window initialization");
-    }
-
-    // State change: FLAG_INTERLACED_HINT
-    if (((CORE.Window.flags & FLAG_INTERLACED_HINT) > 0) && ((flags & FLAG_INTERLACED_HINT) > 0))
-    {
-        TRACELOG(LOG_WARNING, "RPI: Interlaced mode can only by configured before window initialization");
-    }
-#endif
-}
-
-// Set icon for window (only PLATFORM_DESKTOP)
-// NOTE: Image must be in RGBA format, 8bit per channel
-void SetWindowIcon(Image image)
-{
-#if defined(PLATFORM_DESKTOP)
-    if (image.format == PIXELFORMAT_UNCOMPRESSED_R8G8B8A8)
-    {
-        GLFWimage icon[1] = { 0 };
-
-        icon[0].width = image.width;
-        icon[0].height = image.height;
-        icon[0].pixels = (unsigned char *)image.data;
-
-        // NOTE 1: We only support one image icon
-        // NOTE 2: The specified image data is copied before this function returns
-        glfwSetWindowIcon(CORE.Window.handle, 1, icon);
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Window icon image must be in R8G8B8A8 pixel format");
-#endif
+    SDL_MaximizeWindow(Core.Window.handle);
+    CORE.Window.flags &= ~FLAG_WINDOW_MAXIMIZED;
 }
 
 // Set title for window (only PLATFORM_DESKTOP)
@@ -1532,7 +1210,7 @@ void SetWindowTitle(const char *title)
 {
     CORE.Window.title = title;
 #if defined(PLATFORM_DESKTOP)
-    glfwSetWindowTitle(CORE.Window.handle, title);
+    SDL_SetWindowTitle(CORE.Window.handle, title);
 #endif
 }
 
@@ -1540,25 +1218,7 @@ void SetWindowTitle(const char *title)
 void SetWindowPosition(int x, int y)
 {
 #if defined(PLATFORM_DESKTOP)
-    glfwSetWindowPos(CORE.Window.handle, x, y);
-#endif
-}
-
-// Set monitor for the current window (fullscreen mode)
-void SetWindowMonitor(int monitor)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount = 0;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-    if ((monitor >= 0) && (monitor < monitorCount))
-    {
-        TRACELOG(LOG_INFO, "GLFW: Selected fullscreen monitor: [%i] %s", monitor, glfwGetMonitorName(monitors[monitor]));
-
-        const GLFWvidmode *mode = glfwGetVideoMode(monitors[monitor]);
-        glfwSetWindowMonitor(CORE.Window.handle, monitors[monitor], 0, 0, mode->width, mode->height, mode->refreshRate);
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Failed to find selected monitor");
+    SDL_SetWindowPosition(CORE.Window.handle, x, y);
 #endif
 }
 
@@ -1566,8 +1226,7 @@ void SetWindowMonitor(int monitor)
 void SetWindowMinSize(int width, int height)
 {
 #if defined(PLATFORM_DESKTOP)
-    const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    glfwSetWindowSizeLimits(CORE.Window.handle, width, height, mode->width, mode->height);
+    SDL_SetWindowMinimumSize(CORE.Window.handle, width, height);
 #endif
 }
 
@@ -1575,17 +1234,7 @@ void SetWindowMinSize(int width, int height)
 void SetWindowSize(int width, int height)
 {
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    glfwSetWindowSize(CORE.Window.handle, width, height);
-#endif
-}
-
-// Set window opacity, value opacity is between 0.0 and 1.0
-void SetWindowOpacity(float opacity)
-{
-#if defined(PLATFORM_DESKTOP)
-    if (opacity >= 1.0f) opacity = 1.0f;
-    else if (opacity <= 0.0f) opacity = 0.0f;
-    glfwSetWindowOpacity(CORE.Window.handle, opacity);
+    SDL_SetWindowSize(CORE.Window.handle, width, height);
 #endif
 }
 
@@ -1617,205 +1266,6 @@ int GetRenderHeight(void)
 void *GetWindowGL(void){
     return CORE.Window.handle;
 }
-void *GetWindowHandle(void)
-{
-#if defined(PLATFORM_DESKTOP) && defined(_WIN32)
-    // NOTE: Returned handle is: void *HWND (windows.h)
-    return glfwGetWin32Window(CORE.Window.handle);
-#endif
-#if defined(__linux__)
-    // NOTE: Returned handle is: unsigned long Window (X.h)
-    // typedef unsigned long XID;
-    // typedef XID Window;
-    //unsigned long id = (unsigned long)glfwGetX11Window(window);
-    return NULL;    // TODO: Find a way to return value... cast to void *?
-#endif
-#if defined(__APPLE__)
-    // NOTE: Returned handle is: (objc_object *)
-    return NULL;    // TODO: return (void *)glfwGetCocoaWindow(window);
-#endif
-
-    return NULL;
-}
-
-// Get number of monitors
-int GetMonitorCount(void)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    glfwGetMonitors(&monitorCount);
-    return monitorCount;
-#else
-    return 1;
-#endif
-}
-
-// Get number of monitors
-int GetCurrentMonitor(void)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
-    GLFWmonitor* monitor = NULL;
-
-    if (monitorCount == 1) // easy out
-        return 0;
-
-    if (IsWindowFullscreen())
-    {
-        monitor = glfwGetWindowMonitor(CORE.Window.handle);
-        for (int i = 0; i < monitorCount; i++)
-        {
-            if (monitors[i] == monitor)
-                return i;
-        }
-        return 0;
-    }
-    else
-    {
-        int x = 0;
-        int y = 0;
-
-        glfwGetWindowPos(CORE.Window.handle, &x, &y);
-
-        for (int i = 0; i < monitorCount; i++)
-        {
-            int mx = 0;
-            int my = 0;
-
-            int width = 0;
-            int height = 0;
-
-            monitor = monitors[i];
-            glfwGetMonitorWorkarea(monitor, &mx, &my, &width, &height);
-            if (x >= mx && x <= (mx + width) && y >= my && y <= (my + height))
-                return i;
-        }
-    }
-    return 0;
-#else
-    return 0;
-#endif
-}
-
-// Get selected monitor width
-Vector2 GetMonitorPosition(int monitor)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    GLFWmonitor** monitors = glfwGetMonitors(&monitorCount);
-
-    if ((monitor >= 0) && (monitor < monitorCount))
-    {
-        int x, y;
-        glfwGetMonitorPos(monitors[monitor], &x, &y);
-
-        return (Vector2){ (float)x, (float)y };
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Failed to find selected monitor");
-#endif
-    return (Vector2){ 0, 0 };
-}
-
-// Get selected monitor width (max available by monitor)
-int GetMonitorWidth(int monitor)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-    if ((monitor >= 0) && (monitor < monitorCount))
-    {
-        int count = 0;
-        const GLFWvidmode *modes = glfwGetVideoModes(monitors[monitor], &count);
-
-        // We return the maximum resolution available, the last one in the modes array
-        if (count > 0) return modes[count - 1].width;
-        else TRACELOG(LOG_WARNING, "GLFW: Failed to find video mode for selected monitor");
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Failed to find selected monitor");
-#endif
-    return 0;
-}
-
-// Get selected monitor width (max available by monitor)
-int GetMonitorHeight(int monitor)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-    if ((monitor >= 0) && (monitor < monitorCount))
-    {
-        int count = 0;
-        const GLFWvidmode *modes = glfwGetVideoModes(monitors[monitor], &count);
-
-        // We return the maximum resolution available, the last one in the modes array
-        if (count > 0) return modes[count - 1].height;
-        else TRACELOG(LOG_WARNING, "GLFW: Failed to find video mode for selected monitor");
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Failed to find selected monitor");
-#endif
-    return 0;
-}
-
-// Get selected monitor physical width in millimetres
-int GetMonitorPhysicalWidth(int monitor)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-    if ((monitor >= 0) && (monitor < monitorCount))
-    {
-        int physicalWidth;
-        glfwGetMonitorPhysicalSize(monitors[monitor], &physicalWidth, NULL);
-        return physicalWidth;
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Failed to find selected monitor");
-#endif
-    return 0;
-}
-
-// Get primary monitor physical height in millimetres
-int GetMonitorPhysicalHeight(int monitor)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-    if ((monitor >= 0) && (monitor < monitorCount))
-    {
-        int physicalHeight;
-        glfwGetMonitorPhysicalSize(monitors[monitor], NULL, &physicalHeight);
-        return physicalHeight;
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Failed to find selected monitor");
-#endif
-    return 0;
-}
-
-int GetMonitorRefreshRate(int monitor)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-    if ((monitor >= 0) && (monitor < monitorCount))
-    {
-        const GLFWvidmode *vidmode = glfwGetVideoMode(monitors[monitor]);
-        return vidmode->refreshRate;
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Failed to find selected monitor");
-#endif
-#if defined(PLATFORM_DRM)
-    if ((CORE.Window.connector) && (CORE.Window.modeIndex >= 0))
-    {
-        return CORE.Window.connector->modes[CORE.Window.modeIndex].vrefresh;
-    }
-#endif
-    return 0;
-}
 
 // Get window position XY on monitor
 Vector2 GetWindowPosition(void)
@@ -1823,70 +1273,9 @@ Vector2 GetWindowPosition(void)
     int x = 0;
     int y = 0;
 #if defined(PLATFORM_DESKTOP)
-    glfwGetWindowPos(CORE.Window.handle, &x, &y);
+    SDL_GetWindowPosition(CORE.Window.handle, &x, &y);
 #endif
     return (Vector2){ (float)x, (float)y };
-}
-
-// Get window scale DPI factor
-Vector2 GetWindowScaleDPI(void)
-{
-    Vector2 scale = { 1.0f, 1.0f };
-
-#if defined(PLATFORM_DESKTOP)
-    float xdpi = 1.0;
-    float ydpi = 1.0;
-    Vector2 windowPos = GetWindowPosition();
-
-    int monitorCount = 0;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-    // Check window monitor
-    for (int i = 0; i < monitorCount; i++)
-    {
-        glfwGetMonitorContentScale(monitors[i], &xdpi, &ydpi);
-
-        int xpos, ypos, width, height;
-        glfwGetMonitorWorkarea(monitors[i], &xpos, &ypos, &width, &height);
-
-        if ((windowPos.x >= xpos) && (windowPos.x < xpos + width) &&
-            (windowPos.y >= ypos) && (windowPos.y < ypos + height))
-        {
-            scale.x = xdpi;
-            scale.y = ydpi;
-            break;
-        }
-    }
-#endif
-
-    return scale;
-}
-
-// Get the human-readable, UTF-8 encoded name of the primary monitor
-const char *GetMonitorName(int monitor)
-{
-#if defined(PLATFORM_DESKTOP)
-    int monitorCount;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitorCount);
-
-    if ((monitor >= 0) && (monitor < monitorCount))
-    {
-        return glfwGetMonitorName(monitors[monitor]);
-    }
-    else TRACELOG(LOG_WARNING, "GLFW: Failed to find selected monitor");
-#endif
-    return "";
-}
-
-// Set clipboard text content
-void SetClipboardText(const char *text)
-{
-#if defined(PLATFORM_DESKTOP)
-    glfwSetClipboardString(CORE.Window.handle, text);
-#endif
-#if defined(PLATFORM_WEB)
-    emscripten_run_script(TextFormat("navigator.clipboard.writeText('%s')", text));
-#endif
 }
 
 // Enable waiting for events on EndDrawing(), no automatic event polling
@@ -1901,26 +1290,11 @@ RLAPI void DisableEventWaiting(void)
     CORE.Window.eventWaiting = false;
 }
 
-// Get clipboard text content
-// NOTE: returned string is allocated and freed by GLFW
-const char *GetClipboardText(void)
-{
-#if defined(PLATFORM_DESKTOP)
-    return glfwGetClipboardString(CORE.Window.handle);
-#endif
-#if defined(PLATFORM_WEB)
-    return emscripten_run_script_string("navigator.clipboard.readText()");
-#endif
-    return NULL;
-}
-
-
-
 // Show mouse cursor
 void ShowCursor(void)
 {
 #if defined(PLATFORM_DESKTOP)
-    glfwSetInputMode(CORE.Window.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    SDL_ShowCursor(SDL_ENABLE);
 #endif
 
     CORE.Input.Mouse.cursorHidden = false;
@@ -1930,7 +1304,7 @@ void ShowCursor(void)
 void HideCursor(void)
 {
 #if defined(PLATFORM_DESKTOP)
-    glfwSetInputMode(CORE.Window.handle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    SDL_ShowCursor(SDL_DISABLE);
 #endif
 
     CORE.Input.Mouse.cursorHidden = true;
@@ -1942,37 +1316,6 @@ bool IsCursorHidden(void)
     return CORE.Input.Mouse.cursorHidden;
 }
 
-// Enables cursor (unlock cursor)
-void EnableCursor(void)
-{
-#if defined(PLATFORM_DESKTOP)
-    glfwSetInputMode(CORE.Window.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-#endif
-#if defined(PLATFORM_WEB)
-    emscripten_exit_pointerlock();
-#endif
-
-    CORE.Input.Mouse.cursorHidden = false;
-}
-
-// Disables cursor (lock cursor)
-void DisableCursor(void)
-{
-#if defined(PLATFORM_DESKTOP)
-    glfwSetInputMode(CORE.Window.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-#endif
-#if defined(PLATFORM_WEB)
-    emscripten_request_pointerlock("#canvas", 1);
-#endif
-
-    CORE.Input.Mouse.cursorHidden = true;
-}
-
-// Check if cursor is on the current screen.
-bool IsCursorOnScreen(void)
-{
-    return CORE.Input.Mouse.cursorOnScreen;
-}
 
 // Set background color (framebuffer clear color)
 void ClearBackground(Color color)
@@ -2719,7 +2062,7 @@ float GetFrameTime(void)
 double GetTime(void)
 {
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    return glfwGetTime();   // Elapsed time since glfwInit()
+    return (double)SDL_GetTicks() / 1000;   // Elapsed time since glfwInit()
 #endif
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
@@ -2745,32 +2088,6 @@ void SetConfigFlags(unsigned int flags)
 // NOTE TRACELOG() function is located in [utils.h]
 
 // Takes a screenshot of current screen (saved a .png)
-void TakeScreenshot(const char *fileName)
-{
-#if defined(SUPPORT_MODULE_RTEXTURES)
-    Vector2 scale = GetWindowScaleDPI();
-    unsigned char *imgData = rlReadScreenPixels((int)((float)CORE.Window.render.width*scale.x), (int)((float)CORE.Window.render.height*scale.y));
-    Image image = { imgData, (int)((float)CORE.Window.render.width*scale.x), (int)((float)CORE.Window.render.height*scale.y), 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 };
-
-    char path[2048] = { 0 };
-    strcpy(path, TextFormat("%s/%s", CORE.Storage.basePath, fileName));
-
-    ExportImage(image, path);           // WARNING: Module required: rtextures
-    RL_FREE(imgData);
-
-#if defined(PLATFORM_WEB)
-    // Download file from MEMFS (emscripten memory filesystem)
-    // saveFileFromMEMFSToDisk() function is defined in raylib/src/shell.html
-    emscripten_run_script(TextFormat("saveFileFromMEMFSToDisk('%s','%s')", GetFileName(path), GetFileName(path)));
-#endif
-
-    TRACELOG(LOG_INFO, "SYSTEM: [%s] Screenshot taken successfully", path);
-#else
-    TRACELOG(LOG_WARNING,"IMAGE: ExportImage() requires module: rtextures");
-#endif
-}
-
-// Get a random value between min and max (both included)
 int GetRandomValue(int min, int max)
 {
     if (min > max)
@@ -3784,7 +3101,7 @@ void SetMousePosition(int x, int y)
     CORE.Input.Mouse.currentPosition = (Vector2){ (float)x, (float)y };
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
     // NOTE: emscripten not implemented
-    glfwSetCursorPos(CORE.Window.handle, CORE.Input.Mouse.currentPosition.x, CORE.Input.Mouse.currentPosition.y);
+    SDL_WarpMouseInWindow(CORE.Window.handle, CORE.Input.Mouse.currentPosition.x, CORE.Input.Mouse.currentPosition.y);
 #endif
 }
 
@@ -3815,86 +3132,6 @@ float GetMouseWheelMove(void)
     return CORE.Input.Mouse.currentWheelMove;
 }
 
-// Set mouse cursor
-// NOTE: This is a no-op on platforms other than PLATFORM_DESKTOP
-void SetMouseCursor(int cursor)
-{
-#if defined(PLATFORM_DESKTOP)
-    CORE.Input.Mouse.cursor = cursor;
-    if (cursor == MOUSE_CURSOR_DEFAULT) glfwSetCursor(CORE.Window.handle, NULL);
-    else
-    {
-        // NOTE: We are relating internal GLFW enum values to our MouseCursor enum values
-        glfwSetCursor(CORE.Window.handle, glfwCreateStandardCursor(0x00036000 + cursor));
-    }
-#endif
-}
-
-// Get touch position X for touch point 0 (relative to screen size)
-int GetTouchX(void)
-{
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
-    return (int)CORE.Input.Touch.position[0].x;
-#else   // PLATFORM_DESKTOP, PLATFORM_RPI, PLATFORM_DRM
-    return GetMouseX();
-#endif
-}
-
-// Get touch position Y for touch point 0 (relative to screen size)
-int GetTouchY(void)
-{
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_WEB)
-    return (int)CORE.Input.Touch.position[0].y;
-#else   // PLATFORM_DESKTOP, PLATFORM_RPI, PLATFORM_DRM
-    return GetMouseY();
-#endif
-}
-
-// Get touch position XY for a touch point index (relative to screen size)
-// TODO: Touch position should be scaled depending on display size and render size
-Vector2 GetTouchPosition(int index)
-{
-    Vector2 position = { -1.0f, -1.0f };
-
-#if defined(PLATFORM_DESKTOP)
-    // TODO: GLFW does not support multi-touch input just yet
-    // https://www.codeproject.com/Articles/668404/Programming-for-Multi-Touch
-    // https://docs.microsoft.com/en-us/windows/win32/wintouch/getting-started-with-multi-touch-messages
-    if (index == 0) position = GetMousePosition();
-#endif
-#if defined(PLATFORM_ANDROID)
-    if (index < MAX_TOUCH_POINTS) position = CORE.Input.Touch.position[index];
-    else TRACELOG(LOG_WARNING, "INPUT: Required touch point out of range (Max touch points: %i)", MAX_TOUCH_POINTS);
-
-    if ((CORE.Window.screen.width > CORE.Window.display.width) || (CORE.Window.screen.height > CORE.Window.display.height))
-    {
-        position.x = position.x*((float)CORE.Window.screen.width/(float)(CORE.Window.display.width - CORE.Window.renderOffset.x)) - CORE.Window.renderOffset.x/2;
-        position.y = position.y*((float)CORE.Window.screen.height/(float)(CORE.Window.display.height - CORE.Window.renderOffset.y)) - CORE.Window.renderOffset.y/2;
-    }
-    else
-    {
-        position.x = position.x*((float)CORE.Window.render.width/(float)CORE.Window.display.width) - CORE.Window.renderOffset.x/2;
-        position.y = position.y*((float)CORE.Window.render.height/(float)CORE.Window.display.height) - CORE.Window.renderOffset.y/2;
-    }
-#endif
-#if defined(PLATFORM_WEB) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
-    if (index < MAX_TOUCH_POINTS) position = CORE.Input.Touch.position[index];
-    else TRACELOG(LOG_WARNING, "INPUT: Required touch point out of range (Max touch points: %i)", MAX_TOUCH_POINTS);
-#endif
-
-    return position;
-}
-
-// Get touch point identifier for given index
-int GetTouchPointId(int index)
-{
-    int id = -1;
-
-    if (index < MAX_TOUCH_POINTS) id = CORE.Input.Touch.pointId[index];
-
-    return id;
-}
-
 // Get number of touch points
 int GetTouchPointCount(void)
 {
@@ -3917,33 +3154,9 @@ static bool InitGraphicsDevice(int width, int height)
 
     // NOTE: Framebuffer (render area - CORE.Window.render.width, CORE.Window.render.height) could include black bars...
     // ...in top-down or left-right to match display aspect ratio (no weird scalings)
+    SDL_Init(SDL_INIT_EVERYTHING);
 
-#if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    glfwSetErrorCallback(ErrorCallback);
-/*
-    // TODO: Setup GLFW custom allocators to match raylib ones
-    const GLFWallocator allocator = {
-        .allocate = MemAlloc,
-        .deallocate = MemFree,
-        .reallocate = MemRealloc,
-        .user = NULL
-    };
-
-    glfwInitAllocator(&allocator);
-*/
-#if defined(__APPLE__)
-    glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_FALSE);
-#endif
-
-    if (!glfwInit())
-    {
-        TRACELOG(LOG_WARNING, "GLFW: Failed to initialize GLFW");
-        return false;
-    }
-
-    // NOTE: Getting video modes is not implemented in emscripten GLFW3 version
-#if defined(PLATFORM_DESKTOP)
-    // Find monitor resolution
+#if 0
     GLFWmonitor *monitor = glfwGetPrimaryMonitor();
     if (!monitor)
     {
@@ -3958,6 +3171,7 @@ static bool InitGraphicsDevice(int width, int height)
     // Set screen width/height to the display width/height if they are 0
     if (CORE.Window.screen.width == 0) CORE.Window.screen.width = CORE.Window.display.width;
     if (CORE.Window.screen.height == 0) CORE.Window.screen.height = CORE.Window.display.height;
+#endif
 #endif  // PLATFORM_DESKTOP
 
 #if defined(PLATFORM_WEB)
@@ -3965,7 +3179,6 @@ static bool InitGraphicsDevice(int width, int height)
     CORE.Window.display.height = CORE.Window.screen.height;
 #endif  // PLATFORM_WEB
 
-    glfwDefaultWindowHints();                       // Set default windows hints
     //glfwWindowHint(GLFW_RED_BITS, 8);             // Framebuffer red color component bits
     //glfwWindowHint(GLFW_GREEN_BITS, 8);           // Framebuffer green color component bits
     //glfwWindowHint(GLFW_BLUE_BITS, 8);            // Framebuffer blue color component bits
@@ -3976,688 +3189,30 @@ static bool InitGraphicsDevice(int width, int height)
     //glfwWindowHint(GLFW_AUX_BUFFERS, 0);          // Number of auxiliar buffers
 
     // Check window creation flags
-    if ((CORE.Window.flags & FLAG_FULLSCREEN_MODE) > 0) CORE.Window.fullscreen = true;
-
-    if ((CORE.Window.flags & FLAG_WINDOW_HIDDEN) > 0) glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Visible window
-    else glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);     // Window initially hidden
-
-    if ((CORE.Window.flags & FLAG_WINDOW_UNDECORATED) > 0) glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Border and buttons on Window
-    else glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);   // Decorated window
-
-    if ((CORE.Window.flags & FLAG_WINDOW_RESIZABLE) > 0) glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // Resizable window
-    else glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);  // Avoid window being resizable
-
-    // Disable FLAG_WINDOW_MINIMIZED, not supported on initialization
-    if ((CORE.Window.flags & FLAG_WINDOW_MINIMIZED) > 0) CORE.Window.flags &= ~FLAG_WINDOW_MINIMIZED;
-
-    // Disable FLAG_WINDOW_MAXIMIZED, not supported on initialization
-    if ((CORE.Window.flags & FLAG_WINDOW_MAXIMIZED) > 0) CORE.Window.flags &= ~FLAG_WINDOW_MAXIMIZED;
-
-    if ((CORE.Window.flags & FLAG_WINDOW_UNFOCUSED) > 0) glfwWindowHint(GLFW_FOCUSED, GLFW_FALSE);
-    else glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
-
-    if ((CORE.Window.flags & FLAG_WINDOW_TOPMOST) > 0) glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
-    else glfwWindowHint(GLFW_FLOATING, GLFW_FALSE);
-
-    // NOTE: Some GLFW flags are not supported on HTML5
-#if defined(PLATFORM_DESKTOP)
-    if ((CORE.Window.flags & FLAG_WINDOW_TRANSPARENT) > 0) glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);     // Transparent framebuffer
-    else glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_FALSE);  // Opaque framebuffer
-
-    if ((CORE.Window.flags & FLAG_WINDOW_HIGHDPI) > 0)
-    {
-        // Resize window content area based on the monitor content scale.
-        // NOTE: This hint only has an effect on platforms where screen coordinates and pixels always map 1:1 such as Windows and X11.
-        // On platforms like macOS the resolution of the framebuffer is changed independently of the window size.
-        glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);   // Scale content area based on the monitor content scale where window is placed on
-    #if defined(__APPLE__)
-        glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
-    #endif
-    }
-    else glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
-#endif
-
-    if (CORE.Window.flags & FLAG_MSAA_4X_HINT)
-    {
-        // NOTE: MSAA is only enabled for main framebuffer, not user-created FBOs
-        TRACELOG(LOG_INFO, "DISPLAY: Trying to enable MSAA x4");
-        glfwWindowHint(GLFW_SAMPLES, 4);   // Tries to enable multisampling x4 (MSAA), default is 0
-    }
-
-    // NOTE: When asking for an OpenGL context version, most drivers provide highest supported version
-    // with forward compatibility to older OpenGL versions.
-    // For example, if using OpenGL 1.1, driver can provide a 4.3 context forward compatible.
-
-    // Check selection OpenGL version
-    if (rlGetVersion() == OPENGL_21)
-    {
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);          // Choose OpenGL major version (just hint)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);          // Choose OpenGL minor version (just hint)
-    }
-    else if (rlGetVersion() == OPENGL_33)
-    {
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);          // Choose OpenGL major version (just hint)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);          // Choose OpenGL minor version (just hint)
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Profiles Hint: Only 3.3 and above!
-                                                                       // Values: GLFW_OPENGL_CORE_PROFILE, GLFW_OPENGL_ANY_PROFILE, GLFW_OPENGL_COMPAT_PROFILE
-#if defined(__APPLE__)
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);  // OSX Requires fordward compatibility
-#else
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE); // Fordward Compatibility Hint: Only 3.3 and above!
-#endif
-        //glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Request OpenGL DEBUG context
-    }
-    else if (rlGetVersion() == OPENGL_43)
-    {
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);          // Choose OpenGL major version (just hint)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);          // Choose OpenGL minor version (just hint)
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
-#if defined(RLGL_ENABLE_OPENGL_DEBUG_CONTEXT)
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);   // Enable OpenGL Debug Context
-#endif
-    }
-    else if (rlGetVersion() == OPENGL_ES_20)                    // Request OpenGL ES 2.0 context
-    {
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-#if defined(PLATFORM_DESKTOP)
-        glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
-#else
-        glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
-#endif
-    }
-
-#if defined(PLATFORM_DESKTOP)
-    // NOTE: GLFW 3.4+ defers initialization of the Joystick subsystem on the first call to any Joystick related functions.
-    // Forcing this initialization here avoids doing it on PollInputEvents() called by EndDrawing() after first frame has been just drawn.
-    // The initialization will still happen and possible delays still occur, but before the window is shown, which is a nicer experience.
-    // REF: https://github.com/raysan5/raylib/issues/1554
-    if (MAX_GAMEPADS > 0) glfwSetJoystickCallback(NULL);
-#endif
-
-    if (CORE.Window.fullscreen)
-    {
-        // remember center for switchinging from fullscreen to window
-        CORE.Window.position.x = CORE.Window.display.width/2 - CORE.Window.screen.width/2;
-        CORE.Window.position.y = CORE.Window.display.height/2 - CORE.Window.screen.height/2;
-
-        if (CORE.Window.position.x < 0) CORE.Window.position.x = 0;
-        if (CORE.Window.position.y < 0) CORE.Window.position.y = 0;
-
-        // Obtain recommended CORE.Window.display.width/CORE.Window.display.height from a valid videomode for the monitor
-        int count = 0;
-        const GLFWvidmode *modes = glfwGetVideoModes(glfwGetPrimaryMonitor(), &count);
-
-        // Get closest video mode to desired CORE.Window.screen.width/CORE.Window.screen.height
-        for (int i = 0; i < count; i++)
-        {
-            if ((unsigned int)modes[i].width >= CORE.Window.screen.width)
-            {
-                if ((unsigned int)modes[i].height >= CORE.Window.screen.height)
-                {
-                    CORE.Window.display.width = modes[i].width;
-                    CORE.Window.display.height = modes[i].height;
-                    break;
-                }
-            }
-        }
-
-#if defined(PLATFORM_DESKTOP)
-        // If we are windowed fullscreen, ensures that window does not minimize when focus is lost
-        if ((CORE.Window.screen.height == CORE.Window.display.height) && (CORE.Window.screen.width == CORE.Window.display.width))
-        {
-            glfwWindowHint(GLFW_AUTO_ICONIFY, 0);
-        }
-#endif
-        TRACELOG(LOG_WARNING, "SYSTEM: Closest fullscreen videomode: %i x %i", CORE.Window.display.width, CORE.Window.display.height);
-
-        // NOTE: ISSUE: Closest videomode could not match monitor aspect-ratio, for example,
-        // for a desired screen size of 800x450 (16:9), closest supported videomode is 800x600 (4:3),
-        // framebuffer is rendered correctly but once displayed on a 16:9 monitor, it gets stretched
-        // by the sides to fit all monitor space...
-
-        // Try to setup the most appropiate fullscreen framebuffer for the requested screenWidth/screenHeight
-        // It considers device display resolution mode and setups a framebuffer with black bars if required (render size/offset)
-        // Modified global variables: CORE.Window.screen.width/CORE.Window.screen.height - CORE.Window.render.width/CORE.Window.render.height - CORE.Window.renderOffset.x/CORE.Window.renderOffset.y - CORE.Window.screenScale
-        // TODO: It is a quite cumbersome solution to display size vs requested size, it should be reviewed or removed...
-        // HighDPI monitors are properly considered in a following similar function: SetupViewport()
-        SetupFramebuffer(CORE.Window.display.width, CORE.Window.display.height);
-
-        CORE.Window.handle = glfwCreateWindow(CORE.Window.display.width, CORE.Window.display.height, (CORE.Window.title != 0)? CORE.Window.title : " ", glfwGetPrimaryMonitor(), NULL);
-
-        // NOTE: Full-screen change, not working properly...
-        //glfwSetWindowMonitor(CORE.Window.handle, glfwGetPrimaryMonitor(), 0, 0, CORE.Window.screen.width, CORE.Window.screen.height, GLFW_DONT_CARE);
-    }
-    else
-    {
-        // No-fullscreen window creation
-        CORE.Window.handle = glfwCreateWindow(CORE.Window.screen.width, CORE.Window.screen.height, (CORE.Window.title != 0)? CORE.Window.title : " ", NULL, NULL);
-
-        if (CORE.Window.handle)
-        {
-#if defined(PLATFORM_DESKTOP)
-            // Center window on screen
-            int windowPosX = CORE.Window.display.width/2 - CORE.Window.screen.width/2;
-            int windowPosY = CORE.Window.display.height/2 - CORE.Window.screen.height/2;
-
-            if (windowPosX < 0) windowPosX = 0;
-            if (windowPosY < 0) windowPosY = 0;
-
-            glfwSetWindowPos(CORE.Window.handle, windowPosX, windowPosY);
-#endif
-            CORE.Window.render.width = CORE.Window.screen.width;
-            CORE.Window.render.height = CORE.Window.screen.height;
-        }
-    }
+    int flags = 0;
+    if ((CORE.Window.flags & FLAG_WINDOW_RESIZABLE) > 0) flags |= SDL_WINDOW_RESIZABLE;
+    flags |= SDL_WINDOW_OPENGL;
+    
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    CORE.Window.handle = SDL_CreateWindow((CORE.Window.title != 0)? CORE.Window.title : " ", 0, 0, CORE.Window.screen.width, CORE.Window.screen.height, flags);
 
     if (!CORE.Window.handle)
     {
-        glfwTerminate();
+        SDL_Quit();
         TRACELOG(LOG_WARNING, "GLFW: Failed to initialize Window");
         return false;
     }
 
-    // Set window callback events
-    glfwSetWindowSizeCallback(CORE.Window.handle, WindowSizeCallback);      // NOTE: Resizing not allowed by default!
-#if !defined(PLATFORM_WEB)
-    glfwSetWindowMaximizeCallback(CORE.Window.handle, WindowMaximizeCallback);
-#endif
-    glfwSetWindowIconifyCallback(CORE.Window.handle, WindowIconifyCallback);
-    glfwSetWindowFocusCallback(CORE.Window.handle, WindowFocusCallback);
-    glfwSetDropCallback(CORE.Window.handle, WindowDropCallback);
-    // Set input callback events
-    glfwSetKeyCallback(CORE.Window.handle, KeyCallback);
-    glfwSetCharCallback(CORE.Window.handle, CharCallback);
-    glfwSetMouseButtonCallback(CORE.Window.handle, MouseButtonCallback);
-    glfwSetCursorPosCallback(CORE.Window.handle, MouseCursorPosCallback);   // Track mouse position changes
-    glfwSetScrollCallback(CORE.Window.handle, MouseScrollCallback);
-    glfwSetCursorEnterCallback(CORE.Window.handle, CursorEnterCallback);
+    SDL_GL_CreateContext(CORE.Window.handle);
 
-    glfwMakeContextCurrent(CORE.Window.handle);
+    rlLoadExtensions(SDL_GL_GetProcAddress);
+    rlglInit(CORE.Window.screen.width, CORE.Window.screen.height);
 
-#if !defined(PLATFORM_WEB)
-    glfwSwapInterval(0);        // No V-Sync by default
-#endif
-
-    // Try to enable GPU V-Sync, so frames are limited to screen refresh rate (60Hz -> 60 FPS)
-    // NOTE: V-Sync can be enabled by graphic driver configuration
-    if (CORE.Window.flags & FLAG_VSYNC_HINT)
-    {
-        // WARNING: It seems to hits a critical render path in Intel HD Graphics
-        glfwSwapInterval(1);
-        TRACELOG(LOG_INFO, "DISPLAY: Trying to enable VSYNC");
-    }
-
-    int fbWidth = CORE.Window.screen.width;
-    int fbHeight = CORE.Window.screen.height;
-
-#if defined(PLATFORM_DESKTOP)
-    if ((CORE.Window.flags & FLAG_WINDOW_HIGHDPI) > 0)
-    {
-        // NOTE: On APPLE platforms system should manage window/input scaling and also framebuffer scaling
-        // Framebuffer scaling should be activated with: glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
-    #if !defined(__APPLE__)
-        glfwGetFramebufferSize(CORE.Window.handle, &fbWidth, &fbHeight);
-
-        // Screen scaling matrix is required in case desired screen area is different than display area
-        CORE.Window.screenScale = MatrixScale((float)fbWidth/CORE.Window.screen.width, (float)fbHeight/CORE.Window.screen.height, 1.0f);
-
-        // Mouse input scaling for the new screen size
-        SetMouseScale((float)CORE.Window.screen.width/fbWidth, (float)CORE.Window.screen.height/fbHeight);
-    #endif
-    }
-#endif
-
-    CORE.Window.render.width = fbWidth;
-    CORE.Window.render.height = fbHeight;
-    CORE.Window.currentFbo.width = fbWidth;
-    CORE.Window.currentFbo.height = fbHeight;
-
-    TRACELOG(LOG_INFO, "DISPLAY: Device initialized successfully");
-    TRACELOG(LOG_INFO, "    > Display size: %i x %i", CORE.Window.display.width, CORE.Window.display.height);
-    TRACELOG(LOG_INFO, "    > Screen size:  %i x %i", CORE.Window.screen.width, CORE.Window.screen.height);
-    TRACELOG(LOG_INFO, "    > Render size:  %i x %i", CORE.Window.render.width, CORE.Window.render.height);
-    TRACELOG(LOG_INFO, "    > Viewport offsets: %i, %i", CORE.Window.renderOffset.x, CORE.Window.renderOffset.y);
-
-#endif  // PLATFORM_DESKTOP || PLATFORM_WEB
-
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
-    CORE.Window.fullscreen = true;
-    CORE.Window.flags |= FLAG_FULLSCREEN_MODE;
-
-#if defined(PLATFORM_RPI)
-    bcm_host_init();
-
-    DISPMANX_ELEMENT_HANDLE_T dispmanElement = { 0 };
-    DISPMANX_DISPLAY_HANDLE_T dispmanDisplay = { 0 };
-    DISPMANX_UPDATE_HANDLE_T dispmanUpdate = { 0 };
-
-    VC_RECT_T dstRect = { 0 };
-    VC_RECT_T srcRect = { 0 };
-#endif
-
-#if defined(PLATFORM_DRM)
-    CORE.Window.fd = -1;
-    CORE.Window.connector = NULL;
-    CORE.Window.modeIndex = -1;
-    CORE.Window.crtc = NULL;
-    CORE.Window.gbmDevice = NULL;
-    CORE.Window.gbmSurface = NULL;
-    CORE.Window.prevBO = NULL;
-    CORE.Window.prevFB = 0;
-
-#if defined(DEFAULT_GRAPHIC_DEVICE_DRM)
-    CORE.Window.fd = open(DEFAULT_GRAPHIC_DEVICE_DRM, O_RDWR);
-#else
-    TRACELOG(LOG_INFO, "DISPLAY: No graphic card set, trying platform-gpu-card");
-    CORE.Window.fd = open("/dev/dri/by-path/platform-gpu-card",  O_RDWR); // VideoCore VI (Raspberry Pi 4)
-
-    if ((-1 == CORE.Window.fd) || (drmModeGetResources(CORE.Window.fd) == NULL))
-    {
-        TRACELOG(LOG_INFO, "DISPLAY: Failed to open platform-gpu-card, trying card1");
-        CORE.Window.fd = open("/dev/dri/card1", O_RDWR); // Other Embedded
-    }
-
-    if ((-1 == CORE.Window.fd) || (drmModeGetResources(CORE.Window.fd) == NULL))
-    {
-        TRACELOG(LOG_INFO, "DISPLAY: Failed to open graphic card1, trying card0");
-        CORE.Window.fd = open("/dev/dri/card0", O_RDWR); // VideoCore IV (Raspberry Pi 1-3)
-    }
-#endif
-    if (-1 == CORE.Window.fd)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to open graphic card");
-        return false;
-    }
-
-    drmModeRes *res = drmModeGetResources(CORE.Window.fd);
-    if (!res)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed get DRM resources");
-        return false;
-    }
-
-    TRACELOG(LOG_TRACE, "DISPLAY: Connectors found: %i", res->count_connectors);
-    for (size_t i = 0; i < res->count_connectors; i++)
-    {
-        TRACELOG(LOG_TRACE, "DISPLAY: Connector index %i", i);
-        drmModeConnector *con = drmModeGetConnector(CORE.Window.fd, res->connectors[i]);
-        TRACELOG(LOG_TRACE, "DISPLAY: Connector modes detected: %i", con->count_modes);
-        if ((con->connection == DRM_MODE_CONNECTED) && (con->encoder_id))
-        {
-            TRACELOG(LOG_TRACE, "DISPLAY: DRM mode connected");
-            CORE.Window.connector = con;
-            break;
-        }
-        else
-        {
-            TRACELOG(LOG_TRACE, "DISPLAY: DRM mode NOT connected (deleting)");
-            drmModeFreeConnector(con);
-        }
-    }
-    if (!CORE.Window.connector)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: No suitable DRM connector found");
-        drmModeFreeResources(res);
-        return false;
-    }
-
-    drmModeEncoder *enc = drmModeGetEncoder(CORE.Window.fd, CORE.Window.connector->encoder_id);
-    if (!enc)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to get DRM mode encoder");
-        drmModeFreeResources(res);
-        return false;
-    }
-
-    CORE.Window.crtc = drmModeGetCrtc(CORE.Window.fd, enc->crtc_id);
-    if (!CORE.Window.crtc)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to get DRM mode crtc");
-        drmModeFreeEncoder(enc);
-        drmModeFreeResources(res);
-        return false;
-    }
-
-    // If InitWindow should use the current mode find it in the connector's mode list
-    if ((CORE.Window.screen.width <= 0) || (CORE.Window.screen.height <= 0))
-    {
-        TRACELOG(LOG_TRACE, "DISPLAY: Selecting DRM connector mode for current used mode...");
-
-        CORE.Window.modeIndex = FindMatchingConnectorMode(CORE.Window.connector, &CORE.Window.crtc->mode);
-
-        if (CORE.Window.modeIndex < 0)
-        {
-            TRACELOG(LOG_WARNING, "DISPLAY: No matching DRM connector mode found");
-            drmModeFreeEncoder(enc);
-            drmModeFreeResources(res);
-            return false;
-        }
-
-        CORE.Window.screen.width = CORE.Window.display.width;
-        CORE.Window.screen.height = CORE.Window.display.height;
-    }
-
-    const bool allowInterlaced = CORE.Window.flags & FLAG_INTERLACED_HINT;
-    const int fps = (CORE.Time.target > 0) ? (1.0/CORE.Time.target) : 60;
-    // try to find an exact matching mode
-    CORE.Window.modeIndex = FindExactConnectorMode(CORE.Window.connector, CORE.Window.screen.width, CORE.Window.screen.height, fps, allowInterlaced);
-    // if nothing found, try to find a nearly matching mode
-    if (CORE.Window.modeIndex < 0)
-        CORE.Window.modeIndex = FindNearestConnectorMode(CORE.Window.connector, CORE.Window.screen.width, CORE.Window.screen.height, fps, allowInterlaced);
-    // if nothing found, try to find an exactly matching mode including interlaced
-    if (CORE.Window.modeIndex < 0)
-        CORE.Window.modeIndex = FindExactConnectorMode(CORE.Window.connector, CORE.Window.screen.width, CORE.Window.screen.height, fps, true);
-    // if nothing found, try to find a nearly matching mode including interlaced
-    if (CORE.Window.modeIndex < 0)
-        CORE.Window.modeIndex = FindNearestConnectorMode(CORE.Window.connector, CORE.Window.screen.width, CORE.Window.screen.height, fps, true);
-    // if nothing found, there is no suitable mode
-    if (CORE.Window.modeIndex < 0)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to find a suitable DRM connector mode");
-        drmModeFreeEncoder(enc);
-        drmModeFreeResources(res);
-        return false;
-    }
-
-    CORE.Window.display.width = CORE.Window.connector->modes[CORE.Window.modeIndex].hdisplay;
-    CORE.Window.display.height = CORE.Window.connector->modes[CORE.Window.modeIndex].vdisplay;
-
-    TRACELOG(LOG_INFO, "DISPLAY: Selected DRM connector mode %s (%ux%u%c@%u)", CORE.Window.connector->modes[CORE.Window.modeIndex].name,
-        CORE.Window.connector->modes[CORE.Window.modeIndex].hdisplay, CORE.Window.connector->modes[CORE.Window.modeIndex].vdisplay,
-        (CORE.Window.connector->modes[CORE.Window.modeIndex].flags & DRM_MODE_FLAG_INTERLACE) ? 'i' : 'p',
-        CORE.Window.connector->modes[CORE.Window.modeIndex].vrefresh);
-
-    // Use the width and height of the surface for render
-    CORE.Window.render.width = CORE.Window.screen.width;
-    CORE.Window.render.height = CORE.Window.screen.height;
-
-    drmModeFreeEncoder(enc);
-    enc = NULL;
-
-    drmModeFreeResources(res);
-    res = NULL;
-
-    CORE.Window.gbmDevice = gbm_create_device(CORE.Window.fd);
-    if (!CORE.Window.gbmDevice)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to create GBM device");
-        return false;
-    }
-
-    CORE.Window.gbmSurface = gbm_surface_create(CORE.Window.gbmDevice, CORE.Window.connector->modes[CORE.Window.modeIndex].hdisplay,
-        CORE.Window.connector->modes[CORE.Window.modeIndex].vdisplay, GBM_FORMAT_ARGB8888, GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
-    if (!CORE.Window.gbmSurface)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to create GBM surface");
-        return false;
-    }
-#endif
-
-    EGLint samples = 0;
-    EGLint sampleBuffer = 0;
-    if (CORE.Window.flags & FLAG_MSAA_4X_HINT)
-    {
-        samples = 4;
-        sampleBuffer = 1;
-        TRACELOG(LOG_INFO, "DISPLAY: Trying to enable MSAA x4");
-    }
-
-    const EGLint framebufferAttribs[] =
-    {
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,     // Type of context support -> Required on RPI?
-#if defined(PLATFORM_DRM)
-        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,          // Don't use it on Android!
-#endif
-        EGL_RED_SIZE, 8,            // RED color bit depth (alternative: 5)
-        EGL_GREEN_SIZE, 8,          // GREEN color bit depth (alternative: 6)
-        EGL_BLUE_SIZE, 8,           // BLUE color bit depth (alternative: 5)
-#if defined(PLATFORM_DRM)
-        EGL_ALPHA_SIZE, 8,        // ALPHA bit depth (required for transparent framebuffer)
-#endif
-        //EGL_TRANSPARENT_TYPE, EGL_NONE, // Request transparent framebuffer (EGL_TRANSPARENT_RGB does not work on RPI)
-        EGL_DEPTH_SIZE, 16,         // Depth buffer size (Required to use Depth testing!)
-        //EGL_STENCIL_SIZE, 8,      // Stencil buffer size
-        EGL_SAMPLE_BUFFERS, sampleBuffer,    // Activate MSAA
-        EGL_SAMPLES, samples,       // 4x Antialiasing if activated (Free on MALI GPUs)
-        EGL_NONE
-    };
-
-    const EGLint contextAttribs[] =
-    {
-        EGL_CONTEXT_CLIENT_VERSION, 2,
-        EGL_NONE
-    };
-
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
-    EGLint numConfigs = 0;
-
-    // Get an EGL device connection
-#if defined(PLATFORM_DRM)
-    CORE.Window.device = eglGetDisplay((EGLNativeDisplayType)CORE.Window.gbmDevice);
-#else
-    CORE.Window.device = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-#endif
-    if (CORE.Window.device == EGL_NO_DISPLAY)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to initialize EGL device");
-        return false;
-    }
-
-    // Initialize the EGL device connection
-    if (eglInitialize(CORE.Window.device, NULL, NULL) == EGL_FALSE)
-    {
-        // If all of the calls to eglInitialize returned EGL_FALSE then an error has occurred.
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to initialize EGL device");
-        return false;
-    }
-
-#if defined(PLATFORM_DRM)
-    if (!eglChooseConfig(CORE.Window.device, NULL, NULL, 0, &numConfigs))
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to get EGL config count: 0x%x", eglGetError());
-        return false;
-    }
-
-    TRACELOG(LOG_TRACE, "DISPLAY: EGL configs available: %d", numConfigs);
-
-    EGLConfig *configs = RL_CALLOC(numConfigs, sizeof(*configs));
-    if (!configs)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to get memory for EGL configs");
-        return false;
-    }
-
-    EGLint matchingNumConfigs = 0;
-    if (!eglChooseConfig(CORE.Window.device, framebufferAttribs, configs, numConfigs, &matchingNumConfigs))
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to choose EGL config: 0x%x", eglGetError());
-        free(configs);
-        return false;
-    }
-
-    TRACELOG(LOG_TRACE, "DISPLAY: EGL matching configs available: %d", matchingNumConfigs);
-
-    // find the EGL config that matches the previously setup GBM format
-    int found = 0;
-    for (EGLint i = 0; i < matchingNumConfigs; ++i)
-    {
-        EGLint id = 0;
-        if (!eglGetConfigAttrib(CORE.Window.device, configs[i], EGL_NATIVE_VISUAL_ID, &id))
-        {
-            TRACELOG(LOG_WARNING, "DISPLAY: Failed to get EGL config attribute: 0x%x", eglGetError());
-            continue;
-        }
-
-        if (GBM_FORMAT_ARGB8888 == id)
-        {
-            TRACELOG(LOG_TRACE, "DISPLAY: Using EGL config: %d", i);
-            CORE.Window.config = configs[i];
-            found = 1;
-            break;
-        }
-    }
-
-    RL_FREE(configs);
-
-    if (!found)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to find a suitable EGL config");
-        return false;
-    }
-#else
-    // Get an appropriate EGL framebuffer configuration
-    eglChooseConfig(CORE.Window.device, framebufferAttribs, &CORE.Window.config, 1, &numConfigs);
-#endif
-
-    // Set rendering API
-    eglBindAPI(EGL_OPENGL_ES_API);
-
-    // Create an EGL rendering context
-    CORE.Window.context = eglCreateContext(CORE.Window.device, CORE.Window.config, EGL_NO_CONTEXT, contextAttribs);
-    if (CORE.Window.context == EGL_NO_CONTEXT)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to create EGL context");
-        return false;
-    }
-#endif
-
-    // Create an EGL window surface
-    //---------------------------------------------------------------------------------
-#if defined(PLATFORM_ANDROID)
-    EGLint displayFormat = 0;
-
-    // EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is guaranteed to be accepted by ANativeWindow_setBuffersGeometry()
-    // As soon as we picked a EGLConfig, we can safely reconfigure the ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID
-    eglGetConfigAttrib(CORE.Window.device, CORE.Window.config, EGL_NATIVE_VISUAL_ID, &displayFormat);
-
-    // At this point we need to manage render size vs screen size
-    // NOTE: This function use and modify global module variables:
-    //  -> CORE.Window.screen.width/CORE.Window.screen.height
-    //  -> CORE.Window.render.width/CORE.Window.render.height
-    //  -> CORE.Window.screenScale
-    SetupFramebuffer(CORE.Window.display.width, CORE.Window.display.height);
-
-    ANativeWindow_setBuffersGeometry(CORE.Android.app->window, CORE.Window.render.width, CORE.Window.render.height, displayFormat);
-    //ANativeWindow_setBuffersGeometry(CORE.Android.app->window, 0, 0, displayFormat);       // Force use of native display size
-
-    CORE.Window.surface = eglCreateWindowSurface(CORE.Window.device, CORE.Window.config, CORE.Android.app->window, NULL);
-#endif  // PLATFORM_ANDROID
-
-#if defined(PLATFORM_RPI)
-    graphics_get_display_size(0, &CORE.Window.display.width, &CORE.Window.display.height);
-
-    // Screen size security check
-    if (CORE.Window.screen.width <= 0) CORE.Window.screen.width = CORE.Window.display.width;
-    if (CORE.Window.screen.height <= 0) CORE.Window.screen.height = CORE.Window.display.height;
-
-    // At this point we need to manage render size vs screen size
-    // NOTE: This function use and modify global module variables:
-    //  -> CORE.Window.screen.width/CORE.Window.screen.height
-    //  -> CORE.Window.render.width/CORE.Window.render.height
-    //  -> CORE.Window.screenScale
-    SetupFramebuffer(CORE.Window.display.width, CORE.Window.display.height);
-
-    dstRect.x = 0;
-    dstRect.y = 0;
-    dstRect.width = CORE.Window.display.width;
-    dstRect.height = CORE.Window.display.height;
-
-    srcRect.x = 0;
-    srcRect.y = 0;
-    srcRect.width = CORE.Window.render.width << 16;
-    srcRect.height = CORE.Window.render.height << 16;
-
-    // NOTE: RPI dispmanx windowing system takes care of source rectangle scaling to destination rectangle by hardware (no cost)
-    // Take care that renderWidth/renderHeight fit on displayWidth/displayHeight aspect ratio
-
-    VC_DISPMANX_ALPHA_T alpha = { 0 };
-    alpha.flags = DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS;
-    //alpha.flags = DISPMANX_FLAGS_ALPHA_FROM_SOURCE;       // TODO: Allow transparent framebuffer! -> FLAG_WINDOW_TRANSPARENT
-    alpha.opacity = 255;    // Set transparency level for framebuffer, requires EGLAttrib: EGL_TRANSPARENT_TYPE
-    alpha.mask = 0;
-
-    dispmanDisplay = vc_dispmanx_display_open(0);   // LCD
-    dispmanUpdate = vc_dispmanx_update_start(0);
-
-    dispmanElement = vc_dispmanx_element_add(dispmanUpdate, dispmanDisplay, 0/*layer*/, &dstRect, 0/*src*/,
-                                            &srcRect, DISPMANX_PROTECTION_NONE, &alpha, 0/*clamp*/, DISPMANX_NO_ROTATE);
-
-    CORE.Window.handle.element = dispmanElement;
-    CORE.Window.handle.width = CORE.Window.render.width;
-    CORE.Window.handle.height = CORE.Window.render.height;
-    vc_dispmanx_update_submit_sync(dispmanUpdate);
-
-    CORE.Window.surface = eglCreateWindowSurface(CORE.Window.device, CORE.Window.config, &CORE.Window.handle, NULL);
-
-    const unsigned char *const renderer = glGetString(GL_RENDERER);
-    if (renderer) TRACELOG(LOG_INFO, "DISPLAY: Renderer name is: %s", renderer);
-    else TRACELOG(LOG_WARNING, "DISPLAY: Failed to get renderer name");
-    //---------------------------------------------------------------------------------
-#endif  // PLATFORM_RPI
-
-#if defined(PLATFORM_DRM)
-    CORE.Window.surface = eglCreateWindowSurface(CORE.Window.device, CORE.Window.config, (EGLNativeWindowType)CORE.Window.gbmSurface, NULL);
-    if (EGL_NO_SURFACE == CORE.Window.surface)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to create EGL window surface: 0x%04x", eglGetError());
-        return false;
-    }
-
-    // At this point we need to manage render size vs screen size
-    // NOTE: This function use and modify global module variables:
-    //  -> CORE.Window.screen.width/CORE.Window.screen.height
-    //  -> CORE.Window.render.width/CORE.Window.render.height
-    //  -> CORE.Window.screenScale
-    SetupFramebuffer(CORE.Window.display.width, CORE.Window.display.height);
-#endif  // PLATFORM_DRM
-
-    // There must be at least one frame displayed before the buffers are swapped
-    //eglSwapInterval(CORE.Window.device, 1);
-
-    if (eglMakeCurrent(CORE.Window.device, CORE.Window.surface, CORE.Window.surface, CORE.Window.context) == EGL_FALSE)
-    {
-        TRACELOG(LOG_WARNING, "DISPLAY: Failed to attach EGL rendering context to EGL surface");
-        return false;
-    }
-    else
-    {
-        CORE.Window.render.width = CORE.Window.screen.width;
-        CORE.Window.render.height = CORE.Window.screen.height;
-        CORE.Window.currentFbo.width = CORE.Window.render.width;
-        CORE.Window.currentFbo.height = CORE.Window.render.height;
-
-        TRACELOG(LOG_INFO, "DISPLAY: Device initialized successfully");
-        TRACELOG(LOG_INFO, "    > Display size: %i x %i", CORE.Window.display.width, CORE.Window.display.height);
-        TRACELOG(LOG_INFO, "    > Screen size:  %i x %i", CORE.Window.screen.width, CORE.Window.screen.height);
-        TRACELOG(LOG_INFO, "    > Render size:  %i x %i", CORE.Window.render.width, CORE.Window.render.height);
-        TRACELOG(LOG_INFO, "    > Viewport offsets: %i, %i", CORE.Window.renderOffset.x, CORE.Window.renderOffset.y);
-    }
-#endif  // PLATFORM_ANDROID || PLATFORM_RPI || PLATFORM_DRM
-
-    // Load OpenGL extensions
-    // NOTE: GL procedures address loader is required to load extensions
-#if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    rlLoadExtensions(glfwGetProcAddress);
-#else
-    rlLoadExtensions(eglGetProcAddress);
-#endif
-
-    // Initialize OpenGL context (states and resources)
-    // NOTE: CORE.Window.currentFbo.width and CORE.Window.currentFbo.height not used, just stored as globals in rlgl
-    rlglInit(CORE.Window.currentFbo.width, CORE.Window.currentFbo.height);
-
-    // Setup default viewport
-    // NOTE: It updated CORE.Window.render.width and CORE.Window.render.height
-    SetupViewport(CORE.Window.currentFbo.width, CORE.Window.currentFbo.height);
+    SetupViewport(CORE.Window.screen.width, CORE.Window.screen.height);
 
     ClearBackground(RAYWHITE);      // Default background color for raylib games :P
-
-#if defined(PLATFORM_ANDROID)
-    CORE.Window.ready = true;
-#endif
 
     if ((CORE.Window.flags & FLAG_WINDOW_MINIMIZED) > 0) MinimizeWindow();
 
