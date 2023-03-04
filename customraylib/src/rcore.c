@@ -706,6 +706,7 @@ struct android_app *GetAndroidApp(void)
 // NOTE: data parameter could be used to pass any kind of required data to the initialization
 void InitWindow(int width, int height, const char *title)
 {
+    CORE.Window.shouldClose = false;
     TRACELOG(LOG_INFO, "Initializing raylib %s", RAYLIB_VERSION);
 
     TRACELOG(LOG_INFO, "Supported raylib modules:");
@@ -754,6 +755,8 @@ void InitWindow(int width, int height, const char *title)
     CORE.Window.screen.height = height;
     CORE.Window.currentFbo.width = width;
     CORE.Window.currentFbo.height = height;
+
+
 
     // Set desired windows flags before initializing anything
     ANativeActivity_setWindowFlags(CORE.Android.app->activity, AWINDOW_FLAG_FULLSCREEN, 0);  //AWINDOW_FLAG_SCALED, AWINDOW_FLAG_DITHER
@@ -816,6 +819,7 @@ void InitWindow(int width, int height, const char *title)
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
     // Initialize graphics device (display device and OpenGL context)
     // NOTE: returns true if window and graphic device has been initialized successfully
+
     CORE.Window.ready = InitGraphicsDevice(width, height);
 
     // If graphic device is no properly initialized, we end program
@@ -1382,36 +1386,6 @@ void EndDrawing(void)
     }
 #endif
 
-#if defined(SUPPORT_GIF_RECORDING)
-    // Draw record indicator
-    if (gifRecording)
-    {
-        #define GIF_RECORD_FRAMERATE    10
-        gifFrameCounter++;
-
-        // NOTE: We record one gif frame every 10 game frames
-        if ((gifFrameCounter%GIF_RECORD_FRAMERATE) == 0)
-        {
-            // Get image data for the current frame (from backbuffer)
-            // NOTE: This process is quite slow... :(
-            Vector2 scale = GetWindowScaleDPI();
-            unsigned char *screenData = rlReadScreenPixels((int)((float)CORE.Window.render.width*scale.x), (int)((float)CORE.Window.render.height*scale.y));
-            msf_gif_frame(&gifState, screenData, 10, 16, (int)((float)CORE.Window.render.width*scale.x)*4);
-
-            RL_FREE(screenData);    // Free image data
-        }
-
-    #if defined(SUPPORT_MODULE_RSHAPES) && defined(SUPPORT_MODULE_RTEXT)
-        if (((gifFrameCounter/15)%2) == 1)
-        {
-            DrawCircle(30, CORE.Window.screen.height - 20, 10, MAROON);                 // WARNING: Module required: rshapes
-            DrawText("GIF RECORDING", 50, CORE.Window.screen.height - 25, 10, RED);     // WARNING: Module required: rtext
-        }
-    #endif
-
-        rlDrawRenderBatchActive();  // Update and draw internal render batch
-    }
-#endif
 
 #if defined(SUPPORT_EVENTS_AUTOMATION)
     // Draw record/play indicator
@@ -1543,6 +1517,10 @@ void BeginMode3D(Camera3D camera)
 }
 
 // Ends 3D mode and returns to default 2D orthographic mode
+void EnableCursor(){}
+void DisableCursor(){}
+
+
 void EndMode3D(void)
 {
     rlDrawRenderBatchActive();      // Update and draw internal render batch
@@ -1637,13 +1615,12 @@ void BeginScissorMode(int x, int y, int width, int height)
     rlEnableScissorTest();
 
 #if defined(__APPLE__)
-    Vector2 scale = GetWindowScaleDPI();
-    rlScissor((int)(x*scale.x), (int)(GetScreenHeight()*scale.y - (((y + height)*scale.y))), (int)(width*scale.x), (int)(height*scale.y));
+    rlScissor(x, CORE.Window.currentFbo.height - (y + height), width, height);
 #else
     if ((CORE.Window.flags & FLAG_WINDOW_HIGHDPI) > 0)
     {
-        Vector2 scale = GetWindowScaleDPI();
-        rlScissor((int)(x*scale.x), (int)(CORE.Window.currentFbo.height - (y + height)*scale.y), (int)(width*scale.x), (int)(height*scale.y));
+        //Vector2 scale = GetWindowScaleDPI();
+        rlScissor(x, CORE.Window.currentFbo.height - (y + height), width, height);
     }
     else
     {
@@ -2089,7 +2066,7 @@ float GetFrameTime(void)
 double GetTime(void)
 {
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    return (double)SDL_GetTicks() / 1000;   // Elapsed time since glfwInit()
+    return (double)SDL_GetTicks() / 1000.0f;   // Elapsed time since glfwInit()
 #endif
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
@@ -3222,7 +3199,9 @@ static bool InitGraphicsDevice(int width, int height)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    CORE.Window.handle = SDL_CreateWindow((CORE.Window.title != 0)? CORE.Window.title : " ", 0, 0, CORE.Window.screen.width, CORE.Window.screen.height, flags);
+
+
+    CORE.Window.handle = SDL_CreateWindow((CORE.Window.title != 0)? CORE.Window.title : " ", 40, 40, CORE.Window.screen.width, CORE.Window.screen.height, flags);
 
     if (!CORE.Window.handle)
     {
@@ -3232,7 +3211,7 @@ static bool InitGraphicsDevice(int width, int height)
     }
 
     SDL_GL_CreateContext(CORE.Window.handle);
-
+    printf(SDL_GetError());
     rlLoadExtensions(SDL_GL_GetProcAddress);
     rlglInit(CORE.Window.screen.width, CORE.Window.screen.height);
 
@@ -3256,7 +3235,6 @@ static void SetupViewport(int width, int height)
     // render area does not match full display area (this situation is only applicable on fullscreen mode)
 #if defined(__APPLE__)
     float xScale = 1.0f, yScale = 1.0f;
-    glfwGetWindowContentScale(CORE.Window.handle, &xScale, &yScale);
     rlViewport(CORE.Window.renderOffset.x/2*xScale, CORE.Window.renderOffset.y/2*yScale, (CORE.Window.render.width)*xScale, (CORE.Window.render.height)*yScale);
 #else
     rlViewport(CORE.Window.renderOffset.x/2, CORE.Window.renderOffset.y/2, CORE.Window.render.width, CORE.Window.render.height);
@@ -3424,7 +3402,8 @@ void WaitTime(double seconds)
 void SwapScreenBuffer(void)
 {
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    glfwSwapBuffers(CORE.Window.handle);
+    SDL_GL_SwapWindow(CORE.Window.handle);
+    SDL_UpdateWindowSurface(CORE.Window.handle);
 #endif
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
@@ -3463,47 +3442,12 @@ void SwapScreenBuffer(void)
 // Register all input events
 void PollInputEvents(void)
 {
-#if defined(SUPPORT_GESTURES_SYSTEM)
-    // NOTE: Gestures update must be called every frame to reset gestures correctly
-    // because ProcessGestureEvent() is just called on an event, not every frame
-    UpdateGestures();
-#endif
+
 
     // Reset keys/chars pressed registered
     CORE.Input.Keyboard.keyPressedQueueCount = 0;
     CORE.Input.Keyboard.charPressedQueueCount = 0;
 
-#if !(defined(PLATFORM_RPI) || defined(PLATFORM_DRM))
-    // Reset last gamepad button/axis registered state
-    CORE.Input.Gamepad.lastButtonPressed = -1;
-    CORE.Input.Gamepad.axisCount = 0;
-#endif
-
-#if defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
-    // Register previous keys states
-    for (int i = 0; i < MAX_KEYBOARD_KEYS; i++) CORE.Input.Keyboard.previousKeyState[i] = CORE.Input.Keyboard.currentKeyState[i];
-
-    PollKeyboardEvents();
-
-    // Register previous mouse states
-    CORE.Input.Mouse.previousWheelMove = CORE.Input.Mouse.currentWheelMove;
-    CORE.Input.Mouse.currentWheelMove = 0.0f;
-    for (int i = 0; i < MAX_MOUSE_BUTTONS; i++)
-    {
-        CORE.Input.Mouse.previousButtonState[i] = CORE.Input.Mouse.currentButtonState[i];
-        CORE.Input.Mouse.currentButtonState[i] = CORE.Input.Mouse.currentButtonStateEvdev[i];
-    }
-
-    // Register gamepads buttons events
-    for (int i = 0; i < MAX_GAMEPADS; i++)
-    {
-        if (CORE.Input.Gamepad.ready[i])
-        {
-            // Register previous gamepad states
-            for (int k = 0; k < MAX_GAMEPAD_BUTTONS; k++) CORE.Input.Gamepad.previousButtonState[i][k] = CORE.Input.Gamepad.currentButtonState[i][k];
-        }
-    }
-#endif
 
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
     // Keyboard/Mouse input polling (automatically managed by GLFW3 through callback)
@@ -3612,8 +3556,101 @@ void PollInputEvents(void)
 
     CORE.Window.resizedLastFrame = false;
 
-    if (CORE.Window.eventWaiting) glfwWaitEvents();     // Wait for in input events before continue (drawing is paused)
-    else glfwPollEvents();      // Poll input events: keyboard/mouse/window events (callbacks)
+    if (CORE.Window.eventWaiting) SDL_PumpEvents();     // Wait for in input events before continue (drawing is paused)
+    else SDL_PumpEvents();      // Poll input events: keyboard/mouse/window events (callbacks)
+
+
+
+
+    while(1) {
+		SDL_Event ev;
+		if(SDL_PollEvent(&ev) == 0) {
+			//printf(".\n");
+			SDL_Delay(1);
+			continue;
+		}
+		
+		switch(ev.type) {
+			case SDL_QUIT:
+				printf("Received SDL_QUIT - bye!\n");
+                CORE.Window.shouldClose = true;
+				return;
+				
+			case SDL_MOUSEBUTTONUP:
+				printf("SDL_MOUSEBUTTONUP, button %d clicks %d\n", ev.button.button, (int)ev.button.clicks);
+				break;
+				
+			case SDL_MOUSEBUTTONDOWN:
+				printf("SDL_MOUSEBUTTONDOWN, button %d clicks %d\n", ev.button.button, (int)ev.button.clicks);
+				break;
+				
+			case SDL_KEYUP:
+			case SDL_KEYDOWN:
+				if(ev.type == SDL_KEYUP)
+					printf("SDL_KEYUP: ");
+				else
+					printf("SDL_KEYDOWN: ");
+				
+				printf("Keycode: %s (%d) Scancode: %s (%d)\n", 
+					   SDL_GetKeyName(ev.key.keysym.sym), ev.key.keysym.sym,
+					   SDL_GetScancodeName(ev.key.keysym.scancode),
+					   ev.key.keysym.scancode);
+				
+				if(ev.key.keysym.sym == SDLK_q) {
+					printf("You pressed Q - bye!\n");
+					return;
+				}
+				
+				break;
+
+			case SDL_MOUSEWHEEL:
+				printf("MouseWheel: x: %d, y: %d\n", ev.wheel.x, ev.wheel.y);
+				break;
+				
+			case SDL_TEXTINPUT:
+				printf("SDL_TEXTINPUT: %s\n", ev.text.text ? ev.text.text : "<NULL>");
+				break;
+			
+			case SDL_JOYBUTTONDOWN:
+				printf("SDL_JOYBUTTONDOWN dev %d button %d state %d\n",
+						(int)ev.jbutton.which, (int)ev.jbutton.button, (int)ev.jbutton.state);
+				break;
+			case SDL_JOYBUTTONUP:
+				printf("SDL_JOYBUTTONUP dev %d button %d state %d\n",
+						(int)ev.jbutton.which, (int)ev.jbutton.button, (int)ev.jbutton.state);
+				break;
+			
+			case SDL_MOUSEMOTION:
+			case SDL_FINGERDOWN:
+			case SDL_FINGERUP:
+			case SDL_FINGERMOTION:
+				break; // ignore
+			
+			case SDL_WINDOWEVENT:
+                if (ev.window.event == SDL_WINDOWEVENT_RESIZED) {
+                    SDL_SetWindowSize(CORE.Window.handle, ev.window.data1, ev.window.data2);
+                }
+				break;
+			
+			default:
+				// fprintf(outfile, "SDL_Event of type: 0x%x received\n", ev.type);
+				break;
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 #endif  // PLATFORM_DESKTOP
 
 #if defined(PLATFORM_WEB)
@@ -3723,7 +3760,13 @@ void PollInputEvents(void)
     // NOTE: Mouse input events polling is done asynchronously in another pthread - EventThread()
     // NOTE: Gamepad (Joystick) input events polling is done asynchonously in another pthread - GamepadThread()
 #endif
+
 }
+
+bool WindowShouldClose(){
+    return CORE.Window.shouldClose;
+}
+
 
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
 // GLFW3 Error Callback, runs on GLFW3 error
@@ -3752,10 +3795,8 @@ static void WindowSizeCallback(GLFWwindow *window, int width, int height)
 #else
     if ((CORE.Window.flags & FLAG_WINDOW_HIGHDPI) > 0)
     {
-        Vector2 windowScaleDPI = GetWindowScaleDPI();
-
-        CORE.Window.screen.width = (unsigned int)(width/windowScaleDPI.x);
-        CORE.Window.screen.height = (unsigned int)(height/windowScaleDPI.y);
+        CORE.Window.screen.width = width;
+        CORE.Window.screen.height = height;
     }
     else
     {
@@ -3778,197 +3819,51 @@ static void WindowIconifyCallback(GLFWwindow *window, int iconified)
 // GLFW3 WindowMaximize Callback, runs when window is maximized/restored
 static void WindowMaximizeCallback(GLFWwindow *window, int maximized)
 {
-    if (maximized) CORE.Window.flags |= FLAG_WINDOW_MAXIMIZED;  // The window was maximized
-    else CORE.Window.flags &= ~FLAG_WINDOW_MAXIMIZED;           // The window was restored
+
 }
 #endif
 
 // GLFW3 WindowFocus Callback, runs when window get/lose focus
 static void WindowFocusCallback(GLFWwindow *window, int focused)
 {
-    if (focused) CORE.Window.flags &= ~FLAG_WINDOW_UNFOCUSED;   // The window was focused
-    else CORE.Window.flags |= FLAG_WINDOW_UNFOCUSED;            // The window lost focus
+
 }
 
 // GLFW3 Keyboard Callback, runs on key pressed
 static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    // WARNING: GLFW could return GLFW_REPEAT, we need to consider it as 1
-    // to work properly with our implementation (IsKeyDown/IsKeyUp checks)
-    if (action == GLFW_RELEASE) CORE.Input.Keyboard.currentKeyState[key] = 0;
-    else CORE.Input.Keyboard.currentKeyState[key] = 1;
-
-    // Check if there is space available in the key queue
-    if ((CORE.Input.Keyboard.keyPressedQueueCount < MAX_KEY_PRESSED_QUEUE) && (action == GLFW_PRESS))
-    {
-        // Add character to the queue
-        CORE.Input.Keyboard.keyPressedQueue[CORE.Input.Keyboard.keyPressedQueueCount] = key;
-        CORE.Input.Keyboard.keyPressedQueueCount++;
-    }
-
-    // Check the exit key to set close window
-    if ((key == CORE.Input.Keyboard.exitKey) && (action == GLFW_PRESS)) glfwSetWindowShouldClose(CORE.Window.handle, GLFW_TRUE);
-
-#if defined(SUPPORT_SCREEN_CAPTURE)
-    if ((key == GLFW_KEY_F12) && (action == GLFW_PRESS))
-    {
-#if defined(SUPPORT_GIF_RECORDING)
-        if (mods == GLFW_MOD_CONTROL)
-        {
-            if (gifRecording)
-            {
-                gifRecording = false;
-
-                MsfGifResult result = msf_gif_end(&gifState);
-
-                SaveFileData(TextFormat("%s/screenrec%03i.gif", CORE.Storage.basePath, screenshotCounter), result.data, (unsigned int)result.dataSize);
-                msf_gif_free(result);
-
-            #if defined(PLATFORM_WEB)
-                // Download file from MEMFS (emscripten memory filesystem)
-                // saveFileFromMEMFSToDisk() function is defined in raylib/templates/web_shel/shell.html
-                emscripten_run_script(TextFormat("saveFileFromMEMFSToDisk('%s','%s')", TextFormat("screenrec%03i.gif", screenshotCounter - 1), TextFormat("screenrec%03i.gif", screenshotCounter - 1)));
-            #endif
-
-                TRACELOG(LOG_INFO, "SYSTEM: Finish animated GIF recording");
-            }
-            else
-            {
-                gifRecording = true;
-                gifFrameCounter = 0;
-
-                Vector2 scale = GetWindowScaleDPI();
-                msf_gif_begin(&gifState, (int)((float)CORE.Window.render.width*scale.x), (int)((float)CORE.Window.render.height*scale.y));
-                screenshotCounter++;
-
-                TRACELOG(LOG_INFO, "SYSTEM: Start animated GIF recording: %s", TextFormat("screenrec%03i.gif", screenshotCounter));
-            }
-        }
-        else
-#endif  // SUPPORT_GIF_RECORDING
-        {
-            TakeScreenshot(TextFormat("screenshot%03i.png", screenshotCounter));
-            screenshotCounter++;
-        }
-    }
-#endif  // SUPPORT_SCREEN_CAPTURE
-
-#if defined(SUPPORT_EVENTS_AUTOMATION)
-    if ((key == GLFW_KEY_F11) && (action == GLFW_PRESS))
-    {
-        eventsRecording = !eventsRecording;
-
-        // On finish recording, we export events into a file
-        if (!eventsRecording) ExportAutomationEvents("eventsrec.rep");
-    }
-    else if ((key == GLFW_KEY_F9) && (action == GLFW_PRESS))
-    {
-        LoadAutomationEvents("eventsrec.rep");
-        eventsPlaying = true;
-
-        TRACELOG(LOG_WARNING, "eventsPlaying enabled!");
-    }
-#endif
+    
 }
+
+
 
 // GLFW3 Char Key Callback, runs on key down (gets equivalent unicode char value)
 static void CharCallback(GLFWwindow *window, unsigned int key)
 {
-    //TRACELOG(LOG_DEBUG, "Char Callback: KEY:%i(%c)", key, key);
-
-    // NOTE: Registers any key down considering OS keyboard layout but
-    // do not detects action events, those should be managed by user...
-    // Ref: https://github.com/glfw/glfw/issues/668#issuecomment-166794907
-    // Ref: https://www.glfw.org/docs/latest/input_guide.html#input_char
-
-    // Check if there is space available in the queue
-    if (CORE.Input.Keyboard.charPressedQueueCount < MAX_KEY_PRESSED_QUEUE)
-    {
-        // Add character to the queue
-        CORE.Input.Keyboard.charPressedQueue[CORE.Input.Keyboard.charPressedQueueCount] = key;
-        CORE.Input.Keyboard.charPressedQueueCount++;
-    }
+    
 }
 
 // GLFW3 Mouse Button Callback, runs on mouse button pressed
 static void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
 {
-    // WARNING: GLFW could only return GLFW_PRESS (1) or GLFW_RELEASE (0) for now,
-    // but future releases may add more actions (i.e. GLFW_REPEAT)
-    CORE.Input.Mouse.currentButtonState[button] = action;
-
-#if defined(SUPPORT_GESTURES_SYSTEM) && defined(SUPPORT_MOUSE_GESTURES)         // PLATFORM_DESKTOP
-    // Process mouse events as touches to be able to use mouse-gestures
-    GestureEvent gestureEvent = { 0 };
-
-    // Register touch actions
-    if ((CORE.Input.Mouse.currentButtonState[button] == 1) && (CORE.Input.Mouse.previousButtonState[button] == 0)) gestureEvent.touchAction = TOUCH_ACTION_DOWN;
-    else if ((CORE.Input.Mouse.currentButtonState[button] == 0) && (CORE.Input.Mouse.previousButtonState[button] == 1)) gestureEvent.touchAction = TOUCH_ACTION_UP;
-
-    // NOTE: TOUCH_ACTION_MOVE event is registered in MouseCursorPosCallback()
-
-    // Assign a pointer ID
-    gestureEvent.pointId[0] = 0;
-
-    // Register touch points count
-    gestureEvent.pointCount = 1;
-
-    // Register touch points position, only one point registered
-    gestureEvent.position[0] = GetMousePosition();
-
-    // Normalize gestureEvent.position[0] for CORE.Window.screen.width and CORE.Window.screen.height
-    gestureEvent.position[0].x /= (float)GetScreenWidth();
-    gestureEvent.position[0].y /= (float)GetScreenHeight();
-
-    // Gesture data is sent to gestures system for processing
-    ProcessGestureEvent(gestureEvent);
-#endif
+    
 }
 
 // GLFW3 Cursor Position Callback, runs on mouse move
 static void MouseCursorPosCallback(GLFWwindow *window, double x, double y)
 {
-    CORE.Input.Mouse.currentPosition.x = (float)x;
-    CORE.Input.Mouse.currentPosition.y = (float)y;
-    CORE.Input.Touch.position[0] = CORE.Input.Mouse.currentPosition;
-
-#if defined(SUPPORT_GESTURES_SYSTEM) && defined(SUPPORT_MOUSE_GESTURES)         // PLATFORM_DESKTOP
-    // Process mouse events as touches to be able to use mouse-gestures
-    GestureEvent gestureEvent = { 0 };
-
-    gestureEvent.touchAction = TOUCH_ACTION_MOVE;
-
-    // Assign a pointer ID
-    gestureEvent.pointId[0] = 0;
-
-    // Register touch points count
-    gestureEvent.pointCount = 1;
-
-    // Register touch points position, only one point registered
-    gestureEvent.position[0] = CORE.Input.Touch.position[0];
-
-    // Normalize gestureEvent.position[0] for CORE.Window.screen.width and CORE.Window.screen.height
-    gestureEvent.position[0].x /= (float)GetScreenWidth();
-    gestureEvent.position[0].y /= (float)GetScreenHeight();
-
-    // Gesture data is sent to gestures system for processing
-    ProcessGestureEvent(gestureEvent);
-#endif
+    
 }
 
 // GLFW3 Scrolling Callback, runs on mouse wheel
 static void MouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
-    if (fabs(xoffset) > fabs(yoffset)) CORE.Input.Mouse.currentWheelMove = (float)xoffset;
-    else CORE.Input.Mouse.currentWheelMove = (float)yoffset;
-}
+    }
 
 // GLFW3 CursorEnter Callback, when cursor enters the window
 static void CursorEnterCallback(GLFWwindow *window, int enter)
 {
-    if (enter == true) CORE.Input.Mouse.cursorOnScreen = true;
-    else CORE.Input.Mouse.cursorOnScreen = false;
-}
+    }
 
 // GLFW3 Window Drop Callback, runs when drop files into window
 // NOTE: Paths are stored in dynamic memory for further retrieval
