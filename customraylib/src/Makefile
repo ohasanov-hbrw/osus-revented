@@ -412,7 +412,7 @@ endif
 # Define include paths for required headers: INCLUDE_PATHS
 # NOTE: Several external required libraries (stb and others)
 #------------------------------------------------------------------------------------------------
-INCLUDE_PATHS = -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw
+INCLUDE_PATHS = -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2
 
 # Define additional directories containing required header files
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
@@ -526,6 +526,8 @@ ifeq ($(PLATFORM),PLATFORM_ANDROID)
     LDLIBS = -llog -landroid -lEGL -lGLESv2 -lOpenSLES -lc -lm
 endif
 
+
+LDLIBS += -L/usr/x86_64-w64-mingw32/lib -lSDL2main -lSDL2 -lm -lole32 -loleaut32 -limm32 -lwinmm -lpthread -lgdi32 -lopengl32 -lversion -lsetupapi -lhid
 # Define source code object files required
 #------------------------------------------------------------------------------------------------
 OBJS = rcore.o \
