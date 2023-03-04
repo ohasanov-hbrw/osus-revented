@@ -47,15 +47,9 @@ void GetMouse(){
     Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
     if(!Global.MouseInFocus){
         Global.MousePosition = {0,0};
-        //if it isnt in the game area, show the cursor
-        if(IsCursorHidden())
-            ShowCursor();
     }
     else {
         Global.MousePosition = {(GetMouseX() - Global.ZeroPoint.x) / Global.Scale, (GetMouseY() - Global.ZeroPoint.y) / Global.Scale};
-        //if it is in the game area, hide the cursor
-        if(!IsCursorHidden())
-            HideCursor();
     }
 }
 
@@ -85,6 +79,13 @@ void GetKeys(){
         Global.Key2R = true;
     else
         Global.Key2R = false;
+
+    Global.Key1P = Global.Input.k1p;
+    Global.Key2P = Global.Input.k2p;
+    Global.Key1D = Global.Input.k1d;
+    Global.Key2D = Global.Input.k2d;
+    Global.Key1R = Global.Input.k1r;
+    Global.Key2R = Global.Input.k2r;
 }
 
 float Scale(float a){

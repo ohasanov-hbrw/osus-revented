@@ -7,6 +7,7 @@
 #include "gamemanager.hpp"
 #include <thread>
 #include <functional>
+#include "SDL.h"
 
 #define PLATFORM_DESKTOP
 
@@ -16,6 +17,18 @@
     #define GLSL_VERSION            100
 #endif
 
+
+struct InputHandler {
+    int mx = -1;
+    int my = -1;
+    bool k1p = 0;
+    bool k1d = 0;
+    bool k1r = 0;
+    bool k2p = 0;
+    bool k2d = 0;
+    bool k2r = 0;
+    int scr = 0;
+};
 
 class State;
 
@@ -113,6 +126,20 @@ struct Globals {
     int parsedLines = -1;
 
     int loadingState = 0;
+
+    int glfwWindowSizeX = 640;
+    int glfwWindowSizeY = 480;
+    int glfwWindowPosX = 0;
+    int glfwWindowPosY = 0;
+
+    SDL_Window* win;
+    bool quit = false;
+    uint8_t amogs = 0;
+    SDL_Cursor* amog = SDL_CreateCursor(&amogs,
+                             &amogs,
+                             1, 1, 1,
+                             1);
+    InputHandler Input;
 };
 
 extern Globals Global;
