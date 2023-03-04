@@ -219,20 +219,20 @@ int main() {
         //std::cout << getTimer() - what << std::endl;
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  avgFPS), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
-        glfwGetWindowSize(window, &Global.glfwWindowSizeX, &Global.glfwWindowSizeY);
-        glfwGetWindowPos(window, &Global.glfwWindowPosX, &Global.glfwWindowPosY);
+        //glfwGetWindowSize(window, &Global.glfwWindowSizeX, &Global.glfwWindowSizeY);
+        //glfwGetWindowPos(window, &Global.glfwWindowPosX, &Global.glfwWindowPosY);
 
         locktite.unlock();
-        SDL_SetWindowPosition(Global.win, Global.glfwWindowPosX, Global.glfwWindowPosY);
-        SDL_SetWindowSize(Global.win, Global.glfwWindowSizeX, Global.glfwWindowSizeY);
+        //SDL_SetWindowPosition(Global.win, Global.glfwWindowPosX, Global.glfwWindowPosY);
+        //SDL_SetWindowSize(Global.win, Global.glfwWindowSizeX, Global.glfwWindowSizeY);
         rlDrawRenderBatchActive();
         SwapScreenBuffer();
         PollInputEvents();
         //EndDrawing();
         while(getTimer() - lastFrame < 1000.0/144.0 and getTimer() - lastFrame >= 0)
             continue;
-        int x;
-        int y; 
+        //int x;
+        //int y; 
         /*SDL_GetWindowPosition(Global.win,
                            &x, &y);
         std::cout << x << " " << y << std::endl;*/
