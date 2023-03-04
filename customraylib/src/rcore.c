@@ -127,34 +127,6 @@
 #define RAYMATH_IMPLEMENTATION      // Define external out-of-line implementation
 #include "raymath.h"                // Vector3, Quaternion and Matrix functionality
 
-#if defined(SUPPORT_GESTURES_SYSTEM)
-    #define GESTURES_IMPLEMENTATION
-    #include "rgestures.h"           // Gestures detection functionality
-#endif
-
-#if defined(SUPPORT_CAMERA_SYSTEM)
-    #define CAMERA_IMPLEMENTATION
-    #include "rcamera.h"             // Camera system functionality
-#endif
-
-#if defined(SUPPORT_GIF_RECORDING)
-    #define MSF_GIF_MALLOC(contextPointer, newSize) RL_MALLOC(newSize)
-    #define MSF_GIF_REALLOC(contextPointer, oldMemory, oldSize, newSize) RL_REALLOC(oldMemory, newSize)
-    #define MSF_GIF_FREE(contextPointer, oldMemory, oldSize) RL_FREE(oldMemory)
-
-    #define MSF_GIF_IMPL
-    #include "external/msf_gif.h"   // GIF recording functionality
-#endif
-
-#if defined(SUPPORT_COMPRESSION_API)
-    #define SINFL_IMPLEMENTATION
-    #define SINFL_NO_SIMD
-    #include "external/sinfl.h"     // Deflate (RFC 1951) decompressor
-
-    #define SDEFL_IMPLEMENTATION
-    #include "external/sdefl.h"     // Deflate (RFC 1951) compressor
-#endif
-
 #if (defined(__linux__) || defined(PLATFORM_WEB)) && _POSIX_C_SOURCE < 199309L
     #undef _POSIX_C_SOURCE
     #define _POSIX_C_SOURCE 199309L // Required for: CLOCK_MONOTONIC if compiled with c99 without gnu ext.
@@ -208,13 +180,13 @@
 #if defined(PLATFORM_DESKTOP)
     #define GLFW_INCLUDE_NONE       // Disable the standard OpenGL header inclusion on GLFW3
                                     // NOTE: Already provided by rlgl implementation (on glad.h)
-    #include "GLFW/glfw3.h"         // GLFW3 library: Windows, OpenGL context and Input management
+    //#include "GLFW/glfw3.h"         // GLFW3 library: Windows, OpenGL context and Input management
                                     // NOTE: GLFW3 already includes gl.h (OpenGL) headers
 
     // Support retrieving native window handlers
     #if defined(_WIN32)
         #define GLFW_EXPOSE_NATIVE_WIN32
-        #include "GLFW/glfw3native.h"       // WARNING: It requires customization to avoid windows.h inclusion!
+        //#include "GLFW/glfw3native.h"       // WARNING: It requires customization to avoid windows.h inclusion!
 
         #if defined(SUPPORT_WINMM_HIGHRES_TIMER) && !defined(SUPPORT_BUSY_WAIT_LOOP)
             // NOTE: Those functions require linking with winmm library
@@ -228,13 +200,13 @@
         //#define GLFW_EXPOSE_NATIVE_X11      // WARNING: Exposing Xlib.h > X.h results in dup symbols for Font type
         //#define GLFW_EXPOSE_NATIVE_WAYLAND
         //#define GLFW_EXPOSE_NATIVE_MIR
-        #include "GLFW/glfw3native.h"       // Required for: glfwGetX11Window()
+        //#include "GLFW/glfw3native.h"       // Required for: glfwGetX11Window()
     #endif
     #if defined(__APPLE__)
         #include <unistd.h>                 // Required for: usleep()
 
         //#define GLFW_EXPOSE_NATIVE_COCOA    // WARNING: Fails due to type redefinition
-        #include "GLFW/glfw3native.h"       // Required for: glfwGetCocoaWindow()
+        //#include "GLFW/glfw3native.h"       // Required for: glfwGetCocoaWindow()
     #endif
 #endif
 
