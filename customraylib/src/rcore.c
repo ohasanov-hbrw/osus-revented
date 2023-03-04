@@ -2379,8 +2379,8 @@ VrStereoConfig LoadVrStereoConfig(VrDeviceInfo device)
         float projOffset = 4.0f*lensShift;      // Scaled to projection space coordinates [-1..1]
         Matrix proj = MatrixPerspective(fovy, aspect, RL_CULL_DISTANCE_NEAR, RL_CULL_DISTANCE_FAR);
 
-        config.projection[0] = MatrixMultiply(proj, MatrixTranslate(projOffset, 0.0f, 0.0f));
-        config.projection[1] = MatrixMultiply(proj, MatrixTranslate(-projOffset, 0.0f, 0.0f));
+        config.projection[0] = MatrixMultiply2(proj, MatrixTranslate(projOffset, 0.0f, 0.0f));
+        config.projection[1] = MatrixMultiply2(proj, MatrixTranslate(-projOffset, 0.0f, 0.0f));
 
         // Compute camera transformation matrices
         // NOTE: Camera movement might seem more natural if we model the head.
@@ -2551,7 +2551,7 @@ Ray GetMouseRay(Vector2 mouse, Camera camera)
     // Calculate view matrix from camera look at
     Matrix matView = MatrixLookAt(camera.position, camera.target, camera.up);
 
-    Matrix matProj = MatrixIdentity();
+    Matrix matProj = MatrixIdentity2();
 
     if (camera.projection == CAMERA_PERSPECTIVE)
     {
@@ -2618,7 +2618,7 @@ Matrix GetCameraMatrix2D(Camera2D camera)
     Matrix matScale = MatrixScale(camera.zoom, camera.zoom, 1.0f);
     Matrix matTranslation = MatrixTranslate(camera.offset.x, camera.offset.y, 0.0f);
 
-    matTransform = MatrixMultiply(MatrixMultiply(matOrigin, MatrixMultiply(matScale, matRotation)), matTranslation);
+    matTransform = MatrixMultiply2(MatrixMultiply2(matOrigin, MatrixMultiply2(matScale, matRotation)), matTranslation);
 
     return matTransform;
 }
@@ -2635,7 +2635,7 @@ Vector2 GetWorldToScreen(Vector3 position, Camera camera)
 Vector2 GetWorldToScreenEx(Vector3 position, Camera camera, int width, int height)
 {
     // Calculate projection matrix (from perspective instead of frustum
-    Matrix matProj = MatrixIdentity();
+    Matrix matProj = MatrixIdentity2();
 
     if (camera.projection == CAMERA_PERSPECTIVE)
     {
@@ -3941,7 +3941,7 @@ static bool InitGraphicsDevice(int width, int height)
 {
     CORE.Window.screen.width = width;            // User desired width
     CORE.Window.screen.height = height;          // User desired height
-    CORE.Window.screenScale = MatrixIdentity();  // No draw scaling required by default
+    CORE.Window.screenScale = MatrixIdentity2();  // No draw scaling required by default
 
     // NOTE: Framebuffer (render area - CORE.Window.render.width, CORE.Window.render.height) could include black bars...
     // ...in top-down or left-right to match display aspect ratio (no weird scalings)

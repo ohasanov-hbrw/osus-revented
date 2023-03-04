@@ -23,7 +23,7 @@
 #include "zip.h"
 #include "../vendor/raylib/src/external/glfw/include/GLFW/glfw3.h"
 #include <mutex>
-//#include "SDL.h"
+#include "SDLutils.hpp"
 
 double avgFPS = 144;
 double avgHZ = 1000;
@@ -65,11 +65,12 @@ void GameLoop(){
 
 
 int main() {
-    /*SDL_SetMainReady();
+    //SDL_SetMainReady();
+    initSDL();
 
-    SDL_Init(SDL_INIT_EVENTS);
-    SDL_Init(SDL_INIT_JOYSTICK);
-    SDL_Init(SDL_INIT_GAMECONTROLLER);*/
+    //SDL_Init(SDL_INIT_EVENTS);
+    //SDL_Init(SDL_INIT_JOYSTICK);
+    //SDL_Init(SDL_INIT_GAMECONTROLLER);
 
     std::mutex locktite;
     Global.CurrentState = std::make_shared<MainMenu>();
