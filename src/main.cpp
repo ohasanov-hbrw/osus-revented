@@ -25,7 +25,7 @@
 #include "zip.h"
 #include "../vendor/raylib/src/external/glfw/include/GLFW/glfw3.h"
 #include <mutex>
-#include "SDLutils.hpp"
+//#include "SDLutils.hpp"
 
 double avgFPS = 144;
 double avgHZ = 1000;
@@ -82,7 +82,7 @@ int main() {
     
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     SetAudioStreamBufferSizeDefault(128);
-    InitWindow("aa", 640, 480);
+    InitWindow(640, 480, "aa");
     
 
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
@@ -155,15 +155,6 @@ int main() {
     GLFWcursor* cursor = glfwCreateCursor(&image, 0, 0);*/
 
 
-    int wx, wy;
-    GLFWwindow* window = (GLFWwindow*)GetWindowGL();
-    std::cout << "set window\n";
-    std::cout << window << "\n";
-    glfwGetWindowSize(window, &wx, &wy);
-    std::cout << "get window\n";
-    std::cout << wx << " " << wy << "\n";
-    glfwSetWindowTitle (window, "osus? osus.");
-    std::cout << "set name\n";
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     //glfwSwapInterval( 0 );
@@ -182,7 +173,7 @@ int main() {
         lastFrame = getTimer();
         //PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
         
-        if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
+        /*if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
         {
             int display = GetCurrentMonitor();
             if (IsWindowFullscreen())
@@ -193,7 +184,7 @@ int main() {
             SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
             if(!IsWindowFullscreen())
                 SetWindowSize(640, 480); 
-        }
+        }*/
         
         BeginDrawing();
         ClearBackground(Global.Background);

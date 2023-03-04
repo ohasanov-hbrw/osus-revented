@@ -10,9 +10,10 @@
 #include <chrono>
 
 
-
+/*
 void initSDL();
 void quitSDL();
 
 void SDLpollEvent();
 void SDLGetMouse();
+*/

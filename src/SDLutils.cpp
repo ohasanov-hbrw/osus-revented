@@ -1,5 +1,5 @@
 #include "SDLutils.hpp"
-
+/*
 void initSDL(){
     SDL_SetMainReady();
     SDL_Init(SDL_INIT_GAMECONTROLLER);
@@ -7,9 +7,7 @@ void initSDL(){
     SDL_Init(SDL_INIT_JOYSTICK);
     SDL_Init(SDL_INIT_VIDEO);
     Global.win = SDL_CreateWindowFrom(GetWindowHandle());
-    /*Global.win = SDL_CreateWindow("what the hell",
-                              10, 10, 10,
-                              10, SDL_WINDOW_BORDERLESS);*/
+    //Global.win = SDL_CreateWindow("what the hell",10, SDL_WINDOW_BORDERLESS);
     //SDL_HideWindow(Global.win);
     SDL_SetWindowInputFocus(Global.win);
     //std::cout << SDL_GetWindowFlags(Global.win) << std::endl;
@@ -89,4 +87,4 @@ void SDLGetMouse(){
     else {
         Global.MousePosition = {(Global.Input.mx - Global.ZeroPoint.x) / Global.Scale, (Global.Input.my - Global.ZeroPoint.y) / Global.Scale};
     }
-}
+}*/
