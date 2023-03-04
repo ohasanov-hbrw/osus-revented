@@ -8,10 +8,15 @@ void initSDL(){
     SDL_Init(SDL_INIT_JOYSTICK);
     SDL_Init(SDL_INIT_VIDEO);
     Global.win = SDL_CreateWindowFrom(GetWindowHandle());
+    /*Global.win = SDL_CreateWindow("what the hell",
+                              10, 10, 10,
+                              10, SDL_WINDOW_BORDERLESS);*/
+    //SDL_HideWindow(Global.win);
+    SDL_SetWindowInputFocus(Global.win);
     //std::cout << SDL_GetWindowFlags(Global.win) << std::endl;
-    SDL_CaptureMouse(SDL_TRUE);
+    //SDL_CaptureMouse(SDL_TRUE);
     std::cout << SDL_GetError() << std::endl;
-    SDL_ShowCursor(SDL_DISABLE);
+    //SDL_ShowCursor(SDL_DISABLE);
 }
 void quitSDL(){
     SDL_Quit();

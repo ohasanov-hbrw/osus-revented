@@ -135,10 +135,10 @@ struct Globals {
     SDL_Window* win;
     bool quit = false;
     uint8_t amogs = 0;
-    SDL_Cursor* amog = SDL_CreateCursor(&amogs,
+    /*SDL_Cursor* amog = SDL_CreateCursor(&amogs,
                              &amogs,
                              1, 1, 1,
-                             1);
+                             1);*/
     InputHandler Input;
 };
 

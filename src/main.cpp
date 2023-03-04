@@ -44,8 +44,8 @@ Globals Global;
 void GameLoop(){
     while(true){
         //PollInputEvents();
-        SDLpollEvent();
-        SDLGetMouse();
+        //SDLpollEvent();
+        //SDLGetMouse();
 
         Global.FrameTime = getTimer() - Global.LastFrameTime;
         Global.LastFrameTime = getTimer();
@@ -57,7 +57,7 @@ void GameLoop(){
         
 
         //GetMouse();
-        GetKeys();
+        
 
         
         //updateUpDown();
@@ -94,7 +94,7 @@ int main() {
     Global.OsusLogo = LoadTexture("resources/osus.png");
     Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", 330));
 
-    Image cus;
+    //Image cus;
     std::string lastPath = Global.Path;
 	Global.Path = "resources/default_skin/";
 	std::vector<std::string> files = ls(".png");
@@ -143,7 +143,7 @@ int main() {
     Global.GameTextures = 0;
     
 
-    initSDL();
+    //initSDL();
 
     
     //
@@ -173,10 +173,10 @@ int main() {
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     //glfwSwapInterval( 0 );
 
-    int display = GetCurrentMonitor();
+    /*int display = GetCurrentMonitor();
     SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
     ToggleFullscreen();
-    SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
+    SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));*/
     /*glfwSetCursor(window, cursor);
 
     SDL_SetCursor(Global.amog);*/
@@ -211,7 +211,8 @@ int main() {
             Global.gameManager->loadGameTextures();
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
-        //SDLGetMouse();
+        GetMouse();
+        GetKeys();
         //double what = getTimer();
         //updateMouseTrail();
         renderMouse(); 
@@ -222,13 +223,19 @@ int main() {
         glfwGetWindowPos(window, &Global.glfwWindowPosX, &Global.glfwWindowPosY);
 
         locktite.unlock();
-
+        SDL_SetWindowPosition(Global.win, Global.glfwWindowPosX, Global.glfwWindowPosY);
+        SDL_SetWindowSize(Global.win, Global.glfwWindowSizeX, Global.glfwWindowSizeY);
         rlDrawRenderBatchActive();
         SwapScreenBuffer();
         PollInputEvents();
         //EndDrawing();
-        while(getTimer() - lastFrame < 1000.0/72.0 and getTimer() - lastFrame >= 0)
+        while(getTimer() - lastFrame < 1000.0/144.0 and getTimer() - lastFrame >= 0)
             continue;
+        int x;
+        int y; 
+        /*SDL_GetWindowPosition(Global.win,
+                           &x, &y);
+        std::cout << x << " " << y << std::endl;*/
         avgFPS = (avgFPS + 1000.0f / (getTimer() - lastFrame)) / 2.0;
         //std::cout << Mx << " " << My << std::endl;
     }
@@ -238,7 +245,6 @@ int main() {
     UnloadFont(Global.DefaultFont);
     UnloadShader(Global.shdrOutline);
     CloseWindow();
-    SDL_FreeCursor(Global.amog);
-    quitSDL();
+    //quitSDL();
 }
 
