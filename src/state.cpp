@@ -220,7 +220,7 @@ void Game::update() {
     if(initDone == 1){
         Global.enableMouse = false;
         Global.gameManager->run();
-        if(IsKeyPressed(KEY_BACKSPACE)){
+        if(IsKeyPressed(SDL_SCANCODE_BACKSPACE )){
             Global.gameManager->unloadGame();
             Global.CurrentState->unload();
             Global.CurrentState.reset(new PlayMenu());
@@ -337,7 +337,7 @@ void WIPMenu::init(){
     SetTextureFilter(back, TEXTURE_FILTER_BILINEAR );
     float time = 0.2f;
     while(time <= 1.0f){
-        time += GetFrameTime() * 1.0f;
+        time += Global.FrameTime / 1000.0f;
         //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
         float weirdSmooth = easeInOutCubic(time);
         angle = -250 + 255 * weirdSmooth;
@@ -450,7 +450,7 @@ void WIPMenu::render(){
 void WIPMenu::update(){
     float clampaccel = 0;
     if(applyMouse){
-        accel += (float)GetFrameTime() * (float)(100.0f * -Global.Wheel);
+        accel += (float)(Global.FrameTime / 1000.0f) * (float)(100.0f * -Global.Wheel);
         if(accel > 60.0f)
             accel = 60.0f;
         if(accel < -60.0f)
@@ -462,9 +462,9 @@ void WIPMenu::update(){
     if(floatangle >= 20.0f)
         floatangle -= 20.0f;
     if(floatangle >= 10.0f)
-        clampaccel = (float)GetFrameTime() * (float)(2.5f * (20.0f - floatangle));
+        clampaccel = (float)(Global.FrameTime / 1000.0f) * (float)(2.5f * (20.0f - floatangle));
     else
-        clampaccel = -(float)GetFrameTime() * (float)(2.5f * (floatangle));
+        clampaccel = -(float)(Global.FrameTime / 1000.0f) * (float)(2.5f * (floatangle));
     
     posangle = angle;
     while(posangle < 0.0f)
@@ -515,7 +515,7 @@ void WIPMenu::update(){
                 applyMouse = false;
                 float time = 0.2f;
                 while(time <= 1.0f){
-                    time += GetFrameTime() * 1.0f;
+                    time += (Global.FrameTime / 1000.0f) * 1.0f;
                     //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
                     float weirdSmooth = easeInOutCubic(1.0f-time);
                     angle = -250 + 250 * weirdSmooth;
@@ -589,7 +589,7 @@ void WIPMenu::update(){
                 applyMouse = false;
                 float time = 0.2f;
                 while(time <= 1.0f){
-                    time += GetFrameTime() * 1.0f;
+                    time += (Global.FrameTime / 1000.0f) * 1.0f;
                     //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
                     float weirdSmooth = easeInOutCubic(1.0f-time);
                     angle = -250 + 250 * weirdSmooth;
@@ -666,7 +666,7 @@ void WIPMenu::update(){
         lastMouse = Global.MousePosition.y;
     //std::cout << accel << std::endl;
     if(applyMouse)
-        accel += ((-accel) / 2.0f) * ((float)GetFrameTime() * 8.0f);
+        accel += ((-accel) / 2.0f) * ((float)(Global.FrameTime / 1000.0f) * 8.0f);
     angle += accel;
     if(!moving)
         angle += clampaccel;
@@ -691,7 +691,7 @@ void WIPMenu::update(){
                     TempMeta = Metadata;
                 }
             }
-            animtime += GetFrameTime() * 2.0f;
+            animtime += (Global.FrameTime / 1000.0f) * 2.0f;
             if(animtime > 1.0f)
                 animtime = 1.0f;
         }
@@ -700,12 +700,12 @@ void WIPMenu::update(){
         renderMetadata = false;
         if(Metadata.size() > 0)
             Metadata.clear();
-        animtime -= GetFrameTime() * 2.0f;
+        animtime -= (Global.FrameTime / 1000.0f) * 2.0f;
         if(animtime < 0.0f)
             animtime = 0.0f;
     }
 
-    if(IsKeyPressed(KEY_BACKSPACE) and CanGoBack){
+    if(IsKeyPressed(SDL_SCANCODE_BACKSPACE) and CanGoBack){
         Path.pop_back();
         while(Path[Path.size()-1] != '/'){
             Path.pop_back();
@@ -718,7 +718,7 @@ void WIPMenu::update(){
         applyMouse = false;
         float time = 0.2f;
         while(time <= 1.0f){
-            time += GetFrameTime() * 1.0f;
+            time += (Global.FrameTime / 1000.0f) * 1.0f;
             //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
             float weirdSmooth = easeInOutCubic(1.0f-time);
             angle = -250 + 250 * weirdSmooth;
@@ -777,7 +777,7 @@ void WIPMenu::update(){
         applyMouse = true;
         init();
     }
-    if(IsKeyPressed(KEY_BACKSPACE) and !CanGoBack){
+    if(IsKeyPressed(SDL_SCANCODE_BACKSPACE ) and !CanGoBack){
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
     }

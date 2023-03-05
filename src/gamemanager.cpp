@@ -461,7 +461,7 @@ void GameManager::run(){
 		UpdateMusicStream(backgroundMusic);
 		if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 			//DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
-			if(IsKeyPressed(KEY_S)){
+			if(IsKeyPressed(SDL_SCANCODE_S )){
 				SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
 			}
 		}
@@ -1351,7 +1351,7 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
-			if(!IsKeyDown(KEY_D)){
+			if(!IsKeyDown(SDL_SCANCODE_D )){
 				for(int i = 0; i < beatmapSounds.size(); i++){
 					if(beatmapSounds[i] == temp){
 						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1409,7 +1409,7 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
-			if(!IsKeyDown(KEY_D)){
+			if(!IsKeyDown(SDL_SCANCODE_D )){
 				for(int i = 0; i < beatmapSounds.size(); i++){
 					if(beatmapSounds[i] == temp){
 						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1436,7 +1436,7 @@ void GameManager::loadGame(std::string filename){
 		if(gameFile.hitObjects[HitObjectIndex].PlayCustom == true){
 			temp = gameFile.hitObjects[HitObjectIndex].CustomSound;
 			if(SoundFiles.loaded[temp].value == false){
-				if(!IsKeyDown(KEY_F)){
+				if(!IsKeyDown(SDL_SCANCODE_F )){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
 							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1486,7 +1486,7 @@ void GameManager::loadGame(std::string filename){
 						SoundFiles.loaded[temp].value = true;
 					}
 				}
-				if(!IsKeyDown(KEY_D)){
+				if(!IsKeyDown(SDL_SCANCODE_F )){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
 							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1577,7 +1577,7 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
-					if(!IsKeyDown(KEY_D)){
+					if(!IsKeyDown(SDL_SCANCODE_D )){
 						for(int i = 0; i < beatmapSounds.size(); i++){
 							if(beatmapSounds[i] == temp){
 								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1635,7 +1635,7 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
-					if(!IsKeyDown(KEY_D)){
+					if(!IsKeyDown(SDL_SCANCODE_D )){
 						for(int i = 0; i < beatmapSounds.size(); i++){
 							if(beatmapSounds[i] == temp){
 								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1799,7 +1799,7 @@ void GameManager::loadGameTextures(){
     sliderout = LoadTexture("resources/sliderout.png");
     loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
     loadGameSkin(Global.selectedPath); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
-    if(!IsKeyDown(KEY_S)){
+    if(!IsKeyDown(SDL_SCANCODE_S )){
         loadBeatmapSkin(Global.selectedPath); // LOADING THE BEATMAP SKIN USING A SEPERATE FUNCTION
     }
     GenTextureMipmaps(&hit0);

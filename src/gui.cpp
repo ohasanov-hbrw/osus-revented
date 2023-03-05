@@ -118,7 +118,7 @@ void TextBox::update() {
         if(focused){
             if(counter < 0.f)
                 counter = 0.f;
-            counter += GetFrameTime()*1000.0f;
+            counter += (Global.FrameTime / 1000.0f)*1000.0f;
             while(counter > 1000.0f){
                 renderpos++;
                 if(renderpos > (int)text.size()){

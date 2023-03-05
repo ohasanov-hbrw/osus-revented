@@ -140,6 +140,7 @@ struct Globals {
                              1, 1, 1,
                              1);*/
     InputHandler Input;
+    bool renderFrame;
 };
 
 extern Globals Global;
