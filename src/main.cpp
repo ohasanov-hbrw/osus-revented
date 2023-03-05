@@ -42,8 +42,9 @@ Globals Global;
 
 
 void GameLoop(){
+    
     while(true){
-        PollInputEvents();
+        //PollInputEvents();
         //SDLpollEvent();
         //SDLGetMouse();
 
@@ -54,11 +55,11 @@ void GameLoop(){
         Global.CallbackMouse.y = My;
 
         GetScale();
-        GetMouse();
+        /*GetMouse();
         GetKeys();
 
         
-        updateUpDown();
+        updateUpDown();*/
         Global.CurrentState->update();
         while(getTimer() - Global.LastFrameTime < 1 and getTimer() - Global.LastFrameTime >= 0)
             continue;
@@ -208,6 +209,7 @@ int main() {
         locktite.unlock();
         rlDrawRenderBatchActive();
         SwapScreenBuffer();
+        PollInputEvents();
         //PollInputEvents();
         //EndDrawing();
         while(getTimer() - lastFrame < 1000.0/144.0 and getTimer() - lastFrame >= 0)
