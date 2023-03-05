@@ -532,7 +532,7 @@ void Slider::update(){
     //DEBUG
 
     
-    bool debugf = false;
+    bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
     if(debugf){
         inSlider = true;
     }
@@ -580,7 +580,7 @@ void Slider::update(){
             gm->clickCombo++;
         }
 
-        bool debugf = false;
+        bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
         if(is_hit_at_end || debugf){
             SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
             SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
@@ -618,7 +618,7 @@ void Slider::update(){
 
     if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
         int ticksrendered = 0;
-        bool debugf = false;
+        bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){
                 if(tickclicked[i] == -1){
@@ -787,7 +787,7 @@ void Slider::render(){
             angle+=180;
         int ticksrendered = 0;
 
-        bool debugf = false;
+        bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
 
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] > (int)time && (int) time > 0 && ticksrendered < 10){

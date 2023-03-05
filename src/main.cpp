@@ -25,8 +25,11 @@
 #include "zip.h"
 #include "../vendor/raylib/src/external/glfw/include/GLFW/glfw3.h"
 #include <mutex>
+#include <assert.h>
 //#include "SDLutils.hpp"
 
+
+std::mutex locktite;
 double avgFPS = 144;
 double avgHZ = 1000;
 
@@ -41,10 +44,10 @@ double My = 0;
 Globals Global;
 
 
-void GameLoop(){
-    
-    while(true){
-        //PollInputEvents();
+void RenderLoop(){
+    double last = 0;
+    while(!WindowShouldClose()){
+        /*//PollInputEvents();
         //SDLpollEvent();
         //SDLGetMouse();
 
@@ -55,16 +58,43 @@ void GameLoop(){
         Global.CallbackMouse.y = My;
 
         GetScale();
-        /*GetMouse();
+        GetMouse();
         GetKeys();
 
         
-        updateUpDown();*/
+        updateUpDown();
         Global.CurrentState->update();
         while(getTimer() - Global.LastFrameTime < 1 and getTimer() - Global.LastFrameTime >= 0)
             continue;
         avgHZ = (avgHZ + 1000.0f / (getTimer() - Global.LastFrameTime)) / 2.0;
-        //std::cout << "one more logic frame done in " << getTimer() - Global.LastFrameTime << "ms\n";
+        //std::cout << "one more logic frame done in " << getTimer() - Global.LastFrameTime << "ms\n";*/
+        locktite.lock();
+        last = getTimer();
+        SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
+        rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
+        BeginDrawing();
+        ClearBackground(Global.Background);
+        
+        Global.CurrentState->render();
+        if(Global.GameTextures == -1)
+            Global.gameManager->unloadGameTextures();
+        else if(Global.GameTextures == 1)
+            Global.gameManager->loadGameTextures();
+        DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+        DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+        renderMouse(); 
+        
+        DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  avgFPS), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
+        DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
+        rlDrawRenderBatchActive();
+        SwapScreenBuffer();
+        SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
+        locktite.unlock();
+
+        while(getTimer() - last < 1000.0/144.0 and getTimer() - last >= 0)
+            continue;
+        avgFPS = (avgFPS + 1000.0f / (getTimer() - last)) / 2.0;
+        //std::cout << avgFPS << std::endl;
     }
 }
 
@@ -72,7 +102,7 @@ void GameLoop(){
 int main() {
     SDL_SetMainReady();
     
-    std::mutex locktite;
+    
     Global.CurrentState = std::make_shared<MainMenu>();
     for(int i = 0; i < Global.GamePath.size(); i++) {
         if (Global.GamePath[i] == '\\')
@@ -145,51 +175,37 @@ int main() {
     //
     //CORE.Window.handle;
 
-    /*unsigned char pixels[1 * 1 * 4];
-    memset(pixels, 0x00, sizeof(pixels));
-    
-    GLFWimage image;
-    image.width = 1;
-    image.height = 1;
-    image.pixels = pixels;
-    
-    GLFWcursor* cursor = glfwCreateCursor(&image, 0, 0);*/
 
 
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     //glfwSwapInterval( 0 );
 
-    /*int display = GetCurrentMonitor();
-    SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-    ToggleFullscreen();
-    SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));*/
-    /*glfwSetCursor(window, cursor);
+    SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
 
-    SDL_SetCursor(Global.amog);*/
-
-    std::thread geym(GameLoop);
+    std::thread rend(RenderLoop);
 
     while(!WindowShouldClose()){
         lastFrame = getTimer();
-        //PollInputEvents(); //IF I CALL THIS FUNCTION THE GAME BASICALLY BREAKS
-        
-        /*if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
-        {
-            int display = GetCurrentMonitor();
-            if (IsWindowFullscreen())
-                SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            else
-                SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            ToggleFullscreen();
-            SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            if(!IsWindowFullscreen())
-                SetWindowSize(640, 480); 
-        }*/
-        
-        BeginDrawing();
-        ClearBackground(Global.Background);
 
+        PollInputEvents();
+
+        Global.FrameTime = getTimer() - Global.LastFrameTime;
+        Global.LastFrameTime = getTimer();
+        
+        Global.CallbackMouse.x = Mx;
+        Global.CallbackMouse.y = My;
+
+        GetScale();
+        GetMouse();
+        GetKeys();
+
+        
+        updateUpDown();
+        Global.CurrentState->update();
+
+        /*BeginDrawing();
+        ClearBackground(Global.Background);
         locktite.lock();
         Global.CurrentState->render();
         if(Global.GameTextures == -1)
@@ -198,31 +214,29 @@ int main() {
             Global.gameManager->loadGameTextures();
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
-        
-        //double what = getTimer();
-        //updateMouseTrail();
         renderMouse(); 
-        //std::cout << getTimer() - what << std::endl;
+        locktite.unlock();
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  avgFPS), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
-
-        locktite.unlock();
         rlDrawRenderBatchActive();
         SwapScreenBuffer();
-        PollInputEvents();
+        */
+        
+
         //PollInputEvents();
         //EndDrawing();
-        while(getTimer() - lastFrame < 1000.0/144.0 and getTimer() - lastFrame >= 0)
+        while(getTimer() - lastFrame < 1000.0/1000.0 and getTimer() - lastFrame >= 0)
             continue;
+        avgHZ = (avgHZ + 1000.0f / (getTimer() - lastFrame)) / 2.0;
+        //std::cout << SDL_GetError() << std::endl;
         //int x;
         //int y; 
-        /*SDL_GetWindowPosition(Global.win,
-                           &x, &y);
-        std::cout << x << " " << y << std::endl;*/
-        avgFPS = (avgFPS + 1000.0f / (getTimer() - lastFrame)) / 2.0;
+        //SDL_GetWindowPosition(Global.win,&x, &y);
+        //std::cout << x << " " << y << std::endl;
+        
         //std::cout << Mx << " " << My << std::endl;
     }
-    geym.detach();
+    rend.join();
 
     UnloadTexture(Global.OsusLogo);
     UnloadFont(Global.DefaultFont);
@@ -231,3 +245,35 @@ int main() {
     //quitSDL();
 }
 
+
+
+/*typedef int32_t i32;
+typedef uint32_t u32;
+typedef int32_t b32;
+
+#define WinWidth 640
+#define WinHeight 480
+
+int main ()
+{
+    SDL_SetMainReady();
+    u32 WindowFlags = SDL_WINDOW_OPENGL;
+    SDL_Window *Window = SDL_CreateWindow("OpenGL Test", 30, 30, WinWidth, WinHeight, WindowFlags);
+    assert(Window);
+    SDL_GLContext Context = SDL_GL_CreateContext(Window);
+    
+    b32 Running = 1;
+    b32 FullScreen = 0;
+    float a = 0.0f;
+
+    while (!WindowShouldClose())
+    {
+        PollInputEvents();
+        glViewport(0, 0, WinWidth, WinHeight);
+        glClearColor(a, 0.f, 1.f, 0.f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        SDL_GL_SwapWindow(Window);
+    }
+    return 0;
+}*/

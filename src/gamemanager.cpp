@@ -305,7 +305,7 @@ void GameManager::update(){
 			}
 		}
 		else{
-			bool debugf = false;
+			bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
 			if(debugf){
 				objects[i]->update();
 				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
@@ -316,6 +316,7 @@ void GameManager::update(){
 				}
 				else if(objects[i]->data.point != 3 && currentTime*1000.0f > objects[i]->data.time){
 					if (objects[i]->data.type != 2){
+						//Global.MousePosition = {objects[i]->data.x, objects[i]->data.y};
 						objects[i]->data.point = 3;
 						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
@@ -520,7 +521,7 @@ void GameManager::run(){
 
 		//currentTime -= 2/1000.0f;
 		GameManager::update();
-		//std::cout << "called update at time " << currentTime << "\n";
+		//std::cout << "called update at time " << Global.currentOsuTime << "\n";
 		//currentTime += 2/1000.0f;
 	}
 	

@@ -370,6 +370,7 @@ typedef struct CoreData {
     struct {
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
         SDL_Window *handle;                 // GLFW window handle (graphic device)
+        SDL_GLContext context;
 #endif
 #if defined(PLATFORM_RPI)
         EGL_DISPMANX_WINDOW_T handle;       // Native window handle (graphic device)
@@ -939,159 +940,6 @@ void CloseWindow(void)
 #if defined(_WIN32) && defined(SUPPORT_WINMM_HIGHRES_TIMER) && !defined(SUPPORT_BUSY_WAIT_LOOP)
     timeEndPeriod(1);           // Restore time period
 #endif
-
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI)
-    // Close surface, context and display
-    if (CORE.Window.device != EGL_NO_DISPLAY)
-    {
-        eglMakeCurrent(CORE.Window.device, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-
-        if (CORE.Window.surface != EGL_NO_SURFACE)
-        {
-            eglDestroySurface(CORE.Window.device, CORE.Window.surface);
-            CORE.Window.surface = EGL_NO_SURFACE;
-        }
-
-        if (CORE.Window.context != EGL_NO_CONTEXT)
-        {
-            eglDestroyContext(CORE.Window.device, CORE.Window.context);
-            CORE.Window.context = EGL_NO_CONTEXT;
-        }
-
-        eglTerminate(CORE.Window.device);
-        CORE.Window.device = EGL_NO_DISPLAY;
-    }
-#endif
-
-#if defined(PLATFORM_DRM)
-    if (CORE.Window.prevFB)
-    {
-        drmModeRmFB(CORE.Window.fd, CORE.Window.prevFB);
-        CORE.Window.prevFB = 0;
-    }
-
-    if (CORE.Window.prevBO)
-    {
-        gbm_surface_release_buffer(CORE.Window.gbmSurface, CORE.Window.prevBO);
-        CORE.Window.prevBO = NULL;
-    }
-
-    if (CORE.Window.gbmSurface)
-    {
-        gbm_surface_destroy(CORE.Window.gbmSurface);
-        CORE.Window.gbmSurface = NULL;
-    }
-
-    if (CORE.Window.gbmDevice)
-    {
-        gbm_device_destroy(CORE.Window.gbmDevice);
-        CORE.Window.gbmDevice = NULL;
-    }
-
-    if (CORE.Window.crtc)
-    {
-        if (CORE.Window.connector)
-        {
-            drmModeSetCrtc(CORE.Window.fd, CORE.Window.crtc->crtc_id, CORE.Window.crtc->buffer_id,
-                CORE.Window.crtc->x, CORE.Window.crtc->y, &CORE.Window.connector->connector_id, 1, &CORE.Window.crtc->mode);
-            drmModeFreeConnector(CORE.Window.connector);
-            CORE.Window.connector = NULL;
-        }
-
-        drmModeFreeCrtc(CORE.Window.crtc);
-        CORE.Window.crtc = NULL;
-    }
-
-    if (CORE.Window.fd != -1)
-    {
-        close(CORE.Window.fd);
-        CORE.Window.fd = -1;
-    }
-
-    // Close surface, context and display
-    if (CORE.Window.device != EGL_NO_DISPLAY)
-    {
-        if (CORE.Window.surface != EGL_NO_SURFACE)
-        {
-            eglDestroySurface(CORE.Window.device, CORE.Window.surface);
-            CORE.Window.surface = EGL_NO_SURFACE;
-        }
-
-        if (CORE.Window.context != EGL_NO_CONTEXT)
-        {
-            eglDestroyContext(CORE.Window.device, CORE.Window.context);
-            CORE.Window.context = EGL_NO_CONTEXT;
-        }
-
-        eglTerminate(CORE.Window.device);
-        CORE.Window.device = EGL_NO_DISPLAY;
-    }
-#endif
-
-#if defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
-    // Wait for mouse and gamepad threads to finish before closing
-    // NOTE: Those threads should already have finished at this point
-    // because they are controlled by CORE.Window.shouldClose variable
-
-    CORE.Window.shouldClose = true;   // Added to force threads to exit when the close window is called
-
-    // Close the evdev keyboard
-    if (CORE.Input.Keyboard.fd != -1)
-    {
-        close(CORE.Input.Keyboard.fd);
-        CORE.Input.Keyboard.fd = -1;
-    }
-
-    for (int i = 0; i < sizeof(CORE.Input.eventWorker)/sizeof(InputEventWorker); ++i)
-    {
-        if (CORE.Input.eventWorker[i].threadId)
-        {
-            pthread_join(CORE.Input.eventWorker[i].threadId, NULL);
-        }
-    }
-
-    if (CORE.Input.Gamepad.threadId) pthread_join(CORE.Input.Gamepad.threadId, NULL);
-#endif
-
-#if defined(SUPPORT_EVENTS_AUTOMATION)
-    free(events);
-#endif
-
-    CORE.Window.ready = false;
-    TRACELOG(LOG_INFO, "Window closed successfully");
-}
-
-// Check if KEY_ESCAPE pressed or Close icon pressed
-
-// Check if window has been initialized successfully
-bool IsWindowReady(void)
-{
-    return CORE.Window.ready;
-}
-
-// Check if window is currently fullscreen
-bool IsWindowFullscreen(void)
-{
-    return CORE.Window.fullscreen;
-}
-
-// Check if window is currently hidden
-bool IsWindowHidden(void)
-{
-#if defined(PLATFORM_DESKTOP)
-    return ((CORE.Window.flags & FLAG_WINDOW_HIDDEN) > 0);
-#endif
-    return false;
-}
-
-// Check if window has been minimized
-bool IsWindowMinimized(void)
-{
-#if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    return ((CORE.Window.flags & FLAG_WINDOW_MINIMIZED) > 0);
-#else
-    return false;
-#endif
 }
 
 // Check if window has been maximized (only PLATFORM_DESKTOP)
@@ -1294,8 +1142,11 @@ int GetRenderHeight(void)
 }
 
 // Get native window handle
-void *GetWindowGL(void){
+void *GetWindowSDL(void){
     return CORE.Window.handle;
+}
+SDL_GLContext GetWindowGL(void){
+    return CORE.Window.context;
 }
 
 // Get window position XY on monitor
@@ -3192,6 +3043,10 @@ static bool InitGraphicsDevice(int width, int height)
     //glfwWindowHint(GLFW_AUX_BUFFERS, 0);          // Number of auxiliar buffers
 
     // Check window creation flags
+
+
+
+    //SDL_GL_LoadLibrary(NULL);
     int flags = 0;
     if ((CORE.Window.flags & FLAG_WINDOW_RESIZABLE) > 0) flags |= SDL_WINDOW_RESIZABLE;
     flags |= SDL_WINDOW_OPENGL;
@@ -3210,11 +3065,15 @@ static bool InitGraphicsDevice(int width, int height)
         return false;
     }
 
-    SDL_GL_CreateContext(CORE.Window.handle);
+    CORE.Window.context = SDL_GL_CreateContext(CORE.Window.handle);
+    SDL_GL_SetSwapInterval(0);
     printf(SDL_GetError());
     rlLoadExtensions(SDL_GL_GetProcAddress);
     rlglInit(CORE.Window.screen.width, CORE.Window.screen.height);
 
+    printf("rlgl version:");
+    printf("%d", rlGetVersion()); 
+    printf("\n"); 
     SetupViewport(CORE.Window.screen.width, CORE.Window.screen.height);
 
     ClearBackground(RAYWHITE);      // Default background color for raylib games :P
@@ -3401,231 +3260,59 @@ void WaitTime(double seconds)
 // Swap back buffer with front buffer (screen drawing)
 void SwapScreenBuffer(void)
 {
-#if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
     SDL_GL_SwapWindow(CORE.Window.handle);
-    SDL_UpdateWindowSurface(CORE.Window.handle);
-#endif
-
-#if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
-    eglSwapBuffers(CORE.Window.device, CORE.Window.surface);
-
-#if defined(PLATFORM_DRM)
-
-    if (!CORE.Window.gbmSurface || (-1 == CORE.Window.fd) || !CORE.Window.connector || !CORE.Window.crtc) TRACELOG(LOG_ERROR, "DISPLAY: DRM initialization failed to swap");
-
-    struct gbm_bo *bo = gbm_surface_lock_front_buffer(CORE.Window.gbmSurface);
-    if (!bo) TRACELOG(LOG_ERROR, "DISPLAY: Failed GBM to lock front buffer");
-
-    uint32_t fb = 0;
-    int result = drmModeAddFB(CORE.Window.fd, CORE.Window.connector->modes[CORE.Window.modeIndex].hdisplay, CORE.Window.connector->modes[CORE.Window.modeIndex].vdisplay, 24, 32, gbm_bo_get_stride(bo), gbm_bo_get_handle(bo).u32, &fb);
-    if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeAddFB() failed with result: %d", result);
-
-    result = drmModeSetCrtc(CORE.Window.fd, CORE.Window.crtc->crtc_id, fb, 0, 0, &CORE.Window.connector->connector_id, 1, &CORE.Window.connector->modes[CORE.Window.modeIndex]);
-    if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeSetCrtc() failed with result: %d", result);
-
-    if (CORE.Window.prevFB)
-    {
-        result = drmModeRmFB(CORE.Window.fd, CORE.Window.prevFB);
-        if (result != 0) TRACELOG(LOG_ERROR, "DISPLAY: drmModeRmFB() failed with result: %d", result);
-    }
-
-    CORE.Window.prevFB = fb;
-
-    if (CORE.Window.prevBO) gbm_surface_release_buffer(CORE.Window.gbmSurface, CORE.Window.prevBO);
-
-    CORE.Window.prevBO = bo;
-
-#endif  // PLATFORM_DRM
-#endif  // PLATFORM_ANDROID || PLATFORM_RPI || PLATFORM_DRM
+    //SDL_UpdateWindowSurface(CORE.Window.handle);
 }
 
 // Register all input events
 void PollInputEvents(void)
 {
-
-
-    // Reset keys/chars pressed registered
-    CORE.Input.Keyboard.keyPressedQueueCount = 0;
-    CORE.Input.Keyboard.charPressedQueueCount = 0;
-
-
-#if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-    // Keyboard/Mouse input polling (automatically managed by GLFW3 through callback)
-
-    // Register previous keys states
     for (int i = 0; i < MAX_KEYBOARD_KEYS; i++) CORE.Input.Keyboard.previousKeyState[i] = CORE.Input.Keyboard.currentKeyState[i];
-
-    // Register previous mouse states
     for (int i = 0; i < MAX_MOUSE_BUTTONS; i++) CORE.Input.Mouse.previousButtonState[i] = CORE.Input.Mouse.currentButtonState[i];
 
-    // Register previous mouse wheel state
     CORE.Input.Mouse.previousWheelMove = CORE.Input.Mouse.currentWheelMove;
     CORE.Input.Mouse.currentWheelMove = 0.0f;
 
-    // Register previous mouse position
-    CORE.Input.Mouse.previousPosition = CORE.Input.Mouse.currentPosition;
-#endif
-
-    // Register previous touch states
-    for (int i = 0; i < MAX_TOUCH_POINTS; i++) CORE.Input.Touch.previousTouchState[i] = CORE.Input.Touch.currentTouchState[i];
-
-    // Reset touch positions
-    // TODO: It resets on PLATFORM_WEB the mouse position and not filled again until a move-event,
-    // so, if mouse is not moved it returns a (0, 0) position... this behaviour should be reviewed!
-    //for (int i = 0; i < MAX_TOUCH_POINTS; i++) CORE.Input.Touch.position[i] = (Vector2){ 0, 0 };
-
-#if defined(PLATFORM_DESKTOP)
-    // Check if gamepads are ready
-    // NOTE: We do it here in case of disconnection
-    for (int i = 0; i < MAX_GAMEPADS; i++)
-    {
-        if (glfwJoystickPresent(i)) CORE.Input.Gamepad.ready[i] = true;
-        else CORE.Input.Gamepad.ready[i] = false;
-    }
-
-    // Register gamepads buttons events
-    for (int i = 0; i < MAX_GAMEPADS; i++)
-    {
-        if (CORE.Input.Gamepad.ready[i])     // Check if gamepad is available
-        {
-            // Register previous gamepad states
-            for (int k = 0; k < MAX_GAMEPAD_BUTTONS; k++) CORE.Input.Gamepad.previousButtonState[i][k] = CORE.Input.Gamepad.currentButtonState[i][k];
-
-            // Get current gamepad state
-            // NOTE: There is no callback available, so we get it manually
-            // Get remapped buttons
-            GLFWgamepadstate state = { 0 };
-            glfwGetGamepadState(i, &state); // This remapps all gamepads so they have their buttons mapped like an xbox controller
-
-            const unsigned char *buttons = state.buttons;
-
-            for (int k = 0; (buttons != NULL) && (k < GLFW_GAMEPAD_BUTTON_DPAD_LEFT + 1) && (k < MAX_GAMEPAD_BUTTONS); k++)
-            {
-                GamepadButton button = -1;
-
-                switch (k)
-                {
-                    case GLFW_GAMEPAD_BUTTON_Y: button = GAMEPAD_BUTTON_RIGHT_FACE_UP; break;
-                    case GLFW_GAMEPAD_BUTTON_B: button = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
-                    case GLFW_GAMEPAD_BUTTON_A: button = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
-                    case GLFW_GAMEPAD_BUTTON_X: button = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
-
-                    case GLFW_GAMEPAD_BUTTON_LEFT_BUMPER: button = GAMEPAD_BUTTON_LEFT_TRIGGER_1; break;
-                    case GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER: button = GAMEPAD_BUTTON_RIGHT_TRIGGER_1; break;
-
-                    case GLFW_GAMEPAD_BUTTON_BACK: button = GAMEPAD_BUTTON_MIDDLE_LEFT; break;
-                    case GLFW_GAMEPAD_BUTTON_GUIDE: button = GAMEPAD_BUTTON_MIDDLE; break;
-                    case GLFW_GAMEPAD_BUTTON_START: button = GAMEPAD_BUTTON_MIDDLE_RIGHT; break;
-
-                    case GLFW_GAMEPAD_BUTTON_DPAD_UP: button = GAMEPAD_BUTTON_LEFT_FACE_UP; break;
-                    case GLFW_GAMEPAD_BUTTON_DPAD_RIGHT: button = GAMEPAD_BUTTON_LEFT_FACE_RIGHT; break;
-                    case GLFW_GAMEPAD_BUTTON_DPAD_DOWN: button = GAMEPAD_BUTTON_LEFT_FACE_DOWN; break;
-                    case GLFW_GAMEPAD_BUTTON_DPAD_LEFT: button = GAMEPAD_BUTTON_LEFT_FACE_LEFT; break;
-
-                    case GLFW_GAMEPAD_BUTTON_LEFT_THUMB: button = GAMEPAD_BUTTON_LEFT_THUMB; break;
-                    case GLFW_GAMEPAD_BUTTON_RIGHT_THUMB: button = GAMEPAD_BUTTON_RIGHT_THUMB; break;
-                    default: break;
-                }
-
-                if (button != -1)   // Check for valid button
-                {
-                    if (buttons[k] == GLFW_PRESS)
-                    {
-                        CORE.Input.Gamepad.currentButtonState[i][button] = 1;
-                        CORE.Input.Gamepad.lastButtonPressed = button;
-                    }
-                    else CORE.Input.Gamepad.currentButtonState[i][button] = 0;
-                }
-            }
-
-            // Get current axis state
-            const float *axes = state.axes;
-
-            for (int k = 0; (axes != NULL) && (k < GLFW_GAMEPAD_AXIS_LAST + 1) && (k < MAX_GAMEPAD_AXIS); k++)
-            {
-                CORE.Input.Gamepad.axisState[i][k] = axes[k];
-            }
-
-            // Register buttons for 2nd triggers (because GLFW doesn't count these as buttons but rather axis)
-            CORE.Input.Gamepad.currentButtonState[i][GAMEPAD_BUTTON_LEFT_TRIGGER_2] = (char)(CORE.Input.Gamepad.axisState[i][GAMEPAD_AXIS_LEFT_TRIGGER] > 0.1f);
-            CORE.Input.Gamepad.currentButtonState[i][GAMEPAD_BUTTON_RIGHT_TRIGGER_2] = (char)(CORE.Input.Gamepad.axisState[i][GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.1f);
-
-            CORE.Input.Gamepad.axisCount = GLFW_GAMEPAD_AXIS_LAST + 1;
-        }
-    }
-
-    CORE.Window.resizedLastFrame = false;
-
-    if (CORE.Window.eventWaiting) SDL_PumpEvents();     // Wait for in input events before continue (drawing is paused)
-    else SDL_PumpEvents();      // Poll input events: keyboard/mouse/window events (callbacks)
-
-
-
-
-    while(1) {
-		SDL_Event ev;
-		if(SDL_PollEvent(&ev) == 0) {
-			//printf(".\n");
-			SDL_Delay(1);
-			continue;
-		}
-		
+    SDL_Event ev;
+    while(SDL_PollEvent(&ev)) {
 		switch(ev.type) {
 			case SDL_QUIT:
-				printf("Received SDL_QUIT - bye!\n");
                 CORE.Window.shouldClose = true;
 				return;
 				
 			case SDL_MOUSEBUTTONUP:
-				printf("SDL_MOUSEBUTTONUP, button %d clicks %d\n", ev.button.button, (int)ev.button.clicks);
+                CORE.Input.Mouse.currentButtonState[ev.button.button] = 0;
 				break;
 				
 			case SDL_MOUSEBUTTONDOWN:
-				printf("SDL_MOUSEBUTTONDOWN, button %d clicks %d\n", ev.button.button, (int)ev.button.clicks);
+                CORE.Input.Mouse.currentButtonState[ev.button.button] = 1;
 				break;
 				
 			case SDL_KEYUP:
+                CORE.Input.Keyboard.currentKeyState[ev.key.keysym.scancode] = 0;
+                //printf("%d up :)\n", ev.key.keysym.scancode);
+                break;
 			case SDL_KEYDOWN:
-				if(ev.type == SDL_KEYUP)
-					printf("SDL_KEYUP: ");
-				else
-					printf("SDL_KEYDOWN: ");
-				
-				printf("Keycode: %s (%d) Scancode: %s (%d)\n", 
-					   SDL_GetKeyName(ev.key.keysym.sym), ev.key.keysym.sym,
-					   SDL_GetScancodeName(ev.key.keysym.scancode),
-					   ev.key.keysym.scancode);
-				
-				if(ev.key.keysym.sym == SDLK_q) {
-					printf("You pressed Q - bye!\n");
-					return;
-				}
-				
+				CORE.Input.Keyboard.currentKeyState[ev.key.keysym.scancode] = 1;
+                //printf("%d down :(\n", ev.key.keysym.scancode);
 				break;
 
 			case SDL_MOUSEWHEEL:
-				printf("MouseWheel: x: %d, y: %d\n", ev.wheel.x, ev.wheel.y);
-				break;
-				
-			case SDL_TEXTINPUT:
-				printf("SDL_TEXTINPUT: %s\n", ev.text.text ? ev.text.text : "<NULL>");
-				break;
-			
-			case SDL_JOYBUTTONDOWN:
-				printf("SDL_JOYBUTTONDOWN dev %d button %d state %d\n",
-						(int)ev.jbutton.which, (int)ev.jbutton.button, (int)ev.jbutton.state);
-				break;
-			case SDL_JOYBUTTONUP:
-				printf("SDL_JOYBUTTONUP dev %d button %d state %d\n",
-						(int)ev.jbutton.which, (int)ev.jbutton.button, (int)ev.jbutton.state);
+				//printf("MouseWheel: x: %d, y: %d\n", ev.wheel.x, ev.wheel.y);
+                CORE.Input.Mouse.currentWheelMove = ev.wheel.y;
 				break;
 			
 			case SDL_MOUSEMOTION:
-                printf("MOUSEMOTION\n");
+                //printf("MOUSEMOTION x:%d y:%d\n", ev.motion.x, ev.motion.y);
+                CORE.Input.Mouse.currentPosition.x = ev.motion.x;
+                CORE.Input.Mouse.currentPosition.y = ev.motion.y;
 			
 			case SDL_WINDOWEVENT:
                 if (ev.window.event == SDL_WINDOWEVENT_RESIZED) {
-                    SDL_SetWindowSize(CORE.Window.handle, ev.window.data1, ev.window.data2);
+                    //SDL_SetWindowSize(CORE.Window.handle, ev.window.data1, ev.window.data2);
+                    CORE.Window.screen.width = ev.window.data1;
+                    CORE.Window.screen.height = ev.window.data2;
+                    SetupViewport(CORE.Window.screen.width, CORE.Window.screen.height);
                 }
 				break;
 			
@@ -3634,130 +3321,6 @@ void PollInputEvents(void)
 				break;
 		}
 	}
-
-
-
-
-
-
-
-
-
-
-
-    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-#endif  // PLATFORM_DESKTOP
-
-#if defined(PLATFORM_WEB)
-    CORE.Window.resizedLastFrame = false;
-#endif  // PLATFORM_WEB
-
-// Gamepad support using emscripten API
-// NOTE: GLFW3 joystick functionality not available in web
-#if defined(PLATFORM_WEB)
-    // Get number of gamepads connected
-    int numGamepads = 0;
-    if (emscripten_sample_gamepad_data() == EMSCRIPTEN_RESULT_SUCCESS) numGamepads = emscripten_get_num_gamepads();
-
-    for (int i = 0; (i < numGamepads) && (i < MAX_GAMEPADS); i++)
-    {
-        // Register previous gamepad button states
-        for (int k = 0; k < MAX_GAMEPAD_BUTTONS; k++) CORE.Input.Gamepad.previousButtonState[i][k] = CORE.Input.Gamepad.currentButtonState[i][k];
-
-        EmscriptenGamepadEvent gamepadState;
-
-        int result = emscripten_get_gamepad_status(i, &gamepadState);
-
-        if (result == EMSCRIPTEN_RESULT_SUCCESS)
-        {
-            // Register buttons data for every connected gamepad
-            for (int j = 0; (j < gamepadState.numButtons) && (j < MAX_GAMEPAD_BUTTONS); j++)
-            {
-                GamepadButton button = -1;
-
-                // Gamepad Buttons reference: https://www.w3.org/TR/gamepad/#gamepad-interface
-                switch (j)
-                {
-                    case 0: button = GAMEPAD_BUTTON_RIGHT_FACE_DOWN; break;
-                    case 1: button = GAMEPAD_BUTTON_RIGHT_FACE_RIGHT; break;
-                    case 2: button = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; break;
-                    case 3: button = GAMEPAD_BUTTON_RIGHT_FACE_UP; break;
-                    case 4: button = GAMEPAD_BUTTON_LEFT_TRIGGER_1; break;
-                    case 5: button = GAMEPAD_BUTTON_RIGHT_TRIGGER_1; break;
-                    case 6: button = GAMEPAD_BUTTON_LEFT_TRIGGER_2; break;
-                    case 7: button = GAMEPAD_BUTTON_RIGHT_TRIGGER_2; break;
-                    case 8: button = GAMEPAD_BUTTON_MIDDLE_LEFT; break;
-                    case 9: button = GAMEPAD_BUTTON_MIDDLE_RIGHT; break;
-                    case 10: button = GAMEPAD_BUTTON_LEFT_THUMB; break;
-                    case 11: button = GAMEPAD_BUTTON_RIGHT_THUMB; break;
-                    case 12: button = GAMEPAD_BUTTON_LEFT_FACE_UP; break;
-                    case 13: button = GAMEPAD_BUTTON_LEFT_FACE_DOWN; break;
-                    case 14: button = GAMEPAD_BUTTON_LEFT_FACE_LEFT; break;
-                    case 15: button = GAMEPAD_BUTTON_LEFT_FACE_RIGHT; break;
-                    default: break;
-                }
-
-                if (button != -1)   // Check for valid button
-                {
-                    if (gamepadState.digitalButton[j] == 1)
-                    {
-                        CORE.Input.Gamepad.currentButtonState[i][button] = 1;
-                        CORE.Input.Gamepad.lastButtonPressed = button;
-                    }
-                    else CORE.Input.Gamepad.currentButtonState[i][button] = 0;
-                }
-
-                //TRACELOGD("INPUT: Gamepad %d, button %d: Digital: %d, Analog: %g", gamepadState.index, j, gamepadState.digitalButton[j], gamepadState.analogButton[j]);
-            }
-
-            // Register axis data for every connected gamepad
-            for (int j = 0; (j < gamepadState.numAxes) && (j < MAX_GAMEPAD_AXIS); j++)
-            {
-                CORE.Input.Gamepad.axisState[i][j] = gamepadState.axis[j];
-            }
-
-            CORE.Input.Gamepad.axisCount = gamepadState.numAxes;
-        }
-    }
-#endif
-
-#if defined(PLATFORM_ANDROID)
-    // Register previous keys states
-    // NOTE: Android supports up to 260 keys
-    for (int i = 0; i < 260; i++) CORE.Input.Keyboard.previousKeyState[i] = CORE.Input.Keyboard.currentKeyState[i];
-
-    // Android ALooper_pollAll() variables
-    int pollResult = 0;
-    int pollEvents = 0;
-
-    // Poll Events (registered events)
-    // NOTE: Activity is paused if not enabled (CORE.Android.appEnabled)
-    while ((pollResult = ALooper_pollAll(CORE.Android.appEnabled? 0 : -1, NULL, &pollEvents, (void**)&CORE.Android.source)) >= 0)
-    {
-        // Process this event
-        if (CORE.Android.source != NULL) CORE.Android.source->process(CORE.Android.app, CORE.Android.source);
-
-        // NOTE: Never close window, native activity is controlled by the system!
-        if (CORE.Android.app->destroyRequested != 0)
-        {
-            //CORE.Window.shouldClose = true;
-            //ANativeActivity_finish(CORE.Android.app->activity);
-        }
-    }
-#endif
-
-#if (defined(PLATFORM_RPI) || defined(PLATFORM_DRM)) && defined(SUPPORT_SSH_KEYBOARD_RPI)
-    // NOTE: Keyboard reading could be done using input_event(s) or just read from stdin, both methods are used here.
-    // stdin reading is still used for legacy purposes, it allows keyboard input trough SSH console
-
-    if (!CORE.Input.Keyboard.evtMode) ProcessKeyboard();
-
-    // NOTE: Mouse input events polling is done asynchronously in another pthread - EventThread()
-    // NOTE: Gamepad (Joystick) input events polling is done asynchonously in another pthread - GamepadThread()
-#endif
-
 }
 
 bool WindowShouldClose(){
@@ -3881,237 +3444,6 @@ static void WindowDropCallback(GLFWwindow *window, int count, const char **paths
 }
 #endif
 
-#if defined(PLATFORM_ANDROID)
-// ANDROID: Process activity lifecycle commands
-static void AndroidCommandCallback(struct android_app *app, int32_t cmd)
-{
-    switch (cmd)
-    {
-        case APP_CMD_START:
-        {
-            //rendering = true;
-        } break;
-        case APP_CMD_RESUME: break;
-        case APP_CMD_INIT_WINDOW:
-        {
-            if (app->window != NULL)
-            {
-                if (CORE.Android.contextRebindRequired)
-                {
-                    // Reset screen scaling to full display size
-                    EGLint displayFormat = 0;
-                    eglGetConfigAttrib(CORE.Window.device, CORE.Window.config, EGL_NATIVE_VISUAL_ID, &displayFormat);
-                    ANativeWindow_setBuffersGeometry(app->window, CORE.Window.render.width, CORE.Window.render.height, displayFormat);
-
-                    // Recreate display surface and re-attach OpenGL context
-                    CORE.Window.surface = eglCreateWindowSurface(CORE.Window.device, CORE.Window.config, app->window, NULL);
-                    eglMakeCurrent(CORE.Window.device, CORE.Window.surface, CORE.Window.surface, CORE.Window.context);
-
-                    CORE.Android.contextRebindRequired = false;
-                }
-                else
-                {
-                    CORE.Window.display.width = ANativeWindow_getWidth(CORE.Android.app->window);
-                    CORE.Window.display.height = ANativeWindow_getHeight(CORE.Android.app->window);
-
-                    // Initialize graphics device (display device and OpenGL context)
-                    InitGraphicsDevice(CORE.Window.screen.width, CORE.Window.screen.height);
-
-                    // Initialize hi-res timer
-                    InitTimer();
-
-                    // Initialize random seed
-                    srand((unsigned int)time(NULL));
-
-                #if defined(SUPPORT_MODULE_RTEXT) && defined(SUPPORT_DEFAULT_FONT)
-                    // Load default font
-                    // WARNING: External function: Module required: rtext
-                    LoadFontDefault();
-                    Rectangle rec = GetFontDefault().recs[95];
-                    // NOTE: We setup a 1px padding on char rectangle to avoid pixel bleeding on MSAA filtering
-                    #if defined(SUPPORT_MODULE_RSHAPES)
-                    SetShapesTexture(GetFontDefault().texture, (Rectangle){ rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2 });  // WARNING: Module required: rshapes
-                    #endif
-                #endif
-
-                    // TODO: GPU assets reload in case of lost focus (lost context)
-                    // NOTE: This problem has been solved just unbinding and rebinding context from display
-                    /*
-                    if (assetsReloadRequired)
-                    {
-                        for (int i = 0; i < assetCount; i++)
-                        {
-                            // TODO: Unload old asset if required
-
-                            // Load texture again to pointed texture
-                            (*textureAsset + i) = LoadTexture(assetPath[i]);
-                        }
-                    }
-                    */
-                }
-            }
-        } break;
-        case APP_CMD_GAINED_FOCUS:
-        {
-            CORE.Android.appEnabled = true;
-            //ResumeMusicStream();
-        } break;
-        case APP_CMD_PAUSE: break;
-        case APP_CMD_LOST_FOCUS:
-        {
-            CORE.Android.appEnabled = false;
-            //PauseMusicStream();
-        } break;
-        case APP_CMD_TERM_WINDOW:
-        {
-            // Dettach OpenGL context and destroy display surface
-            // NOTE 1: Detaching context before destroying display surface avoids losing our resources (textures, shaders, VBOs...)
-            // NOTE 2: In some cases (too many context loaded), OS could unload context automatically... :(
-            eglMakeCurrent(CORE.Window.device, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-            eglDestroySurface(CORE.Window.device, CORE.Window.surface);
-
-            CORE.Android.contextRebindRequired = true;
-        } break;
-        case APP_CMD_SAVE_STATE: break;
-        case APP_CMD_STOP: break;
-        case APP_CMD_DESTROY:
-        {
-            // TODO: Finish activity?
-            //ANativeActivity_finish(CORE.Android.app->activity);
-        } break;
-        case APP_CMD_CONFIG_CHANGED:
-        {
-            //AConfiguration_fromAssetManager(CORE.Android.app->config, CORE.Android.app->activity->assetManager);
-            //print_cur_config(CORE.Android.app);
-
-            // Check screen orientation here!
-        } break;
-        default: break;
-    }
-}
-
-// ANDROID: Get input events
-static int32_t AndroidInputCallback(struct android_app *app, AInputEvent *event)
-{
-    // If additional inputs are required check:
-    // https://developer.android.com/ndk/reference/group/input
-    // https://developer.android.com/training/game-controllers/controller-input
-
-    int type = AInputEvent_getType(event);
-    int source = AInputEvent_getSource(event);
-
-    if (type == AINPUT_EVENT_TYPE_MOTION)
-    {
-        if (((source & AINPUT_SOURCE_JOYSTICK) == AINPUT_SOURCE_JOYSTICK) ||
-            ((source & AINPUT_SOURCE_GAMEPAD) == AINPUT_SOURCE_GAMEPAD))
-        {
-            // Get first touch position
-            CORE.Input.Touch.position[0].x = AMotionEvent_getX(event, 0);
-            CORE.Input.Touch.position[0].y = AMotionEvent_getY(event, 0);
-
-            // Get second touch position
-            CORE.Input.Touch.position[1].x = AMotionEvent_getX(event, 1);
-            CORE.Input.Touch.position[1].y = AMotionEvent_getY(event, 1);
-
-            int32_t keycode = AKeyEvent_getKeyCode(event);
-            if (AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN)
-            {
-                CORE.Input.Keyboard.currentKeyState[keycode] = 1;   // Key down
-
-                CORE.Input.Keyboard.keyPressedQueue[CORE.Input.Keyboard.keyPressedQueueCount] = keycode;
-                CORE.Input.Keyboard.keyPressedQueueCount++;
-            }
-            else CORE.Input.Keyboard.currentKeyState[keycode] = 0;  // Key up
-
-            // Stop processing gamepad buttons
-            return 1;
-        }
-    }
-    else if (type == AINPUT_EVENT_TYPE_KEY)
-    {
-        int32_t keycode = AKeyEvent_getKeyCode(event);
-        //int32_t AKeyEvent_getMetaState(event);
-
-        // Save current button and its state
-        // NOTE: Android key action is 0 for down and 1 for up
-        if (AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN)
-        {
-            CORE.Input.Keyboard.currentKeyState[keycode] = 1;   // Key down
-
-            CORE.Input.Keyboard.keyPressedQueue[CORE.Input.Keyboard.keyPressedQueueCount] = keycode;
-            CORE.Input.Keyboard.keyPressedQueueCount++;
-        }
-        else CORE.Input.Keyboard.currentKeyState[keycode] = 0;  // Key up
-
-        if (keycode == AKEYCODE_POWER)
-        {
-            // Let the OS handle input to avoid app stuck. Behaviour: CMD_PAUSE -> CMD_SAVE_STATE -> CMD_STOP -> CMD_CONFIG_CHANGED -> CMD_LOST_FOCUS
-            // Resuming Behaviour: CMD_START -> CMD_RESUME -> CMD_CONFIG_CHANGED -> CMD_CONFIG_CHANGED -> CMD_GAINED_FOCUS
-            // It seems like locking mobile, screen size (CMD_CONFIG_CHANGED) is affected.
-            // NOTE: AndroidManifest.xml must have <activity android:configChanges="orientation|keyboardHidden|screenSize" >
-            // Before that change, activity was calling CMD_TERM_WINDOW and CMD_DESTROY when locking mobile, so that was not a normal behaviour
-            return 0;
-        }
-        else if ((keycode == AKEYCODE_BACK) || (keycode == AKEYCODE_MENU))
-        {
-            // Eat BACK_BUTTON and AKEYCODE_MENU, just do nothing... and don't let to be handled by OS!
-            return 1;
-        }
-        else if ((keycode == AKEYCODE_VOLUME_UP) || (keycode == AKEYCODE_VOLUME_DOWN))
-        {
-            // Set default OS behaviour
-            return 0;
-        }
-
-        return 0;
-    }
-
-    // Register touch points count
-    CORE.Input.Touch.pointCount = AMotionEvent_getPointerCount(event);
-
-    for (int i = 0; (i < CORE.Input.Touch.pointCount) && (i < MAX_TOUCH_POINTS); i++)
-    {
-        // Register touch points id
-        CORE.Input.Touch.pointId[i] = AMotionEvent_getPointerId(event, i);
-
-        // Register touch points position
-        CORE.Input.Touch.position[i] = (Vector2){ AMotionEvent_getX(event, i), AMotionEvent_getY(event, i) };
-
-        // Normalize CORE.Input.Touch.position[x] for screenWidth and screenHeight
-        CORE.Input.Touch.position[i].x /= (float)GetScreenWidth();
-        CORE.Input.Touch.position[i].y /= (float)GetScreenHeight();
-    }
-
-    int32_t action = AMotionEvent_getAction(event);
-    unsigned int flags = action & AMOTION_EVENT_ACTION_MASK;
-
-    if (flags == AMOTION_EVENT_ACTION_DOWN || flags == AMOTION_EVENT_ACTION_MOVE) CORE.Input.Touch.currentTouchState[MOUSE_BUTTON_LEFT] = 1;
-    else if (flags == AMOTION_EVENT_ACTION_UP) CORE.Input.Touch.currentTouchState[MOUSE_BUTTON_LEFT] = 0;
-
-#if defined(SUPPORT_GESTURES_SYSTEM)        // PLATFORM_ANDROID
-    GestureEvent gestureEvent = { 0 };
-
-    gestureEvent.pointCount = CORE.Input.Touch.pointCount;
-
-    // Register touch actions
-    if (flags == AMOTION_EVENT_ACTION_DOWN) gestureEvent.touchAction = TOUCH_ACTION_DOWN;
-    else if (flags == AMOTION_EVENT_ACTION_UP) gestureEvent.touchAction = TOUCH_ACTION_UP;
-    else if (flags == AMOTION_EVENT_ACTION_MOVE) gestureEvent.touchAction = TOUCH_ACTION_MOVE;
-    else if (flags == AMOTION_EVENT_ACTION_CANCEL) gestureEvent.touchAction = TOUCH_ACTION_CANCEL;
-
-    for (int i = 0; (i < gestureEvent.pointCount) && (i < MAX_TOUCH_POINTS); i++)
-    {
-        gestureEvent.pointId[i] = CORE.Input.Touch.pointId[i];
-        gestureEvent.position[i] = CORE.Input.Touch.position[i];
-    }
-
-    // Gesture data is sent to gestures system for processing
-    ProcessGestureEvent(gestureEvent);
-#endif
-
-    return 0;
-}
-#endif
 
 #if defined(PLATFORM_WEB)
 // Register fullscreen change events

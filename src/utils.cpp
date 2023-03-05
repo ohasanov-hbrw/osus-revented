@@ -15,12 +15,12 @@
 void updateUpDown(){
     //Get the current state of the mouse wheel
     Global.Wheel = GetMouseWheelMove();
-    if(IsKeyPressed(KEY_DOWN)){
+    if(IsKeyPressed(SDL_SCANCODE_DOWN )){
         //If the down key is pressed, start a timer so that we can simulate a fast mouse wheel movement
         Global.Wheel = -1;
         Global.FrameTimeCounterWheel = -170;
     }
-    if(IsKeyPressed(KEY_UP)){
+    if(IsKeyPressed(SDL_SCANCODE_UP )){
         //The same deal as above but for the up key
         Global.Wheel = 1;
         Global.FrameTimeCounterWheel = -170;
@@ -29,9 +29,9 @@ void updateUpDown(){
     while(Global.FrameTimeCounterWheel > 50.0f){
         //If the keys are still down, trigger a wheel movement every 50 milliseconds
         Global.FrameTimeCounterWheel -= 50.0f;
-        if(IsKeyDown(KEY_UP))
+        if(IsKeyDown(SDL_SCANCODE_UP ))
             Global.Wheel = 1;
-        if(IsKeyDown(KEY_DOWN))
+        if(IsKeyDown(SDL_SCANCODE_DOWN ))
             Global.Wheel = -1;
     }
 }
@@ -55,27 +55,27 @@ void GetMouse(){
 
 void GetKeys(){
     //Get all of the keys an store this data into some variables
-    if(IsKeyPressed(KEY_Z) or (Global.enableMouse and IsMouseButtonPressed(MOUSE_BUTTON_LEFT)))
+    if(IsKeyPressed(SDL_SCANCODE_Z ) or (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_LEFT)))
         Global.Key1P = true;
     else
         Global.Key1P = false;
-    if(IsKeyPressed(KEY_X) or (Global.enableMouse and IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)))
+    if(IsKeyPressed(SDL_SCANCODE_X ) or (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_RIGHT)))
         Global.Key2P = true;
     else
         Global.Key2P = false;
-    if(IsKeyDown(KEY_Z) or (Global.enableMouse and IsMouseButtonDown(MOUSE_BUTTON_LEFT)))
+    if(IsKeyDown(SDL_SCANCODE_Z ) or (Global.enableMouse and IsMouseButtonDown(SDL_BUTTON_LEFT)))
         Global.Key1D = true;
     else
         Global.Key1D = false;
-    if(IsKeyDown(KEY_X) or (Global.enableMouse and IsMouseButtonDown(MOUSE_BUTTON_RIGHT)))
+    if(IsKeyDown(SDL_SCANCODE_X ) or (Global.enableMouse and IsMouseButtonDown(SDL_BUTTON_RIGHT)))
         Global.Key2D = true;
     else
         Global.Key2D = false;
-    if(IsKeyReleased(KEY_Z) or (Global.enableMouse and IsMouseButtonReleased(MOUSE_BUTTON_LEFT)))
+    if(IsKeyReleased(SDL_SCANCODE_Z ) or (Global.enableMouse and IsMouseButtonReleased(SDL_BUTTON_LEFT)))
         Global.Key1R = true;
     else
         Global.Key1R = false;
-    if(IsKeyReleased(KEY_X) or (Global.enableMouse and IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)))
+    if(IsKeyReleased(SDL_SCANCODE_X ) or (Global.enableMouse and IsMouseButtonReleased(SDL_BUTTON_RIGHT)))
         Global.Key2R = true;
     else
         Global.Key2R = false;
