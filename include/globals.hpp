@@ -8,6 +8,7 @@
 #include <thread>
 #include <functional>
 #include "SDL2/SDL.h"
+#include <mutex>
 
 #define PLATFORM_DESKTOP
 
@@ -141,6 +142,7 @@ struct Globals {
                              1);*/
     InputHandler Input;
     bool renderFrame;
+    std::mutex mutex;
 };
 
 extern Globals Global;

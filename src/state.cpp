@@ -27,12 +27,14 @@ void PlayMenu::init() {
     dir_list = SelectableList({320, 260}, {520, 150}, {255,135,198,255}, dir, BLACK, 10, 15, 65);
 }
 void PlayMenu::render() {
+    //Global.mutex.lock();
     bg.render();
     description.render();
     back.render();
     select.render();
     dir_list.render();
     close.render();
+    //Global.mutex.unlock();
 }
 void PlayMenu::update() {
     Global.enableMouse = true;
@@ -95,6 +97,7 @@ void LoadMenu::init() {
 }
 
 void LoadMenu::render() {
+    //Global.mutex.lock();
     bg.render();
     description.render();
     back.render();
@@ -102,6 +105,7 @@ void LoadMenu::render() {
     select.render();
     dir_list.render();
     close.render();
+    //Global.mutex.unlock();
 }
 void LoadMenu::update() {
     Global.enableMouse = true;
@@ -187,10 +191,12 @@ void MainMenu::update() {
     }
 }
 void MainMenu::render() {
+    //Global.mutex.lock();
     DrawTextureCenter(Global.OsusLogo, 320, 200, 1/3.f, WHITE);
     play.render();
     wip.render();
     load.render();
+    //Global.mutex.unlock();
 }
 
 void MainMenu::unload() {
@@ -242,6 +248,7 @@ void Game::render() {
     if(initDone == 1){
         Global.enableMouse = false;
         Global.gameManager->render();
+        //Global.mutex.lock();
         if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
             DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
             //DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
@@ -257,6 +264,7 @@ void Game::render() {
         if(GetMusicTimeLength(Global.gameManager->backgroundMusic) != 0){
             DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
         }
+        //Global.mutex.unlock();
     }
     else if(initDone == -1){
         std::string message;
@@ -272,9 +280,12 @@ void Game::render() {
             message = "GO!";
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+        //Global.mutex.lock();
         DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 7.5f), ScaleCordY(220)}, Scale(20), Scale(1), WHITE);
+        //Global.mutex.unlock();
     }
     else if(initDone == -2){
+        //Global.mutex.lock();
         std::string message;
         message = "Loading Game...";
         
@@ -304,6 +315,7 @@ void Game::render() {
             message = "Loading Textures";
         }
         DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 7.5f), ScaleCordY(220)}, Scale(20), Scale(1), WHITE);
+        //Global.mutex.unlock();
     }
 }
 
@@ -398,6 +410,7 @@ void WIPMenu::init(){
 
 }
 void WIPMenu::render(){
+    //Global.mutex.lock();
     int index = 0;
     float tempangle = angle;
     if(tempangle < 0)
@@ -446,6 +459,7 @@ void WIPMenu::render(){
     }
 
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
+    //Global.mutex.unlock();
 }
 void WIPMenu::update(){
     float clampaccel = 0;

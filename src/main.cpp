@@ -24,12 +24,12 @@
 #include "state.hpp"
 #include "zip.h"
 #include "../vendor/raylib/src/external/glfw/include/GLFW/glfw3.h"
-#include <mutex>
+
 #include <assert.h>
 //#include "SDLutils.hpp"
 
 
-std::mutex locktite;
+
 double avgFPS = 144;
 double avgHZ = 1000;
 
@@ -46,39 +46,45 @@ Globals Global;
 
 void RenderLoop(){
     double last = 0;
-    SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
-    SDL_GL_SetSwapInterval(0);
+    
+    
     while(!WindowShouldClose()){
-
+        SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
         last = getTimer();
         
         rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
         BeginDrawing();
+        //Global.mutex.lock();
+
         ClearBackground(Global.Background);
+        //Global.mutex.unlock();
         
-        locktite.lock();
+        Global.mutex.lock();
         Global.CurrentState->render();
         if(Global.GameTextures == -1)
             Global.gameManager->unloadGameTextures();
         else if(Global.GameTextures == 1)
             Global.gameManager->loadGameTextures();
+        
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
         renderMouse(); 
-        locktite.unlock();
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  avgFPS), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
+        Global.mutex.unlock();
+        /*if(getTimer() - last > 0.5)
+            std::cout << "rendering took: " << getTimer() - last << " milliseconds" << std::endl;*/
         rlDrawRenderBatchActive();
         SwapScreenBuffer();
-        
+        SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
         
 
-        while(getTimer() - last < 1000.0/576.0 and getTimer() - last >= 0)
+        while(getTimer() - last < 1000.0/288.0 and getTimer() - last >= 0)
             continue;
         avgFPS = (avgFPS + 1000.0f / (getTimer() - last)) / 2.0;
         //std::cout << avgFPS << std::endl;
     }
-    SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
+    
 }
 
 
@@ -161,31 +167,30 @@ int main() {
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     //glfwSwapInterval( 0 );
-
+    SDL_GL_SetSwapInterval(0);
     SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
 
     std::thread rend(RenderLoop);
 
     while(!WindowShouldClose()){
         lastFrame = getTimer();
-
-        PollInputEvents();
-
-        Global.FrameTime = getTimer() - Global.LastFrameTime;
-        Global.LastFrameTime = getTimer();
         
-        Global.CallbackMouse.x = Mx;
-        Global.CallbackMouse.y = My;
-
+        /*if(getTimer() - lastFrame > 0.2)
+            std::cout << "main thread waited for the mutex lock for " << getTimer() - lastFrame << " milliseconds" << std::endl;*/
+        PollInputEvents();
         GetScale();
         GetMouse();
         GetKeys();
-
-        
+        if(IsKeyDown(SDL_SCANCODE_LALT) and IsKeyPressed(SDL_SCANCODE_RETURN)){
+            ToggleFullscreen();
+        }
         updateUpDown();
+        Global.mutex.lock();
+        Global.FrameTime = getTimer() - Global.LastFrameTime;
+        Global.LastFrameTime = getTimer();
         Global.CurrentState->update();
-
-        while(getTimer() - lastFrame < 1000.0/1000.0 and getTimer() - lastFrame >= 0)
+        Global.mutex.unlock();
+        while(getTimer() - lastFrame < 1000.0/750.0 and getTimer() - lastFrame >= 0)
             continue;
         avgHZ = (avgHZ + 1000.0f / (getTimer() - lastFrame)) / 2.0;
 

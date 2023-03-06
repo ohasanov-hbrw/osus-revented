@@ -712,11 +712,11 @@ void Slider::render(){
             }
             //EndBlendMode();
             EndTextureMode();
-            if(draw and renderPoints.size() > 0){
+            /*if(draw and renderPoints.size() > 0){
                 //GenTextureMipmaps(&sliderTexture.texture);
                 SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR );
                 //std::cout << "slider filter in use" << std::endl;
-            }
+            }*/
         }
         
         float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);

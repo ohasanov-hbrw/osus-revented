@@ -397,17 +397,23 @@ void GameManager::render(){
 	}
 	
 	for(int i = objects.size() - 1; i >= 0; i--){
+		////Global.mutex.lock();
 		objects[i]->render();
+		////Global.mutex.unlock();
 	}
 	for(int i = dead_objects.size() - 1; i >= 0; i--){
+		////Global.mutex.lock();
 		dead_objects[i]->dead_render();
+		////Global.mutex.unlock();
 	}
 	DrawCNumbersCenter(score, 320, 10, 0.4f, WHITE);
 	DrawCNumbersLeft(clickCombo, 15, 460, 0.6f, WHITE);
 
-
+	
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
+		////Global.mutex.lock();
 		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
+		////Global.mutex.unlock();
 	}
 	//render the points and the combo
 	
@@ -507,7 +513,7 @@ void GameManager::run(){
 				std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
 			}
 			else{
-				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 8;
+				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 6;
 				Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
 			}
 		}
