@@ -214,8 +214,10 @@ void Game::init() {
     Global.parsedLines = 0;
     Global.loadingState = 0;
     initDone = -2;
+    Global.mutex.unlock();
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
+    Global.mutex.lock();
     Global.startTime = -700.0f;
     Global.errorSum = 0;
     Global.errorLast = 0;

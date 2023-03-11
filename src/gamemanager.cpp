@@ -525,10 +525,10 @@ void GameManager::run(){
 			currentTime = Global.currentOsuTime / 1000.0;
 		}
 
-		//currentTime -= 2/1000.0f;
+		currentTime -= 5/1000.0f;
 		GameManager::update();
 		//std::cout << "called update at time " << Global.currentOsuTime << "\n";
-		//currentTime += 2/1000.0f;
+		currentTime += 5/1000.0f;
 	}
 	
 }
