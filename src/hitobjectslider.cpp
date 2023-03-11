@@ -183,20 +183,6 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
-            for(int i = 0; i < renderPoints.size(); i++){
-                if(renderPoints[i].x < -150){
-                    renderPoints[i].x = -150;
-                }
-                if(renderPoints[i].y < -150){
-                    renderPoints[i].y = -150;
-                }
-                if(renderPoints[i].x > 790){
-                    renderPoints[i].x = 790;
-                }
-                if(renderPoints[i].y > 630){
-                    renderPoints[i].y = 630;
-                }
-            }
         }
         else if(data.curveType == 'B'){
             //for the bezier curves we do the calculations in another function
@@ -283,20 +269,6 @@ void Slider::init(){
                     break;
                 renderPoints.pop_back();
             }
-            for(int i = 0; i < renderPoints.size(); i++){
-                if(renderPoints[i].x < -150){
-                    renderPoints[i].x = -150;
-                }
-                if(renderPoints[i].y < -150){
-                    renderPoints[i].y = -150;
-                }
-                if(renderPoints[i].x > 790){
-                    renderPoints[i].x = 790;
-                }
-                if(renderPoints[i].y > 630){
-                    renderPoints[i].y = 630;
-                }
-            }
             //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
         }
         else if(data.curveType == 'P'){
@@ -363,20 +335,7 @@ void Slider::init(){
                     renderPoints.pop_back();
                 }
                 //std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
-                for(int i = 0; i < renderPoints.size(); i++){
-                    if(renderPoints[i].x < -150){
-                        renderPoints[i].x = -150;
-                    }
-                    if(renderPoints[i].y < -150){
-                        renderPoints[i].y = -150;
-                    }
-                    if(renderPoints[i].x > 790){
-                        renderPoints[i].x = 790;
-                    }
-                    if(renderPoints[i].y > 630){
-                        renderPoints[i].y = 630;
-                    }
-                }
+                
             }
             
         }
@@ -386,20 +345,6 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
-            for(int i = 0; i < renderPoints.size(); i++){
-                if(renderPoints[i].x < -150){
-                    renderPoints[i].x = -150;
-                }
-                if(renderPoints[i].y < -150){
-                    renderPoints[i].y = -150;
-                }
-                if(renderPoints[i].x > 790){
-                    renderPoints[i].x = 790;
-                }
-                if(renderPoints[i].y > 630){
-                    renderPoints[i].y = 630;
-                }
-            }
         }
         else{
             std::__throw_invalid_argument("Invalid Slider type!");
@@ -407,6 +352,18 @@ void Slider::init(){
 
     }
     for(size_t i = 0; i < renderPoints.size(); i++){
+        if(renderPoints[i].x < -150){
+            renderPoints[i].x = -150;
+        }
+        if(renderPoints[i].y < -150){
+            renderPoints[i].y = -150;
+        }
+        if(renderPoints[i].x > 790){
+            renderPoints[i].x = 790;
+        }
+        if(renderPoints[i].y > 630){
+            renderPoints[i].y = 630;
+        }
         minX = std::min(minX, renderPoints[i].x);
         minY = std::min(minY, renderPoints[i].y);
         maxX = std::max(maxX, renderPoints[i].x);
@@ -519,6 +476,9 @@ void Slider::update(){
     calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
     /*if(data.length == 7105)
         std::cout << renderPoints[calPos].x << " " << renderPoints[calPos].y << "\n";*/
+    if(Global.useAuto and (gm->currentTime*1000.0f - data.time > 0 or !state))
+        Global.AutoMousePosition = renderPoints[calPos];
+
     if((gm->currentTime*1000.0f - data.time > 0 or !state)){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize))
             inSlider = true;
@@ -587,6 +547,11 @@ void Slider::update(){
             PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
 			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
         }
+
+        Global.AutoMousePositionStart = renderPoints[calPos];
+		Global.AutoMouseStartTime = gm->currentTime*1000.0f;
+
+
         gm->destroyHitObject(data.index);
 
     }
@@ -662,7 +627,7 @@ void Slider::render(){
         EndTextureMode();
     }
 
-    float approachScale = 3*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    float approachScale = 3.5*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
         approachScale = 1;
     float clampedFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 0.7f);

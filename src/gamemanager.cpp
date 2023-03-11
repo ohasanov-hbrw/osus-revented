@@ -40,6 +40,12 @@ void GameManager::init(){
 
 //main game loop
 void GameManager::update(){
+	if(IsKeyDown(SDL_SCANCODE_LEFT)){
+		Global.useAuto = true;
+	}
+	else{
+		Global.useAuto = false;
+	}
 	int eventSize = gameFile.events.size();
 	for(int i = eventSize-1; i >= 0; i--){
 		if(gameFile.events[i].startTime <= currentTime*1000.0f){
@@ -169,10 +175,20 @@ void GameManager::update(){
 	int oldSize = objects.size();
 	int susSize = objects.size();
 	bool stop = true;
+	if(susSize == 0){
+		Global.AutoMouseStartTime = currentTime*1000.0f;
+	}
 	for(int i = susSize-1; i >= 0; i--){
 		//if((std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final)){
+		
+		if(IsKeyPressed(SDL_SCANCODE_LEFT)){
+			Global.AutoMouseStartTime = currentTime*1000.0f;
+			Global.AutoMousePositionStart = {320, 240};
+		}
+
 		if(i == 0){
 			objects[i]->data.touch = true;
+			Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {objects[i]->data.x, objects[i]->data.y}, (currentTime*1000.0f-Global.AutoMouseStartTime) / (objects[i]->data.time-Global.AutoMouseStartTime));
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
@@ -307,7 +323,9 @@ void GameManager::update(){
 		else{
 			bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
 			if(debugf){
+				
 				objects[i]->update();
+				
 				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
 				}
 				else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final){
@@ -336,10 +354,16 @@ void GameManager::update(){
 							PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
 						}
 						objects[i]->data.time = currentTime*1000.0f;
+
+						Global.AutoMousePositionStart = {objects[i]->data.x, objects[i]->data.y};
+						Global.AutoMouseStartTime = currentTime*1000.0f;
+
 						destroyHitObject(i);
 						newSize = objects.size();
 						i--;
 						stop = false;
+						
+
 					}
 					else if (objects[i]->data.type == 2){
 						Slider* tempslider = dynamic_cast<Slider*>(objects[i]);
@@ -361,7 +385,7 @@ void GameManager::update(){
 							PlaySound(SoundFiles.data[tempslider->data.CustomSound]);
 						}
 						objects[i]->data.index = i;
-						objects[i]->update();
+						//objects[i]->update();
 						newSize = objects.size();
 						if(newSize != oldSize){
 							i--;
@@ -525,10 +549,10 @@ void GameManager::run(){
 			currentTime = Global.currentOsuTime / 1000.0;
 		}
 
-		currentTime -= 5/1000.0f;
+		currentTime -= 8/1000.0f;
 		GameManager::update();
 		//std::cout << "called update at time " << Global.currentOsuTime << "\n";
-		currentTime += 5/1000.0f;
+		currentTime += 8/1000.0f;
 	}
 	
 }

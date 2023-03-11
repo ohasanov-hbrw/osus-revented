@@ -49,7 +49,10 @@ void GetMouse(){
         Global.MousePosition = {0,0};
     }
     else {
-        Global.MousePosition = {(GetMouseX() - Global.ZeroPoint.x) / Global.Scale, (GetMouseY() - Global.ZeroPoint.y) / Global.Scale};
+        if(Global.useAuto)
+            Global.MousePosition = Global.AutoMousePosition;
+        else
+            Global.MousePosition = {(GetMouseX() - Global.ZeroPoint.x) / Global.Scale, (GetMouseY() - Global.ZeroPoint.y) / Global.Scale};
     }
 }
 

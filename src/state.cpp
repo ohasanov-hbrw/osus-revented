@@ -20,6 +20,7 @@ PlayMenu::PlayMenu() {
 }
 
 void PlayMenu::init() {
+    Global.useAuto = false;
     Global.LastFrameTime = getTimer();
     temp = Global.Path;
     Global.Path = Global.BeatmapLocation;
@@ -92,6 +93,7 @@ LoadMenu::LoadMenu() {
 }
 
 void LoadMenu::init() {
+    Global.useAuto = false;
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
 }
@@ -168,6 +170,7 @@ MainMenu::MainMenu() {
 void MainMenu::init() {
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
+    Global.useAuto = false;
 }
 void MainMenu::update() {
     Global.enableMouse = true;
@@ -207,6 +210,7 @@ Game::Game() {
     
 }
 void Game::init() {
+    Global.useAuto = false;
     initDone = 0;
     Global.LastFrameTime = getTimer();
     std::cout << Global.selectedPath << std::endl;
