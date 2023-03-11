@@ -205,6 +205,7 @@ void Slider::init(){
                     std::vector<Vector2> samples;
                     std::vector<int> indices;
                     std::vector<float> lengths;
+                    //if(tempResolution < 3000){
                     lengths.push_back(0);
                     samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
                     for(int k = 1; k < tempResolution + 1; k++){
@@ -248,6 +249,11 @@ void Slider::init(){
                     curveIndex++;
                     indices.clear();
                     tempEdges.clear();
+                    //}
+                    //else{
+                        //just fuck it.
+                    //}
+                    //tempEdges.clear();
                 }
             }
             if(renderPoints.size() < data.length){
@@ -418,7 +424,7 @@ void Slider::init(){
     }
     reverseclicked.pop_back();
 
-    //std::cout << "Init slider at time " << data.time << " with the size of " << sliderTexture.texture.width << " and " << sliderTexture.texture.height << " in " << getTimer() - startTime << " miliseconds" << "\n";
+    std::cout << "Init slider at time " << data.time << " with the size of " << sliderTexture.texture.width << " and " << sliderTexture.texture.height << " in " << getTimer() - startTime << " miliseconds" << "\n";
     
     
     textureReady = true;

@@ -177,6 +177,7 @@ int main() {
         
         /*if(getTimer() - lastFrame > 0.2)
             std::cout << "main thread waited for the mutex lock for " << getTimer() - lastFrame << " milliseconds" << std::endl;*/
+        Global.mutex.lock();
         PollInputEvents();
         GetScale();
         GetMouse();
@@ -185,7 +186,6 @@ int main() {
             ToggleFullscreen();
         }
         updateUpDown();
-        Global.mutex.lock();
         Global.FrameTime = getTimer() - Global.LastFrameTime;
         Global.LastFrameTime = getTimer();
         Global.CurrentState->update();

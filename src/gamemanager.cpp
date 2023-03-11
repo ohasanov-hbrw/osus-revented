@@ -125,46 +125,51 @@ void GameManager::update(){
 	int size = gameFile.hitObjects.size();	
 	for(int i = size-1; i >= 0; i--){
 		if(gameFile.hitObjects[i].time - gameFile.preempt <= currentTime*1000.0f){
-			
-			spawnHitObject(gameFile.hitObjects[i]);
-			if(objects[objects.size()-1]->data.startingACombo){
-				currentComboIndex++;
-				if(gameFile.comboColours.size()) currentComboIndex = (currentComboIndex + objects[objects.size()-1]->data.skipComboColours) % gameFile.comboColours.size();
-				combo = 1;
+			if(gameFile.hitObjects[i].type == 2 and gameFile.hitObjects[i].totalLength > Global.maxSliderSize){
+				std::cout << "well fuck this long slider i guess. \n";
+				gameFile.hitObjects.pop_back();
 			}
-			if(gameFile.comboColours.size()) objects[objects.size()-1]->data.colour = gameFile.comboColours[currentComboIndex];
-			objects[objects.size()-1]->data.comboNumber = combo;
-			combo++;
-			int index = 0;
-			for(int amog = 0; amog < timingSettingsForHitObject.size(); amog++){
-				if(timingSettingsForHitObject[amog].time > gameFile.hitObjects[i].time)
-					break;
-				index = amog;
-			}
+			else{
+				spawnHitObject(gameFile.hitObjects[i]);
+				if(objects[objects.size()-1]->data.startingACombo){
+					currentComboIndex++;
+					if(gameFile.comboColours.size()) currentComboIndex = (currentComboIndex + objects[objects.size()-1]->data.skipComboColours) % gameFile.comboColours.size();
+					combo = 1;
+				}
+				if(gameFile.comboColours.size()) objects[objects.size()-1]->data.colour = gameFile.comboColours[currentComboIndex];
+				objects[objects.size()-1]->data.comboNumber = combo;
+				combo++;
+				int index = 0;
+				for(int amog = 0; amog < timingSettingsForHitObject.size(); amog++){
+					if(timingSettingsForHitObject[amog].time > gameFile.hitObjects[i].time)
+						break;
+					index = amog;
+				}
 
-            // o şejkilde lişğaksda başka ne uzun biliyor musun bence benim akıllığım terinde
-            // -ömer 2022
-			objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
-			objects[objects.size()-1]->data.timing.meter = timingSettingsForHitObject[index].meter;
-			objects[objects.size()-1]->data.timing.sampleSet = timingSettingsForHitObject[index].sampleSet;
-			objects[objects.size()-1]->data.timing.sampleIndex = timingSettingsForHitObject[index].sampleIndex;
-			objects[objects.size()-1]->data.timing.volume = timingSettingsForHitObject[index].volume;
-			objects[objects.size()-1]->data.timing.uninherited = timingSettingsForHitObject[index].uninherited;
-			objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject[index].effects;
-			objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject[index].sliderSpeedOverride;
-			objects[objects.size()-1]->data.index = objects.size()-1;
-			objects[objects.size()-1]->data.timing.renderTicks = timingSettingsForHitObject[index].renderTicks;
-			/*std::cout << "Time:" << timingSettingsForHitObject[index].time << " Beat:" << objects[objects.size()-1]->data.timing.beatLength <<
-			" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
-			" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;*/
-			objects[objects.size()-1]->init();
+				// o şejkilde lişğaksda başka ne uzun biliyor musun bence benim akıllığım terinde
+				// -ömer 2022
+				objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
+				objects[objects.size()-1]->data.timing.meter = timingSettingsForHitObject[index].meter;
+				objects[objects.size()-1]->data.timing.sampleSet = timingSettingsForHitObject[index].sampleSet;
+				objects[objects.size()-1]->data.timing.sampleIndex = timingSettingsForHitObject[index].sampleIndex;
+				objects[objects.size()-1]->data.timing.volume = timingSettingsForHitObject[index].volume;
+				objects[objects.size()-1]->data.timing.uninherited = timingSettingsForHitObject[index].uninherited;
+				objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject[index].effects;
+				objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject[index].sliderSpeedOverride;
+				objects[objects.size()-1]->data.index = objects.size()-1;
+				objects[objects.size()-1]->data.timing.renderTicks = timingSettingsForHitObject[index].renderTicks;
+				/*std::cout << "Time:" << timingSettingsForHitObject[index].time << " Beat:" << objects[objects.size()-1]->data.timing.beatLength <<
+				" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
+				" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;*/
+				objects[objects.size()-1]->init();
 
-			//std::thread objectThread(std::bind(&HitObject::init, objects[objects.size()-1]));
-			//objectThread.join();
-			gameFile.hitObjects.pop_back();
-			spawnedHitObjects++;
-			for(int amog = 0; amog < index - 1; amog++){
-				timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
+				//std::thread objectThread(std::bind(&HitObject::init, objects[objects.size()-1]));
+				//objectThread.join();
+				gameFile.hitObjects.pop_back();
+				spawnedHitObjects++;
+				for(int amog = 0; amog < index - 1; amog++){
+					timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
+				}
 			}
 		}
 		else
