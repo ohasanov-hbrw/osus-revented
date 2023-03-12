@@ -28,8 +28,7 @@ class Slider : public HitObject{
         std::vector<std::vector<bool>> renderedLocations = {std::vector<std::vector<bool>>(940, std::vector<bool>(780, false))};
         
 
-        bool textureReady = false;
-        bool textureLoaded = false;
+        
         
 
     private:

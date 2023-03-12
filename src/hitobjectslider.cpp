@@ -145,8 +145,8 @@ std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
 void Slider::init(){
     GameManager* gm = GameManager::getInstance();
 
-    textureReady = false;
-    textureLoaded = false;
+    data.textureReady = false;
+    data.textureLoaded = false;
 
     //these is the points that we get from the beatmap file
     double startTime = getTimer();
@@ -206,46 +206,63 @@ void Slider::init(){
                     std::vector<int> indices;
                     std::vector<float> lengths;
                     //if(tempResolution < 3000){
+                    
                     lengths.push_back(0);
-                    samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
-                    for(int k = 1; k < tempResolution + 1; k++){
-                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
-                        lengths.push_back(distance(samples[k], samples[k-1]) + lengths[k-1]);
-                    }
-                    float maxlen = 1;
-                    for(int k = 0; k < lengths.size(); k++){
-                        maxlen = std::max(lengths[k], maxlen);
-                    }
-                    for(int k = 0; k < lengths.size(); k++)
-                        lengths[k] /= lengths[maxlen];
-                    indices.push_back(0);
-                    for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
-                        float s = (float)k / tempResolution * 2.0f;
-                        s = clip(s, 0.0f, 1.0f);
-                        int j = Search(lengths,s,0,lengths.size()-1);
-                        indices.push_back(j);
-                        //std::cout << "s " << s << std::endl;
-                    }
+                    if(tempResolution != 0){
+                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
 
-                    float s = 1.0f;
-                    int j = Search(lengths,s,0,lengths.size()-1);
-                    if(indices[indices.size() - 1] != j)
-                        indices.push_back(j);
-
-                    samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                    for(float s = 0; s < 1; s += 1.0f / data.lengths[curveIndex]){
-                        currentResolution++;
-                        if(currentResolution > data.lengths[curveIndex]) break;
-                        if(s == 1){
-                            renderPoints.push_back(samples[samples.size() - 1]);
-                            continue;
+                        int aA = tempResolution / 400;
+                        if(aA < 1)
+                            aA = 1;
+                        int lastk = 0;
+                        for(int k = aA; k < tempResolution; k+=aA){
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
+                            lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+                            lastk = k;
                         }
-                        int i = (int)(s * (float)indices.size());
-                        int t = indices[i];
-                        renderPoints.push_back(lerp(samples[t], samples[t+1], s * ((float)indices.size()) - (float)i));
+
+                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                        lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+
+                        float maxlen = 1;
+                        for(int k = 0; k < lengths.size(); k++){
+                            maxlen = std::max(lengths[k], maxlen);
+                        }
+                        for(int k = 0; k < lengths.size(); k++)
+                            lengths[k] /= lengths[maxlen];
+                        indices.push_back(0);
+                        for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
+                            float s = (float)k / tempResolution * 2.0f;
+                            s = clip(s, 0.0f, 1.0f);
+                            int j = Search(lengths,s,0,lengths.size()-1);
+                            indices.push_back(j);
+                            //std::cout << "s " << s << std::endl;
+                        }
+
+                        float s = 1.0f;
+                        int j = Search(lengths,s,0,lengths.size()-1);
+                        if(indices[indices.size() - 1] != j)
+                            indices.push_back(j);
+
+                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                        for(float s = 0; s < 1; s += 1.0f / data.lengths[curveIndex]){
+                            currentResolution++;
+                            if(currentResolution > data.lengths[curveIndex]) break;
+                            if(s == 1){
+                                renderPoints.push_back(samples[samples.size() - 1]);
+                                continue;
+                            }
+                            int i = (int)(s * (float)indices.size());
+                            int t = indices[i];
+                            renderPoints.push_back(lerp(samples[t], samples[t+1], s * ((float)indices.size()) - (float)i));
+                        }
+                        if(i != edgePoints.size()-1 && renderPoints.size() > 1)
+                            renderPoints.pop_back();
                     }
-                    if(i != edgePoints.size()-1 && renderPoints.size() > 1)
-                        renderPoints.pop_back();
+                    else{
+                        std::cout << "ya wtf ya \n";
+                        renderPoints.push_back(tempEdges[0]);
+                    }
                     curveIndex++;
                     indices.clear();
                     tempEdges.clear();
@@ -254,6 +271,7 @@ void Slider::init(){
                         //just fuck it.
                     //}
                     //tempEdges.clear();
+
                 }
             }
             if(renderPoints.size() < data.length){
@@ -357,6 +375,7 @@ void Slider::init(){
         }
 
     }
+
     for(size_t i = 0; i < renderPoints.size(); i++){
         if(renderPoints[i].x < -150){
             renderPoints[i].x = -150;
@@ -424,10 +443,8 @@ void Slider::init(){
     }
     reverseclicked.pop_back();
 
-    std::cout << "Init slider at time " << data.time << " with the size of " << sliderTexture.texture.width << " and " << sliderTexture.texture.height << " in " << getTimer() - startTime << " miliseconds" << "\n";
-    
-    
-    textureReady = true;
+    std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << getTimer() - startTime << " miliseconds" << "\n";
+    data.textureReady = true;
 }
 
 void Slider::update(){
@@ -622,15 +639,15 @@ void Slider::update(){
 
 void Slider::render(){
     GameManager* gm = GameManager::getInstance();
-    if(textureReady == true and textureLoaded == false){
-        textureLoaded = true;
+    if(data.textureReady == true and data.textureLoaded == false){
         sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize);
-        SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
+        //SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
         BeginTextureMode(sliderTexture);
         BeginBlendMode(BLEND_ALPHA_PREMUL);
         ClearBackground(BLANK);
         EndBlendMode();
         EndTextureMode();
+        data.textureLoaded = true;
     }
 
     float approachScale = 3.5*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
@@ -639,7 +656,7 @@ void Slider::render(){
     float clampedFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 0.7f);
     float clampedBigFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 100.0f);
     Color renderColor;
-    if(textureLoaded){
+    if(data.textureLoaded and data.textureReady){
         if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last != renderPoints.size() - 1){
             BeginTextureMode(sliderTexture);
             //BeginBlendMode(BLEND_ALPHA_PREMUL);
@@ -800,11 +817,11 @@ void Slider::dead_render(){
     float clampedFade2 = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/2.0f);
     if(data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
         UnloadRenderTexture(sliderTexture);
-        textureLoaded = false;
+        data.textureReady = false;
     }
     clampedFade2 = clip(clampedFade2, 0.0f, 0.7f);
 
-    if(textureLoaded == true){
+    if(data.textureReady and data.textureLoaded){
         float outlineSize = 4.0 * gm->circlesize/gm->sliderin.width;
         float outlineColor[4] = { 1.0f, 1.0f, 1.0f, clampedFade2 };     // Normalized RED color 
         float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };

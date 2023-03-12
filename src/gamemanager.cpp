@@ -125,11 +125,11 @@ void GameManager::update(){
 	int size = gameFile.hitObjects.size();	
 	for(int i = size-1; i >= 0; i--){
 		if(gameFile.hitObjects[i].time - gameFile.preempt <= currentTime*1000.0f){
-			if(gameFile.hitObjects[i].type == 2 and gameFile.hitObjects[i].totalLength > Global.maxSliderSize){
+			/*if(gameFile.hitObjects[i].type == 2 and gameFile.hitObjects[i].totalLength > Global.maxSliderSize){
 				std::cout << "well fuck this long slider i guess. \n";
 				gameFile.hitObjects.pop_back();
-			}
-			else{
+			}*/
+			//else{
 				spawnHitObject(gameFile.hitObjects[i]);
 				if(objects[objects.size()-1]->data.startingACombo){
 					currentComboIndex++;
@@ -157,6 +157,8 @@ void GameManager::update(){
 				objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject[index].effects;
 				objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject[index].sliderSpeedOverride;
 				objects[objects.size()-1]->data.index = objects.size()-1;
+				objects[objects.size()-1]->data.textureReady = false;
+				objects[objects.size()-1]->data.textureLoaded = false;
 				objects[objects.size()-1]->data.timing.renderTicks = timingSettingsForHitObject[index].renderTicks;
 				/*std::cout << "Time:" << timingSettingsForHitObject[index].time << " Beat:" << objects[objects.size()-1]->data.timing.beatLength <<
 				" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
@@ -170,7 +172,7 @@ void GameManager::update(){
 				for(int amog = 0; amog < index - 1; amog++){
 					timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
 				}
-			}
+			//}
 		}
 		else
 			break;
@@ -1806,7 +1808,7 @@ void GameManager::destroyDeadHitObject(int index){
 	//somehow "kill" the "dead" object
 	if(dead_objects[index]->data.type == 2){
 		Slider* tempslider = dynamic_cast<Slider*>(dead_objects[index]);
-		if(tempslider->textureLoaded == false and tempslider->textureReady == true){
+		if(tempslider->data.textureLoaded == true and tempslider->data.textureReady == false){
 			tempslider->renderedLocations.clear();
         	tempslider->renderPoints.clear();
 			delete dead_objects[index];

@@ -60,6 +60,8 @@ struct HitObjectData{
     std::vector<std::string> EdgeNormalSound ;
     std::vector<std::string> EdgeAdditionSound;
     std::vector<float> lengths;
+    bool textureReady = false;
+    bool textureLoaded = false;
     float totalLength;
     Vector2 extraPos;
 };
