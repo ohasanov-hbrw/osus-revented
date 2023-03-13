@@ -565,6 +565,8 @@ void Slider::update(){
 
         bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
         if(is_hit_at_end || debugf){
+            SetSoundPan(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+            SetSoundPan(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
             SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
             SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
             PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
@@ -585,6 +587,8 @@ void Slider::update(){
                     reverseclicked[curRepeat-1] = 1;
                     reversenumber++;
                     gm->clickCombo++;
+                    SetSoundPan(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+                    SetSoundPan(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
                     SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], (float)volume/100.0f);
                     SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], (float)volume/100.0f);
                     PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
@@ -630,6 +634,7 @@ void Slider::update(){
     }
 
     if(playtick){
+        SetSoundPan(gm->SoundFiles.data[data.NormalSound], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
         SetSoundVolume(gm->SoundFiles.data[data.NormalSound], (float)volume/100.0f);
         PlaySound(gm->SoundFiles.data[data.NormalSound]);
         playtick = false;

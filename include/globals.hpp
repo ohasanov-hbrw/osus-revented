@@ -71,7 +71,7 @@ struct Globals {
     bool MouseInFocus = false;
     int MouseBlur = 20;
     Vector2 MousePosition;
-    Vector2 AutoMousePosition;
+    Vector2 AutoMousePosition = {0,0};
     Vector2 AutoMousePositionStart = {-1, -1};
     double AutoMouseStartTime;
     bool useAuto = false;
