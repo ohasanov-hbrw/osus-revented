@@ -211,7 +211,7 @@ void Slider::init(){
                     if(tempResolution != 0){
                         samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
 
-                        int aA = tempResolution / 400;
+                        int aA = tempResolution / 1000;
                         if(aA < 1)
                             aA = 1;
                         int lastk = 0;
@@ -646,7 +646,7 @@ void Slider::render(){
     GameManager* gm = GameManager::getInstance();
     if(data.textureReady == true and data.textureLoaded == false){
         sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize);
-        //SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
+        SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
         BeginTextureMode(sliderTexture);
         BeginBlendMode(BLEND_ALPHA_PREMUL);
         ClearBackground(BLANK);

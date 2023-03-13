@@ -195,7 +195,7 @@ void GameManager::update(){
 
 		if(i == 0){
 			objects[i]->data.touch = true;
-			Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {objects[i]->data.x, objects[i]->data.y}, (currentTime*1000.0f-Global.AutoMouseStartTime) / (objects[i]->data.time-Global.AutoMouseStartTime));
+			Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {objects[i]->data.x, objects[i]->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (objects[i]->data.time-Global.AutoMouseStartTime), 0, 1));
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
