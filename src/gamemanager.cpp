@@ -185,7 +185,7 @@ void GameManager::update(){
 	if(susSize == 0){
 		Global.AutoMouseStartTime = currentTime*1000.0f;
 	}
-	for(int i = susSize-1; i >= 0; i--){
+	for(int i = 0; i < objects.size(); i++){
 		//if((std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final)){
 		
 		if(IsKeyPressed(SDL_SCANCODE_LEFT)){
@@ -347,17 +347,7 @@ void GameManager::update(){
 					oldSize = newSize;
 				}
 				else{
-				//std::cout << "updated object on time: " << objects[i]->data.time << std::endl;
-					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
-						objects[i]->update();
-					}
-					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final){
-						objects[i]->update();
-					}
-					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final){
-						objects[i]->update();
-					}
-					else if(objects[i]->data.point != 3 && currentTime*1000.0f > objects[i]->data.time){
+					if(objects[i]->data.point != 3 && currentTime*1000.0f > objects[i]->data.time){
 						if (objects[i]->data.type != 2){
 							//Global.MousePosition = {objects[i]->data.x, objects[i]->data.y};
 							objects[i]->data.point = 3;
@@ -425,6 +415,17 @@ void GameManager::update(){
 							}
 						}
 					}
+					else{
+						if (objects[i]->data.type == 2){
+							objects[i]->data.index = i;
+							objects[i]->update();
+							newSize = objects.size();
+							if(newSize != oldSize){
+								i--;
+								oldSize = newSize;
+							}
+						}
+					}
 				}
 
 				newSize = objects.size();
@@ -444,12 +445,20 @@ void GameManager::update(){
 			}
 		}
 	}
+
+
 	int deadoldsize = dead_objects.size();
 	int deadnewsize = dead_objects.size();
-	for(size_t i = 0; i < dead_objects.size(); i++){
+
+	for(int i = 0; i < dead_objects.size(); i++){
 		dead_objects[i]->data.index = i;
+		
 		dead_objects[i]->dead_update();
-		deadnewsize = objects.size();
+		if(dead_objects[i]->data.expired == true){
+			destroyDeadHitObject(i);
+			//std::cout << "deleted an object\n";
+		}
+		deadnewsize = dead_objects.size();
 		if(deadnewsize != deadoldsize){
 			i--;
 			deadoldsize = deadnewsize;
@@ -583,7 +592,7 @@ void GameManager::run(){
 				std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
 			}
 			else{
-				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 6;
+				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 8;
 				Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
 			}
 		}
@@ -1845,7 +1854,7 @@ void GameManager::destroyHitObject(int index){
 
 void GameManager::destroyDeadHitObject(int index){
 	//somehow "kill" the "dead" object
-	if(dead_objects[index]->data.type == 2){
+	/*if(dead_objects[index]->data.type == 2){
 		Slider* tempslider = dynamic_cast<Slider*>(dead_objects[index]);
 		if(tempslider->data.textureLoaded == true and tempslider->data.textureReady == false){
 			tempslider->renderedLocations.clear();
@@ -1853,11 +1862,11 @@ void GameManager::destroyDeadHitObject(int index){
 			delete dead_objects[index];
 			dead_objects.erase(dead_objects.begin()+index);
 		}
-	}
-	else{
+	}*/
+	//else{
 		delete dead_objects[index];
 		dead_objects.erase(dead_objects.begin()+index);
-	}
+	//}
 }
 
 void GameManager::render_points(){

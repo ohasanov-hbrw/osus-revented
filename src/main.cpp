@@ -49,23 +49,21 @@ void RenderLoop(){
     
     
     while(!WindowShouldClose()){
+
+        
         SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
         last = getTimer();
-        
         rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
         BeginDrawing();
-        //Global.mutex.lock();
-
         ClearBackground(Global.Background);
-        //Global.mutex.unlock();
-        
         Global.mutex.lock();
         Global.CurrentState->render();
+        //std::cout << "gamemanager render done\n";
         if(Global.GameTextures == -1)
             Global.gameManager->unloadGameTextures();
         else if(Global.GameTextures == 1)
             Global.gameManager->loadGameTextures();
-        
+        //std::cout << "load-unload render done\n";
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
         //std::cout << "Drawing mouse... " << Global.AutoMousePosition.x << " " << Global.AutoMousePosition.y << std::endl;
@@ -73,12 +71,11 @@ void RenderLoop(){
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  avgFPS), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
         Global.mutex.unlock();
-        /*if(getTimer() - last > 0.5)
-            std::cout << "rendering took: " << getTimer() - last << " milliseconds" << std::endl;*/
         rlDrawRenderBatchActive();
         SwapScreenBuffer();
+        //Global.mutex.lock();
         SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
-        
+        //Global.mutex.unlock();
 
         while(getTimer() - last < 1000.0/288.0 and getTimer() - last >= 0)
             continue;

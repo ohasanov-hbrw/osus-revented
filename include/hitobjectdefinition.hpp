@@ -64,6 +64,7 @@ struct HitObjectData{
     bool textureLoaded = false;
     float totalLength;
     Vector2 extraPos;
+    bool expired = false;
 };
 
 class HitObject{

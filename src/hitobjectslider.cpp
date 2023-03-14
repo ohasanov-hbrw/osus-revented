@@ -847,22 +847,26 @@ void Slider::dead_render(){
         BeginShaderMode(Global.shdrOutline);
         DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade2), gm->circlesize);
         EndShaderMode();
-    }
+    
 
-    if(data.point == 0)
-        DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
-    else if(data.point == 1)
-        DrawTextureCenter(gm->hit50, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit50.width)*0.5f , Fade(WHITE,clampedFade));
-    else if(data.point == 2)
-        DrawTextureCenter(gm->hit100, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit100.width)*0.5f , Fade(WHITE,clampedFade));
-    else if(data.point == 3)
-        DrawTextureCenter(gm->hit300, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit300.width)*0.5f , Fade(WHITE,clampedFade));
+        if(data.point == 0)
+            DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
+        else if(data.point == 1)
+            DrawTextureCenter(gm->hit50, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit50.width)*0.5f , Fade(WHITE,clampedFade));
+        else if(data.point == 2)
+            DrawTextureCenter(gm->hit100, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit100.width)*0.5f , Fade(WHITE,clampedFade));
+        else if(data.point == 3)
+            DrawTextureCenter(gm->hit300, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit300.width)*0.5f , Fade(WHITE,clampedFade));
+    }
 }
 
 void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
     if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        gm->destroyDeadHitObject(data.index);
+        //std::cout << "trying to erase object\n";
+        //gm->destroyDeadHitObject(data.index);
+        if(!data.textureReady and data.textureLoaded)
+            data.expired = true;
     }
 }
 

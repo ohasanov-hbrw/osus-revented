@@ -88,6 +88,7 @@ void Circle::dead_update(){
     GameManager* gm = GameManager::getInstance();
     //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
     if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        gm->destroyDeadHitObject(data.index);
+        //gm->destroyDeadHitObject(data.index);
+        data.expired = true;
     }
 }
