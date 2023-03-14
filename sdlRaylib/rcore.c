@@ -205,38 +205,6 @@
     #define CHDIR chdir
 #endif
 
-#if defined(PLATFORM_DESKTOP)
-    #define GLFW_INCLUDE_NONE       // Disable the standard OpenGL header inclusion on GLFW3
-                                    // NOTE: Already provided by rlgl implementation (on glad.h)
-    #include "GLFW/glfw3.h"         // GLFW3 library: Windows, OpenGL context and Input management
-                                    // NOTE: GLFW3 already includes gl.h (OpenGL) headers
-
-    // Support retrieving native window handlers
-    #if defined(_WIN32)
-        #define GLFW_EXPOSE_NATIVE_WIN32
-        #include "GLFW/glfw3native.h"       // WARNING: It requires customization to avoid windows.h inclusion!
-
-        #if defined(SUPPORT_WINMM_HIGHRES_TIMER) && !defined(SUPPORT_BUSY_WAIT_LOOP)
-            // NOTE: Those functions require linking with winmm library
-            unsigned int __stdcall timeBeginPeriod(unsigned int uPeriod);
-            unsigned int __stdcall timeEndPeriod(unsigned int uPeriod);
-        #endif
-    #endif
-    #if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__)
-        #include <sys/time.h>               // Required for: timespec, nanosleep(), select() - POSIX
-
-        #define GLFW_EXPOSE_NATIVE_X11      // WARNING: Exposing Xlib.h > X.h results in dup symbols for Font type
-        #define GLFW_EXPOSE_NATIVE_WAYLAND
-        #define GLFW_EXPOSE_NATIVE_MIR
-        #include "GLFW/glfw3native.h"       // Required for: glfwGetX11Window()
-    #endif
-    #if defined(__APPLE__)
-        #include <unistd.h>                 // Required for: usleep()
-
-        #define GLFW_EXPOSE_NATIVE_COCOA    // WARNING: Fails due to type redefinition
-        #include "GLFW/glfw3native.h"       // Required for: glfwGetCocoaWindow()
-    #endif
-#endif
 
 #if defined(PLATFORM_ANDROID)
     //#include <android/sensor.h>           // Required for: Android sensors functions (accelerometer, gyroscope, light...)
@@ -274,14 +242,6 @@
     //#include "GLES2/gl2.h"            // OpenGL ES 2.0 library (not required in this module, only in rlgl)
 #endif
 
-#if defined(PLATFORM_WEB)
-    #define GLFW_INCLUDE_ES2            // GLFW3: Enable OpenGL ES 2.0 (translated to WebGL)
-    #include "GLFW/glfw3.h"             // GLFW3: Windows, OpenGL context and Input management
-    #include <sys/time.h>               // Required for: timespec, nanosleep(), select() - POSIX
-
-    #include <emscripten/emscripten.h>  // Emscripten functionality for C
-    #include <emscripten/html5.h>       // Emscripten HTML5 library
-#endif
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -937,9 +897,6 @@ void CloseWindow(void)
     SDL_Quit();
 #endif
 
-#if defined(_WIN32) && defined(SUPPORT_WINMM_HIGHRES_TIMER) && !defined(SUPPORT_BUSY_WAIT_LOOP)
-    timeEndPeriod(1);           // Restore time period
-#endif
 }
 
 // Check if window has been maximized (only PLATFORM_DESKTOP)
@@ -2760,17 +2717,6 @@ bool IsGamepadAvailable(int gamepad)
 // Get gamepad internal name id
 const char *GetGamepadName(int gamepad)
 {
-#if defined(PLATFORM_DESKTOP)
-    if (CORE.Input.Gamepad.ready[gamepad]) return glfwGetJoystickName(gamepad);
-    else return NULL;
-#endif
-#if defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
-    if (CORE.Input.Gamepad.ready[gamepad]) ioctl(CORE.Input.Gamepad.streamId[gamepad], JSIOCGNAME(64), &CORE.Input.Gamepad.name[gamepad]);
-    return CORE.Input.Gamepad.name[gamepad];
-#endif
-#if defined(PLATFORM_WEB)
-    return CORE.Input.Gamepad.name[gamepad];
-#endif
     return NULL;
 }
 
@@ -2852,9 +2798,6 @@ int SetGamepadMappings(const char *mappings)
 {
     int result = 0;
 
-#if defined(PLATFORM_DESKTOP)
-    result = glfwUpdateGamepadMappings(mappings);
-#endif
 
     return result;
 }
@@ -3195,9 +3138,7 @@ static void InitTimer(void)
 // However, it can also reduce overall system performance, because the thread scheduler switches tasks more often.
 // High resolutions can also prevent the CPU power management system from entering power-saving modes.
 // Setting a higher resolution does not improve the accuracy of the high-resolution performance counter.
-#if defined(_WIN32) && defined(SUPPORT_WINMM_HIGHRES_TIMER) && !defined(SUPPORT_BUSY_WAIT_LOOP)
-    timeBeginPeriod(1);                 // Setup high-resolution timer to 1ms (granularity of 1-2 ms)
-#endif
+
 
 #if defined(PLATFORM_ANDROID) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
     struct timespec now = { 0 };
@@ -3327,122 +3268,6 @@ bool WindowShouldClose(){
     return CORE.Window.shouldClose;
 }
 
-
-#if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB)
-// GLFW3 Error Callback, runs on GLFW3 error
-static void ErrorCallback(int error, const char *description)
-{
-    TRACELOG(LOG_WARNING, "GLFW: Error: %i Description: %s", error, description);
-}
-
-// GLFW3 WindowSize Callback, runs when window is resizedLastFrame
-// NOTE: Window resizing not allowed by default
-static void WindowSizeCallback(GLFWwindow *window, int width, int height)
-{
-    // Reset viewport and projection matrix for new size
-    SetupViewport(width, height);
-
-    CORE.Window.currentFbo.width = width;
-    CORE.Window.currentFbo.height = height;
-    CORE.Window.resizedLastFrame = true;
-
-    if (IsWindowFullscreen()) return;
-
-    // Set current screen size
-#if defined(__APPLE__)
-    CORE.Window.screen.width = width;
-    CORE.Window.screen.height = height;
-#else
-    if ((CORE.Window.flags & FLAG_WINDOW_HIGHDPI) > 0)
-    {
-        CORE.Window.screen.width = width;
-        CORE.Window.screen.height = height;
-    }
-    else
-    {
-        CORE.Window.screen.width = width;
-        CORE.Window.screen.height = height;
-    }
-#endif
-
-    // NOTE: Postprocessing texture is not scaled to new size
-}
-
-// GLFW3 WindowIconify Callback, runs when window is minimized/restored
-static void WindowIconifyCallback(GLFWwindow *window, int iconified)
-{
-    if (iconified) CORE.Window.flags |= FLAG_WINDOW_MINIMIZED;  // The window was iconified
-    else CORE.Window.flags &= ~FLAG_WINDOW_MINIMIZED;           // The window was restored
-}
-
-#if !defined(PLATFORM_WEB)
-// GLFW3 WindowMaximize Callback, runs when window is maximized/restored
-static void WindowMaximizeCallback(GLFWwindow *window, int maximized)
-{
-
-}
-#endif
-
-// GLFW3 WindowFocus Callback, runs when window get/lose focus
-static void WindowFocusCallback(GLFWwindow *window, int focused)
-{
-
-}
-
-// GLFW3 Keyboard Callback, runs on key pressed
-static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
-{
-    
-}
-
-
-
-// GLFW3 Char Key Callback, runs on key down (gets equivalent unicode char value)
-static void CharCallback(GLFWwindow *window, unsigned int key)
-{
-    
-}
-
-// GLFW3 Mouse Button Callback, runs on mouse button pressed
-static void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
-{
-    
-}
-
-// GLFW3 Cursor Position Callback, runs on mouse move
-static void MouseCursorPosCallback(GLFWwindow *window, double x, double y)
-{
-    
-}
-
-// GLFW3 Scrolling Callback, runs on mouse wheel
-static void MouseScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
-{
-    }
-
-// GLFW3 CursorEnter Callback, when cursor enters the window
-static void CursorEnterCallback(GLFWwindow *window, int enter)
-{
-    }
-
-// GLFW3 Window Drop Callback, runs when drop files into window
-// NOTE: Paths are stored in dynamic memory for further retrieval
-// Everytime new files are dropped, old ones are discarded
-static void WindowDropCallback(GLFWwindow *window, int count, const char **paths)
-{
-    UnloadDroppedFiles();
-
-    CORE.Window.dropFilepaths = (char **)RL_MALLOC(count*sizeof(char *));
-
-    for (int i = 0; i < count; i++)
-    {
-        CORE.Window.dropFilepaths[i] = (char *)RL_MALLOC(MAX_FILEPATH_LENGTH*sizeof(char));
-        strcpy(CORE.Window.dropFilepaths[i], paths[i]);
-    }
-
-    CORE.Window.dropFileCount = count;
-}
-#endif
 
 
 #if defined(PLATFORM_WEB)

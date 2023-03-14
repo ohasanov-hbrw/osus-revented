@@ -199,6 +199,7 @@ void GameManager::update(){
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
+				Global.amogus2 = 12.0f;
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 0;
@@ -335,6 +336,8 @@ void GameManager::update(){
 					oldSize = newSize;
 				}
 			}
+			Global.Key1P = false;
+			Global.Key2P = false;
 		}
 		else{
 			bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
@@ -452,7 +455,6 @@ void GameManager::update(){
 
 	for(int i = 0; i < dead_objects.size(); i++){
 		dead_objects[i]->data.index = i;
-		
 		dead_objects[i]->dead_update();
 		if(dead_objects[i]->data.expired == true){
 			destroyDeadHitObject(i);
@@ -507,7 +509,7 @@ void GameManager::run(){
 	//ms = getTimer() / 1000.0;
 
 	if(Global.startTime < 0){
-		Global.amogus2 = 0;
+		Global.amogus2 = 16;
 		Global.amogus3 = 0.0f;
 		Global.startTime += Global.FrameTime;
 		Time = Global.startTime;
@@ -531,7 +533,7 @@ void GameManager::run(){
 		double Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 		double amog = getTimer();
 		Global.amogus4 = getTimer();
-		Global.amogus2 = 0.0f;
+		Global.amogus2 = 12;
 		Global.amogus3 = 0.0f;
 		std::cout << "time delay??? " << Global.amogus2 << std::endl;
 		std::cout << "Time:" << Time << std::endl;
@@ -560,7 +562,7 @@ void GameManager::run(){
 		if (IsMusicStreamPlaying(backgroundMusic)){
 			Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 			if(!AreSame(TimerLast, Time)){
-				Global.amogus2 = std::abs((Time - TimerLast) / 1.5f);
+				//Global.amogus2 = std::abs((Time - TimerLast) / 1.5f);
 				Global.amogus3 = Time - TimerLast;
 
 				TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
@@ -592,7 +594,7 @@ void GameManager::run(){
 				std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
 			}
 			else{
-				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 8;
+				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 5;
 				Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
 			}
 		}

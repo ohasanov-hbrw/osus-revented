@@ -211,9 +211,10 @@ void Slider::init(){
                     if(tempResolution != 0){
                         samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
 
-                        int aA = tempResolution / 1000;
+                        int aA = tempResolution / 2000;
                         if(aA < 1)
                             aA = 1;
+                        aA = 1; //just for debugging and shitty big maps
                         int lastk = 0;
                         for(int k = aA; k < tempResolution; k+=aA){
                             samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
@@ -443,14 +444,18 @@ void Slider::init(){
     }
     reverseclicked.pop_back();
 
-    std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << getTimer() - startTime << " miliseconds" << "\n";
+    //std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << getTimer() - startTime << " miliseconds" << "\n";
     data.textureReady = true;
 }
 
 void Slider::update(){
     GameManager* gm = GameManager::getInstance();
+    
     position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
     
+    if(data.timing.beatLength < 0.1)
+        position = 0;
+
     int volume = data.volume;
     if(volume == 0){
         data.volume = data.timing.volume;
@@ -459,6 +464,8 @@ void Slider::update(){
 
     position *= (double)100;
     curRepeat = std::max(0,(int)(position / data.length));
+    if(data.timing.beatLength < 0.1)
+        curRepeat = 0;
     if((int)(std::max((double)0, position) + data.length) < (int)(data.length*data.slides)){
         repeat = true;
     }
@@ -480,10 +487,12 @@ void Slider::update(){
     }
     
     if(gm->currentTime*1000.0f - data.time > 0){
-        if ((int)((gm->currentTime*1000.0f - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
-            position = (double)data.length - (absolutePosition + 1.0f); 
-        else
-            position = absolutePosition + 1.0f; 
+        if(data.timing.beatLength > 0.1){
+            if ((int)((gm->currentTime*1000.0f - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
+                position = (double)data.length - (absolutePosition + 1.0f); 
+            else
+                position = absolutePosition + 1.0f; 
+        }
     }
     position = std::max((double)0,position);
     if (is_hit_at_first || gm->currentTime*1000.0f > data.time + gm->gameFile.p50Final)
@@ -674,9 +683,9 @@ void Slider::render(){
                             DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                             (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
                             
-                            DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
+                            /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
                             {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                            (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});
+                            (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
                             last = std::max(i, 0);
                             if(last == renderPoints.size() - 1){
                                 last = renderPoints.size();
@@ -694,9 +703,9 @@ void Slider::render(){
                     DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                     (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
                     
-                    DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
+                    /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
                     {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                    (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});
+                    (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
                     last = std::max(i, 0);
                     renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150] = true;
                 }
