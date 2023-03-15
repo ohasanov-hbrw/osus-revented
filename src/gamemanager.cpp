@@ -59,7 +59,7 @@ void GameManager::update(){
 	}
 
 	timingSettings tempTiming;
-	int timingSize = gameFile.timingPoints.size();
+	int timingSize = gameFile.timingPoints.size(); 
 	for(int i = timingSize-1; i >= 0; i--){
 		if(gameFile.timingPoints[i].time - gameFile.preempt <= currentTime*1000.0f){
 			tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
@@ -552,7 +552,7 @@ void GameManager::run(){
 				SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
 			}
 		}
-		if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
+		if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 0.05f)
 			stop = true;
 		if(stop && Global.curTime2 < 1.0f){
 			StopMusicStream(backgroundMusic);
@@ -1098,7 +1098,7 @@ void GameManager::loadGame(std::string filename){
 				
 				gameFile.hitObjects[i].totalLength = totalCalculatedLength;
 				gameFile.hitObjects[i].lengths = curveLengths;
-
+				std::cout << "Slider: " << gameFile.hitObjects[i].time << "  Calc: " << totalCalculatedLength << "  Real?: " << gameFile.hitObjects[i].length << std::endl;
 				curveLengths.clear();
 				tempEdges.clear();
 				tempRender.clear();

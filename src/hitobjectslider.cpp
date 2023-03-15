@@ -174,7 +174,7 @@ void Slider::init(){
             data.totalLength+=data.lengths[data.lengths.size()-1];
 
             lengthScale = data.totalLength/data.length;
-
+            //lengthScale = 1;
             for(size_t i = 0; i < edgePoints.size()-1; i++)
                 for(float j = 0; j < data.lengths[i]; j += lengthScale)
                     renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
@@ -202,7 +202,7 @@ void Slider::init(){
                     std::vector<float> tValues;
                     currentResolution = 0;
                     float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
-                    tempResolution = std::min(data.lengths[curveIndex], 4000.0f);
+                    tempResolution = std::min(data.lengths[curveIndex], 500.0f);
                     std::vector<Vector2> samples;
                     std::vector<int> indices;
                     std::vector<float> lengths;
@@ -251,6 +251,7 @@ void Slider::init(){
                             indices.push_back(j);
 
                         samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                        //lengths.push_back(1);
                         for(float s = 0; s < 1; s += 1.0f / data.lengths[curveIndex]){
                             currentResolution++;
                             if(currentResolution > data.lengths[curveIndex]) break;
@@ -260,7 +261,15 @@ void Slider::init(){
                             }
                             int i = (int)(s * (float)indices.size());
                             int t = indices[i];
-                            renderPoints.push_back(lerp(samples[t], samples[t+1], s * ((float)indices.size()) - (float)i));
+                            float temporaryLerpPos;
+                            if(t >= lengths.size() - 1){
+                                temporaryLerpPos = 0;
+                            }
+                            else{
+                                temporaryLerpPos = (s - lengths[t]) / (lengths[t + 1] - lengths[t]);
+                            }
+                            float otherLerp = s * ((float)indices.size()) - (float)i;
+                            renderPoints.push_back(lerp(samples[t], samples[t+1], temporaryLerpPos));
                         }
                         if(i != edgePoints.size()-1 && renderPoints.size() > 1)
                             renderPoints.pop_back();
@@ -298,6 +307,7 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length)
                     break;
                 renderPoints.pop_back();
+                //std::cout << data.time << " " << renderPoints.size() << " " << data.length << std::endl;
             }
             //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
         }
@@ -672,7 +682,7 @@ void Slider::render(){
         sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize),
                                           (int)(((std::max(maxY-minY, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.height))+16)*Global.sliderTexSize));
         
-        //SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
+        SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
         BeginTextureMode(sliderTexture);
         BeginBlendMode(BLEND_ALPHA_PREMUL);
         ClearBackground(BLANK);
