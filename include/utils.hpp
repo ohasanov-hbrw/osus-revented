@@ -107,3 +107,6 @@ void resumeTimer();
 double getTimer();
 void addOffsetTimer(unsigned long long int);
 void updateTimer();
+
+bool IsTextureReady(Texture2D);
+bool IsRenderTextureReady(RenderTexture2D);

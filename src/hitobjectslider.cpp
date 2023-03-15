@@ -202,6 +202,7 @@ void Slider::init(){
                     std::vector<float> tValues;
                     currentResolution = 0;
                     float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
+                    tempResolution = std::min(data.lengths[curveIndex], 4000.0f);
                     std::vector<Vector2> samples;
                     std::vector<int> indices;
                     std::vector<float> lengths;
@@ -216,7 +217,7 @@ void Slider::init(){
                             aA = 1;
                         aA = 1; //just for debugging and shitty big maps
                         int lastk = 0;
-                        for(int k = aA; k < tempResolution; k+=aA){
+                        for(int k = 1; k < tempResolution; k++){
                             samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
                             lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
                             lastk = k;
@@ -230,7 +231,11 @@ void Slider::init(){
                             maxlen = std::max(lengths[k], maxlen);
                         }
                         for(int k = 0; k < lengths.size(); k++)
-                            lengths[k] /= lengths[maxlen];
+                            lengths[k] /= maxlen;
+                        
+
+                        tempResolution = data.lengths[curveIndex];
+
                         indices.push_back(0);
                         for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
                             float s = (float)k / tempResolution * 2.0f;
@@ -394,8 +399,9 @@ void Slider::init(){
         minY = std::min(minY, renderPoints[i].y);
         maxX = std::max(maxX, renderPoints[i].x);
         maxY = std::max(maxY, renderPoints[i].y);
+        
     }
-
+    //std::cout << "slider:" << data.time << " minX:" << minX << " minY:" << minY << " maxX:" << maxX << " maxY:" << maxY << "\n";
     
     
     ticks = 0;
@@ -445,6 +451,7 @@ void Slider::init(){
     reverseclicked.pop_back();
 
     //std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << getTimer() - startTime << " miliseconds" << "\n";
+    
     data.textureReady = true;
 }
 
@@ -529,12 +536,51 @@ void Slider::update(){
         inSlider = true;
     }
 
+    if(data.timing.beatLength < 0.1)
+        inSlider = 0;
+    if(data.timing.beatLength < 0.1)
+        is_hit_at_end = 0;
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
     if(gm->currentTime*1000.0f > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
         if(inSlider && (Global.Key1D || Global.Key2D || debugf)){
             is_hit_at_end = true;
         }
     }
+
+    if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
+        int ticksrendered = 0;
+        bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
+        for(int i = 0; i < tickPositions.size(); i++){
+            if(tickPositions[i] <= (int)time && (int) time > 0){
+                if(tickclicked[i] == -1){
+                    if((inSlider && (Global.Key1D || Global.Key2D)) || debugf){
+                        tickclicked[i] = 1;
+                        ticknumber++;
+                        gm->clickCombo++;
+                        playtick = true;
+                    }
+                    else{
+                        tickclicked[i] = 0;
+                        if(gm->clickCombo > 30){
+							SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+							PlaySound(gm->SoundFiles.data["combobreak"]);
+						}
+                        gm->clickCombo = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    if(playtick){
+        SetSoundPan(gm->SoundFiles.data[data.NormalSound], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+        SetSoundVolume(gm->SoundFiles.data[data.NormalSound], (float)volume/100.0f);
+        PlaySound(gm->SoundFiles.data[data.NormalSound]);
+        playtick = false;
+    }
+
+
+
     if(gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
         
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
@@ -617,51 +663,22 @@ void Slider::update(){
 
 
 
-    if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
-        int ticksrendered = 0;
-        bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
-        for(int i = 0; i < tickPositions.size(); i++){
-            if(tickPositions[i] <= (int)time && (int) time > 0){
-                if(tickclicked[i] == -1){
-                    if((inSlider && (Global.Key1D || Global.Key2D)) || debugf){
-                        tickclicked[i] = 1;
-                        ticknumber++;
-                        gm->clickCombo++;
-                        playtick = true;
-                    }
-                    else{
-                        tickclicked[i] = 0;
-                        if(gm->clickCombo > 30){
-							SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
-							PlaySound(gm->SoundFiles.data["combobreak"]);
-						}
-                        gm->clickCombo = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    if(playtick){
-        SetSoundPan(gm->SoundFiles.data[data.NormalSound], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
-        SetSoundVolume(gm->SoundFiles.data[data.NormalSound], (float)volume/100.0f);
-        PlaySound(gm->SoundFiles.data[data.NormalSound]);
-        playtick = false;
-    }
-
 }
 
 void Slider::render(){
     GameManager* gm = GameManager::getInstance();
+    bool changeTex = false;
     if(data.textureReady == true and data.textureLoaded == false){
-        sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize);
-        SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
+        sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize),
+                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.height))+16)*Global.sliderTexSize));
+        
+        //SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
         BeginTextureMode(sliderTexture);
         BeginBlendMode(BLEND_ALPHA_PREMUL);
         ClearBackground(BLANK);
         EndBlendMode();
         EndTextureMode();
-        data.textureLoaded = true;
+        changeTex = true;
     }
 
     float approachScale = 3.5*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
@@ -670,6 +687,7 @@ void Slider::render(){
     float clampedFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 0.7f);
     float clampedBigFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 100.0f);
     Color renderColor;
+    data.textureLoaded = IsRenderTextureReady(sliderTexture);
     if(data.textureLoaded and data.textureReady){
         if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last != renderPoints.size() - 1){
             BeginTextureMode(sliderTexture);
@@ -679,7 +697,7 @@ void Slider::render(){
                 for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
                     draw = false;
                     if(i < renderPoints.size() and renderPoints[i].x > -150 and renderPoints[i].x < 790 and renderPoints[i].y > -150 and renderPoints[i].y < 630){
-                        if(!renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150]){
+                        if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
                             DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                             (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
                             
@@ -690,7 +708,7 @@ void Slider::render(){
                             if(last == renderPoints.size() - 1){
                                 last = renderPoints.size();
                             }
-                            renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150] = true;
+                            renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
                         }
                     }
                 }
@@ -699,7 +717,7 @@ void Slider::render(){
             if(draw and renderPoints.size() > 0 and last != renderPoints.size() - 1){
                 //std::cout << "wtf" << std::endl;
                 int i = renderPoints.size() - 1;
-                if(!renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150]){
+                if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
                     DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                     (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
                     
@@ -707,7 +725,7 @@ void Slider::render(){
                     {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
                     (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
                     last = std::max(i, 0);
-                    renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150] = true;
+                    renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
                 }
                 last = renderPoints.size() - 1;
                 
@@ -722,7 +740,7 @@ void Slider::render(){
         }
         
         float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
-        float outlineColor[4] = { 0.9f, 0.9f, 0.9f, 0.9f };     // Normalized RED color 
+        float outlineColor[4] = { 0.9f, 0.9f, 0.9f, 1.0f };     // Normalized RED color 
         float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
         
         // Get shader locations
@@ -823,14 +841,17 @@ void Slider::render(){
         DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width*(gm->hitCircleOverlay.width/128.0f) , Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width*(gm->approachCircle.width/128.0f) , renderColor);
     }
+    /*if(changeTex == true)
+        data.textureLoaded = true;*/
 }
 
 void Slider::dead_render(){
     GameManager* gm = GameManager::getInstance();
     float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
     float clampedFade2 = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/2.0f);
-    if(data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        UnloadRenderTexture(sliderTexture);
+    if(readyToDelete){
+        if(IsRenderTextureReady(sliderTexture))
+            UnloadRenderTexture(sliderTexture);
         data.textureReady = false;
     }
     clampedFade2 = clip(clampedFade2, 0.0f, 0.7f);
@@ -854,7 +875,7 @@ void Slider::dead_render(){
 
 
         BeginShaderMode(Global.shdrOutline);
-        DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade2), gm->circlesize);
+        DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade2), gm->circlesize);
         EndShaderMode();
     
 
@@ -872,9 +893,8 @@ void Slider::dead_render(){
 void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
     if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        //std::cout << "trying to erase object\n";
-        //gm->destroyDeadHitObject(data.index);
-        if(!data.textureReady and data.textureLoaded)
+        readyToDelete = true;
+        if(!data.textureReady)
             data.expired = true;
     }
 }

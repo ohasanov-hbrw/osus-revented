@@ -377,3 +377,21 @@ void updateTimer(){
         
     }
 }
+
+bool IsTextureReady(Texture2D texture)
+{
+    // TODO: Validate maximum texture size supported by GPU?
+
+    return ((texture.id > 0) &&         // Validate OpenGL id
+            (texture.width > 0) &&
+            (texture.height > 0) &&     // Validate texture size
+            (texture.format > 0) &&     // Validate texture pixel format
+            (texture.mipmaps > 0));     // Validate texture mipmaps (at least 1 for basic mipmap level)
+}
+
+bool IsRenderTextureReady(RenderTexture2D target)
+{
+    return ((target.id > 0) &&                  // Validate OpenGL id
+            IsTextureReady(target.depth) &&     // Validate FBO depth texture/renderbuffer
+            IsTextureReady(target.texture));    // Validate FBO texture
+}
