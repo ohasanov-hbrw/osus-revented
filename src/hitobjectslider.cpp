@@ -157,6 +157,7 @@ void Slider::init(){
     float lengthScale, totalLength = 0;
     //std::cout << "init: " << data.time << std::endl;
     //add every point from the beatmap 
+    //renderPoints.push_back(edgePoints[0]);
     for(size_t i = 0; i < data.curvePoints.size(); i++)
         edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
     //if the "curve" is linear calculate the points needed to render the slider
@@ -196,26 +197,23 @@ void Slider::init(){
             tempEdges.clear();
             tempRender.clear();
             int curveIndex = 0;
+            double currentMax = 0;
+
             for(size_t i = 0; i < edgePoints.size(); i++){
                 tempEdges.push_back(edgePoints[i]);
                 if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
                     std::vector<float> tValues;
                     currentResolution = 0;
                     float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
-                    tempResolution = std::min(data.lengths[curveIndex], 500.0f);
+                    tempResolution = std::min(data.lengths[curveIndex], 400.0f);
                     std::vector<Vector2> samples;
                     std::vector<int> indices;
                     std::vector<float> lengths;
                     //if(tempResolution < 3000){
                     
-                    lengths.push_back(0);
                     if(tempResolution != 0){
                         samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
-
-                        int aA = tempResolution / 2000;
-                        if(aA < 1)
-                            aA = 1;
-                        aA = 1; //just for debugging and shitty big maps
+                        lengths.push_back(0);
                         int lastk = 0;
                         for(int k = 1; k < tempResolution; k++){
                             samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
@@ -252,13 +250,19 @@ void Slider::init(){
 
                         samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
                         //lengths.push_back(1);
-                        for(float s = 0; s < 1; s += 1.0f / data.lengths[curveIndex]){
+                        int index = 0;
+                        currentMax += data.lengths[curveIndex];
+                        int add = currentMax - renderPoints.size();
+                        for(index = 0; index < data.lengths[curveIndex]; index++){
+                            double s = (double)index / (double)data.lengths[curveIndex];
+                            
+                            if(renderPoints.size() > data.length)
+                                break;
+                            if(renderPoints.size() > currentMax)
+                                break;
                             currentResolution++;
-                            if(currentResolution > data.lengths[curveIndex]) break;
-                            if(s == 1){
-                                renderPoints.push_back(samples[samples.size() - 1]);
-                                continue;
-                            }
+                            if(currentResolution > data.lengths[curveIndex])
+                                break;
                             int i = (int)(s * (float)indices.size());
                             int t = indices[i];
                             float temporaryLerpPos;
@@ -271,8 +275,11 @@ void Slider::init(){
                             float otherLerp = s * ((float)indices.size()) - (float)i;
                             renderPoints.push_back(lerp(samples[t], samples[t+1], temporaryLerpPos));
                         }
-                        if(i != edgePoints.size()-1 && renderPoints.size() > 1)
-                            renderPoints.pop_back();
+                        /*if((i != edgePoints.size()-1 && renderPoints.size() > 1) and (renderPoints.size() > currentMax))
+                            renderPoints.pop_back();*/
+                        //std::cout << renderPoints.size() << " " << currentMax << std::endl;
+                        if((i != edgePoints.size()-1 && renderPoints.size() > 1))
+                           renderPoints.pop_back();
                     }
                     else{
                         std::cout << "ya wtf ya \n";

@@ -1062,7 +1062,7 @@ void GameManager::loadGame(std::string filename){
 				std::vector<Vector2> tempEdges;
 				std::vector<Vector2> tempRender;
 				std::vector<float> curveLengths;
-				float totalCalculatedLength = 0;
+				double totalCalculatedLength = 0;
 				int curves = 0;
 				for(size_t j = 0; j < edgePoints.size(); j++){
 					if(j == edgePoints.size()-1 || (edgePoints[j].x == edgePoints[j+1].x && edgePoints[j].y == edgePoints[j+1].y)){
@@ -1081,13 +1081,13 @@ void GameManager::loadGame(std::string filename){
 						while(true){
 							if(currentResolution > num)
 								break;
-							currentResolution++;
 							float j = (float)currentResolution / (float)num;
 							
 							Vector2 tmp = get2BezierPoint(tempEdges, tempEdges.size(), j);
 							if(m >= 1)
 								tempLength += std::sqrt(std::pow(lasttmp.x - tmp.x,2) + std::pow(lasttmp.y - tmp.y,2));
 							lasttmp = tmp;
+							currentResolution++;
 							m++;
 						}
 						curveLengths.push_back(tempLength + 1);
@@ -1099,6 +1099,12 @@ void GameManager::loadGame(std::string filename){
 				gameFile.hitObjects[i].totalLength = totalCalculatedLength;
 				gameFile.hitObjects[i].lengths = curveLengths;
 				std::cout << "Slider: " << gameFile.hitObjects[i].time << "  Calc: " << totalCalculatedLength << "  Real?: " << gameFile.hitObjects[i].length << std::endl;
+				if(gameFile.hitObjects[i].time == 9076){
+					for(int i = 0; i < curveLengths.size(); i++){
+						std::cout << curveLengths[i] << " | ";
+					}
+					std::cout << " <-> " << curveLengths.size() << std::endl;
+				}
 				curveLengths.clear();
 				tempEdges.clear();
 				tempRender.clear();

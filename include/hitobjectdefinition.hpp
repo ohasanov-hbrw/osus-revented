@@ -36,7 +36,7 @@ struct HitObjectData{
     char curveType;
     std::vector<std::pair<int,int> > curvePoints;
     int slides;
-    float length;
+    double length;
     std::vector<int> edgeSounds;
     std::vector<std::pair<int, int> > edgeSets;
     int endTime;
@@ -62,7 +62,7 @@ struct HitObjectData{
     std::vector<float> lengths;
     bool textureReady = false;
     bool textureLoaded = false;
-    float totalLength;
+    double totalLength;
     Vector2 extraPos;
     bool expired = false;
 };
