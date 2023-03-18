@@ -186,137 +186,227 @@ void Slider::init(){
             }
         }
         else if(data.curveType == 'B'){
-            //for the bezier curves we do the calculations in another function
-            Vector2 edges[edgePoints.size()];
-            for(size_t i = 0; i < edgePoints.size(); i++)
-                edges[i] = edgePoints[i];
-            std::vector<Vector2> tempEdges;
-            std::vector<Vector2> tempRender;
-            std::vector<float> curveLengths;
-            float totalCalculatedLength = 0;
-            tempEdges.clear();
-            tempRender.clear();
-            int curveIndex = 0;
-            double currentMax = 0;
+            bool old = false;
+            if(old){
+                //for the bezier curves we do the calculations in another function
+                Vector2 edges[edgePoints.size()];
+                for(size_t i = 0; i < edgePoints.size(); i++)
+                    edges[i] = edgePoints[i];
+                std::vector<Vector2> tempEdges;
+                std::vector<Vector2> tempRender;
+                std::vector<float> curveLengths;
+                float totalCalculatedLength = 0;
+                tempEdges.clear();
+                tempRender.clear();
+                int curveIndex = 0;
+                double currentMax = 0;
 
-            for(size_t i = 0; i < edgePoints.size(); i++){
-                tempEdges.push_back(edgePoints[i]);
-                if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
-                    std::vector<float> tValues;
-                    currentResolution = 0;
-                    float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
-                    tempResolution = std::min(data.lengths[curveIndex], 400.0f);
-                    std::vector<Vector2> samples;
-                    std::vector<int> indices;
-                    std::vector<float> lengths;
-                    //if(tempResolution < 3000){
-                    
-                    if(tempResolution != 0){
-                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
-                        lengths.push_back(0);
-                        int lastk = 0;
-                        for(int k = 1; k < tempResolution; k++){
-                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
-                            lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
-                            lastk = k;
-                        }
-
-                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                        lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
-
-                        float maxlen = 1;
-                        for(int k = 0; k < lengths.size(); k++){
-                            maxlen = std::max(lengths[k], maxlen);
-                        }
-                        for(int k = 0; k < lengths.size(); k++)
-                            lengths[k] /= maxlen;
+                for(size_t i = 0; i < edgePoints.size(); i++){
+                    tempEdges.push_back(edgePoints[i]);
+                    if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
+                        std::vector<float> tValues;
+                        currentResolution = 0;
+                        float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
+                        tempResolution = std::min(data.lengths[curveIndex], 400.0f);
+                        std::vector<Vector2> samples;
+                        std::vector<int> indices;
+                        std::vector<float> lengths;
+                        //if(tempResolution < 3000){
                         
+                        if(tempResolution != 0){
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
+                            lengths.push_back(0);
+                            int lastk = 0;
+                            for(int k = 1; k < tempResolution; k++){
+                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
+                                lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+                                lastk = k;
+                            }
 
-                        tempResolution = data.lengths[curveIndex];
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                            lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
 
-                        indices.push_back(0);
-                        for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
-                            float s = (float)k / tempResolution * 2.0f;
-                            s = clip(s, 0.0f, 1.0f);
-                            int j = Search(lengths,s,0,lengths.size()-1);
-                            indices.push_back(j);
-                            //std::cout << "s " << s << std::endl;
-                        }
-
-                        float s = 1.0f;
-                        int j = Search(lengths,s,0,lengths.size()-1);
-                        if(indices[indices.size() - 1] != j)
-                            indices.push_back(j);
-
-                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                        //lengths.push_back(1);
-                        int index = 0;
-                        currentMax += data.lengths[curveIndex];
-                        int add = currentMax - renderPoints.size();
-                        for(index = 0; index < data.lengths[curveIndex]; index++){
-                            double s = (double)index / (double)data.lengths[curveIndex];
+                            float maxlen = 1;
+                            for(int k = 0; k < lengths.size(); k++){
+                                maxlen = std::max(lengths[k], maxlen);
+                            }
+                            for(int k = 0; k < lengths.size(); k++)
+                                lengths[k] /= maxlen;
                             
-                            if(renderPoints.size() > data.length)
-                                break;
-                            if(renderPoints.size() > currentMax)
-                                break;
-                            currentResolution++;
-                            if(currentResolution > data.lengths[curveIndex])
-                                break;
-                            int i = (int)(s * (float)indices.size());
-                            int t = indices[i];
-                            float temporaryLerpPos;
-                            if(t >= lengths.size() - 1){
-                                temporaryLerpPos = 0;
-                            }
-                            else{
-                                temporaryLerpPos = (s - lengths[t]) / (lengths[t + 1] - lengths[t]);
-                            }
-                            float otherLerp = s * ((float)indices.size()) - (float)i;
-                            renderPoints.push_back(lerp(samples[t], samples[t+1], temporaryLerpPos));
-                        }
-                        /*if((i != edgePoints.size()-1 && renderPoints.size() > 1) and (renderPoints.size() > currentMax))
-                            renderPoints.pop_back();*/
-                        //std::cout << renderPoints.size() << " " << currentMax << std::endl;
-                        if((i != edgePoints.size()-1 && renderPoints.size() > 1))
-                           renderPoints.pop_back();
-                    }
-                    else{
-                        std::cout << "ya wtf ya \n";
-                        renderPoints.push_back(tempEdges[0]);
-                    }
-                    curveIndex++;
-                    indices.clear();
-                    tempEdges.clear();
-                    //}
-                    //else{
-                        //just fuck it.
-                    //}
-                    //tempEdges.clear();
 
+                            tempResolution = data.lengths[curveIndex];
+
+                            indices.push_back(0);
+                            for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
+                                float s = (float)k / tempResolution * 2.0f;
+                                s = clip(s, 0.0f, 1.0f);
+                                int j = Search(lengths,s,0,lengths.size()-1);
+                                indices.push_back(j);
+                                //std::cout << "s " << s << std::endl;
+                            }
+
+                            float s = 1.0f;
+                            int j = Search(lengths,s,0,lengths.size()-1);
+                            if(indices[indices.size() - 1] != j)
+                                indices.push_back(j);
+
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                            //lengths.push_back(1);
+                            int index = 0;
+                            currentMax += data.lengths[curveIndex];
+                            int add = currentMax - renderPoints.size();
+                            for(index = 0; index < data.lengths[curveIndex]; index++){
+                                double s = (double)index / (double)data.lengths[curveIndex];
+                                
+                                if(renderPoints.size() > data.length)
+                                    break;
+                                if(renderPoints.size() > currentMax)
+                                    break;
+                                currentResolution++;
+                                if(currentResolution > data.lengths[curveIndex])
+                                    break;
+                                int i = (int)(s * (float)indices.size());
+                                int t = indices[i];
+                                float temporaryLerpPos;
+                                if(t >= lengths.size() - 1){
+                                    temporaryLerpPos = 0;
+                                }
+                                else{
+                                    temporaryLerpPos = (s - lengths[t]) / (lengths[t + 1] - lengths[t]);
+                                }
+                                float otherLerp = s * ((float)indices.size()) - (float)i;
+                                renderPoints.push_back(lerp(samples[t], samples[t+1], temporaryLerpPos));
+                            }
+                            /*if((i != edgePoints.size()-1 && renderPoints.size() > 1) and (renderPoints.size() > currentMax))
+                                renderPoints.pop_back();*/
+                            //std::cout << renderPoints.size() << " " << currentMax << std::endl;
+                            if((i != edgePoints.size()-1 && renderPoints.size() > 1))
+                            renderPoints.pop_back();
+                        }
+                        else{
+                            std::cout << "ya wtf ya \n";
+                            renderPoints.push_back(tempEdges[0]);
+                        }
+                        curveIndex++;
+                        indices.clear();
+                        tempEdges.clear();
+                        //}
+                        //else{
+                            //just fuck it.
+                        //}
+                        //tempEdges.clear();
+
+                    }
                 }
-            }
-            if(renderPoints.size() < data.length){
-                float angle = atan2(renderPoints[renderPoints.size()-1].y - renderPoints[renderPoints.size()-2].y, renderPoints[renderPoints.size()-1].x - renderPoints[renderPoints.size()-2].x) * 180 / 3.14159265;
-                float hipotenus = data.length - totalLength;
-                float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-                float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-                extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/abs(angle))};
-                int lerploc = renderPoints.size() - 1;
-                int res = 0;
-                for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {
-                    res++;
-                    if(res > hipotenus) break;
-                    renderPoints.push_back(lerp(renderPoints[lerploc], extraPosition, i));
+                if(renderPoints.size() < data.length){
+                    float angle = atan2(renderPoints[renderPoints.size()-1].y - renderPoints[renderPoints.size()-2].y, renderPoints[renderPoints.size()-1].x - renderPoints[renderPoints.size()-2].x) * 180 / 3.14159265;
+                    float hipotenus = data.length - totalLength;
+                    float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+                    float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
+                    extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/abs(angle))};
+                    int lerploc = renderPoints.size() - 1;
+                    int res = 0;
+                    for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {
+                        res++;
+                        if(res > hipotenus) break;
+                        renderPoints.push_back(lerp(renderPoints[lerploc], extraPosition, i));
+                    }
                 }
+                while(!false){
+                    if(renderPoints.size() <= data.length)
+                        break;
+                    renderPoints.pop_back();
+                    //std::cout << data.time << " " << renderPoints.size() << " " << data.length << std::endl;
+                }
+                //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
             }
-            while(!false){
-                if(renderPoints.size() <= data.length)
-                    break;
-                renderPoints.pop_back();
-                //std::cout << data.time << " " << renderPoints.size() << " " << data.length << std::endl;
-            }
-            //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
+            else{
+                Vector2 edges[edgePoints.size()];
+                for(size_t i = 0; i < edgePoints.size(); i++)
+                    edges[i] = edgePoints[i];
+                std::vector<Vector2> tempEdges;
+                std::vector<Vector2> tempRender;
+                std::vector<float> curveLengths;
+                double totalCalculatedLength = 0;
+                tempEdges.clear();
+                tempRender.clear();
+                int curveIndex = 0;
+                double currentMax = 0;
+                std::vector<Vector2> samples;
+                std::vector<int> indices;
+                std::vector<float> lengths;
+                bool first = true;
+                double tempResolution;
+                for(size_t i = 0; i < edgePoints.size(); i++){
+                    tempEdges.push_back(edgePoints[i]);
+                    if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
+                        tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
+                        //std::cout << "tempResolution: " << tempResolution << std::endl;
+                        tempResolution = std::min(data.lengths[curveIndex], 400.0f);
+                        if(tempResolution > 0 and tempEdges.size() > 1){
+                            if(first){
+                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
+                                lengths.push_back(0);
+                            }
+                            int lastk = 0;
+                            int k = 1;
+                            if(!first)
+                                k = 0;
+                            for(; k < tempResolution; k++){
+                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), ((double)k)/tempResolution));
+                                lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+                                lastk = k;
+                            }
+
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                            lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+                            if(first)
+                                first = false;
+                        }
+                        curveIndex++;
+                        tempEdges.clear();
+                    }
+                }
+
+                totalCalculatedLength = lengths[lengths.size() - 1];
+                tempResolution = data.length;
+                float amog = 0;
+                for(int i = 0; i < data.lengths.size(); i++)
+                    amog += data.lengths[i];
+                std::cout << totalCalculatedLength << " " << amog << " " << tempResolution << std::endl;
+                if(totalCalculatedLength < data.length){
+                    float angle = atan2(samples[samples.size()-1].y - samples[samples.size()-2].y, samples[samples.size()-1].x - samples[samples.size()-2].x) * 180 / 3.14159265;
+                    float hipotenus = data.length - totalCalculatedLength;
+                    float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+                    float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
+                    int ything = 1;
+                    if(angle < 0.0f){
+                        ything = -1;
+                    }
+                    else if(angle == 0.0f){
+                        ything = 0;
+                    }
+
+                    Vector2 extraPosition = {samples[samples.size()-1].x + xdiff, samples[samples.size()-1].y - ydiff * (float)ything};
+                    samples.push_back(extraPosition);
+                    lengths.push_back(data.length);
+                }
+                renderPoints.clear();
+
+                int SampleIndex = 1;
+
+                for(int index = 0; index <= data.length; index++){
+                    while(index > lengths[SampleIndex]){
+                        if(SampleIndex == lengths.size() - 1)  
+                            break;
+                        else{
+                            SampleIndex++;
+                        }
+                    }
+                    double lerpPos = (index - lengths[SampleIndex - 1]) / (lengths[SampleIndex] - lengths[SampleIndex - 1]);
+                    renderPoints.push_back(lerp(samples[SampleIndex], samples[SampleIndex - 1], lerpPos));
+                }
+            }   
         }
         else if(data.curveType == 'P'){
             std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);

@@ -1055,59 +1055,59 @@ void GameManager::loadGame(std::string filename){
 				}
 			}
 			if(gameFile.hitObjects[i].curveType == 'B'){
-				//std::cout << "will calculate bezier slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
-				Vector2 edges[edgePoints.size()];
-				for(size_t j = 0; j < edgePoints.size(); j++)
-					edges[j] = edgePoints[j];
-				std::vector<Vector2> tempEdges;
-				std::vector<Vector2> tempRender;
-				std::vector<float> curveLengths;
-				double totalCalculatedLength = 0;
-				int curves = 0;
-				for(size_t j = 0; j < edgePoints.size(); j++){
-					if(j == edgePoints.size()-1 || (edgePoints[j].x == edgePoints[j+1].x && edgePoints[j].y == edgePoints[j+1].y)){
-						curves++;
-					}
-				}
-				for(size_t k = 0; k < edgePoints.size(); k++){
-					tempEdges.push_back(edgePoints[k]);
-					if(k == edgePoints.size()-1 || (edgePoints[k].x == edgePoints[k+1].x && edgePoints[k].y == edgePoints[k+1].y)){
-						currentResolution = 0;
-						int num = tempEdges.size();
-						num = std::max((int)(gameFile.hitObjects[i].length/curves), 50);
-						int m = 0;
-						float tempLength = 0;
-						Vector2 lasttmp;
-						while(true){
-							if(currentResolution > num)
-								break;
-							float j = (float)currentResolution / (float)num;
-							
-							Vector2 tmp = get2BezierPoint(tempEdges, tempEdges.size(), j);
-							if(m >= 1)
-								tempLength += std::sqrt(std::pow(lasttmp.x - tmp.x,2) + std::pow(lasttmp.y - tmp.y,2));
-							lasttmp = tmp;
-							currentResolution++;
-							m++;
+				bool old = true;
+				if(old){
+					//std::cout << "will calculate bezier slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+					Vector2 edges[edgePoints.size()];
+					for(size_t j = 0; j < edgePoints.size(); j++)
+						edges[j] = edgePoints[j];
+					std::vector<Vector2> tempEdges;
+					std::vector<Vector2> tempRender;
+					std::vector<float> curveLengths;
+					double totalCalculatedLength = 0;
+					int curves = 0;
+					for(size_t j = 0; j < edgePoints.size(); j++){
+						if(j == edgePoints.size()-1 || (edgePoints[j].x == edgePoints[j+1].x && edgePoints[j].y == edgePoints[j+1].y)){
+							curves++;
 						}
-						curveLengths.push_back(tempLength + 1);
-						totalCalculatedLength += tempLength;
-						tempEdges.clear();
 					}
-				}
-				
-				gameFile.hitObjects[i].totalLength = totalCalculatedLength;
-				gameFile.hitObjects[i].lengths = curveLengths;
-				std::cout << "Slider: " << gameFile.hitObjects[i].time << "  Calc: " << totalCalculatedLength << "  Real?: " << gameFile.hitObjects[i].length << std::endl;
-				if(gameFile.hitObjects[i].time == 9076){
-					for(int i = 0; i < curveLengths.size(); i++){
-						std::cout << curveLengths[i] << " | ";
+					for(size_t k = 0; k < edgePoints.size(); k++){
+						tempEdges.push_back(edgePoints[k]);
+						if(k == edgePoints.size()-1 || (edgePoints[k].x == edgePoints[k+1].x && edgePoints[k].y == edgePoints[k+1].y)){
+							currentResolution = 0;
+							int num = tempEdges.size();
+							num = std::max((int)(gameFile.hitObjects[i].length/curves), 50);
+							int m = 0;
+							float tempLength = 0;
+							Vector2 lasttmp;
+							while(true){
+								if(currentResolution > num)
+									break;
+								float j = (float)currentResolution / (float)num;
+								
+								Vector2 tmp = get2BezierPoint(tempEdges, tempEdges.size(), j);
+								if(m >= 1)
+									tempLength += std::sqrt(std::pow(lasttmp.x - tmp.x,2) + std::pow(lasttmp.y - tmp.y,2));
+								lasttmp = tmp;
+								currentResolution++;
+								m++;
+							}
+							curveLengths.push_back(tempLength);
+							// sometimes +1 is better?????
+							totalCalculatedLength += tempLength;
+							tempEdges.clear();
+						}
 					}
-					std::cout << " <-> " << curveLengths.size() << std::endl;
+					
+					gameFile.hitObjects[i].totalLength = totalCalculatedLength;
+					gameFile.hitObjects[i].lengths = curveLengths;
+					curveLengths.clear();
+					tempEdges.clear();
+					tempRender.clear();
 				}
-				curveLengths.clear();
-				tempEdges.clear();
-				tempRender.clear();
+				else{
+
+				}
 			}
 
 		}
