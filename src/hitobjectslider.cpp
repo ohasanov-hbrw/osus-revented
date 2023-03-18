@@ -370,10 +370,6 @@ void Slider::init(){
 
                 totalCalculatedLength = lengths[lengths.size() - 1];
                 tempResolution = data.length;
-                float amog = 0;
-                for(int i = 0; i < data.lengths.size(); i++)
-                    amog += data.lengths[i];
-                std::cout << totalCalculatedLength << " " << amog << " " << tempResolution << std::endl;
                 if(totalCalculatedLength < data.length){
                     float angle = atan2(samples[samples.size()-1].y - samples[samples.size()-2].y, samples[samples.size()-1].x - samples[samples.size()-2].x) * 180 / 3.14159265;
                     float hipotenus = data.length - totalCalculatedLength;
@@ -389,7 +385,7 @@ void Slider::init(){
 
                     Vector2 extraPosition = {samples[samples.size()-1].x + xdiff, samples[samples.size()-1].y - ydiff * (float)ything};
                     samples.push_back(extraPosition);
-                    lengths.push_back(data.length);
+                    lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
                 }
                 renderPoints.clear();
 

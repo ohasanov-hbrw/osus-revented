@@ -1093,7 +1093,7 @@ void GameManager::loadGame(std::string filename){
 								m++;
 							}
 							curveLengths.push_back(tempLength);
-							// sometimes +1 is better?????
+							// sometimes + 1 is better?????
 							totalCalculatedLength += tempLength;
 							tempEdges.clear();
 						}
