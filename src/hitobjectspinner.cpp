@@ -16,6 +16,8 @@ Spinner::Spinner(HitObjectData data){
 void Spinner::init(){
     GameManager* gm = GameManager::getInstance();
     neededAngle = ((gm->spinsPerSecond) * (data.endTime - data.time) * 360) / 1000.0f;
+    data.ex = data.x;
+    data.ey = data.y;
 }
 
 //the main code that runs for every circle on screen, the collision and point manager is in the GamerManager

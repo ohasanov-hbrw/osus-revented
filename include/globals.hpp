@@ -18,6 +18,10 @@
     #define GLSL_VERSION            100
 #endif
 
+struct GameSettings {
+    bool useDefaultSkin = false;
+    bool useDefaultSounds = false;
+};
 
 struct InputHandler {
     int mx = -1;
@@ -150,6 +154,8 @@ struct Globals {
     InputHandler Input;
     bool renderFrame;
     std::mutex mutex;
+
+    GameSettings settings;
 };
 
 extern Globals Global;

@@ -16,7 +16,12 @@ PlayMenu::PlayMenu() {
     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 15);
     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 15);
     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 15);
-    
+    skin = Switch({310,350}, {40,20}, RED, GREEN, {255,135,198,255}, BLACK);
+    sound = Switch({310,370}, {40,20}, RED, GREEN, {255,135,198,255}, BLACK);
+    usedskin = TextBox({200,350}, {100,20}, {240,98,161,255}, "Use default skin", WHITE, 10, 50);
+    usedsound = TextBox({200,370}, {100,20}, {240,98,161,255}, "Use default sound", WHITE, 10, 50);
+    skin.state = Global.settings.useDefaultSkin;
+    sound.state = Global.settings.useDefaultSounds;
 }
 
 void PlayMenu::init() {
@@ -35,6 +40,10 @@ void PlayMenu::render() {
     select.render();
     dir_list.render();
     close.render();
+    skin.render();
+    sound.render();
+    usedskin.render();
+    usedsound.render();
     //Global.mutex.unlock();
 }
 void PlayMenu::update() {
@@ -43,7 +52,15 @@ void PlayMenu::update() {
     select.update();
     back.update();
     close.update();
+    skin.update();
+    sound.update();
 
+    if(skin.state != Global.settings.useDefaultSkin)
+        Global.settings.useDefaultSkin = skin.state;
+    
+    if(sound.state != Global.settings.useDefaultSounds)
+        Global.settings.useDefaultSounds = sound.state;
+    
     if(close.action){
         Global.Path = temp;
         Global.CurrentState->unload();

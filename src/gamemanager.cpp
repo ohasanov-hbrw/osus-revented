@@ -163,7 +163,19 @@ void GameManager::update(){
 				/*std::cout << "Time:" << timingSettingsForHitObject[index].time << " Beat:" << objects[objects.size()-1]->data.timing.beatLength <<
 				" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
 				" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;*/
+
+				
+
 				objects[objects.size()-1]->init();
+				Vector2 templastCords = {objects[objects.size()-1]->data.ex, objects[objects.size()-1]->data.ey};
+				objects[objects.size()-1]->data.ex = lastCords.x;
+				objects[objects.size()-1]->data.ey = lastCords.y;
+				objects[objects.size()-1]->data.lastTime = lastHitTime;
+				lastHitTime = objects[objects.size()-1]->data.time;
+				if(objects[objects.size()-1]->data.type == 2){
+					objects[objects.size()-1]->data.time + (objects[objects.size()-1]->data.length/100) * (objects[objects.size()-1]->data.timing.beatLength) / (sliderSpeed * objects[objects.size()-1]->data.timing.sliderSpeedOverride) * objects[objects.size()-1]->data.slides;
+				}
+				lastCords = templastCords;
 
 				//std::thread objectThread(std::bind(&HitObject::init, objects[objects.size()-1]));
 				//objectThread.join();
@@ -479,7 +491,14 @@ void GameManager::render(){
 	
 	for(int i = objects.size() - 1; i >= 0; i--){
 		////Global.mutex.lock();
+		if(!objects[i]->data.startingACombo){
+			float clampedFade = (currentTime*1000.0f - objects[i]->data.lastTime /*+ gameFile.preempt*/) / (objects[i]->data.time - objects[i]->data.lastTime);
+			DrawLineEx(ScaleCords(lerp({objects[i]->data.ex, objects[i]->data.ey} ,{objects[i]->data.x, objects[i]->data.y}, clip(clampedFade, 0.0f, 1.0f))), 
+			ScaleCords(lerp({objects[i]->data.ex, objects[i]->data.ey} ,{objects[i]->data.x, objects[i]->data.y}, clip(clampedFade + 0.5f, 0.0f, 1.0f))),
+			Scale(3), Fade(WHITE, 0.7f));
+		}
 		objects[i]->render();
+		
 		////Global.mutex.unlock();
 	}
 	for(int i = dead_objects.size() - 1; i >= 0; i--){
@@ -1444,7 +1463,7 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
-			if(!IsKeyDown(SDL_SCANCODE_D )){
+			if(!Global.settings.useDefaultSounds){
 				for(int i = 0; i < beatmapSounds.size(); i++){
 					if(beatmapSounds[i] == temp){
 						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1502,7 +1521,7 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
-			if(!IsKeyDown(SDL_SCANCODE_D )){
+			if(!Global.settings.useDefaultSounds){
 				for(int i = 0; i < beatmapSounds.size(); i++){
 					if(beatmapSounds[i] == temp){
 						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1529,7 +1548,7 @@ void GameManager::loadGame(std::string filename){
 		if(gameFile.hitObjects[HitObjectIndex].PlayCustom == true){
 			temp = gameFile.hitObjects[HitObjectIndex].CustomSound;
 			if(SoundFiles.loaded[temp].value == false){
-				if(!IsKeyDown(SDL_SCANCODE_F )){
+				if(!Global.settings.useDefaultSounds){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
 							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1579,7 +1598,7 @@ void GameManager::loadGame(std::string filename){
 						SoundFiles.loaded[temp].value = true;
 					}
 				}
-				if(!IsKeyDown(SDL_SCANCODE_F )){
+				if(!Global.settings.useDefaultSounds){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
 							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1670,7 +1689,7 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
-					if(!IsKeyDown(SDL_SCANCODE_D )){
+					if(!Global.settings.useDefaultSounds){
 						for(int i = 0; i < beatmapSounds.size(); i++){
 							if(beatmapSounds[i] == temp){
 								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1728,7 +1747,7 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
-					if(!IsKeyDown(SDL_SCANCODE_D )){
+					if(!Global.settings.useDefaultSounds){
 						for(int i = 0; i < beatmapSounds.size(); i++){
 							if(beatmapSounds[i] == temp){
 								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1892,7 +1911,7 @@ void GameManager::loadGameTextures(){
     sliderout = LoadTexture("resources/sliderout.png");
     loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
     loadGameSkin(Global.selectedPath); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
-    if(!IsKeyDown(SDL_SCANCODE_S )){
+    if(!Global.settings.useDefaultSkin){
         loadBeatmapSkin(Global.selectedPath); // LOADING THE BEATMAP SKIN USING A SEPERATE FUNCTION
     }
     GenTextureMipmaps(&hit0);

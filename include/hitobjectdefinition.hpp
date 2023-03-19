@@ -29,7 +29,10 @@ struct timingSettings{
 struct HitObjectData{
     int x;
     int y;
+    int ex;
+    int ey;
     double time;
+    double lastTime;
     int type;
     int hitSound;
     int point = 0;

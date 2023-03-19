@@ -556,6 +556,15 @@ void Slider::init(){
     //std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << getTimer() - startTime << " miliseconds" << "\n";
     
     data.textureReady = true;
+    if(data.slides % 2 == 0){
+        data.ex = data.x;
+        data.ey = data.y;
+    }
+    else{
+        data.ex = renderPoints[renderPoints.size() - 1].x;
+        data.ey = renderPoints[renderPoints.size() - 1].y;
+    }
+    
 }
 
 void Slider::update(){
@@ -870,9 +879,9 @@ void Slider::render(){
     float angle = 0;
     if(curRepeat%2 == 0){
         index = renderPoints.size()-1;
-        topla = -1;
+        topla = -2;
     }
-    if(renderPoints.size() >= 2){
+    if(renderPoints.size() > 2){
         angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
         angle = angle * 180 / PI + 180;
     }
@@ -880,13 +889,13 @@ void Slider::render(){
         DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/128.0f), angle, Fade(WHITE, clampedFade));
     
     index = renderPoints.size()-1;
-    topla = -1;
+    topla = -2;
     angle = 0;
     if(curRepeat%2 == 0){
         index = 0; 
-        topla = 1; 
+        topla = 2; 
     }
-    if(renderPoints.size() >= 2){
+    if(renderPoints.size() > 2){
         angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
         angle = angle * 180 / PI + 180;
     }
