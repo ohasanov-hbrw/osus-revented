@@ -23,7 +23,6 @@
 #include "fs.hpp"
 #include "state.hpp"
 #include "zip.h"
-#include "../vendor/raylib/src/external/glfw/include/GLFW/glfw3.h"
 
 #include <assert.h>
 //#include "SDLutils.hpp"
