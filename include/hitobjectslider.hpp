@@ -25,7 +25,8 @@ class Slider : public HitObject{
         int last = 0;
         int lastblack = 0;
         bool readyToDelete = false;
-
+        bool durationNull = false;
+        Vector2 lastPosition;
         std::vector<std::vector<bool>> renderedLocations = {std::vector<std::vector<bool>>(945, std::vector<bool>(785, false))};
         
 

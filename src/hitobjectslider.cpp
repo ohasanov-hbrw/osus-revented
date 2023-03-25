@@ -143,11 +143,17 @@ std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
 
 //initilizes a Slider, all the curve stuff and the texture creation happens here
 void Slider::init(){
+    //std::cout << "Starting slider init at time " << data.time << "\n";
     GameManager* gm = GameManager::getInstance();
 
     data.textureReady = false;
     data.textureLoaded = false;
-
+    bool durationNull = false;
+    double templength = data.length;
+    if(data.length < 2){
+        data.length = 2;
+        durationNull = true;
+    }
     //these is the points that we get from the beatmap file
     double startTime = getTimer();
     edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
@@ -173,7 +179,6 @@ void Slider::init(){
             data.totalLength-=data.lengths[data.lengths.size()-1];
             data.lengths[data.lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
             data.totalLength+=data.lengths[data.lengths.size()-1];
-
             lengthScale = data.totalLength/data.length;
             //lengthScale = 1;
             for(size_t i = 0; i < edgePoints.size()-1; i++)
@@ -181,7 +186,8 @@ void Slider::init(){
                     renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
             renderPoints.push_back(edgePoints[edgePoints.size()-1]);
             while(!false){
-                if(renderPoints.size() <= data.length) break;
+                if(renderPoints.size() <= data.length)
+                    break;
                 renderPoints.pop_back();
             }
         }
@@ -484,7 +490,6 @@ void Slider::init(){
         }
 
     }
-
     for(size_t i = 0; i < renderPoints.size(); i++){
         if(renderPoints[i].x < -150){
             renderPoints[i].x = -150;
@@ -505,10 +510,11 @@ void Slider::init(){
         
     }
     //std::cout << "slider:" << data.time << " minX:" << minX << " minY:" << minY << " maxX:" << maxX << " maxY:" << maxY << "\n";
-    
-    
     ticks = 0;
     sliderDuration = (double)(data.length/100) * (double)(data.timing.beatLength) / (double)((double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride);
+    if(durationNull){
+        sliderDuration = 1.0;
+    }
     currentDuration = 0.0f;
     while(true){
         currentDuration += (double)data.timing.beatLength / (double)gm->slidertickrate;
@@ -518,9 +524,9 @@ void Slider::init(){
             ticks++;
         }
     }
+    //ticks = (int)((sliderDuration - 1) / ((double)data.timing.beatLength / (double)gm->slidertickrate));
     if(ticks < 0)
         ticks = 0;
-
     std::vector<int> indices;
     if(true || data.timing.renderTicks){
         for(int i = 1; i <= ticks; i++){
@@ -552,8 +558,9 @@ void Slider::init(){
         }
     }
     reverseclicked.pop_back();
-
-    //std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << getTimer() - startTime << " miliseconds" << "\n";
+    data.length = templength;
+    double operationTime = getTimer() - startTime;
+    //std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << operationTime << " miliseconds" << "\n";
     
     data.textureReady = true;
     if(data.slides % 2 == 0){
@@ -649,9 +656,9 @@ void Slider::update(){
     }
 
     if(data.timing.beatLength < 0.1)
-        inSlider = 0;
+        inSlider = true;
     if(data.timing.beatLength < 0.1)
-        is_hit_at_end = 0;
+        is_hit_at_end = true;
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
     if(gm->currentTime*1000.0f > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
         if(inSlider && (Global.Key1D || Global.Key2D || debugf)){
@@ -693,41 +700,59 @@ void Slider::update(){
 
 
 
-    if(gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
+    if(durationNull or gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
         
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
+        //std::cout << "Killed slider at time " << data.time << "\n";
         data.time = gm->currentTime*1000.0f;
         data.point = 0;
         //gm->clickCombo = 0;
         //std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << " Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f<< std::endl;
-        
-        float succ = ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f;
-        if(AreSame(succ,0))
-            data.point = 0;
-        if(succ > 0.0f)
-            data.point = 1;
-        if(succ >= 50.0f)
-            data.point = 2;
-        if(AreSame(succ,100.0f))
-            data.point = 3;
-        if(data.point == 0){
-            if(gm->clickCombo > 30){
-                SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
-                PlaySound(gm->SoundFiles.data["combobreak"]);
+
+        if(durationNull or (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides <= 36.0f){
+            if(is_hit_at_first){
+                data.point = 3;
+                gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+                gm->clickCombo++;
             }
-            gm->clickCombo = 0;
+            else{
+                data.point = 0;
+                if(gm->clickCombo > 30){
+                    SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+                    PlaySound(gm->SoundFiles.data["combobreak"]);
+                }
+                gm->clickCombo = 0;
+            }
         }
-        else if(data.point == 1){
-            gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-            gm->clickCombo++;
-        }
-        else if(data.point == 2){
-            gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-            gm->clickCombo++;
-        }
-        else if(data.point == 3){
-            gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-            gm->clickCombo++;
+        else{
+            float succ = ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f;
+            if(AreSame(succ,0))
+                data.point = 0;
+            if(succ > 0.0f)
+                data.point = 1;
+            if(succ >= 50.0f)
+                data.point = 2;
+            if(AreSame(succ,100.0f))
+                data.point = 3;
+            if(data.point == 0){
+                if(gm->clickCombo > 30){
+                    SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+                    PlaySound(gm->SoundFiles.data["combobreak"]);
+                }
+                gm->clickCombo = 0;
+            }
+            else if(data.point == 1){
+                gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+                gm->clickCombo++;
+            }
+            else if(data.point == 2){
+                gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+                gm->clickCombo++;
+            }
+            else if(data.point == 3){
+                gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+                gm->clickCombo++;
+            }
         }
 
         bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
@@ -739,10 +764,9 @@ void Slider::update(){
             PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
 			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
         }
-
+        lastPosition = renderPoints[calPos];
         Global.AutoMousePositionStart = renderPoints[calPos];
 		Global.AutoMouseStartTime = gm->currentTime*1000.0f;
-
 
         gm->destroyHitObject(data.index);
 
@@ -991,6 +1015,23 @@ void Slider::dead_render(){
         EndShaderMode();
     
 
+
+        float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
+        scale = clip(scale,1,2);
+        Color renderColor;
+        float x = lastPosition.x;
+        float y = lastPosition.y;
+        if(data.colour.size() > 2)
+            renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
+        else
+            renderColor =  Fade(Color{255,255,255}, clampedFade2);
+        DrawTextureCenter(gm->hitCircle, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
+        //DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade2));
+        DrawTextureCenter(gm->hitCircleOverlay, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f) , Fade(WHITE,clampedFade2));
+        if(data.point != 0)
+            DrawTextureCenter(gm->selectCircle, x, y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);
+
+
         if(data.point == 0)
             DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
         else if(data.point == 1)
@@ -1006,8 +1047,10 @@ void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
     if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
         readyToDelete = true;
-        if(!data.textureReady)
+        if(!data.textureReady){
             data.expired = true;
+            renderPoints.clear();
+        }
     }
 }
 

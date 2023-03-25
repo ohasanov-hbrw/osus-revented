@@ -626,6 +626,7 @@ void GameManager::run(){
 		}
 
 		currentTime -= 8/1000.0f;
+		//currentTime *= 2;
 		GameManager::update();
 		//std::cout << "called update at time " << Global.currentOsuTime << "\n";
 		currentTime += 8/1000.0f;
