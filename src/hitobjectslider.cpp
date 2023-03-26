@@ -150,8 +150,8 @@ void Slider::init(){
     data.textureLoaded = false;
     bool durationNull = false;
     double templength = data.length;
-    if(data.length < 2){
-        data.length = 2;
+    if(data.length < 1){
+        data.length = 1;
         durationNull = true;
     }
     //these is the points that we get from the beatmap file
@@ -558,7 +558,7 @@ void Slider::init(){
         }
     }
     reverseclicked.pop_back();
-    data.length = templength;
+    //data.length = templength;
     double operationTime = getTimer() - startTime;
     //std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << operationTime << " miliseconds" << "\n";
     
