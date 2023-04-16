@@ -491,12 +491,12 @@ void GameManager::render(){
 	
 	for(int i = objects.size() - 1; i >= 0; i--){
 		////Global.mutex.lock();
-		if(!objects[i]->data.startingACombo){
-			float clampedFade = (currentTime*1000.0f - objects[i]->data.lastTime /*+ gameFile.preempt*/) / (objects[i]->data.time - objects[i]->data.lastTime);
+		/*if(!objects[i]->data.startingACombo){
+			float clampedFade = (currentTime*1000.0f - objects[i]->data.lastTime) / (objects[i]->data.time - objects[i]->data.lastTime);
 			DrawLineEx(ScaleCords(lerp({objects[i]->data.ex, objects[i]->data.ey} ,{objects[i]->data.x, objects[i]->data.y}, clip(clampedFade, 0.0f, 1.0f))), 
 			ScaleCords(lerp({objects[i]->data.ex, objects[i]->data.ey} ,{objects[i]->data.x, objects[i]->data.y}, clip(clampedFade + 0.5f, 0.0f, 1.0f))),
 			Scale(3), Fade(WHITE, 0.7f));
-		}
+		}*/
 		objects[i]->render();
 		
 		////Global.mutex.unlock();
