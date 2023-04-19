@@ -497,6 +497,7 @@ void GameManager::render(){
 			ScaleCords(lerp({objects[i]->data.ex, objects[i]->data.ey} ,{objects[i]->data.x, objects[i]->data.y}, clip(clampedFade + 0.5f, 0.0f, 1.0f))),
 			Scale(3), Fade(WHITE, 0.7f));
 		}*/
+
 		objects[i]->render();
 		
 		////Global.mutex.unlock();
@@ -668,6 +669,7 @@ Vector2 get2BezierPoint(std::vector<Vector2> &points, int numPoints, float t){
 
 //load the beatmap
 void GameManager::loadDefaultSkin(std::string filename){
+
 	std::vector<std::string> files;
 	files.clear();
 	Global.Path = "resources/default_skin/";
@@ -936,58 +938,6 @@ void GameManager::loadGame(std::string filename){
 	files.clear();
 	Global.Path = lastPath + '/';
 	files = ls(".png");
-	/*std::vector<std::string> files2 = ls(".jpg");
-	std::vector<std::string> files3 = ls(".jpeg");
-	files.insert(files.end(), files2.begin(), files2.end());
-	files.insert(files.end(), files3.begin(), files3.end());
-
-	for(int i = 0; i < (int)gameFile.events.size(); i++){
-		if(gameFile.events[i].eventType == 0){
-			std::cout << "Time: " << gameFile.events[i].startTime << "ms - Filename: " << gameFile.events[i].filename << '.' << std::endl;
-			if(gameFile.events[i].startTime == 0){
-				gameFile.events[i].startTime -= 7000;
-				std::cout << "Time changed to: " << gameFile.events[i].startTime << std::endl;
-			}
-		}
-	}
-	
-
-	std::cout << "Found this many files: " << files.size() << std::endl;
-	for(int i = 0; i < files.size(); i++){
-		std::cout << files[i] << std::endl;
-	}
-
-	for(int i = 0; i < files.size(); i++){
-		for(int j = 0; j < (int)gameFile.events.size(); j++){
-			if(gameFile.events[j].eventType == 0){
-				std::cout << "attempting to load a background\n";
-				int t = gameFile.events[j].filename.size() - 1;
-				while(gameFile.events[j].filename[t] == ' ' and t >= 0){
-					gameFile.events[j].filename.pop_back();
-					t--;
-				}
-				t = 0;
-				while(gameFile.events[j].filename[t] == ' ' and gameFile.events[j].filename.size() > 0){
-					gameFile.events[j].filename.erase(gameFile.events[j].filename.begin());
-				}
-				std::cout << "finding function returned: " << files[i].rfind(gameFile.events[j].filename, 0) << " for: " << gameFile.events[j].filename << " and " << files[i] << std::endl;
-				if(files[i].rfind(gameFile.events[j].filename, 0) == 0){
-					std::cout << "WHAT DA HEEEEEEEEEELLLLLLLLLLLLL" << std::endl;
-					Image image = LoadImage((Global.Path + files[i]).c_str());
-					backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(image);
-					UnloadImage(image); 
-					backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
-					if(backgroundTextures.data[gameFile.events[j].filename].width != 0){
-						backgroundTextures.loaded[gameFile.events[j].filename].value = true;
-						std::cout << "Loaded: Background with filename: " << gameFile.events[j].filename << std::endl;
-						GenTextureMipmaps(&backgroundTextures.data[gameFile.events[j].filename]);
-						SetTextureFilter(backgroundTextures.data[gameFile.events[j].filename], TEXTURE_FILTER_TRILINEAR );
-					}
-				}
-			}
-		}
-	}*/
-
 
 	std::reverse(gameFile.events.begin(),gameFile.events.end());
 	double start = getTimer();
@@ -1141,7 +1091,7 @@ void GameManager::loadGame(std::string filename){
 		gameFile.fade_in = 800.0f + 400.0f * (5.0f - std::stof(gameFile.configDifficulty["ApproachRate"])) / 5.0f;
 	}
 	else if(std::stof(gameFile.configDifficulty["ApproachRate"]) > 5.0f){
-		gameFile.preempt = 1200.0f - 750.0f * (std::stof(gameFile.configDifficulty["ApproachRate"]) - 5.0f) / 5;
+		gameFile.preempt = 1200.0f - 750.0f * (std::stof(gameFile.configDifficulty["ApproachRate"]) - 5.0f) / 5.0f;
 		gameFile.fade_in = 800.0f - 500.0f * (std::stof(gameFile.configDifficulty["ApproachRate"]) - 5.0f) / 5.0f;
 	}
 	else{
@@ -1910,6 +1860,7 @@ void GameManager::render_combo(){
 void GameManager::loadGameTextures(){
 	sliderin = LoadTexture("resources/sliderin.png");
     sliderout = LoadTexture("resources/sliderout.png");
+	followPoint = LoadTexture("resources/followpoint.png");
     loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
     loadGameSkin(Global.selectedPath); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
     if(!Global.settings.useDefaultSkin){

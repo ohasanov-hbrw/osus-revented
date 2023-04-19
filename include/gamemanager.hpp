@@ -64,6 +64,7 @@ class GameManager{
 		Texture2D spinnerApproachCircle;
 		Texture2D spinnerMetre;
 		Texture2D spinnerBack;
+		Texture2D followPoint;
 		Music backgroundMusic;
 		double currentTime;
 		double currentTimeTemp = -1;

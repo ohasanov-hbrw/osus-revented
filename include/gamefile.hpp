@@ -4,6 +4,7 @@
 #include "hitobject.hpp"
 #include "gamefile.hpp"
 #include "timingpoint.hpp"
+#include "followpoint.hpp"
 #include "event.hpp"
 #include <string.h>
 
@@ -16,6 +17,7 @@ struct GameFile{
     std::vector<std::vector<int>> comboColours;
     std::vector<HitObjectData> hitObjects;
     std::vector<TimingPoint> timingPoints;
+    std::vector<FollowPoint> followPoints;
     std::vector<Event> events;
     float p300 = 79.5f;
     float p300Change = 6.0f;
