@@ -105,7 +105,8 @@ class GameManager{
 		double TimeLast = 0;
 		HitSound SoundFiles;
 
-
+		Vector2 lastCords = {0,0};
+		double lastHitTime = 0;
 		Background backgroundTextures;
 		std::string currentBackgroundTexture = "";
 

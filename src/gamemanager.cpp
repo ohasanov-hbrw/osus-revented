@@ -40,6 +40,12 @@ void GameManager::init(){
 
 //main game loop
 void GameManager::update(){
+	if(IsKeyDown(SDL_SCANCODE_LEFT)){
+		Global.useAuto = true;
+	}
+	else{
+		Global.useAuto = false;
+	}
 	int eventSize = gameFile.events.size();
 	for(int i = eventSize-1; i >= 0; i--){
 		if(gameFile.events[i].startTime <= currentTime*1000.0f){
@@ -53,7 +59,7 @@ void GameManager::update(){
 	}
 
 	timingSettings tempTiming;
-	int timingSize = gameFile.timingPoints.size();
+	int timingSize = gameFile.timingPoints.size(); 
 	for(int i = timingSize-1; i >= 0; i--){
 		if(gameFile.timingPoints[i].time - gameFile.preempt <= currentTime*1000.0f){
 			tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
@@ -119,47 +125,66 @@ void GameManager::update(){
 	int size = gameFile.hitObjects.size();	
 	for(int i = size-1; i >= 0; i--){
 		if(gameFile.hitObjects[i].time - gameFile.preempt <= currentTime*1000.0f){
-			
-			spawnHitObject(gameFile.hitObjects[i]);
-			if(objects[objects.size()-1]->data.startingACombo){
-				currentComboIndex++;
-				if(gameFile.comboColours.size()) currentComboIndex = (currentComboIndex + objects[objects.size()-1]->data.skipComboColours) % gameFile.comboColours.size();
-				combo = 1;
-			}
-			if(gameFile.comboColours.size()) objects[objects.size()-1]->data.colour = gameFile.comboColours[currentComboIndex];
-			objects[objects.size()-1]->data.comboNumber = combo;
-			combo++;
-			int index = 0;
-			for(int amog = 0; amog < timingSettingsForHitObject.size(); amog++){
-				if(timingSettingsForHitObject[amog].time > gameFile.hitObjects[i].time)
-					break;
-				index = amog;
-			}
+			/*if(gameFile.hitObjects[i].type == 2 and gameFile.hitObjects[i].totalLength > Global.maxSliderSize){
+				std::cout << "well fuck this long slider i guess. \n";
+				gameFile.hitObjects.pop_back();
+			}*/
+			//else{
+				spawnHitObject(gameFile.hitObjects[i]);
+				if(objects[objects.size()-1]->data.startingACombo){
+					currentComboIndex++;
+					if(gameFile.comboColours.size()) currentComboIndex = (currentComboIndex + objects[objects.size()-1]->data.skipComboColours) % gameFile.comboColours.size();
+					combo = 1;
+				}
+				if(gameFile.comboColours.size()) objects[objects.size()-1]->data.colour = gameFile.comboColours[currentComboIndex];
+				objects[objects.size()-1]->data.comboNumber = combo;
+				combo++;
+				int index = 0;
+				for(int amog = 0; amog < timingSettingsForHitObject.size(); amog++){
+					if(timingSettingsForHitObject[amog].time > gameFile.hitObjects[i].time)
+						break;
+					index = amog;
+				}
 
-            // o şejkilde lişğaksda başka ne uzun biliyor musun bence benim akıllığım terinde
-            // -ömer 2022
-			objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
-			objects[objects.size()-1]->data.timing.meter = timingSettingsForHitObject[index].meter;
-			objects[objects.size()-1]->data.timing.sampleSet = timingSettingsForHitObject[index].sampleSet;
-			objects[objects.size()-1]->data.timing.sampleIndex = timingSettingsForHitObject[index].sampleIndex;
-			objects[objects.size()-1]->data.timing.volume = timingSettingsForHitObject[index].volume;
-			objects[objects.size()-1]->data.timing.uninherited = timingSettingsForHitObject[index].uninherited;
-			objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject[index].effects;
-			objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject[index].sliderSpeedOverride;
-			objects[objects.size()-1]->data.index = objects.size()-1;
-			objects[objects.size()-1]->data.timing.renderTicks = timingSettingsForHitObject[index].renderTicks;
-			/*std::cout << "Time:" << timingSettingsForHitObject[index].time << " Beat:" << objects[objects.size()-1]->data.timing.beatLength <<
-			" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
-			" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;*/
-			objects[objects.size()-1]->init();
+				// o şejkilde lişğaksda başka ne uzun biliyor musun bence benim akıllığım terinde
+				// -ömer 2022
+				objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
+				objects[objects.size()-1]->data.timing.meter = timingSettingsForHitObject[index].meter;
+				objects[objects.size()-1]->data.timing.sampleSet = timingSettingsForHitObject[index].sampleSet;
+				objects[objects.size()-1]->data.timing.sampleIndex = timingSettingsForHitObject[index].sampleIndex;
+				objects[objects.size()-1]->data.timing.volume = timingSettingsForHitObject[index].volume;
+				objects[objects.size()-1]->data.timing.uninherited = timingSettingsForHitObject[index].uninherited;
+				objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject[index].effects;
+				objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject[index].sliderSpeedOverride;
+				objects[objects.size()-1]->data.index = objects.size()-1;
+				objects[objects.size()-1]->data.textureReady = false;
+				objects[objects.size()-1]->data.textureLoaded = false;
+				objects[objects.size()-1]->data.timing.renderTicks = timingSettingsForHitObject[index].renderTicks;
+				/*std::cout << "Time:" << timingSettingsForHitObject[index].time << " Beat:" << objects[objects.size()-1]->data.timing.beatLength <<
+				" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
+				" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;*/
 
-			//std::thread objectThread(std::bind(&HitObject::init, objects[objects.size()-1]));
-			//objectThread.join();
-			gameFile.hitObjects.pop_back();
-			spawnedHitObjects++;
-			for(int amog = 0; amog < index - 1; amog++){
-				timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
-			}
+				
+
+				objects[objects.size()-1]->init();
+				Vector2 templastCords = {objects[objects.size()-1]->data.ex, objects[objects.size()-1]->data.ey};
+				objects[objects.size()-1]->data.ex = lastCords.x;
+				objects[objects.size()-1]->data.ey = lastCords.y;
+				objects[objects.size()-1]->data.lastTime = lastHitTime;
+				lastHitTime = objects[objects.size()-1]->data.time;
+				if(objects[objects.size()-1]->data.type == 2){
+					objects[objects.size()-1]->data.time + (objects[objects.size()-1]->data.length/100) * (objects[objects.size()-1]->data.timing.beatLength) / (sliderSpeed * objects[objects.size()-1]->data.timing.sliderSpeedOverride) * objects[objects.size()-1]->data.slides;
+				}
+				lastCords = templastCords;
+
+				//std::thread objectThread(std::bind(&HitObject::init, objects[objects.size()-1]));
+				//objectThread.join();
+				gameFile.hitObjects.pop_back();
+				spawnedHitObjects++;
+				for(int amog = 0; amog < index - 1; amog++){
+					timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
+				}
+			//}
 		}
 		else
 			break;
@@ -169,13 +194,24 @@ void GameManager::update(){
 	int oldSize = objects.size();
 	int susSize = objects.size();
 	bool stop = true;
-	for(int i = susSize-1; i >= 0; i--){
+	if(susSize == 0){
+		Global.AutoMouseStartTime = currentTime*1000.0f;
+	}
+	for(int i = 0; i < objects.size(); i++){
 		//if((std::abs(currentTime*1000 - objects[i]->data.time) <= gameFile.p50Final)){
+		
+		if(IsKeyPressed(SDL_SCANCODE_LEFT)){
+			Global.AutoMouseStartTime = currentTime*1000.0f;
+			Global.AutoMousePositionStart = {320, 240};
+		}
+
 		if(i == 0){
 			objects[i]->data.touch = true;
+			Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {objects[i]->data.x, objects[i]->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (objects[i]->data.time-Global.AutoMouseStartTime), 0, 1));
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
+				Global.amogus2 = 12.0f;
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 0;
@@ -222,21 +258,27 @@ void GameManager::update(){
 						objects[i]->data.volume = objects[i]->data.timing.volume;
 						volume = objects[i]->data.volume;
 					}
+					SetSoundPan(SoundFiles.data[objects[i]->data.NormalSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
 					SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
 					PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
 					if(objects[i]->data.PlayAddition){
+						SetSoundPan(SoundFiles.data[objects[i]->data.AdditionSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
 						SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
 						PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
 					}
 					if(objects[i]->data.PlayCustom){
+						SetSoundPan(SoundFiles.data[objects[i]->data.CustomSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
 						SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
 						PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
 					}
 					objects[i]->data.time = currentTime*1000.0f;
 					destroyHitObject(i);
 					newSize = objects.size();
-					i--;
 					stop = false;
+					if(newSize != oldSize){
+						i--;
+						oldSize = newSize;
+					}
 				}
 				else{
 					objects[i]->data.touch = true;
@@ -275,11 +317,14 @@ void GameManager::update(){
 							tempslider->data.volume = tempslider->data.timing.volume;
 							volume = tempslider->data.volume;
 						}
+						SetSoundPan(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
+						SetSoundPan(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
 						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
 						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
 						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
 						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
 						if(tempslider->data.PlayCustom){
+							SetSoundPan(SoundFiles.data[tempslider->data.CustomSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
 							SetSoundVolume(SoundFiles.data[tempslider->data.CustomSound], (float)volume/100.0f);
 							PlaySound(SoundFiles.data[tempslider->data.CustomSound]);
 						}
@@ -303,70 +348,105 @@ void GameManager::update(){
 					oldSize = newSize;
 				}
 			}
+			Global.Key1P = false;
+			Global.Key2P = false;
 		}
 		else{
-			bool debugf = false;
+			bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
 			if(debugf){
-				objects[i]->update();
-				if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final){
+				//std::cout << "updating object on time: " << objects[i]->data.time << std::endl;
+				
+				newSize = objects.size();
+				if(newSize != oldSize){
+					i--;
+					oldSize = newSize;
 				}
-				else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final){
-				}
-				else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final){
-				}
-				else if(objects[i]->data.point != 3 && currentTime*1000.0f > objects[i]->data.time){
-					if (objects[i]->data.type != 2){
-						objects[i]->data.point = 3;
-						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
-						clickCombo++;
-						int volume = objects[i]->data.volume;
-						if(volume == 0){
-							objects[i]->data.volume = objects[i]->data.timing.volume;
-							volume = objects[i]->data.volume;
+				else{
+					if(objects[i]->data.point != 3 && currentTime*1000.0f > objects[i]->data.time){
+						if (objects[i]->data.type != 2){
+							//Global.MousePosition = {objects[i]->data.x, objects[i]->data.y};
+							objects[i]->data.point = 3;
+							score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+							clickCombo++;
+							int volume = objects[i]->data.volume;
+							if(volume == 0){
+								objects[i]->data.volume = objects[i]->data.timing.volume;
+								volume = objects[i]->data.volume;
+							}
+							SetSoundPan(SoundFiles.data[objects[i]->data.NormalSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
+							SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
+							PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
+							if(objects[i]->data.PlayAddition){
+								SetSoundPan(SoundFiles.data[objects[i]->data.AdditionSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
+								SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
+								PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
+							}
+							if(objects[i]->data.PlayCustom){
+								SetSoundPan(SoundFiles.data[objects[i]->data.CustomSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
+								SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
+								PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
+							}
+							objects[i]->data.time = currentTime*1000.0f;
+
+							Global.AutoMousePositionStart = {objects[i]->data.x, objects[i]->data.y};
+							Global.AutoMouseStartTime = currentTime*1000.0f;
+
+							destroyHitObject(i);
+							newSize = objects.size();
+							stop = false;
+							if(newSize != oldSize){
+								i--;
+								oldSize = newSize;
+							}
 						}
-						SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
-						PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
-						if(objects[i]->data.PlayAddition){
-							SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
-							PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
+						else if (objects[i]->data.type == 2){
+							Slider* tempslider = dynamic_cast<Slider*>(objects[i]);
+							tempslider->is_hit_at_first = true;
+							objects[i]->data.point = 3;
+							stop = false;
+							clickCombo++;
+							int volume = tempslider->data.volume;
+							if(volume == 0){
+								tempslider->data.volume = tempslider->data.timing.volume;
+								volume = tempslider->data.volume;
+							}
+							SetSoundPan(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
+							SetSoundPan(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
+							SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
+							SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
+							PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
+							PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
+							if(tempslider->data.PlayCustom){
+								SetSoundPan(SoundFiles.data[tempslider->data.CustomSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
+								SetSoundVolume(SoundFiles.data[tempslider->data.CustomSound], (float)volume/100.0f);
+								PlaySound(SoundFiles.data[tempslider->data.CustomSound]);
+							}
+							objects[i]->data.index = i;
+							objects[i]->update();
+							newSize = objects.size();
+							if(newSize != oldSize){
+								i--;
+								oldSize = newSize;
+							}
 						}
-						if(objects[i]->data.PlayCustom){
-							SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
-							PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
-						}
-						objects[i]->data.time = currentTime*1000.0f;
-						destroyHitObject(i);
-						newSize = objects.size();
-						i--;
-						stop = false;
 					}
-					else if (objects[i]->data.type == 2){
-						Slider* tempslider = dynamic_cast<Slider*>(objects[i]);
-						tempslider->is_hit_at_first = true;
-						objects[i]->data.point = 3;
-						stop = false;
-						clickCombo++;
-						int volume = tempslider->data.volume;
-						if(volume == 0){
-							tempslider->data.volume = tempslider->data.timing.volume;
-							volume = tempslider->data.volume;
-						}
-						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
-						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
-						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
-						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
-						if(tempslider->data.PlayCustom){
-							SetSoundVolume(SoundFiles.data[tempslider->data.CustomSound], (float)volume/100.0f);
-							PlaySound(SoundFiles.data[tempslider->data.CustomSound]);
-						}
-						objects[i]->data.index = i;
-						objects[i]->update();
-						newSize = objects.size();
-						if(newSize != oldSize){
-							i--;
-							oldSize = newSize;
+					else{
+						if (objects[i]->data.type == 2){
+							objects[i]->data.index = i;
+							objects[i]->update();
+							newSize = objects.size();
+							if(newSize != oldSize){
+								i--;
+								oldSize = newSize;
+							}
 						}
 					}
+				}
+
+				newSize = objects.size();
+				if(newSize != oldSize){
+					i--;
+					oldSize = newSize;
 				}
 			}
 			else{
@@ -380,9 +460,23 @@ void GameManager::update(){
 			}
 		}
 	}
-	for(size_t i = 0; i < dead_objects.size(); i++){
+
+
+	int deadoldsize = dead_objects.size();
+	int deadnewsize = dead_objects.size();
+
+	for(int i = 0; i < dead_objects.size(); i++){
 		dead_objects[i]->data.index = i;
 		dead_objects[i]->dead_update();
+		if(dead_objects[i]->data.expired == true){
+			destroyDeadHitObject(i);
+			//std::cout << "deleted an object\n";
+		}
+		deadnewsize = dead_objects.size();
+		if(deadnewsize != deadoldsize){
+			i--;
+			deadoldsize = deadnewsize;
+		}
 	}
 }
 
@@ -396,17 +490,30 @@ void GameManager::render(){
 	}
 	
 	for(int i = objects.size() - 1; i >= 0; i--){
+		////Global.mutex.lock();
+		/*if(!objects[i]->data.startingACombo){
+			float clampedFade = (currentTime*1000.0f - objects[i]->data.lastTime) / (objects[i]->data.time - objects[i]->data.lastTime);
+			DrawLineEx(ScaleCords(lerp({objects[i]->data.ex, objects[i]->data.ey} ,{objects[i]->data.x, objects[i]->data.y}, clip(clampedFade, 0.0f, 1.0f))), 
+			ScaleCords(lerp({objects[i]->data.ex, objects[i]->data.ey} ,{objects[i]->data.x, objects[i]->data.y}, clip(clampedFade + 0.5f, 0.0f, 1.0f))),
+			Scale(3), Fade(WHITE, 0.7f));
+		}*/
 		objects[i]->render();
+		
+		////Global.mutex.unlock();
 	}
 	for(int i = dead_objects.size() - 1; i >= 0; i--){
+		////Global.mutex.lock();
 		dead_objects[i]->dead_render();
+		////Global.mutex.unlock();
 	}
 	DrawCNumbersCenter(score, 320, 10, 0.4f, WHITE);
 	DrawCNumbersLeft(clickCombo, 15, 460, 0.6f, WHITE);
 
-
+	
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
+		////Global.mutex.lock();
 		DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
+		////Global.mutex.unlock();
 	}
 	//render the points and the combo
 	
@@ -421,7 +528,7 @@ void GameManager::run(){
 	//ms = getTimer() / 1000.0;
 
 	if(Global.startTime < 0){
-		Global.amogus2 = 0;
+		Global.amogus2 = 16;
 		Global.amogus3 = 0.0f;
 		Global.startTime += Global.FrameTime;
 		Time = Global.startTime;
@@ -445,7 +552,7 @@ void GameManager::run(){
 		double Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 		double amog = getTimer();
 		Global.amogus4 = getTimer();
-		Global.amogus2 = 0.0f;
+		Global.amogus2 = 12;
 		Global.amogus3 = 0.0f;
 		std::cout << "time delay??? " << Global.amogus2 << std::endl;
 		std::cout << "Time:" << Time << std::endl;
@@ -460,11 +567,11 @@ void GameManager::run(){
 		UpdateMusicStream(backgroundMusic);
 		if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 			//DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
-			if(IsKeyPressed(KEY_S)){
+			if(IsKeyPressed(SDL_SCANCODE_S )){
 				SeekMusicStream(backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
 			}
 		}
-		if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 1.0f)
+		if(GetMusicTimeLength(backgroundMusic) - GetMusicTimePlayed(backgroundMusic) < 0.05f)
 			stop = true;
 		if(stop && Global.curTime2 < 1.0f){
 			StopMusicStream(backgroundMusic);
@@ -474,7 +581,7 @@ void GameManager::run(){
 		if (IsMusicStreamPlaying(backgroundMusic)){
 			Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 			if(!AreSame(TimerLast, Time)){
-				Global.amogus2 = std::abs((Time - TimerLast) / 1.5f);
+				//Global.amogus2 = std::abs((Time - TimerLast) / 1.5f);
 				Global.amogus3 = Time - TimerLast;
 
 				TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
@@ -506,7 +613,7 @@ void GameManager::run(){
 				std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
 			}
 			else{
-				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 8;
+				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 5;
 				Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
 			}
 		}
@@ -518,10 +625,11 @@ void GameManager::run(){
 			currentTime = Global.currentOsuTime / 1000.0;
 		}
 
-		//currentTime -= 2/1000.0f;
+		currentTime -= 8/1000.0f;
+		//currentTime *= 2;
 		GameManager::update();
-		//std::cout << "called update at time " << currentTime << "\n";
-		//currentTime += 2/1000.0f;
+		//std::cout << "called update at time " << Global.currentOsuTime << "\n";
+		currentTime += 8/1000.0f;
 	}
 	
 }
@@ -967,53 +1075,59 @@ void GameManager::loadGame(std::string filename){
 				}
 			}
 			if(gameFile.hitObjects[i].curveType == 'B'){
-				//std::cout << "will calculate bezier slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
-				Vector2 edges[edgePoints.size()];
-				for(size_t j = 0; j < edgePoints.size(); j++)
-					edges[j] = edgePoints[j];
-				std::vector<Vector2> tempEdges;
-				std::vector<Vector2> tempRender;
-				std::vector<float> curveLengths;
-				float totalCalculatedLength = 0;
-				int curves = 0;
-				for(size_t j = 0; j < edgePoints.size(); j++){
-					if(j == edgePoints.size()-1 || (edgePoints[j].x == edgePoints[j+1].x && edgePoints[j].y == edgePoints[j+1].y)){
-						curves++;
-					}
-				}
-				for(size_t k = 0; k < edgePoints.size(); k++){
-					tempEdges.push_back(edgePoints[k]);
-					if(k == edgePoints.size()-1 || (edgePoints[k].x == edgePoints[k+1].x && edgePoints[k].y == edgePoints[k+1].y)){
-						currentResolution = 0;
-						int num = tempEdges.size();
-						num = std::max((int)(gameFile.hitObjects[i].length/curves), 50);
-						int m = 0;
-						float tempLength = 0;
-						Vector2 lasttmp;
-						while(true){
-							if(currentResolution > num)
-								break;
-							currentResolution++;
-							float j = (float)currentResolution / (float)num;
-							
-							Vector2 tmp = get2BezierPoint(tempEdges, tempEdges.size(), j);
-							if(m >= 1)
-								tempLength += std::sqrt(std::pow(lasttmp.x - tmp.x,2) + std::pow(lasttmp.y - tmp.y,2));
-							lasttmp = tmp;
-							m++;
+				bool old = true;
+				if(old){
+					//std::cout << "will calculate bezier slider id " << i << " at time " << gameFile.hitObjects[i].time << std::endl;
+					Vector2 edges[edgePoints.size()];
+					for(size_t j = 0; j < edgePoints.size(); j++)
+						edges[j] = edgePoints[j];
+					std::vector<Vector2> tempEdges;
+					std::vector<Vector2> tempRender;
+					std::vector<float> curveLengths;
+					double totalCalculatedLength = 0;
+					int curves = 0;
+					for(size_t j = 0; j < edgePoints.size(); j++){
+						if(j == edgePoints.size()-1 || (edgePoints[j].x == edgePoints[j+1].x && edgePoints[j].y == edgePoints[j+1].y)){
+							curves++;
 						}
-						curveLengths.push_back(tempLength + 1);
-						totalCalculatedLength += tempLength;
-						tempEdges.clear();
 					}
+					for(size_t k = 0; k < edgePoints.size(); k++){
+						tempEdges.push_back(edgePoints[k]);
+						if(k == edgePoints.size()-1 || (edgePoints[k].x == edgePoints[k+1].x && edgePoints[k].y == edgePoints[k+1].y)){
+							currentResolution = 0;
+							int num = tempEdges.size();
+							num = std::max((int)(gameFile.hitObjects[i].length/curves), 50);
+							int m = 0;
+							float tempLength = 0;
+							Vector2 lasttmp;
+							while(true){
+								if(currentResolution > num)
+									break;
+								float j = (float)currentResolution / (float)num;
+								
+								Vector2 tmp = get2BezierPoint(tempEdges, tempEdges.size(), j);
+								if(m >= 1)
+									tempLength += std::sqrt(std::pow(lasttmp.x - tmp.x,2) + std::pow(lasttmp.y - tmp.y,2));
+								lasttmp = tmp;
+								currentResolution++;
+								m++;
+							}
+							curveLengths.push_back(tempLength);
+							// sometimes + 1 is better?????
+							totalCalculatedLength += tempLength;
+							tempEdges.clear();
+						}
+					}
+					
+					gameFile.hitObjects[i].totalLength = totalCalculatedLength;
+					gameFile.hitObjects[i].lengths = curveLengths;
+					curveLengths.clear();
+					tempEdges.clear();
+					tempRender.clear();
 				}
-				
-				gameFile.hitObjects[i].totalLength = totalCalculatedLength;
-				gameFile.hitObjects[i].lengths = curveLengths;
+				else{
 
-				curveLengths.clear();
-				tempEdges.clear();
-				tempRender.clear();
+				}
 			}
 
 		}
@@ -1350,7 +1464,7 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
-			if(!IsKeyDown(KEY_D)){
+			if(!Global.settings.useDefaultSounds){
 				for(int i = 0; i < beatmapSounds.size(); i++){
 					if(beatmapSounds[i] == temp){
 						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1408,7 +1522,7 @@ void GameManager::loadGame(std::string filename){
 					SoundFiles.loaded[temp].value = true;
 				}
 			}
-			if(!IsKeyDown(KEY_D)){
+			if(!Global.settings.useDefaultSounds){
 				for(int i = 0; i < beatmapSounds.size(); i++){
 					if(beatmapSounds[i] == temp){
 						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1435,7 +1549,7 @@ void GameManager::loadGame(std::string filename){
 		if(gameFile.hitObjects[HitObjectIndex].PlayCustom == true){
 			temp = gameFile.hitObjects[HitObjectIndex].CustomSound;
 			if(SoundFiles.loaded[temp].value == false){
-				if(!IsKeyDown(KEY_F)){
+				if(!Global.settings.useDefaultSounds){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
 							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1485,7 +1599,7 @@ void GameManager::loadGame(std::string filename){
 						SoundFiles.loaded[temp].value = true;
 					}
 				}
-				if(!IsKeyDown(KEY_D)){
+				if(!Global.settings.useDefaultSounds){
 					for(int i = 0; i < beatmapSounds.size(); i++){
 						if(beatmapSounds[i] == temp){
 							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1576,7 +1690,7 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
-					if(!IsKeyDown(KEY_D)){
+					if(!Global.settings.useDefaultSounds){
 						for(int i = 0; i < beatmapSounds.size(); i++){
 							if(beatmapSounds[i] == temp){
 								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1634,7 +1748,7 @@ void GameManager::loadGame(std::string filename){
 							SoundFiles.loaded[temp].value = true;
 						}
 					}
-					if(!IsKeyDown(KEY_D)){
+					if(!Global.settings.useDefaultSounds){
 						for(int i = 0; i < beatmapSounds.size(); i++){
 							if(beatmapSounds[i] == temp){
 								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
@@ -1768,19 +1882,19 @@ void GameManager::destroyHitObject(int index){
 
 void GameManager::destroyDeadHitObject(int index){
 	//somehow "kill" the "dead" object
-	if(dead_objects[index]->data.type == 2){
+	/*if(dead_objects[index]->data.type == 2){
 		Slider* tempslider = dynamic_cast<Slider*>(dead_objects[index]);
-		if(tempslider->textureLoaded == false and tempslider->textureReady == true){
+		if(tempslider->data.textureLoaded == true and tempslider->data.textureReady == false){
 			tempslider->renderedLocations.clear();
         	tempslider->renderPoints.clear();
 			delete dead_objects[index];
 			dead_objects.erase(dead_objects.begin()+index);
 		}
-	}
-	else{
+	}*/
+	//else{
 		delete dead_objects[index];
 		dead_objects.erase(dead_objects.begin()+index);
-	}
+	//}
 }
 
 void GameManager::render_points(){
@@ -1798,7 +1912,7 @@ void GameManager::loadGameTextures(){
     sliderout = LoadTexture("resources/sliderout.png");
     loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
     loadGameSkin(Global.selectedPath); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
-    if(!IsKeyDown(KEY_S)){
+    if(!Global.settings.useDefaultSkin){
         loadBeatmapSkin(Global.selectedPath); // LOADING THE BEATMAP SKIN USING A SEPERATE FUNCTION
     }
     GenTextureMipmaps(&hit0);

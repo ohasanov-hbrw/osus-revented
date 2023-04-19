@@ -1,4 +1,5 @@
 #include "SDLutils.hpp"
+<<<<<<< HEAD
 /*
 void initSDL(){
     SDL_SetMainReady();
@@ -88,3 +89,5 @@ void SDLGetMouse(){
         Global.MousePosition = {(Global.Input.mx - Global.ZeroPoint.x) / Global.Scale, (Global.Input.my - Global.ZeroPoint.y) / Global.Scale};
     }
 }*/
+=======
+>>>>>>> f13b003f88aef38f55536ca83a07365f7d00b590

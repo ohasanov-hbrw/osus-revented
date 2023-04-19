@@ -16,6 +16,8 @@ Spinner::Spinner(HitObjectData data){
 void Spinner::init(){
     GameManager* gm = GameManager::getInstance();
     neededAngle = ((gm->spinsPerSecond) * (data.endTime - data.time) * 360) / 1000.0f;
+    data.ex = data.x;
+    data.ey = data.y;
 }
 
 //the main code that runs for every circle on screen, the collision and point manager is in the GamerManager
@@ -158,6 +160,7 @@ void Spinner::dead_update(){
     GameManager* gm = GameManager::getInstance();
     //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
     if (data.time+gm->gameFile.fade_in/1.5f < gm->currentTime*1000.0f){
-        gm->destroyDeadHitObject(data.index);
+        //gm->destroyDeadHitObject(data.index);
+        data.expired = true;
     }
 }

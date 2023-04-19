@@ -77,6 +77,8 @@
 #ifndef RAYLIB_H
 #define RAYLIB_H
 
+#include "SDL2/SDL.h"
+
 #include <stdarg.h>     // Required for: va_list - Only used by TraceLogCallback
 
 #define RAYLIB_VERSION  "4.2-dev"
@@ -931,7 +933,8 @@ RLAPI void SetWindowMinSize(int width, int height);               // Set window 
 RLAPI void SetWindowSize(int width, int height);                  // Set window dimensions
 RLAPI void SetWindowOpacity(float opacity);                       // Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
 RLAPI void *GetWindowHandle(void);                                // Get native window handle
-RLAPI void *GetWindowGL(void);
+RLAPI SDL_GLContext GetWindowGL(void);
+RLAPI void *GetWindowSDL(void);
 RLAPI int GetScreenWidth(void);                                   // Get current screen width
 RLAPI int GetScreenHeight(void);                                  // Get current screen height
 RLAPI int GetRenderWidth(void);                                   // Get current render width (it considers HiDPI)

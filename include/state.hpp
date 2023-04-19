@@ -26,6 +26,10 @@ private:
     TextBox bg;
     TextBox path;
     TextBox description;
+    Switch skin;
+    Switch sound;
+    TextBox usedskin;
+    TextBox usedsound;
     std::string temp;
 public:
     PlayMenu();

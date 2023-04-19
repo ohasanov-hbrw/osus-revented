@@ -118,7 +118,7 @@ void TextBox::update() {
         if(focused){
             if(counter < 0.f)
                 counter = 0.f;
-            counter += GetFrameTime()*1000.0f;
+            counter += (Global.FrameTime / 1000.0f)*1000.0f;
             while(counter > 1000.0f){
                 renderpos++;
                 if(renderpos > (int)text.size()){
@@ -219,4 +219,65 @@ void SelectableList::init() {
     }
     text.clear();
     bg = TextBox({position.x, position.y}, {size.x, size.y}, color, " ", BLACK, 0, 50);
+}
+
+
+Switch::Switch(Vector2 position, Vector2 size, Color color, Color altcolor, Color outcolor, Color switchcolor) 
+    : GuiElement(position, size), color(color), altcolor(altcolor), switchcolor(switchcolor), outcolor(outcolor)
+{  }
+
+
+void Switch::render() {
+    //Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text, textsize, 1);
+    //Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
+    //melih buradaki variablelar calismio placeholder koydum
+    Rectangle Left = GetRaylibOriginR({position.x - size.x/4.0f, position.y, size.x/2.0f, size.y});
+    Rectangle Right = GetRaylibOriginR({position.x + size.x/4.0f, position.y, size.x/2.0f, size.y});
+    if(this->state){
+        DrawRectangleRec(ScaleRect(Left), this->altcolor);
+        DrawRectangleRec(ScaleRect(Right), this->switchcolor);
+    }
+    else{
+        DrawRectangleRec(ScaleRect(Left), this->switchcolor);
+        DrawRectangleRec(ScaleRect(Right), this->color);
+    }
+    if (this->focused){
+        //DrawRectangleRec(ScaleRect(this->getRect()), this->color);
+        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
+        //DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+    }
+    else{
+        //DrawRectangleRec(ScaleRect(this->getRect()), this->color);
+        //DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), this->outcolor);
+        
+    }
+}
+
+void Switch::update() {
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    bool click = Global.MouseInFocus and Global.Key1P;
+
+    if (hover and click) {
+        this->focused = true;
+        this->clicked = true;
+        this->focusbreak = false;
+    }
+    else if (hover) {
+        this->focused = true;
+        this->clicked = false;
+    }
+    else {
+        this->focused = false;
+        this->clicked = false;
+        this->focusbreak = true;
+    }
+
+    if(hover and !focusbreak and Global.Key1R)
+        action = true;
+    else
+        action = false;
+
+    if(action == true)
+        this->state = !this->state;
 }

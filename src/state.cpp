@@ -16,10 +16,16 @@ PlayMenu::PlayMenu() {
     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 15);
     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 15);
     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 15);
-    
+    skin = Switch({310,350}, {40,20}, RED, GREEN, {255,135,198,255}, BLACK);
+    sound = Switch({310,370}, {40,20}, RED, GREEN, {255,135,198,255}, BLACK);
+    usedskin = TextBox({200,350}, {100,20}, {240,98,161,255}, "Use default skin", WHITE, 10, 50);
+    usedsound = TextBox({200,370}, {100,20}, {240,98,161,255}, "Use default sound", WHITE, 10, 50);
+    skin.state = Global.settings.useDefaultSkin;
+    sound.state = Global.settings.useDefaultSounds;
 }
 
 void PlayMenu::init() {
+    Global.useAuto = false;
     Global.LastFrameTime = getTimer();
     temp = Global.Path;
     Global.Path = Global.BeatmapLocation;
@@ -27,12 +33,18 @@ void PlayMenu::init() {
     dir_list = SelectableList({320, 260}, {520, 150}, {255,135,198,255}, dir, BLACK, 10, 15, 65);
 }
 void PlayMenu::render() {
+    //Global.mutex.lock();
     bg.render();
     description.render();
     back.render();
     select.render();
     dir_list.render();
     close.render();
+    skin.render();
+    sound.render();
+    usedskin.render();
+    usedsound.render();
+    //Global.mutex.unlock();
 }
 void PlayMenu::update() {
     Global.enableMouse = true;
@@ -40,7 +52,15 @@ void PlayMenu::update() {
     select.update();
     back.update();
     close.update();
+    skin.update();
+    sound.update();
 
+    if(skin.state != Global.settings.useDefaultSkin)
+        Global.settings.useDefaultSkin = skin.state;
+    
+    if(sound.state != Global.settings.useDefaultSounds)
+        Global.settings.useDefaultSounds = sound.state;
+    
     if(close.action){
         Global.Path = temp;
         Global.CurrentState->unload();
@@ -90,11 +110,13 @@ LoadMenu::LoadMenu() {
 }
 
 void LoadMenu::init() {
+    Global.useAuto = false;
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
 }
 
 void LoadMenu::render() {
+    //Global.mutex.lock();
     bg.render();
     description.render();
     back.render();
@@ -102,6 +124,7 @@ void LoadMenu::render() {
     select.render();
     dir_list.render();
     close.render();
+    //Global.mutex.unlock();
 }
 void LoadMenu::update() {
     Global.enableMouse = true;
@@ -164,6 +187,7 @@ MainMenu::MainMenu() {
 void MainMenu::init() {
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
+    Global.useAuto = false;
 }
 void MainMenu::update() {
     Global.enableMouse = true;
@@ -187,10 +211,12 @@ void MainMenu::update() {
     }
 }
 void MainMenu::render() {
+    //Global.mutex.lock();
     DrawTextureCenter(Global.OsusLogo, 320, 200, 1/3.f, WHITE);
     play.render();
     wip.render();
     load.render();
+    //Global.mutex.unlock();
 }
 
 void MainMenu::unload() {
@@ -201,6 +227,7 @@ Game::Game() {
     
 }
 void Game::init() {
+    Global.useAuto = false;
     initDone = 0;
     Global.LastFrameTime = getTimer();
     std::cout << Global.selectedPath << std::endl;
@@ -208,8 +235,10 @@ void Game::init() {
     Global.parsedLines = 0;
     Global.loadingState = 0;
     initDone = -2;
+    Global.mutex.unlock();
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
+    Global.mutex.lock();
     Global.startTime = -700.0f;
     Global.errorSum = 0;
     Global.errorLast = 0;
@@ -220,7 +249,7 @@ void Game::update() {
     if(initDone == 1){
         Global.enableMouse = false;
         Global.gameManager->run();
-        if(IsKeyPressed(KEY_BACKSPACE)){
+        if(IsKeyPressed(SDL_SCANCODE_BACKSPACE )){
             Global.gameManager->unloadGame();
             Global.CurrentState->unload();
             Global.CurrentState.reset(new PlayMenu());
@@ -242,6 +271,7 @@ void Game::render() {
     if(initDone == 1){
         Global.enableMouse = false;
         Global.gameManager->render();
+        //Global.mutex.lock();
         if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
             DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(20)}, Scale(15) , Scale(1), WHITE);
             //DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
@@ -257,6 +287,7 @@ void Game::render() {
         if(GetMusicTimeLength(Global.gameManager->backgroundMusic) != 0){
             DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
         }
+        //Global.mutex.unlock();
     }
     else if(initDone == -1){
         std::string message;
@@ -272,9 +303,12 @@ void Game::render() {
             message = "GO!";
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+        //Global.mutex.lock();
         DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 7.5f), ScaleCordY(220)}, Scale(20), Scale(1), WHITE);
+        //Global.mutex.unlock();
     }
     else if(initDone == -2){
+        //Global.mutex.lock();
         std::string message;
         message = "Loading Game...";
         
@@ -304,6 +338,7 @@ void Game::render() {
             message = "Loading Textures";
         }
         DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 7.5f), ScaleCordY(220)}, Scale(20), Scale(1), WHITE);
+        //Global.mutex.unlock();
     }
 }
 
@@ -337,7 +372,7 @@ void WIPMenu::init(){
     SetTextureFilter(back, TEXTURE_FILTER_BILINEAR );
     float time = 0.2f;
     while(time <= 1.0f){
-        time += GetFrameTime() * 1.0f;
+        time += Global.FrameTime / 1000.0f;
         //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
         float weirdSmooth = easeInOutCubic(time);
         angle = -250 + 255 * weirdSmooth;
@@ -398,6 +433,7 @@ void WIPMenu::init(){
 
 }
 void WIPMenu::render(){
+    //Global.mutex.lock();
     int index = 0;
     float tempangle = angle;
     if(tempangle < 0)
@@ -446,11 +482,12 @@ void WIPMenu::render(){
     }
 
     DrawTextureRotate(logo, 800, 240, 0.5f, angle, WHITE);
+    //Global.mutex.unlock();
 }
 void WIPMenu::update(){
     float clampaccel = 0;
     if(applyMouse){
-        accel += (float)GetFrameTime() * (float)(100.0f * -Global.Wheel);
+        accel += (float)(Global.FrameTime / 1000.0f) * (float)(100.0f * -Global.Wheel);
         if(accel > 60.0f)
             accel = 60.0f;
         if(accel < -60.0f)
@@ -462,9 +499,9 @@ void WIPMenu::update(){
     if(floatangle >= 20.0f)
         floatangle -= 20.0f;
     if(floatangle >= 10.0f)
-        clampaccel = (float)GetFrameTime() * (float)(2.5f * (20.0f - floatangle));
+        clampaccel = (float)(Global.FrameTime / 1000.0f) * (float)(2.5f * (20.0f - floatangle));
     else
-        clampaccel = -(float)GetFrameTime() * (float)(2.5f * (floatangle));
+        clampaccel = -(float)(Global.FrameTime / 1000.0f) * (float)(2.5f * (floatangle));
     
     posangle = angle;
     while(posangle < 0.0f)
@@ -515,7 +552,7 @@ void WIPMenu::update(){
                 applyMouse = false;
                 float time = 0.2f;
                 while(time <= 1.0f){
-                    time += GetFrameTime() * 1.0f;
+                    time += (Global.FrameTime / 1000.0f) * 1.0f;
                     //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
                     float weirdSmooth = easeInOutCubic(1.0f-time);
                     angle = -250 + 250 * weirdSmooth;
@@ -589,7 +626,7 @@ void WIPMenu::update(){
                 applyMouse = false;
                 float time = 0.2f;
                 while(time <= 1.0f){
-                    time += GetFrameTime() * 1.0f;
+                    time += (Global.FrameTime / 1000.0f) * 1.0f;
                     //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
                     float weirdSmooth = easeInOutCubic(1.0f-time);
                     angle = -250 + 250 * weirdSmooth;
@@ -666,7 +703,7 @@ void WIPMenu::update(){
         lastMouse = Global.MousePosition.y;
     //std::cout << accel << std::endl;
     if(applyMouse)
-        accel += ((-accel) / 2.0f) * ((float)GetFrameTime() * 8.0f);
+        accel += ((-accel) / 2.0f) * ((float)(Global.FrameTime / 1000.0f) * 8.0f);
     angle += accel;
     if(!moving)
         angle += clampaccel;
@@ -691,7 +728,7 @@ void WIPMenu::update(){
                     TempMeta = Metadata;
                 }
             }
-            animtime += GetFrameTime() * 2.0f;
+            animtime += (Global.FrameTime / 1000.0f) * 2.0f;
             if(animtime > 1.0f)
                 animtime = 1.0f;
         }
@@ -700,12 +737,12 @@ void WIPMenu::update(){
         renderMetadata = false;
         if(Metadata.size() > 0)
             Metadata.clear();
-        animtime -= GetFrameTime() * 2.0f;
+        animtime -= (Global.FrameTime / 1000.0f) * 2.0f;
         if(animtime < 0.0f)
             animtime = 0.0f;
     }
 
-    if(IsKeyPressed(KEY_BACKSPACE) and CanGoBack){
+    if(IsKeyPressed(SDL_SCANCODE_BACKSPACE) and CanGoBack){
         Path.pop_back();
         while(Path[Path.size()-1] != '/'){
             Path.pop_back();
@@ -718,7 +755,7 @@ void WIPMenu::update(){
         applyMouse = false;
         float time = 0.2f;
         while(time <= 1.0f){
-            time += GetFrameTime() * 1.0f;
+            time += (Global.FrameTime / 1000.0f) * 1.0f;
             //float weirdSmooth = -(std::cos(M_PI * time) - 1.0f) / 2.0f;
             float weirdSmooth = easeInOutCubic(1.0f-time);
             angle = -250 + 250 * weirdSmooth;
@@ -777,7 +814,7 @@ void WIPMenu::update(){
         applyMouse = true;
         init();
     }
-    if(IsKeyPressed(KEY_BACKSPACE) and !CanGoBack){
+    if(IsKeyPressed(SDL_SCANCODE_BACKSPACE ) and !CanGoBack){
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
     }

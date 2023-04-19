@@ -9,6 +9,7 @@
 #include <ctime>
 #include <chrono>
 
+<<<<<<< HEAD
 
 /*
 void initSDL();
@@ -17,3 +18,5 @@ void quitSDL();
 void SDLpollEvent();
 void SDLGetMouse();
 */
+=======
+>>>>>>> f13b003f88aef38f55536ca83a07365f7d00b590

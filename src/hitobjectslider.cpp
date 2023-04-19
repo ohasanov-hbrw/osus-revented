@@ -143,11 +143,17 @@ std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
 
 //initilizes a Slider, all the curve stuff and the texture creation happens here
 void Slider::init(){
+    //std::cout << "Starting slider init at time " << data.time << "\n";
     GameManager* gm = GameManager::getInstance();
 
-    textureReady = false;
-    textureLoaded = false;
-
+    data.textureReady = false;
+    data.textureLoaded = false;
+    bool durationNull = false;
+    double templength = data.length;
+    if(data.length < 1){
+        data.length = 1;
+        durationNull = true;
+    }
     //these is the points that we get from the beatmap file
     double startTime = getTimer();
     edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
@@ -157,6 +163,7 @@ void Slider::init(){
     float lengthScale, totalLength = 0;
     //std::cout << "init: " << data.time << std::endl;
     //add every point from the beatmap 
+    //renderPoints.push_back(edgePoints[0]);
     for(size_t i = 0; i < data.curvePoints.size(); i++)
         edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
     //if the "curve" is linear calculate the points needed to render the slider
@@ -172,132 +179,236 @@ void Slider::init(){
             data.totalLength-=data.lengths[data.lengths.size()-1];
             data.lengths[data.lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
             data.totalLength+=data.lengths[data.lengths.size()-1];
-
             lengthScale = data.totalLength/data.length;
-
+            //lengthScale = 1;
             for(size_t i = 0; i < edgePoints.size()-1; i++)
                 for(float j = 0; j < data.lengths[i]; j += lengthScale)
                     renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
             renderPoints.push_back(edgePoints[edgePoints.size()-1]);
             while(!false){
-                if(renderPoints.size() <= data.length) break;
-                renderPoints.pop_back();
-            }
-            for(int i = 0; i < renderPoints.size(); i++){
-                if(renderPoints[i].x < -150){
-                    renderPoints[i].x = -150;
-                }
-                if(renderPoints[i].y < -150){
-                    renderPoints[i].y = -150;
-                }
-                if(renderPoints[i].x > 790){
-                    renderPoints[i].x = 790;
-                }
-                if(renderPoints[i].y > 630){
-                    renderPoints[i].y = 630;
-                }
-            }
-        }
-        else if(data.curveType == 'B'){
-            //for the bezier curves we do the calculations in another function
-            Vector2 edges[edgePoints.size()];
-            for(size_t i = 0; i < edgePoints.size(); i++)
-                edges[i] = edgePoints[i];
-            std::vector<Vector2> tempEdges;
-            std::vector<Vector2> tempRender;
-            std::vector<float> curveLengths;
-            float totalCalculatedLength = 0;
-            tempEdges.clear();
-            tempRender.clear();
-            int curveIndex = 0;
-            for(size_t i = 0; i < edgePoints.size(); i++){
-                tempEdges.push_back(edgePoints[i]);
-                if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
-                    std::vector<float> tValues;
-                    currentResolution = 0;
-                    float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
-                    std::vector<Vector2> samples;
-                    std::vector<int> indices;
-                    std::vector<float> lengths;
-                    lengths.push_back(0);
-                    samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
-                    for(int k = 1; k < tempResolution + 1; k++){
-                        samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
-                        lengths.push_back(distance(samples[k], samples[k-1]) + lengths[k-1]);
-                    }
-                    float maxlen = 1;
-                    for(int k = 0; k < lengths.size(); k++){
-                        maxlen = std::max(lengths[k], maxlen);
-                    }
-                    for(int k = 0; k < lengths.size(); k++)
-                        lengths[k] /= lengths[maxlen];
-                    indices.push_back(0);
-                    for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
-                        float s = (float)k / tempResolution * 2.0f;
-                        s = clip(s, 0.0f, 1.0f);
-                        int j = Search(lengths,s,0,lengths.size()-1);
-                        indices.push_back(j);
-                        //std::cout << "s " << s << std::endl;
-                    }
-
-                    float s = 1.0f;
-                    int j = Search(lengths,s,0,lengths.size()-1);
-                    if(indices[indices.size() - 1] != j)
-                        indices.push_back(j);
-
-                    samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                    for(float s = 0; s < 1; s += 1.0f / data.lengths[curveIndex]){
-                        currentResolution++;
-                        if(currentResolution > data.lengths[curveIndex]) break;
-                        if(s == 1){
-                            renderPoints.push_back(samples[samples.size() - 1]);
-                            continue;
-                        }
-                        int i = (int)(s * (float)indices.size());
-                        int t = indices[i];
-                        renderPoints.push_back(lerp(samples[t], samples[t+1], s * ((float)indices.size()) - (float)i));
-                    }
-                    if(i != edgePoints.size()-1 && renderPoints.size() > 1)
-                        renderPoints.pop_back();
-                    curveIndex++;
-                    indices.clear();
-                    tempEdges.clear();
-                }
-            }
-            if(renderPoints.size() < data.length){
-                float angle = atan2(renderPoints[renderPoints.size()-1].y - renderPoints[renderPoints.size()-2].y, renderPoints[renderPoints.size()-1].x - renderPoints[renderPoints.size()-2].x) * 180 / 3.14159265;
-                float hipotenus = data.length - totalLength;
-                float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-                float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-                extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/abs(angle))};
-                int lerploc = renderPoints.size() - 1;
-                int res = 0;
-                for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {
-                    res++;
-                    if(res > hipotenus) break;
-                    renderPoints.push_back(lerp(renderPoints[lerploc], extraPosition, i));
-                }
-            }
-            while(!false){
                 if(renderPoints.size() <= data.length)
                     break;
                 renderPoints.pop_back();
             }
-            for(int i = 0; i < renderPoints.size(); i++){
-                if(renderPoints[i].x < -150){
-                    renderPoints[i].x = -150;
+        }
+        else if(data.curveType == 'B'){
+            bool old = false;
+            if(old){
+                //for the bezier curves we do the calculations in another function
+                Vector2 edges[edgePoints.size()];
+                for(size_t i = 0; i < edgePoints.size(); i++)
+                    edges[i] = edgePoints[i];
+                std::vector<Vector2> tempEdges;
+                std::vector<Vector2> tempRender;
+                std::vector<float> curveLengths;
+                float totalCalculatedLength = 0;
+                tempEdges.clear();
+                tempRender.clear();
+                int curveIndex = 0;
+                double currentMax = 0;
+
+                for(size_t i = 0; i < edgePoints.size(); i++){
+                    tempEdges.push_back(edgePoints[i]);
+                    if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
+                        std::vector<float> tValues;
+                        currentResolution = 0;
+                        float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
+                        tempResolution = std::min(data.lengths[curveIndex], 400.0f);
+                        std::vector<Vector2> samples;
+                        std::vector<int> indices;
+                        std::vector<float> lengths;
+                        //if(tempResolution < 3000){
+                        
+                        if(tempResolution != 0){
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
+                            lengths.push_back(0);
+                            int lastk = 0;
+                            for(int k = 1; k < tempResolution; k++){
+                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
+                                lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+                                lastk = k;
+                            }
+
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                            lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+
+                            float maxlen = 1;
+                            for(int k = 0; k < lengths.size(); k++){
+                                maxlen = std::max(lengths[k], maxlen);
+                            }
+                            for(int k = 0; k < lengths.size(); k++)
+                                lengths[k] /= maxlen;
+                            
+
+                            tempResolution = data.lengths[curveIndex];
+
+                            indices.push_back(0);
+                            for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
+                                float s = (float)k / tempResolution * 2.0f;
+                                s = clip(s, 0.0f, 1.0f);
+                                int j = Search(lengths,s,0,lengths.size()-1);
+                                indices.push_back(j);
+                                //std::cout << "s " << s << std::endl;
+                            }
+
+                            float s = 1.0f;
+                            int j = Search(lengths,s,0,lengths.size()-1);
+                            if(indices[indices.size() - 1] != j)
+                                indices.push_back(j);
+
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                            //lengths.push_back(1);
+                            int index = 0;
+                            currentMax += data.lengths[curveIndex];
+                            int add = currentMax - renderPoints.size();
+                            for(index = 0; index < data.lengths[curveIndex]; index++){
+                                double s = (double)index / (double)data.lengths[curveIndex];
+                                
+                                if(renderPoints.size() > data.length)
+                                    break;
+                                if(renderPoints.size() > currentMax)
+                                    break;
+                                currentResolution++;
+                                if(currentResolution > data.lengths[curveIndex])
+                                    break;
+                                int i = (int)(s * (float)indices.size());
+                                int t = indices[i];
+                                float temporaryLerpPos;
+                                if(t >= lengths.size() - 1){
+                                    temporaryLerpPos = 0;
+                                }
+                                else{
+                                    temporaryLerpPos = (s - lengths[t]) / (lengths[t + 1] - lengths[t]);
+                                }
+                                float otherLerp = s * ((float)indices.size()) - (float)i;
+                                renderPoints.push_back(lerp(samples[t], samples[t+1], temporaryLerpPos));
+                            }
+                            /*if((i != edgePoints.size()-1 && renderPoints.size() > 1) and (renderPoints.size() > currentMax))
+                                renderPoints.pop_back();*/
+                            //std::cout << renderPoints.size() << " " << currentMax << std::endl;
+                            if((i != edgePoints.size()-1 && renderPoints.size() > 1))
+                            renderPoints.pop_back();
+                        }
+                        else{
+                            std::cout << "ya wtf ya \n";
+                            renderPoints.push_back(tempEdges[0]);
+                        }
+                        curveIndex++;
+                        indices.clear();
+                        tempEdges.clear();
+                        //}
+                        //else{
+                            //just fuck it.
+                        //}
+                        //tempEdges.clear();
+
+                    }
                 }
-                if(renderPoints[i].y < -150){
-                    renderPoints[i].y = -150;
+                if(renderPoints.size() < data.length){
+                    float angle = atan2(renderPoints[renderPoints.size()-1].y - renderPoints[renderPoints.size()-2].y, renderPoints[renderPoints.size()-1].x - renderPoints[renderPoints.size()-2].x) * 180 / 3.14159265;
+                    float hipotenus = data.length - totalLength;
+                    float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+                    float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
+                    extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/abs(angle))};
+                    int lerploc = renderPoints.size() - 1;
+                    int res = 0;
+                    for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {
+                        res++;
+                        if(res > hipotenus) break;
+                        renderPoints.push_back(lerp(renderPoints[lerploc], extraPosition, i));
+                    }
                 }
-                if(renderPoints[i].x > 790){
-                    renderPoints[i].x = 790;
+                while(!false){
+                    if(renderPoints.size() <= data.length)
+                        break;
+                    renderPoints.pop_back();
+                    //std::cout << data.time << " " << renderPoints.size() << " " << data.length << std::endl;
                 }
-                if(renderPoints[i].y > 630){
-                    renderPoints[i].y = 630;
-                }
+                //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
             }
-            //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
+            else{
+                Vector2 edges[edgePoints.size()];
+                for(size_t i = 0; i < edgePoints.size(); i++)
+                    edges[i] = edgePoints[i];
+                std::vector<Vector2> tempEdges;
+                std::vector<Vector2> tempRender;
+                std::vector<float> curveLengths;
+                double totalCalculatedLength = 0;
+                tempEdges.clear();
+                tempRender.clear();
+                int curveIndex = 0;
+                double currentMax = 0;
+                std::vector<Vector2> samples;
+                std::vector<int> indices;
+                std::vector<float> lengths;
+                bool first = true;
+                double tempResolution;
+                for(size_t i = 0; i < edgePoints.size(); i++){
+                    tempEdges.push_back(edgePoints[i]);
+                    if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
+                        tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
+                        //std::cout << "tempResolution: " << tempResolution << std::endl;
+                        tempResolution = std::min(data.lengths[curveIndex], 400.0f);
+                        if(tempResolution > 0 and tempEdges.size() > 1){
+                            if(first){
+                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
+                                lengths.push_back(0);
+                            }
+                            int lastk = 0;
+                            int k = 1;
+                            if(!first)
+                                k = 0;
+                            for(; k < tempResolution; k++){
+                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), ((double)k)/tempResolution));
+                                lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+                                lastk = k;
+                            }
+
+                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+                            lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+                            if(first)
+                                first = false;
+                        }
+                        curveIndex++;
+                        tempEdges.clear();
+                    }
+                }
+
+                totalCalculatedLength = lengths[lengths.size() - 1];
+                tempResolution = data.length;
+                if(totalCalculatedLength < data.length){
+                    float angle = atan2(samples[samples.size()-1].y - samples[samples.size()-2].y, samples[samples.size()-1].x - samples[samples.size()-2].x) * 180 / 3.14159265;
+                    float hipotenus = data.length - totalCalculatedLength;
+                    float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+                    float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
+                    int ything = 1;
+                    if(angle < 0.0f){
+                        ything = -1;
+                    }
+                    else if(angle == 0.0f){
+                        ything = 0;
+                    }
+
+                    Vector2 extraPosition = {samples[samples.size()-1].x + xdiff, samples[samples.size()-1].y - ydiff * (float)ything};
+                    samples.push_back(extraPosition);
+                    lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+                }
+                renderPoints.clear();
+
+                int SampleIndex = 1;
+
+                for(int index = 0; index <= data.length; index++){
+                    while(index > lengths[SampleIndex]){
+                        if(SampleIndex == lengths.size() - 1)  
+                            break;
+                        else{
+                            SampleIndex++;
+                        }
+                    }
+                    double lerpPos = (index - lengths[SampleIndex - 1]) / (lengths[SampleIndex] - lengths[SampleIndex - 1]);
+                    renderPoints.push_back(lerp(samples[SampleIndex], samples[SampleIndex - 1], lerpPos));
+                }
+            }   
         }
         else if(data.curveType == 'P'){
             std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
@@ -363,20 +474,7 @@ void Slider::init(){
                     renderPoints.pop_back();
                 }
                 //std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
-                for(int i = 0; i < renderPoints.size(); i++){
-                    if(renderPoints[i].x < -150){
-                        renderPoints[i].x = -150;
-                    }
-                    if(renderPoints[i].y < -150){
-                        renderPoints[i].y = -150;
-                    }
-                    if(renderPoints[i].x > 790){
-                        renderPoints[i].x = 790;
-                    }
-                    if(renderPoints[i].y > 630){
-                        renderPoints[i].y = 630;
-                    }
-                }
+                
             }
             
         }
@@ -386,20 +484,6 @@ void Slider::init(){
                 if(renderPoints.size() <= data.length) break;
                 renderPoints.pop_back();
             }
-            for(int i = 0; i < renderPoints.size(); i++){
-                if(renderPoints[i].x < -150){
-                    renderPoints[i].x = -150;
-                }
-                if(renderPoints[i].y < -150){
-                    renderPoints[i].y = -150;
-                }
-                if(renderPoints[i].x > 790){
-                    renderPoints[i].x = 790;
-                }
-                if(renderPoints[i].y > 630){
-                    renderPoints[i].y = 630;
-                }
-            }
         }
         else{
             std::__throw_invalid_argument("Invalid Slider type!");
@@ -407,16 +491,30 @@ void Slider::init(){
 
     }
     for(size_t i = 0; i < renderPoints.size(); i++){
+        if(renderPoints[i].x < -150){
+            renderPoints[i].x = -150;
+        }
+        if(renderPoints[i].y < -150){
+            renderPoints[i].y = -150;
+        }
+        if(renderPoints[i].x > 790){
+            renderPoints[i].x = 790;
+        }
+        if(renderPoints[i].y > 630){
+            renderPoints[i].y = 630;
+        }
         minX = std::min(minX, renderPoints[i].x);
         minY = std::min(minY, renderPoints[i].y);
         maxX = std::max(maxX, renderPoints[i].x);
         maxY = std::max(maxY, renderPoints[i].y);
+        
     }
-
-    
-    
+    //std::cout << "slider:" << data.time << " minX:" << minX << " minY:" << minY << " maxX:" << maxX << " maxY:" << maxY << "\n";
     ticks = 0;
     sliderDuration = (double)(data.length/100) * (double)(data.timing.beatLength) / (double)((double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride);
+    if(durationNull){
+        sliderDuration = 1.0;
+    }
     currentDuration = 0.0f;
     while(true){
         currentDuration += (double)data.timing.beatLength / (double)gm->slidertickrate;
@@ -426,9 +524,9 @@ void Slider::init(){
             ticks++;
         }
     }
+    //ticks = (int)((sliderDuration - 1) / ((double)data.timing.beatLength / (double)gm->slidertickrate));
     if(ticks < 0)
         ticks = 0;
-
     std::vector<int> indices;
     if(true || data.timing.renderTicks){
         for(int i = 1; i <= ticks; i++){
@@ -460,17 +558,30 @@ void Slider::init(){
         }
     }
     reverseclicked.pop_back();
-
-    //std::cout << "Init slider at time " << data.time << " with the size of " << sliderTexture.texture.width << " and " << sliderTexture.texture.height << " in " << getTimer() - startTime << " miliseconds" << "\n";
+    //data.length = templength;
+    double operationTime = getTimer() - startTime;
+    //std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << operationTime << " miliseconds" << "\n";
     
+    data.textureReady = true;
+    if(data.slides % 2 == 0){
+        data.ex = data.x;
+        data.ey = data.y;
+    }
+    else{
+        data.ex = renderPoints[renderPoints.size() - 1].x;
+        data.ey = renderPoints[renderPoints.size() - 1].y;
+    }
     
-    textureReady = true;
 }
 
 void Slider::update(){
     GameManager* gm = GameManager::getInstance();
+    
     position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
     
+    if(data.timing.beatLength < 0.1)
+        position = 0;
+
     int volume = data.volume;
     if(volume == 0){
         data.volume = data.timing.volume;
@@ -479,6 +590,8 @@ void Slider::update(){
 
     position *= (double)100;
     curRepeat = std::max(0,(int)(position / data.length));
+    if(data.timing.beatLength < 0.1)
+        curRepeat = 0;
     if((int)(std::max((double)0, position) + data.length) < (int)(data.length*data.slides)){
         repeat = true;
     }
@@ -500,10 +613,12 @@ void Slider::update(){
     }
     
     if(gm->currentTime*1000.0f - data.time > 0){
-        if ((int)((gm->currentTime*1000.0f - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
-            position = (double)data.length - (absolutePosition + 1.0f); 
-        else
-            position = absolutePosition + 1.0f; 
+        if(data.timing.beatLength > 0.1){
+            if ((int)((gm->currentTime*1000.0f - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
+                position = (double)data.length - (absolutePosition + 1.0f); 
+            else
+                position = absolutePosition + 1.0f; 
+        }
     }
     position = std::max((double)0,position);
     if (is_hit_at_first || gm->currentTime*1000.0f > data.time + gm->gameFile.p50Final)
@@ -519,6 +634,9 @@ void Slider::update(){
     calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
     /*if(data.length == 7105)
         std::cout << renderPoints[calPos].x << " " << renderPoints[calPos].y << "\n";*/
+    if(Global.useAuto and (gm->currentTime*1000.0f - data.time > 0 or !state))
+        Global.AutoMousePosition = renderPoints[calPos];
+
     if((gm->currentTime*1000.0f - data.time > 0 or !state)){
         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize))
             inSlider = true;
@@ -532,93 +650,25 @@ void Slider::update(){
     //DEBUG
 
     
-    bool debugf = false;
+    bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
     if(debugf){
         inSlider = true;
     }
 
+    if(data.timing.beatLength < 0.1)
+        inSlider = true;
+    if(data.timing.beatLength < 0.1)
+        is_hit_at_end = true;
     float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
     if(gm->currentTime*1000.0f > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
         if(inSlider && (Global.Key1D || Global.Key2D || debugf)){
             is_hit_at_end = true;
         }
     }
-    if(gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
-        
-        //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
-        data.time = gm->currentTime*1000.0f;
-        data.point = 0;
-        //gm->clickCombo = 0;
-        //std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << " Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f<< std::endl;
-        
-        float succ = ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f;
-        if(AreSame(succ,0))
-            data.point = 0;
-        if(succ > 0.0f)
-            data.point = 1;
-        if(succ >= 50.0f)
-            data.point = 2;
-        if(AreSame(succ,100.0f))
-            data.point = 3;
-        if(data.point == 0){
-            if(gm->clickCombo > 30){
-                SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
-                PlaySound(gm->SoundFiles.data["combobreak"]);
-            }
-            gm->clickCombo = 0;
-        }
-        else if(data.point == 1){
-            gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-            gm->clickCombo++;
-        }
-        else if(data.point == 2){
-            gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-            gm->clickCombo++;
-        }
-        else if(data.point == 3){
-            gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-            gm->clickCombo++;
-        }
-
-        bool debugf = false;
-        if(is_hit_at_end || debugf){
-            SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
-            SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
-            PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
-			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
-        }
-        gm->destroyHitObject(data.index);
-
-    }
-    else{
-        if(curRepeat > 0){
-            if(reverseclicked[curRepeat-1] == -1){
-                if(inSlider || debugf){
-                    reverseclicked[curRepeat-1] = 1;
-                    reversenumber++;
-                    gm->clickCombo++;
-                    SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], (float)volume/100.0f);
-                    SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], (float)volume/100.0f);
-                    PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
-			        PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
-                }
-                else{
-                    reverseclicked[curRepeat-1] = 0;
-                    if(gm->clickCombo > 30){
-                        SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
-                        PlaySound(gm->SoundFiles.data["combobreak"]);
-                    }
-                    gm->clickCombo = 0;
-                }
-            }
-        }
-    }
-
-
 
     if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
         int ticksrendered = 0;
-        bool debugf = false;
+        bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] <= (int)time && (int) time > 0){
                 if(tickclicked[i] == -1){
@@ -642,33 +692,139 @@ void Slider::update(){
     }
 
     if(playtick){
+        SetSoundPan(gm->SoundFiles.data[data.NormalSound], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
         SetSoundVolume(gm->SoundFiles.data[data.NormalSound], (float)volume/100.0f);
         PlaySound(gm->SoundFiles.data[data.NormalSound]);
         playtick = false;
     }
 
+
+
+    if(durationNull or gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
+        
+        //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
+        //std::cout << "Killed slider at time " << data.time << "\n";
+        data.time = gm->currentTime*1000.0f;
+        data.point = 0;
+        //gm->clickCombo = 0;
+        //std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << " Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f<< std::endl;
+
+        if(durationNull or (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides <= 36.0f){
+            if(is_hit_at_first){
+                data.point = 3;
+                gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+                gm->clickCombo++;
+            }
+            else{
+                data.point = 0;
+                if(gm->clickCombo > 30){
+                    SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+                    PlaySound(gm->SoundFiles.data["combobreak"]);
+                }
+                gm->clickCombo = 0;
+            }
+        }
+        else{
+            float succ = ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f;
+            if(AreSame(succ,0))
+                data.point = 0;
+            if(succ > 0.0f)
+                data.point = 1;
+            if(succ >= 50.0f)
+                data.point = 2;
+            if(AreSame(succ,100.0f))
+                data.point = 3;
+            if(data.point == 0){
+                if(gm->clickCombo > 30){
+                    SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+                    PlaySound(gm->SoundFiles.data["combobreak"]);
+                }
+                gm->clickCombo = 0;
+            }
+            else if(data.point == 1){
+                gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+                gm->clickCombo++;
+            }
+            else if(data.point == 2){
+                gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+                gm->clickCombo++;
+            }
+            else if(data.point == 3){
+                gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+                gm->clickCombo++;
+            }
+        }
+
+        bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
+        if(is_hit_at_end || debugf){
+            SetSoundPan(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+            SetSoundPan(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+            SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
+            SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
+            PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
+			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);
+        }
+        lastPosition = renderPoints[calPos];
+        Global.AutoMousePositionStart = renderPoints[calPos];
+		Global.AutoMouseStartTime = gm->currentTime*1000.0f;
+
+        gm->destroyHitObject(data.index);
+
+    }
+    else{
+        if(curRepeat > 0){
+            if(reverseclicked[curRepeat-1] == -1){
+                if(inSlider || debugf){
+                    reverseclicked[curRepeat-1] = 1;
+                    reversenumber++;
+                    gm->clickCombo++;
+                    SetSoundPan(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+                    SetSoundPan(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+                    SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], (float)volume/100.0f);
+                    SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], (float)volume/100.0f);
+                    PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
+			        PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
+                }
+                else{
+                    reverseclicked[curRepeat-1] = 0;
+                    if(gm->clickCombo > 30){
+                        SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
+                        PlaySound(gm->SoundFiles.data["combobreak"]);
+                    }
+                    gm->clickCombo = 0;
+                }
+            }
+        }
+    }
+
+
+
 }
 
 void Slider::render(){
     GameManager* gm = GameManager::getInstance();
-    if(textureReady == true and textureLoaded == false){
-        textureLoaded = true;
-        sliderTexture = LoadRenderTexture(((maxX-minX+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize, ((maxY-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize);
+    bool changeTex = false;
+    if(data.textureReady == true and data.textureLoaded == false){
+        sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize),
+                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.height))+16)*Global.sliderTexSize));
+        
         SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
         BeginTextureMode(sliderTexture);
         BeginBlendMode(BLEND_ALPHA_PREMUL);
         ClearBackground(BLANK);
         EndBlendMode();
         EndTextureMode();
+        changeTex = true;
     }
 
-    float approachScale = 3*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    float approachScale = 3.5*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
         approachScale = 1;
     float clampedFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 0.7f);
     float clampedBigFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 100.0f);
     Color renderColor;
-    if(textureLoaded){
+    data.textureLoaded = IsRenderTextureReady(sliderTexture);
+    if(data.textureLoaded and data.textureReady){
         if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last != renderPoints.size() - 1){
             BeginTextureMode(sliderTexture);
             //BeginBlendMode(BLEND_ALPHA_PREMUL);
@@ -677,18 +833,18 @@ void Slider::render(){
                 for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
                     draw = false;
                     if(i < renderPoints.size() and renderPoints[i].x > -150 and renderPoints[i].x < 790 and renderPoints[i].y > -150 and renderPoints[i].y < 630){
-                        if(!renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150]){
+                        if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
                             DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                             (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
                             
-                            DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
+                            /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
                             {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                            (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});
+                            (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
                             last = std::max(i, 0);
                             if(last == renderPoints.size() - 1){
                                 last = renderPoints.size();
                             }
-                            renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150] = true;
+                            renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
                         }
                     }
                 }
@@ -697,30 +853,30 @@ void Slider::render(){
             if(draw and renderPoints.size() > 0 and last != renderPoints.size() - 1){
                 //std::cout << "wtf" << std::endl;
                 int i = renderPoints.size() - 1;
-                if(!renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150]){
+                if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
                     DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                     (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
                     
-                    DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
+                    /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
                     {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                    (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});
+                    (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
                     last = std::max(i, 0);
-                    renderedLocations[(int)renderPoints[i].x + 150][(int)renderPoints[i].y + 150] = true;
+                    renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
                 }
                 last = renderPoints.size() - 1;
                 
             }
             //EndBlendMode();
             EndTextureMode();
-            if(draw and renderPoints.size() > 0){
+            /*if(draw and renderPoints.size() > 0){
                 //GenTextureMipmaps(&sliderTexture.texture);
                 SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR );
                 //std::cout << "slider filter in use" << std::endl;
-            }
+            }*/
         }
         
         float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
-        float outlineColor[4] = { 0.9f, 0.9f, 0.9f, 0.9f };     // Normalized RED color 
+        float outlineColor[4] = { 0.9f, 0.9f, 0.9f, 1.0f };     // Normalized RED color 
         float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
         
         // Get shader locations
@@ -747,9 +903,9 @@ void Slider::render(){
     float angle = 0;
     if(curRepeat%2 == 0){
         index = renderPoints.size()-1;
-        topla = -1;
+        topla = -2;
     }
-    if(renderPoints.size() >= 2){
+    if(renderPoints.size() > 2){
         angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
         angle = angle * 180 / PI + 180;
     }
@@ -757,13 +913,13 @@ void Slider::render(){
         DrawTextureRotate(gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/128.0f), angle, Fade(WHITE, clampedFade));
     
     index = renderPoints.size()-1;
-    topla = -1;
+    topla = -2;
     angle = 0;
     if(curRepeat%2 == 0){
         index = 0; 
-        topla = 1; 
+        topla = 2; 
     }
-    if(renderPoints.size() >= 2){
+    if(renderPoints.size() > 2){
         angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
         angle = angle * 180 / PI + 180;
     }
@@ -787,7 +943,7 @@ void Slider::render(){
             angle+=180;
         int ticksrendered = 0;
 
-        bool debugf = false;
+        bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
 
         for(int i = 0; i < tickPositions.size(); i++){
             if(tickPositions[i] > (int)time && (int) time > 0 && ticksrendered < 10){
@@ -821,19 +977,22 @@ void Slider::render(){
         DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width*(gm->hitCircleOverlay.width/128.0f) , Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width*(gm->approachCircle.width/128.0f) , renderColor);
     }
+    /*if(changeTex == true)
+        data.textureLoaded = true;*/
 }
 
 void Slider::dead_render(){
     GameManager* gm = GameManager::getInstance();
     float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
     float clampedFade2 = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/2.0f);
-    if(data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        UnloadRenderTexture(sliderTexture);
-        textureLoaded = false;
+    if(readyToDelete){
+        if(IsRenderTextureReady(sliderTexture))
+            UnloadRenderTexture(sliderTexture);
+        data.textureReady = false;
     }
     clampedFade2 = clip(clampedFade2, 0.0f, 0.7f);
 
-    if(textureLoaded == true){
+    if(data.textureReady and data.textureLoaded){
         float outlineSize = 4.0 * gm->circlesize/gm->sliderin.width;
         float outlineColor[4] = { 1.0f, 1.0f, 1.0f, clampedFade2 };     // Normalized RED color 
         float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
@@ -852,24 +1011,46 @@ void Slider::dead_render(){
 
 
         BeginShaderMode(Global.shdrOutline);
-        DrawTextureSlider(sliderTexture.texture, minX-1, minY-1, Fade(WHITE,clampedFade2), gm->circlesize);
+        DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade2), gm->circlesize);
         EndShaderMode();
-    }
+    
 
-    if(data.point == 0)
-        DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
-    else if(data.point == 1)
-        DrawTextureCenter(gm->hit50, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit50.width)*0.5f , Fade(WHITE,clampedFade));
-    else if(data.point == 2)
-        DrawTextureCenter(gm->hit100, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit100.width)*0.5f , Fade(WHITE,clampedFade));
-    else if(data.point == 3)
-        DrawTextureCenter(gm->hit300, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit300.width)*0.5f , Fade(WHITE,clampedFade));
+
+        float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
+        scale = clip(scale,1,2);
+        Color renderColor;
+        float x = lastPosition.x;
+        float y = lastPosition.y;
+        if(data.colour.size() > 2)
+            renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
+        else
+            renderColor =  Fade(Color{255,255,255}, clampedFade2);
+        DrawTextureCenter(gm->hitCircle, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
+        //DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade2));
+        DrawTextureCenter(gm->hitCircleOverlay, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f) , Fade(WHITE,clampedFade2));
+        if(data.point != 0)
+            DrawTextureCenter(gm->selectCircle, x, y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);
+
+
+        if(data.point == 0)
+            DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
+        else if(data.point == 1)
+            DrawTextureCenter(gm->hit50, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit50.width)*0.5f , Fade(WHITE,clampedFade));
+        else if(data.point == 2)
+            DrawTextureCenter(gm->hit100, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit100.width)*0.5f , Fade(WHITE,clampedFade));
+        else if(data.point == 3)
+            DrawTextureCenter(gm->hit300, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit300.width)*0.5f , Fade(WHITE,clampedFade));
+    }
 }
 
 void Slider::dead_update(){
     GameManager* gm = GameManager::getInstance();
     if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        gm->destroyDeadHitObject(data.index);
+        readyToDelete = true;
+        if(!data.textureReady){
+            data.expired = true;
+            renderPoints.clear();
+        }
     }
 }
 

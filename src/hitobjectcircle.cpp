@@ -15,6 +15,8 @@ Circle::Circle(HitObjectData data){
 //initilizes a circle
 void Circle::init(){
     //std::cout << data.hitSound << std::endl;
+    data.ex = data.x;
+    data.ey = data.y;
 }
 
 //the main code that runs for every circle on screen, the collision and point manager is in the GamerManager
@@ -38,7 +40,7 @@ void Circle::update(){
 //renders the Circle
 void Circle::render(){
     GameManager* gm = GameManager::getInstance();
-    float approachScale = 3*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    float approachScale = 3.5*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
         approachScale = 1;
     float clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
@@ -88,6 +90,7 @@ void Circle::dead_update(){
     GameManager* gm = GameManager::getInstance();
     //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
     if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        gm->destroyDeadHitObject(data.index);
+        //gm->destroyDeadHitObject(data.index);
+        data.expired = true;
     }
 }
