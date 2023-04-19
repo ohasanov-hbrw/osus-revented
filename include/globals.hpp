@@ -7,7 +7,8 @@
 #include "gamemanager.hpp"
 #include <thread>
 #include <functional>
-#include "SDL.h"
+#include "SDL2/SDL.h"
+#include <mutex>
 
 #define PLATFORM_DESKTOP
 
@@ -17,6 +18,10 @@
     #define GLSL_VERSION            100
 #endif
 
+struct GameSettings {
+    bool useDefaultSkin = false;
+    bool useDefaultSounds = false;
+};
 
 struct InputHandler {
     int mx = -1;
@@ -52,6 +57,9 @@ struct Globals {
     struct timespec ts1 = timespec{0,0}, ts2 = timespec{0,0};
     bool paused = false;
 
+    int maxSliderSize = 10000;
+
+
     long int startTime2;
     double curTime = 0;
     double startTime = -1;
@@ -67,6 +75,10 @@ struct Globals {
     bool MouseInFocus = false;
     int MouseBlur = 20;
     Vector2 MousePosition;
+    Vector2 AutoMousePosition = {0,0};
+    Vector2 AutoMousePositionStart = {-1, -1};
+    double AutoMouseStartTime;
+    bool useAuto = false;
 
     Font DefaultFont;
 
@@ -81,7 +93,7 @@ struct Globals {
 
     Texture2D OsusLogo;
 
-    double volume = 0.8f;
+    double volume = 1.0f;
 
     bool Key1P = false;
     bool Key1D = false;
@@ -103,7 +115,7 @@ struct Globals {
 
     Globals() = default;
 
-    float sliderTexSize = 2.0f;
+    float sliderTexSize = 3.0f;
 
     long long errorSum = 0;
     long long errorLast = 0;
@@ -140,6 +152,10 @@ struct Globals {
                              1, 1, 1,
                              1);*/
     InputHandler Input;
+    bool renderFrame;
+    std::mutex mutex;
+
+    GameSettings settings;
 };
 
 extern Globals Global;

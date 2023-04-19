@@ -3,7 +3,6 @@ bin
 build
 object
 beatmaps
-vendor
 
 # Prerequisites
 *.d

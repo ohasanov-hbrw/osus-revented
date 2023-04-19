@@ -29,14 +29,17 @@ struct timingSettings{
 struct HitObjectData{
     int x;
     int y;
+    int ex;
+    int ey;
     double time;
+    double lastTime;
     int type;
     int hitSound;
     int point = 0;
     char curveType;
     std::vector<std::pair<int,int> > curvePoints;
     int slides;
-    float length;
+    double length;
     std::vector<int> edgeSounds;
     std::vector<std::pair<int, int> > edgeSets;
     int endTime;
@@ -60,8 +63,11 @@ struct HitObjectData{
     std::vector<std::string> EdgeNormalSound ;
     std::vector<std::string> EdgeAdditionSound;
     std::vector<float> lengths;
-    float totalLength;
+    bool textureReady = false;
+    bool textureLoaded = false;
+    double totalLength;
     Vector2 extraPos;
+    bool expired = false;
 };
 
 class HitObject{

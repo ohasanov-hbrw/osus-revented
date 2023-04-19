@@ -1,9 +1,0 @@
-[submodule "vendor/raylib"]
-	path = vendor/raylib
-	url = https://github.com/raysan5/raylib
-[submodule "vendor/zip"]
-	path = vendor/zip
-	url = https://github.com/kuba--/zip
-[submodule "vendor/SDL_mixer"]
-	path = vendor/SDL_mixer
-	url = git@github.com:libsdl-org/SDL_mixer.git

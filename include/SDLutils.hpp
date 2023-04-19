@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include "globals.hpp"
 #include <string>
 #include <vector>
@@ -9,10 +9,3 @@
 #include <ctime>
 #include <chrono>
 
-
-
-void initSDL();
-void quitSDL();
-
-void SDLpollEvent();
-void SDLGetMouse();

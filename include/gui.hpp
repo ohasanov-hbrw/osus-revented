@@ -85,6 +85,24 @@ public:
     int mouseSelectIndex = 0;
 };
 
+class Switch : public GuiElement {
+private:
+    
+public:
+    Switch(Vector2 position, Vector2 size, Color color, Color altcolor, Color outcolor, Color switchcolor);
+    Switch() = default;
+
+    Color color;
+    Color altcolor;
+    Color switchcolor;
+    Color outcolor;
+    bool state = false;
+
+    void render() override;
+    void update() override;
+
+};
+
 class ErrorDialogue {
     
 };
