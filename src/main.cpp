@@ -23,17 +23,11 @@
 #include "fs.hpp"
 #include "state.hpp"
 #include "zip.h"
-<<<<<<< HEAD
-#include "../vendor/raylib/src/external/glfw/include/GLFW/glfw3.h"
-#include <mutex>
-//#include "SDLutils.hpp"
-=======
 
 #include <assert.h>
 //#include "SDLutils.hpp"
 
 
->>>>>>> f13b003f88aef38f55536ca83a07365f7d00b590
 
 double avgFPS = 144;
 double avgHZ = 1000;
@@ -178,46 +172,6 @@ int main() {
     while(!WindowShouldClose()){
         lastFrame = getTimer();
         
-<<<<<<< HEAD
-        /*if (IsKeyPressed(KEY_F) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
-        {
-            int display = GetCurrentMonitor();
-            if (IsWindowFullscreen())
-                SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            else
-                SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            ToggleFullscreen();
-            SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            if(!IsWindowFullscreen())
-                SetWindowSize(640, 480); 
-        }*/
-        
-        BeginDrawing();
-        ClearBackground(Global.Background);
-
-        locktite.lock();
-        Global.CurrentState->render();
-        if(Global.GameTextures == -1)
-            Global.gameManager->unloadGameTextures();
-        else if(Global.GameTextures == 1)
-            Global.gameManager->loadGameTextures();
-        DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
-        DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
-        
-        //double what = getTimer();
-        //updateMouseTrail();
-        renderMouse(); 
-        //std::cout << getTimer() - what << std::endl;
-        DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  avgFPS), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
-        DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
-
-        locktite.unlock();
-        rlDrawRenderBatchActive();
-        SwapScreenBuffer();
-        //PollInputEvents();
-        //EndDrawing();
-        while(getTimer() - lastFrame < 1000.0/144.0 and getTimer() - lastFrame >= 0)
-=======
         /*if(getTimer() - lastFrame > 0.2)
             std::cout << "main thread waited for the mutex lock for " << getTimer() - lastFrame << " milliseconds" << std::endl;*/
         Global.mutex.lock();
@@ -234,7 +188,6 @@ int main() {
         Global.CurrentState->update();
         Global.mutex.unlock();
         while(getTimer() - lastFrame < 1000.0/750.0 and getTimer() - lastFrame >= 0)
->>>>>>> f13b003f88aef38f55536ca83a07365f7d00b590
             continue;
         avgHZ = (avgHZ + 1000.0f / (getTimer() - lastFrame)) / 2.0;
 
@@ -247,4 +200,3 @@ int main() {
     CloseWindow();
     //quitSDL();
 }
-
