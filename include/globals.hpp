@@ -108,20 +108,20 @@ struct Globals {
     double FrameTime;
 
     Shader shdrOutline;
-
+    Shader shdrTest;
     std::shared_ptr<State> CurrentState;
 
     GameManager *gameManager = GameManager::getInstance();
 
     Globals() = default;
 
-    float sliderTexSize = 3.0f;
+    float sliderTexSize = 1.0f;
 
     long long errorSum = 0;
     long long errorLast = 0;
     long long errorDiv = 0;
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+    std::chrono::time_point<std::chrono::steady_clock> start, end;
 
 
 

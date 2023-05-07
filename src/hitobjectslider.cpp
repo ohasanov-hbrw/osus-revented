@@ -893,6 +893,19 @@ void Slider::render(){
         //BeginBlendMode(BLEND_ALPHA_PREMUL);
 
         BeginShaderMode(Global.shdrOutline);
+
+
+        /*int xs = GetShaderLocation(Global.shdrTest, "xs");
+        int ys = GetShaderLocation(Global.shdrTest, "ys");
+        int r = GetShaderLocation(Global.shdrTest, "r");
+        float j = 1.0f;
+        float xsf = sliderTexture.texture.width;
+        float ysf = sliderTexture.texture.height;
+        SetShaderValue(Global.shdrTest, xs, &xsf, SHADER_UNIFORM_FLOAT);
+        SetShaderValue(Global.shdrTest, ys, &ysf, SHADER_UNIFORM_FLOAT);
+        SetShaderValue(Global.shdrTest, r, &j, SHADER_UNIFORM_FLOAT);
+
+        BeginShaderMode(Global.shdrTest);*/
         DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade), gm->circlesize);
         //Vector2 tempPos2 = renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size()))];
         //DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y, gm->circlesize/gm->sliderin.width, RED);

@@ -24,6 +24,8 @@ void main()
     texelScale.x = outlineSize/textureSize.x;
     texelScale.y = outlineSize/textureSize.y;
 
+    
+
     // We sample four corner texels, but only for the alpha channel (this is for the outline)
     vec4 corners = vec4(0.0);
     corners.x = texture(texture0, fragTexCoord + vec2(texelScale.x, texelScale.y)).a;
@@ -34,10 +36,15 @@ void main()
     float outline = min(dot(corners, vec4(1.0)), 1.0);
     vec4 color = mix(vec4(0.0), outlineColor, outline);
     //texel.a = outlineColor.a;
+
     finalColor = mix(color, texel, texel.a);
     vec4 empty = finalColor;
     empty.a = 0;
     finalColor = mix(finalColor, empty, 1.0 - transparency);
+    //finalColor = res;
     
+    
+
+
     //finalColor.a = outlineColor.a;
 }

@@ -350,7 +350,7 @@ std::vector<std::string> ParseNameFile(std::string file){
 }
 
 void initTimer(){
-    Global.start = std::chrono::high_resolution_clock::now();
+    Global.start = std::chrono::steady_clock::now();
 }
 
 void pauseTimer(){
@@ -363,7 +363,7 @@ void resumeTimer(){
 
 
 double getTimer(){
-    Global.end = std::chrono::high_resolution_clock::now();
+    Global.end = std::chrono::steady_clock::now();
 
     return (Global.end - Global.start).count() / 1000000.0;
 }

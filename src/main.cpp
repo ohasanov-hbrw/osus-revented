@@ -1,10 +1,3 @@
-#define WINVER 0x0500
-#define _WIN32_WINNT 0x500
-
-#define GetTickCount64() GetTickCount()
-
-#define OPENGL_SPOOF
-
 #define SDL_MAIN_HANDLED
 
 
@@ -23,11 +16,12 @@
 #include "fs.hpp"
 #include "state.hpp"
 #include "zip.h"
-
+#include <condition_variable>
 #include <assert.h>
+#include "time_util.hpp"
 //#include "SDLutils.hpp"
 
-
+std::condition_variable cv;
 
 double avgFPS = 144;
 double avgHZ = 1000;
@@ -48,8 +42,7 @@ void RenderLoop(){
     
     
     while(!WindowShouldClose()){
-
-        
+        auto t1 = std::chrono::steady_clock::now();
         SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
         last = getTimer();
         rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
@@ -72,17 +65,29 @@ void RenderLoop(){
         Global.mutex.unlock();
         rlDrawRenderBatchActive();
         SwapScreenBuffer();
-        //Global.mutex.lock();
         SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
-        //Global.mutex.unlock();
 
-        while(getTimer() - last < 1000.0/288.0 and getTimer() - last >= 0)
-            continue;
-        avgFPS = (avgFPS + 1000.0f / (getTimer() - last)) / 2.0;
+        /*while(getTimer() - last < 1000.0/288.0 and getTimer() - last >= 0)
+            continue;*/
+        //double tTime = getTimer();
+        /*if(tTime - last >= 0 and (tTime - last) < 1000.0/288.0)
+            std::this_thread::sleep_for(std::chrono::duration<double>((1000.0/288.0 - (tTime - last)) / 1000.0));*/
+
+        std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
+        unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/288.0) - sleepTime.count()) * 1000.0);
+        //std::cout << "Sleeptime of  " << sleepTimeInt << " us ";
+        SleepInUs(sleepTimeInt);
+        std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
+        //std::cout << " Took " << elapsed.count() << " ms\n";
+        //std::cout << "Took " << elapsed.count() << " ms\n";
+        avgFPS = (avgFPS + 1000.0f / (elapsed.count())) / 2.0;
+        //avgFPS = (avgFPS + 1000.0f / (getTimer() - last)) / 2.0;
         //std::cout << avgFPS << std::endl;
     }
     
 }
+
+
 
 
 int main() {
@@ -103,7 +108,7 @@ int main() {
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");
     Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", 330));
-
+    Global.shdrTest = LoadShader(0, TextFormat("resources/shaders/glsl%i/testshader.fs", 330));
     //Image cus;
     std::string lastPath = Global.Path;
 	Global.Path = "resources/default_skin/";
@@ -168,12 +173,11 @@ int main() {
     SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
 
     std::thread rend(RenderLoop);
-
     while(!WindowShouldClose()){
-        lastFrame = getTimer();
-        
+        //lastFrame = getTimer();
         /*if(getTimer() - lastFrame > 0.2)
             std::cout << "main thread waited for the mutex lock for " << getTimer() - lastFrame << " milliseconds" << std::endl;*/
+        auto t1 = std::chrono::steady_clock::now();
         Global.mutex.lock();
         PollInputEvents();
         GetScale();
@@ -187,9 +191,22 @@ int main() {
         Global.LastFrameTime = getTimer();
         Global.CurrentState->update();
         Global.mutex.unlock();
-        while(getTimer() - lastFrame < 1000.0/750.0 and getTimer() - lastFrame >= 0)
-            continue;
-        avgHZ = (avgHZ + 1000.0f / (getTimer() - lastFrame)) / 2.0;
+
+        /*auto end = t1 + std::chrono::microseconds((int)(1000000.0/750.0));
+        do {
+            std::this_thread::yield();
+        } while (std::chrono::high_resolution_clock::now() < end);
+        std::chrono::duration<double, std::milli> elapsed {std::chrono::high_resolution_clock::now() - t1};*/
+        
+        //std::cout << "Took " << elapsed.count() << " ms\n";
+
+        std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
+        unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/1000.0) - sleepTime.count()) * 1000.0);
+        //std::cout << "Took " << sleepTimeInt << " us\n";
+        SleepInUs(sleepTimeInt);
+        std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
+        
+        avgHZ = (avgHZ + 1000.0f / (elapsed.count())) / 2.0;
 
     }
     rend.join();
