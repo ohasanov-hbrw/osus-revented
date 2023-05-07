@@ -1,3 +1,3 @@
 make clean
-make deps CC="x86_64-w64-mingw32-gcc --static -DGRAPHICS_API_OPENGL_33 -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32" -j12
-make run CC="x86_64-w64-mingw32-g++ --static -DGRAPHICS_API_OPENGL_33 -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32" name="osus.exe" ldflags="-lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -L/usr/x86_64-w64-mingw32/lib -lSDL2main -lSDL2 -lm -lole32 -loleaut32 -limm32 -lwinmm -lpthread -lgdi32 -lopengl32 -lversion -lsetupapi -lhid" -j12
+make deps CC="x86_64-w64-mingw32-gcc --static  -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32" -j12
+make run CC="x86_64-w64-mingw32-g++ --static  -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32" name="osus.exe" ldflags="-lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -L/usr/x86_64-w64-mingw32/lib -lSDL2main -lSDL2 -lm -lole32 -loleaut32 -limm32 -lwinmm -lpthread -lgdi32 -lopengl32 -lversion -lsetupapi -lhid" -j12

@@ -711,72 +711,6 @@ void InitWindow(int width, int height, const char *title)
     CORE.Window.eventWaiting = true;
 #endif
 
-#if defined(PLATFORM_ANDROID)
-    CORE.Window.screen.width = width;
-    CORE.Window.screen.height = height;
-    CORE.Window.currentFbo.width = width;
-    CORE.Window.currentFbo.height = height;
-
-
-
-    // Set desired windows flags before initializing anything
-    ANativeActivity_setWindowFlags(CORE.Android.app->activity, AWINDOW_FLAG_FULLSCREEN, 0);  //AWINDOW_FLAG_SCALED, AWINDOW_FLAG_DITHER
-
-    int orientation = AConfiguration_getOrientation(CORE.Android.app->config);
-
-    if (orientation == ACONFIGURATION_ORIENTATION_PORT) TRACELOG(LOG_INFO, "ANDROID: Window orientation set as portrait");
-    else if (orientation == ACONFIGURATION_ORIENTATION_LAND) TRACELOG(LOG_INFO, "ANDROID: Window orientation set as landscape");
-
-    // TODO: Automatic orientation doesn't seem to work
-    if (width <= height)
-    {
-        AConfiguration_setOrientation(CORE.Android.app->config, ACONFIGURATION_ORIENTATION_PORT);
-        TRACELOG(LOG_WARNING, "ANDROID: Window orientation changed to portrait");
-    }
-    else
-    {
-        AConfiguration_setOrientation(CORE.Android.app->config, ACONFIGURATION_ORIENTATION_LAND);
-        TRACELOG(LOG_WARNING, "ANDROID: Window orientation changed to landscape");
-    }
-
-    //AConfiguration_getDensity(CORE.Android.app->config);
-    //AConfiguration_getKeyboard(CORE.Android.app->config);
-    //AConfiguration_getScreenSize(CORE.Android.app->config);
-    //AConfiguration_getScreenLong(CORE.Android.app->config);
-
-    // Initialize App command system
-    // NOTE: On APP_CMD_INIT_WINDOW -> InitGraphicsDevice(), InitTimer(), LoadFontDefault()...
-    CORE.Android.app->onAppCmd = AndroidCommandCallback;
-
-    // Initialize input events system
-    CORE.Android.app->onInputEvent = AndroidInputCallback;
-
-    // Initialize assets manager
-    InitAssetManager(CORE.Android.app->activity->assetManager, CORE.Android.app->activity->internalDataPath);
-
-    // Initialize base path for storage
-    CORE.Storage.basePath = CORE.Android.app->activity->internalDataPath;
-
-    TRACELOG(LOG_INFO, "ANDROID: App initialized successfully");
-
-    // Android ALooper_pollAll() variables
-    int pollResult = 0;
-    int pollEvents = 0;
-
-    // Wait for window to be initialized (display and context)
-    while (!CORE.Window.ready)
-    {
-        // Process events loop
-        while ((pollResult = ALooper_pollAll(0, NULL, &pollEvents, (void**)&CORE.Android.source)) >= 0)
-        {
-            // Process this event
-            if (CORE.Android.source != NULL) CORE.Android.source->process(CORE.Android.app, CORE.Android.source);
-
-            // NOTE: Never close window, native activity is controlled by the system!
-            //if (CORE.Android.app->destroyRequested != 0) CORE.Window.shouldClose = true;
-        }
-    }
-#endif
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_WEB) || defined(PLATFORM_RPI) || defined(PLATFORM_DRM)
     // Initialize graphics device (display device and OpenGL context)
     // NOTE: returns true if window and graphic device has been initialized successfully
@@ -2956,8 +2890,8 @@ static bool InitGraphicsDevice(int width, int height)
     if ((CORE.Window.flags & FLAG_WINDOW_RESIZABLE) > 0) flags |= SDL_WINDOW_RESIZABLE;
     flags |= SDL_WINDOW_OPENGL;
     
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 
@@ -2984,6 +2918,10 @@ static bool InitGraphicsDevice(int width, int height)
     ClearBackground(RAYWHITE);      // Default background color for raylib games :P
 
     if ((CORE.Window.flags & FLAG_WINDOW_MINIMIZED) > 0) MinimizeWindow();
+
+   
+
+
 
     return true;
 }

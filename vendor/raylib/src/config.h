@@ -29,6 +29,11 @@
 // Module selection - Some modules could be avoided
 // Mandatory modules: rcore, rlgl, utils
 //------------------------------------------------------------------------------------
+
+#define GRAPHICS_API_OPENGL_21
+//#define GRAPHICS_API_OPENGL_33
+
+
 #define SUPPORT_MODULE_RSHAPES           1
 #define SUPPORT_MODULE_RTEXTURES         1
 #define SUPPORT_MODULE_RTEXT             1          // WARNING: It requires SUPPORT_MODULE_RTEXTURES to load sprite font textures

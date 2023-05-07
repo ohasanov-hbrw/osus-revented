@@ -2043,7 +2043,7 @@ void rlLoadExtensions(void *loader)
             extList[numExt] = &extensionsDup[i + 1];
         }
     }
-
+    
     TRACELOG(RL_LOG_INFO, "GL: Supported extensions count: %i", numExt);
 
 #if defined(RLGL_SHOW_GL_DETAILS_INFO)

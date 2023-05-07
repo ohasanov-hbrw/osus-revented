@@ -3077,12 +3077,19 @@ void GenTextureMipmaps(Texture2D *texture)
 {
     // NOTE: NPOT textures support check inside function
     // On WebGL (OpenGL ES 2.0) NPOT textures support is limited
+    #if defined(GRAPHICS_API_OPENGL_11)
+        return;
+    #endif
     rlGenTextureMipmaps(texture->id, texture->width, texture->height, texture->format, &texture->mipmaps);
 }
 
 // Set texture scaling filter mode
 void SetTextureFilter(Texture2D texture, int filter)
 {
+    #if defined(GRAPHICS_API_OPENGL_11)
+        if(filter == TEXTURE_FILTER_TRILINEAR)
+            filter = TEXTURE_FILTER_BILINEAR;
+    #endif
     switch (filter)
     {
         case TEXTURE_FILTER_POINT:

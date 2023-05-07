@@ -1,4 +1,4 @@
-CC = g++ -DGRAPHICS_API_OPENGL_33 -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG
+CC = g++ -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG
 cflags = -std=c++17 -O2
 cflags += -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -D_REENTRANT
 ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl -lSDL2main -lSDL2 -lpthread -I/usr/include/SDL2
