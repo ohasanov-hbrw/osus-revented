@@ -20,17 +20,25 @@
 #include <condition_variable>
 #include <assert.h>
 #include "time_util.hpp"
+#include <queue>
 //#include "SDLutils.hpp"
 
 std::condition_variable cv;
 
-double avgFPS = 144;
+double avgFPS = Global.FPS;
 double avgHZ = 1000;
 
 double Mx = 0;
 double My = 0;
 
+int VSYNC = 0;
 
+int avgFPSqueueNUM = 0;
+int avgHZqueueNUM = 0;
+double avgFPSqueueSUM = 0;
+double avgHZqueueSUM = 0;
+std::queue<double> avgFPSq;
+std::queue<double> avgHZq;
 
 
 
@@ -73,15 +81,25 @@ void RenderLoop(){
         //double tTime = getTimer();
         /*if(tTime - last >= 0 and (tTime - last) < 1000.0/288.0)
             std::this_thread::sleep_for(std::chrono::duration<double>((1000.0/288.0 - (tTime - last)) / 1000.0));*/
-
-        std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
-        unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/288.0) - sleepTime.count()) * 1000.0);
-        //std::cout << "Sleeptime of  " << sleepTimeInt << " us ";
-        SleepInUs(sleepTimeInt);
+        if(VSYNC == 0){
+            std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
+            unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/Global.FPS) - sleepTime.count()) * 1000.0);
+            //std::cout << "Sleeptime of  " << sleepTimeInt << " us ";
+            SleepInUs(sleepTimeInt);
+        }
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
         //std::cout << " Took " << elapsed.count() << " ms\n";
         //std::cout << "Took " << elapsed.count() << " ms\n";
-        avgFPS = (avgFPS + 1000.0f / (elapsed.count())) / 2.0;
+        double fps = (1000.0f / (elapsed.count()));
+        avgFPSq.push(fps);
+        avgFPSqueueSUM += fps;
+        if(avgFPSq.size() > 1000){
+            avgFPSqueueSUM -= avgFPSq.front();
+            avgFPSq.pop();
+        }
+        avgFPS = avgFPSqueueSUM / (double)(avgFPSq.size());
+        //avgFPS = (avgFPS + 1000.0f / (elapsed.count())) / 2.0;
+        
         //avgFPS = (avgFPS + 1000.0f / (getTimer() - last)) / 2.0;
         //std::cout << avgFPS << std::endl;
     }
@@ -170,14 +188,11 @@ int main() {
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     //glfwSwapInterval( 0 );
-    SDL_GL_SetSwapInterval(0);
+    SDL_GL_SetSwapInterval(VSYNC);
     SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
 
     std::thread rend(RenderLoop);
     while(!WindowShouldClose()){
-        //lastFrame = getTimer();
-        /*if(getTimer() - lastFrame > 0.2)
-            std::cout << "main thread waited for the mutex lock for " << getTimer() - lastFrame << " milliseconds" << std::endl;*/
         auto t1 = std::chrono::steady_clock::now();
         Global.mutex.lock();
         PollInputEvents();
@@ -193,22 +208,19 @@ int main() {
         Global.CurrentState->update();
         Global.mutex.unlock();
 
-        /*auto end = t1 + std::chrono::microseconds((int)(1000000.0/750.0));
-        do {
-            std::this_thread::yield();
-        } while (std::chrono::high_resolution_clock::now() < end);
-        std::chrono::duration<double, std::milli> elapsed {std::chrono::high_resolution_clock::now() - t1};*/
-        
-        //std::cout << "Took " << elapsed.count() << " ms\n";
-
         std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
         unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/1000.0) - sleepTime.count()) * 1000.0);
-        //std::cout << "Took " << sleepTimeInt << " us\n";
         SleepInUs(sleepTimeInt);
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
-        
-        avgHZ = (avgHZ + 1000.0f / (elapsed.count())) / 2.0;
-
+        //avgHZ = (avgHZ + 1000.0f / (elapsed.count())) / 2.0;
+        double hz = (1000.0f / (elapsed.count()));
+        avgHZq.push(hz);
+        avgHZqueueSUM += hz;
+        if(avgHZq.size() > 1000){
+            avgHZqueueSUM -= avgHZq.front();
+            avgHZq.pop();
+        }
+        avgHZ = avgHZqueueSUM / (double)(avgHZq.size());
     }
     rend.join();
 
