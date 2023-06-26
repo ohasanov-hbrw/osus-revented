@@ -183,17 +183,20 @@ MainMenu::MainMenu() {
     play = Button({250,420}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
     wip = Button({320,320}, {120,60}, {255,135,198,0}, "WIP", BLACK, 20);
     load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
+    volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
 }
 void MainMenu::init() {
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
     Global.useAuto = false;
+    volume.location = Global.volume * 100.0f;
 }
 void MainMenu::update() {
     Global.enableMouse = true;
     play.update();
     wip.update();
     load.update();
+    //test.update();
     if(wip.action){
         Global.CurrentState->unload();
         Global.CurrentState.reset(new WIPMenu());
@@ -209,6 +212,10 @@ void MainMenu::update() {
         Global.CurrentState.reset(new LoadMenu());
         Global.CurrentState->init();
     }
+
+    if(IsKeyDown(SDL_SCANCODE_LALT ))
+        volume.update();
+    Global.volume = volume.location / 100.0f;
 }
 void MainMenu::render() {
     //Global.mutex.lock();
@@ -216,6 +223,9 @@ void MainMenu::render() {
     play.render();
     wip.render();
     load.render();
+    if(IsKeyDown(SDL_SCANCODE_LALT ))
+        volume.render();
+    //test.render();
     //Global.mutex.unlock();
 }
 
@@ -224,7 +234,7 @@ void MainMenu::unload() {
 }
 
 Game::Game() {
-    
+    volume = TestSlider({320,240}, {240,60}, BLUE, PURPLE, BLACK, BLACK);
 }
 void Game::init() {
     Global.useAuto = false;
@@ -266,8 +276,11 @@ void Game::update() {
             initDone = true;
         }
     }
+    if(IsKeyDown(SDL_SCANCODE_LALT ))
+        volume.update();
 }
 void Game::render() {
+    
     if(initDone == 1){
         Global.enableMouse = false;
         Global.gameManager->render();
@@ -340,6 +353,8 @@ void Game::render() {
         DrawTextEx(Global.DefaultFont, message.c_str(), {ScaleCordX(320 - message.size() * 7.5f), ScaleCordY(220)}, Scale(20), Scale(1), WHITE);
         //Global.mutex.unlock();
     }
+    if(IsKeyDown(SDL_SCANCODE_LALT ))
+        volume.render();
 }
 
 void Game::unload(){

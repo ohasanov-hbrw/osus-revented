@@ -63,6 +63,8 @@ private:
     Button play;
     Button wip;
     Button load;
+    TestSlider volume;
+    
 public:
     MainMenu();
 
@@ -74,6 +76,7 @@ public:
 
 class Game : public State {
 private:
+    TestSlider volume;
 public:
     Game();
 

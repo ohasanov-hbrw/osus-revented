@@ -7,13 +7,13 @@ void initMouseTrail(){
 }
 
 void updateMouseTrail(){
-    /*FrameTimeCounterTrail += (getTimer() * 1000.0f - FrameTimeCounterTrail);
+    FrameTimeCounterTrail += Global.FrameTime * 1.5;
     while(FrameTimeCounterTrail > 1.0f){
         FrameTimeCounterTrail -= 1.0f;
         indexTrail++;
         indexTrail = indexTrail % Global.MouseTrailSize;
         MouseTrail[indexTrail] = Global.MousePosition;
-    }*/
+    }
 }
 
 

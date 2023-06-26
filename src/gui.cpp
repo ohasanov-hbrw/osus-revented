@@ -281,3 +281,101 @@ void Switch::update() {
     if(action == true)
         this->state = !this->state;
 }
+
+TestSlider::TestSlider(Vector2 position, Vector2 size, Color color, Color altcolor, Color outcolor, Color switchcolor) 
+    : GuiElement(position, size), color(color), altcolor(altcolor), switchcolor(switchcolor), outcolor(outcolor)
+{  }
+
+
+void TestSlider::render() {
+    /*//Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text, textsize, 1);
+    //Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
+    //melih buradaki variablelar calismio placeholder koydum
+    Rectangle Left = GetRaylibOriginR({position.x - size.x/4.0f, position.y, size.x/2.0f, size.y});
+    Rectangle Right = GetRaylibOriginR({position.x + size.x/4.0f, position.y, size.x/2.0f, size.y});
+    if(this->state){
+        DrawRectangleRec(ScaleRect(Left), this->altcolor);
+        DrawRectangleRec(ScaleRect(Right), this->switchcolor);
+    }
+    else{
+        DrawRectangleRec(ScaleRect(Left), this->switchcolor);
+        DrawRectangleRec(ScaleRect(Right), this->color);
+    }
+    if (this->focused){
+        //DrawRectangleRec(ScaleRect(this->getRect()), this->color);
+        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
+        //DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+    }
+    else{
+        //DrawRectangleRec(ScaleRect(this->getRect()), this->color);
+        //DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), this->outcolor);
+        
+    }*/
+
+    double percentage = location / 100.0f;
+    Rectangle Left = GetRaylibOriginR({position.x - (size.x * (1 - percentage)) / 2, position.y, size.x * percentage, size.y});
+    Rectangle Right = GetRaylibOriginR({position.x + (size.x * (percentage)) / 2, position.y, size.x * (1.0f-percentage), size.y});
+    Rectangle Dingus = GetRaylibOriginR({position.x - (size.x / 2) + (size.x * (percentage)), position.y, size.y / 2, size.y});
+    if(Dingus.x < position.x - (size.x / 2))
+        Dingus.x = position.x - (size.x / 2);
+    if(Dingus.x > position.x + (size.x / 2) - size.y/2)
+        Dingus.x = position.x + (size.x / 2) - size.y/2;
+    DrawRectangleRec(ScaleRect(Left), this->altcolor);
+    DrawRectangleRec(ScaleRect(Right), this->color);
+
+    DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), this->outcolor);
+    if(!active)
+        DrawRectangleRec(ScaleRect(Dingus), this->switchcolor);
+    else
+        DrawRectangleRec(ScaleRect(Dingus), WHITE);
+}
+
+void TestSlider::update() {
+    bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
+    bool click = Global.MouseInFocus and Global.Key1P;
+    if (hover and click) {
+        this->focused = true;
+        this->clicked = true;
+        this->focusbreak = false;
+    }
+    else if (hover) {
+        this->focused = true;
+        this->clicked = false;
+    }
+    else {
+        this->focused = false;
+        this->clicked = false;
+        this->focusbreak = true;
+    }
+    if(this->focused && Global.Wheel > 0){
+        location += 1;
+        if(location > 100.0)
+            location = 100;
+    }
+    else if(this->focused && Global.Wheel < 0){
+        location -= 1;
+        if(location < 0.0)
+            location = 0;
+    }
+
+    double percentage = location / 100.0f;
+    Rectangle Dingus = GetRaylibOriginR({position.x - (size.x / 2) + (size.x * (percentage)), position.y, size.y / 2, size.y});
+    if(Dingus.x < position.x - (size.x / 2))
+        Dingus.x = position.x - (size.x / 2);
+    if(Dingus.x > position.x + (size.x / 2) - size.y/2)
+        Dingus.x = position.x + (size.x / 2) - size.y/2;
+    if(Global.Key1P && CheckCollisionPointRec(Global.MousePosition, Dingus))
+        active = true;
+    if(!Global.Key1D)
+        active = false;
+    if(active && Global.Key1D){
+        location = (Global.MousePosition.x - (position.x - (size.x / 2.0))) / size.x;
+        location *= 100;
+        if(location > 100.0)
+            location = 100;
+        else if(location < 0.0)
+            location = 0;
+        //std::cout << (Global.MousePosition.x - (position.x - (size.x / 2.0))) / size.x << std::endl;
+    }
+}

@@ -103,6 +103,24 @@ public:
 
 };
 
+class TestSlider : public GuiElement {
+private:
+    
+public:
+    TestSlider(Vector2 position, Vector2 size, Color color, Color altcolor, Color outcolor, Color switchcolor);
+    TestSlider() = default;
+
+    Color color;
+    Color altcolor;
+    Color switchcolor;
+    Color outcolor;
+    double location = 100;
+    bool active = true;
+    void render() override;
+    void update() override;
+
+};
+
 class ErrorDialogue {
     
 };

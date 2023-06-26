@@ -203,8 +203,10 @@ int main() {
             ToggleFullscreen();
         }
         updateUpDown();
+        
         Global.FrameTime = getTimer() - Global.LastFrameTime;
         Global.LastFrameTime = getTimer();
+        updateMouseTrail();
         Global.CurrentState->update();
         Global.mutex.unlock();
 
