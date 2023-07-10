@@ -211,7 +211,7 @@ void GameManager::update(){
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
-				Global.amogus2 = 12.0f;
+				Global.amogus2 = 0.0f;
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 0;
@@ -529,7 +529,7 @@ void GameManager::run(){
 	//ms = getTimer() / 1000.0;
 
 	if(Global.startTime < 0){
-		Global.amogus2 = 16;
+		Global.amogus2 = 0;
 		Global.amogus3 = 0.0f;
 		Global.startTime += Global.FrameTime;
 		Time = Global.startTime;
@@ -553,7 +553,7 @@ void GameManager::run(){
 		double Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 		double amog = getTimer();
 		Global.amogus4 = getTimer();
-		Global.amogus2 = 12;
+		Global.amogus2 = 0;
 		Global.amogus3 = 0.0f;
 		std::cout << "time delay??? " << Global.amogus2 << std::endl;
 		std::cout << "Time:" << Time << std::endl;
@@ -1108,9 +1108,13 @@ void GameManager::loadGame(std::string filename){
 	else{
 		spinsPerSecond = 5.0f;
 	}
-	gameFile.p300Final = gameFile.p300 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p300Change;
-	gameFile.p100Final = gameFile.p100 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p100Change;
-	gameFile.p50Final = gameFile.p50 - std::stoi(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p50Change;
+	gameFile.p300Final = gameFile.p300 - std::stof(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p300Change;
+	gameFile.p100Final = gameFile.p100 - std::stof(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p100Change;
+	gameFile.p50Final = gameFile.p50 - std::stof(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p50Change;
+
+	std::cout << gameFile.p300Final << " " << gameFile.p100Final << " " << gameFile.p50Final << " " << gameFile.preempt << std::endl;
+	std::cout << std::stof(gameFile.configDifficulty["OverallDifficulty"]) << " " << gameFile.configDifficulty["OverallDifficulty"] << std::endl;
+	std::cout << std::stof(gameFile.configDifficulty["ApproachRate"]) << " " << gameFile.configDifficulty["ApproachRate"] << std::endl;
 	//debug, just say what the name of the music file is and load it
 	//std::cout << (Global.Path + '/' + gameFile.configGeneral["AudioFilename"]) << std::endl;
 
