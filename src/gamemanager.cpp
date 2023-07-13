@@ -486,7 +486,7 @@ void GameManager::render(){
 	if(currentBackgroundTexture.length() > 0 && backgroundTextures.loaded[currentBackgroundTexture].value){
 		//std::cout << currentBackgroundTexture << std::endl;
 		DrawTextureCenter(backgroundTextures.data[currentBackgroundTexture], 320, 240, (double)std::max((double)GetScreenWidth()/(double)backgroundTextures.data[currentBackgroundTexture].width, (double)GetScreenHeight()/(double)backgroundTextures.data[currentBackgroundTexture].height) / (double)Global.Scale , WHITE);
-		//DrawRectangle(-5, -5, GetScreenWidth() + 10, GetScreenHeight() + 10, Fade(BLACK, 0.9f));
+		DrawRectangle(-5, -5, GetScreenWidth() + 10, GetScreenHeight() + 10, Fade(BLUE, 1.0f));
 	}
 	
 	for(int i = objects.size() - 1; i >= 0; i--){
@@ -1865,6 +1865,7 @@ void GameManager::render_combo(){
 
 void GameManager::loadGameTextures(){
 	sliderin = LoadTexture("resources/sliderin.png");
+	sliderblank = LoadTexture("resources/SliderBlank.png");
     sliderout = LoadTexture("resources/sliderout.png");
 	followPoint = LoadTexture("resources/followpoint.png");
     loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
@@ -1893,6 +1894,7 @@ void GameManager::loadGameTextures(){
 
 
     SetTextureFilter(sliderin, TEXTURE_FILTER_POINT);
+	SetTextureFilter(sliderblank, TEXTURE_FILTER_POINT);
     SetTextureFilter(sliderout, TEXTURE_FILTER_POINT);
 
     GenTextureMipmaps(&sliderscorepoint);
@@ -1986,6 +1988,7 @@ void GameManager::unloadGameTextures(){
     UnloadTexture(hit0);
     UnloadTexture(sliderb);
     UnloadTexture(sliderin);
+	UnloadTexture(sliderblank);
     UnloadTexture(sliderout);
     UnloadTexture(selectCircle);
     UnloadTexture(reverseArrow);

@@ -56,6 +56,7 @@ class GameManager{
 		Texture2D sliderfollow;
 		Texture2D reverseArrow;
 		Texture2D sliderin;
+		Texture2D sliderblank;
 		Texture2D sliderout;
 		Texture2D numbers[10];
 		Texture2D spinnerBottom;
