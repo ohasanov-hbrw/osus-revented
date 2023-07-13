@@ -486,7 +486,7 @@ void GameManager::render(){
 	if(currentBackgroundTexture.length() > 0 && backgroundTextures.loaded[currentBackgroundTexture].value){
 		//std::cout << currentBackgroundTexture << std::endl;
 		DrawTextureCenter(backgroundTextures.data[currentBackgroundTexture], 320, 240, (double)std::max((double)GetScreenWidth()/(double)backgroundTextures.data[currentBackgroundTexture].width, (double)GetScreenHeight()/(double)backgroundTextures.data[currentBackgroundTexture].height) / (double)Global.Scale , WHITE);
-		DrawRectangle(-5, -5, GetScreenWidth() + 10, GetScreenHeight() + 10, Fade(BLACK, 0.8f));
+		//DrawRectangle(-5, -5, GetScreenWidth() + 10, GetScreenHeight() + 10, Fade(BLACK, 0.9f));
 	}
 	
 	for(int i = objects.size() - 1; i >= 0; i--){
@@ -538,6 +538,8 @@ void GameManager::run(){
 	if(Global.startTime >= 0 and startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
+		Global.volume = 1.0f;
+		std::cout << Global.volume << std::endl;
     	SetMusicVolume(backgroundMusic, Global.volume);
 		SeekMusicStream(backgroundMusic, 0.0f);
 		UpdateMusicStream(backgroundMusic);
@@ -626,11 +628,11 @@ void GameManager::run(){
 			currentTime = Global.currentOsuTime / 1000.0;
 		}
 
-		currentTime -= 8/1000.0f;
+		//currentTime -= 8/1000.0f;
 		//currentTime *= 2;
 		GameManager::update();
 		//std::cout << "called update at time " << Global.currentOsuTime << "\n";
-		currentTime += 8/1000.0f;
+		//currentTime += 8/1000.0f;
 	}
 	
 }
@@ -1950,8 +1952,13 @@ void GameManager::loadGameTextures(){
 				if(files[i].rfind(gameFile.events[j].filename, 0) == 0){
 					std::cout << "WHAT DA HEEEEEEEEEELLLLLLLLLLLLL" << std::endl;
 					Image image = LoadImage((Global.Path + files[i]).c_str());
+					//ImageColorBrightness(&image, -128);
+					ImageColorTint(&image, Color{30,30,30,255});
+					ImageBlurGaussian(&image, 2);
+					
 					backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(image);
 					UnloadImage(image); 
+					
 					backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
 					if(backgroundTextures.data[gameFile.events[j].filename].width != 0){
 						backgroundTextures.loaded[gameFile.events[j].filename].value = true;

@@ -1,5 +1,5 @@
 #include "hitobjectdefinition.hpp"
-
+#include "rlgl.h"
 class Slider : public HitObject{
     public:
         Slider(HitObjectData data);
@@ -51,6 +51,7 @@ class Slider : public HitObject{
         Shader shdrOutline;
 
         
+        unsigned int VAO;
         
         float minX = static_cast<float>(INT_MAX), minY = static_cast<float>(INT_MAX), maxX = INT_MIN, maxY = INT_MIN;
 };

@@ -802,6 +802,7 @@ void Slider::update(){
 }
 
 void Slider::render(){
+    bool legacyRender = false;
     GameManager* gm = GameManager::getInstance();
     bool changeTex = false;
     if(data.textureReady == true and data.textureLoaded == false){
@@ -815,7 +816,11 @@ void Slider::render(){
         EndBlendMode();
         EndTextureMode();
         changeTex = true;
+        if(!legacyRender){
+            
+        }
     }
+
 
     float approachScale = 3.5*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
     if (approachScale <= 1)
@@ -825,91 +830,115 @@ void Slider::render(){
     Color renderColor;
     data.textureLoaded = IsRenderTextureReady(sliderTexture);
     if(data.textureLoaded and data.textureReady){
-        if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last != renderPoints.size() - 1){
-            BeginTextureMode(sliderTexture);
-            //BeginBlendMode(BLEND_ALPHA_PREMUL);
-            bool draw = true;
-            if(renderPoints.size() > 0){
-                for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
-                    draw = false;
-                    if(i < renderPoints.size() and renderPoints[i].x > -150 and renderPoints[i].x < 790 and renderPoints[i].y > -150 and renderPoints[i].y < 630){
-                        if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
-                            DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
-                            (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
-                            
-                            /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                            {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                            (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
-                            last = std::max(i, 0);
-                            if(last == renderPoints.size() - 1){
-                                last = renderPoints.size();
+        
+        if(legacyRender){
+            /*int style = GetShaderLocation(Global.shdrTest, "style");
+            int bodyAlphaMultiplier = GetShaderLocation(Global.shdrTest, "bodyAlphaMultiplier");
+            int bodyColorSaturation = GetShaderLocation(Global.shdrTest, "bodyColorSaturation");
+            int borderSizeMultiplier = GetShaderLocation(Global.shdrTest, "borderSizeMultiplier");
+            int borderFeather = GetShaderLocation(Global.shdrTest, "borderFeather");
+            int colBorder = GetShaderLocation(Global.shdrTest, "colBorder");
+            int colBody = GetShaderLocation(Global.shdrTest, "colBody");
+
+            int styleValue = 0;
+            SetShaderValue(Global.shdrTest, style, &styleValue, SHADER_UNIFORM_INT);
+            float tempValue = 1.0f;
+            SetShaderValue(Global.shdrTest, bodyAlphaMultiplier, &tempValue, SHADER_UNIFORM_FLOAT);
+            SetShaderValue(Global.shdrTest, bodyColorSaturation, &tempValue, SHADER_UNIFORM_FLOAT);
+            SetShaderValue(Global.shdrTest, borderSizeMultiplier, &tempValue, SHADER_UNIFORM_FLOAT);
+            tempValue = 0.0f;
+            SetShaderValue(Global.shdrTest, borderFeather, &tempValue, SHADER_UNIFORM_FLOAT);
+
+            float BorderColor[3] = { 0.9f, 0.9f, 0.9f};
+            float BodyColor[3] = { 0.0f, 0.05f, 0.0f};
+            SetShaderValue(Global.shdrTest, colBorder, BorderColor, SHADER_UNIFORM_VEC3);
+            SetShaderValue(Global.shdrTest, colBody, BodyColor, SHADER_UNIFORM_VEC3);
+            BeginShaderMode(Global.shdrTest);*/
+
+            
+            if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last != renderPoints.size() - 1){
+                BeginTextureMode(sliderTexture);
+                //BeginBlendMode(BLEND_ALPHA_PREMUL);
+                bool draw = true;
+                if(renderPoints.size() > 0){
+                    for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
+                        draw = false;
+                        if(i < renderPoints.size() and renderPoints[i].x > -150 and renderPoints[i].x < 790 and renderPoints[i].y > -150 and renderPoints[i].y < 630){
+                            if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
+                                DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
+                                (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
+                                
+                                /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
+                                {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
+                                (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
+                                last = std::max(i, 0);
+                                if(last == renderPoints.size() - 1){
+                                    last = renderPoints.size();
+                                }
+                                renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
                             }
-                            renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
                         }
                     }
                 }
-            }
-            
-            if(draw and renderPoints.size() > 0 and last != renderPoints.size() - 1){
-                //std::cout << "wtf" << std::endl;
-                int i = renderPoints.size() - 1;
-                if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
-                    DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
-                    (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
-                    
-                    /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                    {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                    (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
-                    last = std::max(i, 0);
-                    renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
-                }
-                last = renderPoints.size() - 1;
                 
+                if(draw and renderPoints.size() > 0 and last != renderPoints.size() - 1){
+                    //std::cout << "wtf" << std::endl;
+                    int i = renderPoints.size() - 1;
+                    if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
+                        DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
+                        (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
+                        
+                        /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
+                        {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
+                        (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
+                        last = std::max(i, 0);
+                        renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
+                    }
+                    last = renderPoints.size() - 1;
+                    
+                }
+                //EndBlendMode();
+                
+                EndTextureMode();
+                /*if(draw and renderPoints.size() > 0){
+                    //GenTextureMipmaps(&sliderTexture.texture);
+                    SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR );
+                    //std::cout << "slider filter in use" << std::endl;
+                }*/
+            
             }
-            //EndBlendMode();
-            EndTextureMode();
-            /*if(draw and renderPoints.size() > 0){
-                //GenTextureMipmaps(&sliderTexture.texture);
-                SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR );
-                //std::cout << "slider filter in use" << std::endl;
-            }*/
+            //EndShaderMode();
+            /*float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
+            float outlineColor[4] = { 0.9f, 0.9f, 0.9f, 1.0f };     // Normalized RED color 
+            float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
+            
+            // Get shader locations
+            int outlineSizeLoc = GetShaderLocation(Global.shdrOutline, "outlineSize");
+            int outlineColorLoc = GetShaderLocation(Global.shdrOutline, "outlineColor");
+            int textureSizeLoc = GetShaderLocation(Global.shdrOutline, "textureSize");
+            int transparency = GetShaderLocation(Global.shdrOutline, "transparency");
+            
+            // Set shader values (they can be changed later)
+            SetShaderValue(Global.shdrOutline, outlineSizeLoc, &outlineSize, SHADER_UNIFORM_FLOAT);
+            SetShaderValue(Global.shdrOutline, outlineColorLoc, outlineColor, SHADER_UNIFORM_VEC4);
+            SetShaderValue(Global.shdrOutline, textureSizeLoc, textureSize, SHADER_UNIFORM_VEC2);
+            SetShaderValue(Global.shdrOutline, transparency, &clampedFade, SHADER_UNIFORM_FLOAT);*/
+
+            //BeginBlendMode(BLEND_ALPHA_PREMUL);
+
+            //BeginShaderMode(Global.shdrOutline);
+
+
+            
+
+            //BeginShaderMode(Global.shdrTest);
+            DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade), gm->circlesize);
+            //Vector2 tempPos2 = renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size()))];
+            //DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y, gm->circlesize/gm->sliderin.width, RED);
         }
-        
-        float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
-        float outlineColor[4] = { 0.9f, 0.9f, 0.9f, 1.0f };     // Normalized RED color 
-        float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
-        
-        // Get shader locations
-        int outlineSizeLoc = GetShaderLocation(Global.shdrOutline, "outlineSize");
-        int outlineColorLoc = GetShaderLocation(Global.shdrOutline, "outlineColor");
-        int textureSizeLoc = GetShaderLocation(Global.shdrOutline, "textureSize");
-        int transparency = GetShaderLocation(Global.shdrOutline, "transparency");
-        
-        // Set shader values (they can be changed later)
-        SetShaderValue(Global.shdrOutline, outlineSizeLoc, &outlineSize, SHADER_UNIFORM_FLOAT);
-        SetShaderValue(Global.shdrOutline, outlineColorLoc, outlineColor, SHADER_UNIFORM_VEC4);
-        SetShaderValue(Global.shdrOutline, textureSizeLoc, textureSize, SHADER_UNIFORM_VEC2);
-        SetShaderValue(Global.shdrOutline, transparency, &clampedFade, SHADER_UNIFORM_FLOAT);
-        //BeginBlendMode(BLEND_ALPHA_PREMUL);
+        else{
 
-        BeginShaderMode(Global.shdrOutline);
-
-
-        /*int xs = GetShaderLocation(Global.shdrTest, "xs");
-        int ys = GetShaderLocation(Global.shdrTest, "ys");
-        int r = GetShaderLocation(Global.shdrTest, "r");
-        float j = 1.0f;
-        float xsf = sliderTexture.texture.width;
-        float ysf = sliderTexture.texture.height;
-        SetShaderValue(Global.shdrTest, xs, &xsf, SHADER_UNIFORM_FLOAT);
-        SetShaderValue(Global.shdrTest, ys, &ysf, SHADER_UNIFORM_FLOAT);
-        SetShaderValue(Global.shdrTest, r, &j, SHADER_UNIFORM_FLOAT);
-
-        BeginShaderMode(Global.shdrTest);*/
-        DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade), gm->circlesize);
-        //Vector2 tempPos2 = renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size()))];
-        //DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y, gm->circlesize/gm->sliderin.width, RED);
-        EndShaderMode();
+        }
     }
     int index = 0;
     int topla = 1;
@@ -1011,7 +1040,7 @@ void Slider::dead_render(){
         float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
         
         // Get shader locations
-        int outlineSizeLoc = GetShaderLocation(Global.shdrOutline, "outlineSize");
+        /*int outlineSizeLoc = GetShaderLocation(Global.shdrOutline, "outlineSize");
         int outlineColorLoc = GetShaderLocation(Global.shdrOutline, "outlineColor");
         int textureSizeLoc = GetShaderLocation(Global.shdrOutline, "textureSize");
         int transparency = GetShaderLocation(Global.shdrOutline, "transparency");
@@ -1023,9 +1052,8 @@ void Slider::dead_render(){
         SetShaderValue(Global.shdrOutline, transparency, &clampedFade2, SHADER_UNIFORM_FLOAT);
 
 
-        BeginShaderMode(Global.shdrOutline);
+        BeginShaderMode(Global.shdrOutline);*/
         DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade2), gm->circlesize);
-        EndShaderMode();
     
 
 

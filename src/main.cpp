@@ -126,8 +126,10 @@ int main() {
 
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");
-    Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", 100));
-    //Global.shdrTest = LoadShader(0, TextFormat("resources/shaders/glsl%i/testshader.fs", 330));
+
+    //Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", 100));
+
+    Global.shdrTest = LoadShader(TextFormat("resources/shaders/glsl%i/mcosu.vsh", 330), TextFormat("resources/shaders/glsl%i/mcosu.fsh", 330));
     //Image cus;
     std::string lastPath = Global.Path;
 	Global.Path = "resources/default_skin/";
@@ -228,7 +230,7 @@ int main() {
 
     UnloadTexture(Global.OsusLogo);
     UnloadFont(Global.DefaultFont);
-    UnloadShader(Global.shdrOutline);
+    //UnloadShader(Global.shdrOutline);
     CloseWindow();
     //quitSDL();
 }
