@@ -1,6 +1,6 @@
 #version 110
 
-uniform sampler2D tex;
+uniform sampler2D texture0;
 uniform int style;
 uniform float bodyColorSaturation;
 uniform float bodyAlphaMultiplier;
@@ -9,7 +9,7 @@ uniform float borderFeather;
 uniform vec3 colBorder;
 uniform vec3 colBody;
 
-varying vec2 tex_coord;
+varying vec2 fragTexCoord;
 
 const float defaultTransitionSize = 0.011;
 const float defaultBorderSize = 0.11;
@@ -64,26 +64,33 @@ void main()
 	if (borderSizeMultiplier < 0.01)
 		borderColor = outerShadowColor;
 	
-	// linear variant
-	// just shadow
-	float delta = tex_coord.x/(outerShadowSize-transitionSize);
-	out_color += mix(vec4(0.0), outerShadowColor, delta) * clamp(ceil(-delta+1.0), 0.0, 1.0);
+	// conditional variant
 	
-	// shadow + border
-	delta = (tex_coord.x - outerShadowSize + transitionSize) / (2.0*transitionSize);
-	out_color += mix(outerShadowColor, borderColor, delta) * clamp(ceil(tex_coord.x - (outerShadowSize - transitionSize)), 0.0, 1.0) * clamp(ceil(-abs(delta)+1.0), 0.0, 1.0);
-	
-	// just border
-	out_color += borderColor * clamp(ceil(tex_coord.x - (outerShadowSize + transitionSize)), 0.0, 1.0) * clamp(ceil(-(tex_coord.x - (outerShadowSize + borderSize - transitionSize))), 0.0, 1.0);
-	
-	// border + outer body
-	delta = (tex_coord.x - outerShadowSize - borderSize + transitionSize) / (2.0*transitionSize);
-	out_color += mix(borderColor, outerBodyColor, delta) * clamp(ceil(tex_coord.x - (outerShadowSize + borderSize - transitionSize)), 0.0, 1.0) * clamp(ceil(-abs(delta)+1.0), 0.0, 1.0);
-	
-	// outer body + inner body
-	delta = outerShadowSize + borderSize + transitionSize;
-	delta = (tex_coord.x - delta) / (1.0-delta); // [VARIABLE REUSING INTENSIFIES]
-	out_color += mix(outerBodyColor, innerBodyColor, delta) * clamp(ceil(tex_coord.x - (outerShadowSize + borderSize + transitionSize)), 0.0, 1.0);
+	if (fragTexCoord.x < outerShadowSize - transitionSize) // just shadow
+	{
+		float delta = fragTexCoord.x / (outerShadowSize - transitionSize);
+		out_color = mix(vec4(0), outerShadowColor, delta);
+	}
+	if (fragTexCoord.x > outerShadowSize - transitionSize && fragTexCoord.x < outerShadowSize + transitionSize) // shadow + border
+	{
+		float delta = (fragTexCoord.x - outerShadowSize + transitionSize) / (2.0*transitionSize);
+		out_color = mix(outerShadowColor, borderColor, delta);
+	}
+	if (fragTexCoord.x > outerShadowSize + transitionSize && fragTexCoord.x < outerShadowSize + borderSize - transitionSize) // just border
+	{
+		out_color = borderColor;
+	}
+	if (fragTexCoord.x > outerShadowSize + borderSize - transitionSize && fragTexCoord.x < outerShadowSize + borderSize + transitionSize) // border + outer body
+	{
+		float delta = (fragTexCoord.x - outerShadowSize - borderSize + transitionSize) / (2.0*transitionSize);
+		out_color = mix(borderColor, outerBodyColor, delta);
+	}
+	if (fragTexCoord.x > outerShadowSize + borderSize + transitionSize) // outer body + inner body
+	{	
+		float size = outerShadowSize + borderSize + transitionSize;
+		float delta = ((fragTexCoord.x - size) / (1.0-size));
+		out_color = mix(outerBodyColor, innerBodyColor, delta);
+	}
 	
 	gl_FragColor = out_color;
 }

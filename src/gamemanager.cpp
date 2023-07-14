@@ -1864,7 +1864,10 @@ void GameManager::render_combo(){
 }
 
 void GameManager::loadGameTextures(){
-	sliderin = LoadTexture("resources/sliderin.png");
+	Image tempImage = LoadImage("resources/sliderin.png");
+	ImageColorReplace(&tempImage, {255,255,255,159}, {255,255,255,0});
+	sliderin = LoadTextureFromImage(tempImage);
+	UnloadImage(tempImage);
 	sliderblank = LoadTexture("resources/SliderBlank.png");
     sliderout = LoadTexture("resources/sliderout.png");
 	followPoint = LoadTexture("resources/followpoint.png");

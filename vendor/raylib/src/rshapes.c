@@ -1461,46 +1461,21 @@ void DrawPoly(Vector2 center, int sides, float radius, float rotation, Color col
 #endif
 
     rlPushMatrix();
-        rlTranslatef(center.x, center.y, 0.0f);
-        rlRotatef(rotation, 0.0f, 0.0f, 1.0f);
+    rlTranslatef(center.x, center.y, 0.0f);
+    rlRotatef(rotation, 0.0f, 0.0f, 1.0f);
 
-#if defined(SUPPORT_QUADS_DRAW_MODE)
-        rlSetTexture(texShapes.id);
+    rlBegin(RL_TRIANGLES);
+        for (int i = 0; i < sides; i++)
+        {
+            rlColor4ub(color.r, color.g, color.b, color.a);
 
-        rlBegin(RL_QUADS);
-            for (int i = 0; i < sides; i++)
-            {
-                rlColor4ub(color.r, color.g, color.b, color.a);
+            rlVertex2f(0, 0);
+            rlVertex2f(sinf(DEG2RAD*centralAngle)*radius, cosf(DEG2RAD*centralAngle)*radius);
 
-                rlTexCoord2f(texShapesRec.x/texShapes.width, texShapesRec.y/texShapes.height);
-                rlVertex2f(0, 0);
-
-                rlTexCoord2f(texShapesRec.x/texShapes.width, (texShapesRec.y + texShapesRec.height)/texShapes.height);
-                rlVertex2f(sinf(DEG2RAD*centralAngle)*radius, cosf(DEG2RAD*centralAngle)*radius);
-
-                rlTexCoord2f((texShapesRec.x + texShapesRec.width)/texShapes.width, (texShapesRec.y + texShapesRec.height)/texShapes.height);
-                rlVertex2f(sinf(DEG2RAD*centralAngle)*radius, cosf(DEG2RAD*centralAngle)*radius);
-
-                centralAngle += 360.0f/(float)sides;
-                rlTexCoord2f((texShapesRec.x + texShapesRec.width)/texShapes.width, texShapesRec.y/texShapes.height);
-                rlVertex2f(sinf(DEG2RAD*centralAngle)*radius, cosf(DEG2RAD*centralAngle)*radius);
-            }
-        rlEnd();
-        rlSetTexture(0);
-#else
-        rlBegin(RL_TRIANGLES);
-            for (int i = 0; i < sides; i++)
-            {
-                rlColor4ub(color.r, color.g, color.b, color.a);
-
-                rlVertex2f(0, 0);
-                rlVertex2f(sinf(DEG2RAD*centralAngle)*radius, cosf(DEG2RAD*centralAngle)*radius);
-
-                centralAngle += 360.0f/(float)sides;
-                rlVertex2f(sinf(DEG2RAD*centralAngle)*radius, cosf(DEG2RAD*centralAngle)*radius);
-            }
-        rlEnd();
-#endif
+            centralAngle += 360.0f/(float)sides;
+            rlVertex2f(sinf(DEG2RAD*centralAngle)*radius, cosf(DEG2RAD*centralAngle)*radius);
+        }
+    rlEnd();
     rlPopMatrix();
 }
 

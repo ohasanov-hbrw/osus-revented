@@ -1,11 +1,31 @@
 #version 110
 
-varying vec2 tex_coord;
+// Input vertex attributes
+attribute vec3 vertexPosition;
+attribute vec2 vertexTexCoord;
+attribute vec3 vertexNormal;
+attribute vec4 vertexColor;
+
+// Input uniform values
+uniform mat4 mvp;
+
+// Output vertex attributes (to fragment shader)
+varying vec2 fragTexCoord;
+
+// NOTE: Add here your custom variables
 
 void main()
-{	
+{
+    // Send vertex attributes to fragment shader
+    //fragTexCoord = vertexTexCoord;
+
+    // Calculate final vertex position
+    //gl_Position = mvp*vec4(vertexPosition, 1.0);
+
+
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 	
 	gl_FrontColor = gl_Color;
-	tex_coord = gl_MultiTexCoord0.xy;
+
+	fragTexCoord = gl_MultiTexCoord0.xy;
 }
