@@ -9,7 +9,7 @@ uniform float transparency;
 
 vec4 calculateColor(vec4 texel){
     vec4 outputColor = vec4(0,0,0,0);
-    if(texel.r > 0.07){
+    if(texel.r > 0.06){
         if(texel.a > 0.25){
             outputColor = vec4(texel.a*0.3,texel.a*0.3,texel.a*0.3,0.7 * transparency);
         }
@@ -29,11 +29,14 @@ vec4 calculateColor(vec4 texel){
                 color = 0.9;
             }
             
-            if(texel.r < 0.09){
+            if(texel.r < 0.08){
                 opacity = 0.2 * transparency;
             }
+            else if(texel.r < 0.09){
+                opacity = 0.3 * transparency;
+            }
             else if(texel.r < 0.11){
-                opacity = 0.4 * transparency;
+                opacity = 0.5 * transparency;
             }
             else if(texel.r < 0.12){
                 opacity = 0.6 * transparency;
