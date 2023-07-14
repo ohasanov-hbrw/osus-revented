@@ -486,7 +486,7 @@ void GameManager::render(){
 	if(currentBackgroundTexture.length() > 0 && backgroundTextures.loaded[currentBackgroundTexture].value){
 		//std::cout << currentBackgroundTexture << std::endl;
 		DrawTextureCenter(backgroundTextures.data[currentBackgroundTexture], 320, 240, (double)std::max((double)GetScreenWidth()/(double)backgroundTextures.data[currentBackgroundTexture].width, (double)GetScreenHeight()/(double)backgroundTextures.data[currentBackgroundTexture].height) / (double)Global.Scale , WHITE);
-		DrawRectangle(-5, -5, GetScreenWidth() + 10, GetScreenHeight() + 10, Fade(BLUE, 1.0f));
+		//DrawRectangle(-5, -5, GetScreenWidth() + 10, GetScreenHeight() + 10, Fade(BLUE, 1.0f));
 	}
 	
 	for(int i = objects.size() - 1; i >= 0; i--){
@@ -1868,8 +1868,12 @@ void GameManager::loadGameTextures(){
 	ImageColorReplace(&tempImage, {255,255,255,159}, {255,255,255,0});
 	sliderin = LoadTextureFromImage(tempImage);
 	UnloadImage(tempImage);
+
+	Image tempImage2 = GenImageGradientRadial(sliderin.width, sliderin.height, 0.1, {255,0,0,255}, {0,0,0,0});
 	sliderblank = LoadTexture("resources/SliderBlank.png");
-    sliderout = LoadTexture("resources/sliderout.png");
+	sliderout = LoadTextureFromImage(tempImage2);
+	UnloadImage(tempImage2);
+    //sliderout = LoadTexture("resources/sliderout.png");
 	followPoint = LoadTexture("resources/followpoint.png");
     loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
     loadGameSkin(Global.selectedPath); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
