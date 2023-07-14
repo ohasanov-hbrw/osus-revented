@@ -937,6 +937,10 @@ void Slider::render(){
             int transparency = GetShaderLocation(Global.shdrTest, "transparency");
             SetShaderValue(Global.shdrTest, transparency, &clampedFade, SHADER_UNIFORM_FLOAT);
 
+            //int textureSizeLoc = GetShaderLocation(Global.shdrTest, "textureSize");
+            //SetShaderValue(Global.shdrTest, textureSizeLoc, textureSize, SHADER_UNIFORM_VEC2);
+
+
             BeginShaderMode(Global.shdrTest);
             DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,1), gm->circlesize);
             EndShaderMode();

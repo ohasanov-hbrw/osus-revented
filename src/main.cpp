@@ -56,8 +56,9 @@ void RenderLoop(){
         last = getTimer();
         rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
         BeginDrawing();
-        ClearBackground(Global.Background);
         Global.mutex.lock();
+        if(Global.NeedForBackgroundClear)
+            ClearBackground(Global.Background);
         Global.CurrentState->render();
         //std::cout << "gamemanager render done\n";
         if(Global.GameTextures == -1)
@@ -120,6 +121,7 @@ int main() {
     InitAudioDevice();
     
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetAudioStreamBufferSizeDefault(128);
     InitWindow(640, 480, "aa");
     

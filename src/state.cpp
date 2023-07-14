@@ -25,6 +25,7 @@ PlayMenu::PlayMenu() {
 }
 
 void PlayMenu::init() {
+    Global.NeedForBackgroundClear = true;
     Global.useAuto = false;
     Global.LastFrameTime = getTimer();
     temp = Global.Path;
@@ -110,6 +111,7 @@ LoadMenu::LoadMenu() {
 }
 
 void LoadMenu::init() {
+    Global.NeedForBackgroundClear = true;
     Global.useAuto = false;
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
@@ -186,6 +188,7 @@ MainMenu::MainMenu() {
     volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
 }
 void MainMenu::init() {
+    Global.NeedForBackgroundClear = true;
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
     Global.useAuto = false;
@@ -237,6 +240,7 @@ Game::Game() {
     volume = TestSlider({320,240}, {240,60}, BLUE, PURPLE, BLACK, BLACK);
 }
 void Game::init() {
+    Global.NeedForBackgroundClear = true;
     Global.useAuto = false;
     initDone = 0;
     Global.LastFrameTime = getTimer();
@@ -358,7 +362,7 @@ void Game::render() {
 }
 
 void Game::unload(){
-
+    Global.NeedForBackgroundClear = true;
 }
 
 WIPMenu::WIPMenu() {
@@ -367,6 +371,7 @@ WIPMenu::WIPMenu() {
 
 void WIPMenu::init(){
     //index = 0;
+    Global.NeedForBackgroundClear = true;
     applyMouse = false;
     std::string temp = Global.Path;
     Global.Path = Path;

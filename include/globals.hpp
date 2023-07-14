@@ -124,7 +124,7 @@ struct Globals {
     std::chrono::time_point<std::chrono::steady_clock> start, end;
 
 
-
+    bool NeedForBackgroundClear = true;
 
     double CurrentInterpolatedTime = 0;
     double LastOsuTime = 0;
