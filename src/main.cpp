@@ -49,10 +49,10 @@ Globals Global;
 void RenderLoop(){
     double last = 0;
     
-    
+    SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
     while(!WindowShouldClose()){
+
         auto t1 = std::chrono::steady_clock::now();
-        SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
         last = getTimer();
         rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
         BeginDrawing();
@@ -73,9 +73,11 @@ void RenderLoop(){
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  avgFPS), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
         DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
         Global.mutex.unlock();
+
         rlDrawRenderBatchActive();
-        SwapScreenBuffer();
-        SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
+        //SwapScreenBuffer();
+        SDL_GL_SwapWindow((SDL_Window*)GetWindowSDL());
+        //SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
 
         /*while(getTimer() - last < 1000.0/288.0 and getTimer() - last >= 0)
             continue;*/
@@ -196,6 +198,7 @@ int main() {
     SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
 
     std::thread rend(RenderLoop);
+
     while(!WindowShouldClose()){
         auto t1 = std::chrono::steady_clock::now();
         Global.mutex.lock();
