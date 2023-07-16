@@ -12,9 +12,15 @@ class FollowPoint{
         virtual ~FollowPoint() = default;
         void render();
         void update();
-        float sx,sy;
-        float ex,ey;
-        float startTime,endTime;
+        float startTime;
+        float startTime2;
+        float endTime;
+        float endTime2;
+        float startX,startY,endX,endY;
+        bool shouldRender = false;
+        bool shouldDelete = false;
+        float startLoc = 0.0f;
+        float endLoc = 0.0f;
     private:
         
 };

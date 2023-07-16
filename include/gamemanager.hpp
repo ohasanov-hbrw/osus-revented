@@ -1,6 +1,10 @@
 #pragma once
 #include "parser.hpp"
 #include <raylib.h>
+#include <cmath>
+#include <algorithm>
+#include "utils.hpp"
+#include <limits>
 
 struct dbool
 {
@@ -35,6 +39,7 @@ class GameManager{
 		void unloadGameTextures();
 		void destroyHitObject(int index);
 		void destroyDeadHitObject(int index);
+		std::vector<int> sliderPreInit(HitObjectData data);
 		void render();
 		float windowScale = 2.0f;
         HitSound hitCircleHS;
@@ -94,6 +99,9 @@ class GameManager{
 		GameFile gameFile;
 		Parser parser;
 		std::vector<HitObject*> objects;
+
+		std::vector<FollowPoint> followLines;
+
 		std::vector<HitObject*> dead_objects;
 		float clip(float value, float min, float max);
 		std::vector<timingSettings> timingSettingsForHitObject;

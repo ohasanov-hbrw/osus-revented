@@ -12,6 +12,7 @@
 #include "utils.hpp"
 #include "fs.hpp"
 #include <sys/time.h>
+#include "followpoint.hpp"
 
 //for some reason the clamp function didnt work so here is a manual one
 float GameManager::clip(float value, float min, float max){
@@ -167,15 +168,15 @@ void GameManager::update(){
 				
 
 				objects[objects.size()-1]->init();
-				Vector2 templastCords = {objects[objects.size()-1]->data.ex, objects[objects.size()-1]->data.ey};
+				/*Vector2 templastCords = {objects[objects.size()-1]->data.ex, objects[objects.size()-1]->data.ey};
 				objects[objects.size()-1]->data.ex = lastCords.x;
 				objects[objects.size()-1]->data.ey = lastCords.y;
-				objects[objects.size()-1]->data.lastTime = lastHitTime;
+				objects[objects.size()-1]->data.lastTime = lastHitTime;*/
 				lastHitTime = objects[objects.size()-1]->data.time;
 				if(objects[objects.size()-1]->data.type == 2){
 					objects[objects.size()-1]->data.time + (objects[objects.size()-1]->data.length/100) * (objects[objects.size()-1]->data.timing.beatLength) / (sliderSpeed * objects[objects.size()-1]->data.timing.sliderSpeedOverride) * objects[objects.size()-1]->data.slides;
 				}
-				lastCords = templastCords;
+				//lastCords = templastCords;
 
 				//std::thread objectThread(std::bind(&HitObject::init, objects[objects.size()-1]));
 				//objectThread.join();
@@ -478,6 +479,24 @@ void GameManager::update(){
 			deadoldsize = deadnewsize;
 		}
 	}
+
+
+
+	for(int i = followLines.size()-1; i >= 0; i--){
+		if(followLines[i].startTime > currentTime*1000.0f){
+			break;
+		}
+		followLines[i].update();
+	}
+
+	for(int i = followLines.size()-1; i >= 0; i--){
+		if(!followLines[i].shouldDelete){
+			break;
+		}
+		followLines.pop_back();
+	}
+
+
 }
 
 //main rendering loop
@@ -490,6 +509,16 @@ void GameManager::render(){
 		//DrawRectangle(-5, -5, GetScreenWidth() + 10, GetScreenHeight() + 10, Fade(BLUE, 1.0f));
 	}
 	
+	for(int i = followLines.size()-1; i >= 0; i--){
+		if(followLines[i].startTime > currentTime*1000.0f){
+			break;
+		}
+		followLines[i].render();
+	}
+
+
+
+
 	for(int i = objects.size() - 1; i >= 0; i--){
 		////Global.mutex.lock();
 		/*if(!objects[i]->data.startingACombo){
@@ -923,8 +952,10 @@ void GameManager::loadGame(std::string filename){
 	Global.numberLines = gameFile.hitObjects.size();
     Global.parsedLines = 0;
 	//reverse the hitobject array because we need it reversed for it to make sense (and make it faster because pop_back)
-	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
-	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
+
+	
+
+	
 
 	lastPath = Global.Path;
 
@@ -942,7 +973,7 @@ void GameManager::loadGame(std::string filename){
 	Global.Path = lastPath + '/';
 	files = ls(".png");
 
-	std::reverse(gameFile.events.begin(),gameFile.events.end());
+	
 	double start = getTimer();
 	for(int i = 0; i < gameFile.hitObjects.size(); i++){
 		if(gameFile.hitObjects[i].type == 2){
@@ -1088,6 +1119,9 @@ void GameManager::loadGame(std::string filename){
 	std::cout << getTimer() - start << "ms -> The time it took for you to finish :)" << std::endl;
 	Global.loadingState = 2;
 	
+	
+
+	
 	//calculate all the variables for the game (these may be a bit wrong but they feel right)
 	if(std::stof(gameFile.configDifficulty["ApproachRate"]) < 5.0f){
 		gameFile.preempt = 1200.0f + 600.0f * (5.0f - std::stof(gameFile.configDifficulty["ApproachRate"])) / 5.0f;
@@ -1127,6 +1161,8 @@ void GameManager::loadGame(std::string filename){
 	//backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
 
 
+
+	
 
 	
 	FILE *music = fopen((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str(), "rb");
@@ -1192,24 +1228,21 @@ void GameManager::loadGame(std::string filename){
 		renderSpinnerBack = false;
 	}
 
-
-
-
-	
-
-
-
-
 	
 
 	files.clear();
 	Global.Path = "resources/skin/";
 	files = ls(".wav");
 
+
+	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
+	std::reverse(gameFile.events.begin(),gameFile.events.end());
+
+
     timingSettings tempTiming;
     std::vector<timingSettings> times;
-    int amogus;
-    for(int i =  gameFile.timingPoints.size()-1; i >= 0; i--){
+    double amogus;
+    for(int i = gameFile.timingPoints.size()-1; i >= 0; i--){
         tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
         tempTiming.sliderSpeedOverride = 1;
         tempTiming.time = gameFile.timingPoints[i].time;
@@ -1230,8 +1263,71 @@ void GameManager::loadGame(std::string filename){
         tempTiming.volume = gameFile.timingPoints[i].volume;
         tempTiming.uninherited = gameFile.timingPoints[i].uninherited;
         tempTiming.effects = gameFile.timingPoints[i].effects;
+		//std::cout << "push timing point at: " << tempTiming.time << "\n";
         times.push_back(tempTiming);
     }
+	
+	int index = 0;
+
+	float followPointFadeTime = gameFile.preempt - gameFile.fade_in;
+	followLines.clear();
+	for(int i = 1; i < gameFile.hitObjects.size(); i++){
+		//float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides; //slider length
+		if(gameFile.hitObjects[i].startingACombo == false and gameFile.hitObjects[i - 1].type != 3){
+			FollowPoint tempPoint;
+			tempPoint.endTime = gameFile.hitObjects[i].time;
+			tempPoint.endTime2 = gameFile.hitObjects[i].time + followPointFadeTime;
+			tempPoint.endX = gameFile.hitObjects[i].x;
+			tempPoint.endY = gameFile.hitObjects[i].y;
+			
+			if(gameFile.hitObjects[i - 1].type == 2){
+				/*if(data.slides % 2 == 0){
+					data.ex = data.x;
+					data.ey = data.y;
+				}
+				else{
+					data.ex = renderPoints[renderPoints.size() - 1].x;
+					data.ey = renderPoints[renderPoints.size() - 1].y;
+				}*/
+				HitObjectData tempData = gameFile.hitObjects[i - 1];
+				while(true){
+					if(index + 1 > times.size() - 1)
+						break;
+					if(times[index + 1].time > tempData.time)
+						break;
+					index++;
+				}
+
+				//--------------------------------------------- STANDART SLIDER PROCEDURE ---------------------------------------------
+				
+				tempData.timing.beatLength = times[index + 1].beatLength;
+				tempData.timing.sliderSpeedOverride = times[index + 1].sliderSpeedOverride;
+				std::vector<int> output = sliderPreInit(tempData);
+
+				tempPoint.startTime = output[2] - followPointFadeTime;
+				tempPoint.startTime2 = output[2];
+				tempPoint.startX = output[0];
+				tempPoint.startY = output[1];
+
+				//std::cout << "done calculation of follow line starting from slider at time: " << tempData.time << "\n";
+				//--------------------------------------------- STANDART SLIDER PROCEDURE ---------------------------------------------
+
+			}
+			else{
+				tempPoint.startTime = gameFile.hitObjects[i - 1].time - followPointFadeTime;
+				tempPoint.startTime2 = gameFile.hitObjects[i - 1].time;
+				tempPoint.startX = gameFile.hitObjects[i - 1].x;
+				tempPoint.startY = gameFile.hitObjects[i - 1].y;
+			}
+			followLines.push_back(tempPoint);
+			//std::cout << "followLine from between times " << tempPoint.startTime << " - " << tempPoint.endTime << " and between cords " << tempPoint.startX << ", " << tempPoint.startY << " - " << tempPoint.endX << ", " << tempPoint.endY << "\n";
+		}
+	}
+
+
+	std::reverse(followLines.begin(),followLines.end());
+	std::reverse(gameFile.hitObjects.begin(),gameFile.hitObjects.end());
+
 	reverse(times.begin(), times.end());
 
 	int defaultSampleSet = 0;
@@ -2005,6 +2101,7 @@ void GameManager::unloadGameTextures(){
     UnloadTexture(spinnerCircle);
     UnloadTexture(spinnerApproachCircle);
     UnloadTexture(spinnerMetre);
+	UnloadTexture(followPoint);
     for(int i = 0; i < 10; i++){
         UnloadTexture(numbers[i]);
     }
@@ -2018,4 +2115,335 @@ void GameManager::unloadGameTextures(){
     backgroundTextures.data.clear();
     backgroundTextures.pos.clear();
     backgroundTextures.loaded.clear();
+}
+
+int orientation2(Vector2 &p1, Vector2 &p2, Vector2 &p3){
+    int val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
+    return (val > 0)? false: true;
+}
+
+float interpolate2(float *p, float *time, float t) {
+    float L01 = p[0] * (time[1] - t) / (time[1] - time[0]) + p[1] * (t - time[0]) / (time[1] - time[0]);
+    float L12 = p[1] * (time[2] - t) / (time[2] - time[1]) + p[2] * (t - time[1]) / (time[2] - time[1]);
+    float L23 = p[2] * (time[3] - t) / (time[3] - time[2]) + p[3] * (t - time[2]) / (time[3] - time[2]);
+    float L012 = L01 * (time[2] - t) / (time[2] - time[0]) + L12 * (t - time[0]) / (time[2] - time[0]);
+    float L123 = L12 * (time[3] - t) / (time[3] - time[1]) + L23 * (t - time[1]) / (time[3] - time[1]);
+    float C12 = L012 * (time[2] - t) / (time[2] - time[1]) + L123 * (t - time[1]) / (time[2] - time[1]);
+    return C12;
+}   
+
+std::vector<Vector2> interpolate2(std::vector<Vector2> &points, int index, int pointsPerSegment) {
+    std::vector<Vector2> result;
+    float x[4];
+    float y[4];
+    float time[4];
+    for (int i = 0; i < 4; i++) {
+        x[i] = points[index + i].x;
+        y[i] = points[index + i].y;
+        time[i] = i;
+    }
+    float tstart = 1;
+    float tend = 2;
+    float total = 0;
+    for (int i = 1; i < 4; i++) {
+        float dx = x[i] - x[i - 1];
+        float dy = y[i] - y[i - 1];
+        total += std::pow(dx * dx + dy * dy, .25);
+        time[i] = total;
+    }
+    tstart = time[1];
+    tend = time[2];
+    int segments = pointsPerSegment - 1;
+    result.push_back(points[index + 1]);
+    for (int i = 1; i < segments; i++) {
+        float xi = interpolate2(x, time, tstart + (i * (tend - tstart)) / segments);
+        float yi = interpolate2(y, time, tstart + (i * (tend - tstart)) / segments);
+        result.push_back(Vector2{xi, yi});
+    }
+    result.push_back(points[index + 2]);
+    return result;
+}
+
+std::vector<Vector2> interpolate2(std::vector<Vector2> &coordinates, float length){
+    std::vector<Vector2> vertices;
+    std::vector<int> pointsPerSegment;
+    for (size_t i = 0; i < coordinates.size(); i++){
+        vertices.push_back(coordinates[i]);
+        if(i > 0)
+            pointsPerSegment.push_back(distance(vertices[i], vertices[i-1]));
+    }
+    float lengthAll = 0;
+    for(size_t i = 0; i < pointsPerSegment.size(); i++) 
+        lengthAll += pointsPerSegment[i];
+    for(size_t i = 0; i < pointsPerSegment.size(); i++)
+        pointsPerSegment[i] *= length/lengthAll;
+    float dx = vertices[1].x - vertices[0].x;
+    float dy = vertices[1].y - vertices[0].y;
+    float x1 = vertices[0].x - dx;
+    float y1 = vertices[0].y - dy;
+    Vector2 start = {x1, y1};
+    int n = vertices.size() - 1;
+    dx = vertices[n].x - vertices[n-1].x;
+    dy = vertices[n].y - vertices[n-1].y;
+    float xn = vertices[n].x + dx;
+    float yn = vertices[n].y + dy;
+    Vector2 end = {xn, yn};
+    vertices.insert(vertices.begin(), start);
+    vertices.push_back(end);
+    std::vector<Vector2> result;
+    for (size_t i = 0; i < vertices.size() - 3; i++) {
+        std::vector<Vector2> points = interpolate2(vertices, i, pointsPerSegment[i]);
+        for(size_t i = (result.size() > 0) ? 1 : 0; i < points.size(); i++)
+            result.push_back(points[i]);
+    }
+    return result;
+}
+
+
+
+std::vector<int> GameManager::sliderPreInit(HitObjectData data){
+    bool durationNull = false;
+    double templength = data.length;
+    if(data.length < 1){
+        data.length = 1;
+        durationNull = true;
+    }
+
+	std::vector<Vector2> edgePoints;
+	std::vector<Vector2> renderPoints;
+    edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
+
+    float resolution = data.length;
+    float currentResolution = 0;
+    float lengthScale, totalLength = 0;
+
+	Vector2 extraPosition;
+
+    for(size_t i = 0; i < data.curvePoints.size(); i++)
+        edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
+
+    if(edgePoints.size() == 1){
+        for(int k = 0; k < data.length; k++){
+            renderPoints.push_back(edgePoints[0]);
+        }
+    }
+    else{
+        if(data.curveType == 'L'){
+            extraPosition = data.extraPos;
+            edgePoints[edgePoints.size()-1] = extraPosition;
+            data.totalLength-=data.lengths[data.lengths.size()-1];
+            data.lengths[data.lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
+            data.totalLength+=data.lengths[data.lengths.size()-1];
+            lengthScale = data.totalLength/data.length;
+            for(size_t i = 0; i < edgePoints.size()-1; i++)
+                for(float j = 0; j < data.lengths[i]; j += lengthScale)
+                    renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
+            renderPoints.push_back(edgePoints[edgePoints.size()-1]);
+            while(!false){
+                if(renderPoints.size() <= data.length)
+                    break;
+                renderPoints.pop_back();
+            }
+        }
+        else if(data.curveType == 'B'){
+			Vector2 edges[edgePoints.size()];
+			for(size_t i = 0; i < edgePoints.size(); i++)
+				edges[i] = edgePoints[i];
+			std::vector<Vector2> tempEdges;
+			std::vector<Vector2> tempRender;
+			std::vector<float> curveLengths;
+			double totalCalculatedLength = 0;
+			tempEdges.clear();
+			tempRender.clear();
+			int curveIndex = 0;
+			double currentMax = 0;
+			std::vector<Vector2> samples;
+			std::vector<int> indices;
+			std::vector<float> lengths;
+			bool first = true;
+			double tempResolution;
+			for(size_t i = 0; i < edgePoints.size(); i++){
+				tempEdges.push_back(edgePoints[i]);
+				if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
+					tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
+					//std::cout << "tempResolution: " << tempResolution << std::endl;
+					tempResolution = std::min(data.lengths[curveIndex], 400.0f);
+					if(tempResolution > 0 and tempEdges.size() > 1){
+						if(first){
+							samples.push_back(get2BezierPoint(tempEdges, tempEdges.size(), 0));
+							lengths.push_back(0);
+						}
+						int lastk = 0;
+						int k = 1;
+						if(!first)
+							k = 0;
+						for(; k < tempResolution; k++){
+							samples.push_back(get2BezierPoint(tempEdges, tempEdges.size(), ((double)k)/tempResolution));
+							lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+							lastk = k;
+						}
+
+						samples.push_back(get2BezierPoint(tempEdges, tempEdges.size(), 1));
+						lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+						if(first)
+							first = false;
+					}
+					curveIndex++;
+					tempEdges.clear();
+				}
+			}
+
+			totalCalculatedLength = lengths[lengths.size() - 1];
+			tempResolution = data.length;
+			if(totalCalculatedLength < data.length){
+				float angle = atan2(samples[samples.size()-1].y - samples[samples.size()-2].y, samples[samples.size()-1].x - samples[samples.size()-2].x) * 180 / 3.14159265;
+				float hipotenus = data.length - totalCalculatedLength;
+				float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+				float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
+				int ything = 1;
+				if(angle < 0.0f){
+					ything = -1;
+				}
+				else if(angle == 0.0f){
+					ything = 0;
+				}
+
+				Vector2 extraPosition = {samples[samples.size()-1].x + xdiff, samples[samples.size()-1].y - ydiff * (float)ything};
+				samples.push_back(extraPosition);
+				lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
+			}
+			renderPoints.clear();
+			int SampleIndex = 1;
+			for(int index = 0; index <= data.length; index++){
+				while(index > lengths[SampleIndex]){
+					if(SampleIndex == lengths.size() - 1)  
+						break;
+					else{
+						SampleIndex++;
+					}
+				}
+				double lerpPos = (index - lengths[SampleIndex - 1]) / (lengths[SampleIndex] - lengths[SampleIndex - 1]);
+				renderPoints.push_back(lerp(samples[SampleIndex], samples[SampleIndex - 1], lerpPos));
+			}
+        }
+        else if(data.curveType == 'P'){
+            std::pair<Vector2, float> circleData = get2PerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
+            float inf = std::numeric_limits<float>::infinity();
+            if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
+                extraPosition = data.extraPos;
+                edgePoints[edgePoints.size()-1] = extraPosition;
+                data.totalLength-=data.lengths[data.lengths.size()-1];
+                data.lengths[data.lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
+                data.totalLength+=data.lengths[data.lengths.size()-1];
+
+                lengthScale = data.totalLength/data.length;
+
+                for(size_t i = 0; i < edgePoints.size()-1; i++)
+                    for(float j = 0; j < data.lengths[i]; j += lengthScale)
+                        renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
+                renderPoints.push_back(edgePoints[edgePoints.size()-1]);
+                while(!false){
+                    if(renderPoints.size() <= data.length) break;
+                    renderPoints.pop_back();
+                }
+            }
+            else{
+                Vector2 center = circleData.first;
+                int radius = circleData.second;
+                float degree1 = atan2(edgePoints[0].y - center.y , edgePoints[0].x - center.x) * RAD2DEG;
+                float degree2 = atan2(edgePoints[1].y - center.y , edgePoints[1].x - center.x) * RAD2DEG;
+                float degree3 = atan2(edgePoints[2].y - center.y , edgePoints[2].x - center.x) * RAD2DEG;
+                degree1 = degree1 < 0 ? degree1 + 360 : degree1;
+                degree2 = degree2 < 0 ? degree2 + 360 : degree2;
+                degree3 = degree3 < 0 ? degree3 + 360 : degree3;
+                bool clockwise = !orientation2(edgePoints[0], edgePoints[1], edgePoints[2]);
+                float angle = (((data.length * 360) / radius ) / 3.14159265 ) / 2;
+                int a = 0;
+                if(clockwise){
+                    degree1 = degree1 < degree3 ? degree1 + 360 : degree1;
+                    degree2 = degree2 < degree3 ? degree2 + 360 : degree2;
+                    for(float i = degree1; i > degree1 - angle; i-=angle/data.length){
+                        if(a > data.length){
+                            renderPoints.pop_back();
+                            break;
+                        }
+                        Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
+                        renderPoints.push_back(tempPoint);
+                        a++;
+                    }
+                }
+                else{
+                    degree2 = degree2 < degree1 ? degree2 + 360 : degree2;
+                    degree3 = degree3 < degree1 ? degree3 + 360 : degree3;
+                    for(float i = degree1; i < degree1 + angle; i+=angle/data.length){
+                        if(a > data.length){
+                            renderPoints.pop_back();
+                            break;
+                        }
+                        Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
+                        renderPoints.push_back(tempPoint);
+                        a++;
+                    }
+                    //std::reverse(renderPoints.begin(), renderPoints.end());
+                }
+                while(renderPoints.size() > data.length){
+                    renderPoints.pop_back();
+                }
+                //std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
+                
+            }
+            
+        }
+        else if(data.curveType == 'C'){
+            renderPoints = interpolate2(edgePoints, data.length);
+            while(!false){
+                if(renderPoints.size() <= data.length) break;
+                renderPoints.pop_back();
+            }
+        }
+        else{
+            std::__throw_invalid_argument("Invalid Slider type!");
+        }
+
+    }
+    for(size_t i = 0; i < renderPoints.size(); i++){
+        if(renderPoints[i].x < -150){
+            renderPoints[i].x = -150;
+        }
+        if(renderPoints[i].y < -150){
+            renderPoints[i].y = -150;
+        }
+        if(renderPoints[i].x > 790){
+            renderPoints[i].x = 790;
+        }
+        if(renderPoints[i].y > 630){
+            renderPoints[i].y = 630;
+        }
+    }
+
+    if(data.slides % 2 == 0){
+        data.ex = data.x;
+        data.ey = data.y;
+    }
+    else{
+        data.ex = renderPoints[renderPoints.size() - 1].x;
+        data.ey = renderPoints[renderPoints.size() - 1].y;
+    }
+
+	float tempTimeLength = (data.length/100) * (data.timing.beatLength) / (sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
+	float endTime = data.time + tempTimeLength - (36 - (18 * (tempTimeLength <= 72.0f)));
+	if(durationNull){
+		endTime = data.time;
+	}
+
+	std::vector<int> out;
+
+	edgePoints.clear();
+	renderPoints.clear();
+
+	out.push_back(data.ex);
+	out.push_back(data.ey);
+	out.push_back(endTime);
+
+    return out;
 }

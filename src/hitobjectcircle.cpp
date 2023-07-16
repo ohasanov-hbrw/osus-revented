@@ -56,6 +56,7 @@ void Circle::render(){
     DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade));
     DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width*(gm->hitCircleOverlay.width/128.0f) , Fade(WHITE,clampedFade));
     DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width*(gm->approachCircle.width/128.0f) , renderColor);
+
 }
 
 //renders the "dead" Circle
