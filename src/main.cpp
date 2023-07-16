@@ -86,14 +86,19 @@ void RenderLoop(){
             std::this_thread::sleep_for(std::chrono::duration<double>((1000.0/288.0 - (tTime - last)) / 1000.0));*/
         if(VSYNC == 0){
             std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
-            unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/Global.FPS) - sleepTime.count()) * 1000.0);
+            unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/Global.FPS) - (sleepTime.count())) * 800.0);
             //std::cout << "Sleeptime of  " << sleepTimeInt << " us ";
             SleepInUs(sleepTimeInt);
+            while(getTimer() - last < 1000.0/Global.FPS and getTimer() - last >= 0)
+                continue;
         }
+
+        
+        
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
-        //std::cout << " Took " << elapsed.count() << " ms\n";
-        //std::cout << "Took " << elapsed.count() << " ms\n";
         double fps = (1000.0f / (elapsed.count()));
+        if(elapsed.count() > 16)
+            std::cout << "dropped frame with " << elapsed.count() << "ms\n";
         avgFPSq.push(fps);
         avgFPSqueueSUM += fps;
         if(avgFPSq.size() > 1000){
@@ -101,10 +106,6 @@ void RenderLoop(){
             avgFPSq.pop();
         }
         avgFPS = avgFPSqueueSUM / (double)(avgFPSq.size());
-        //avgFPS = (avgFPS + 1000.0f / (elapsed.count())) / 2.0;
-        
-        //avgFPS = (avgFPS + 1000.0f / (getTimer() - last)) / 2.0;
-        //std::cout << avgFPS << std::endl;
     }
     
 }
@@ -200,6 +201,7 @@ int main() {
     std::thread rend(RenderLoop);
 
     while(!WindowShouldClose()){
+        double timerXXX = getTimer();
         auto t1 = std::chrono::steady_clock::now();
         Global.mutex.lock();
         PollInputEvents();

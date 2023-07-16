@@ -253,7 +253,7 @@ void Game::init() {
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
     Global.mutex.lock();
-    Global.startTime = -700.0f;
+    Global.startTime = -2000.0f;
     Global.errorSum = 0;
     Global.errorLast = 0;
     Global.errorDiv = 0;

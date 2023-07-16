@@ -2028,7 +2028,7 @@ void GameManager::loadGameTextures(){
 	for(int i = 0; i < (int)gameFile.events.size(); i++){
 		if(gameFile.events[i].eventType == 0){
 			std::cout << "Time: " << gameFile.events[i].startTime << "ms - Filename: " << gameFile.events[i].filename << '.' << std::endl;
-			if(gameFile.events[i].startTime == 0){
+			if(gameFile.events[i].startTime < 1000){
 				gameFile.events[i].startTime -= 7000;
 				std::cout << "Time changed to: " << gameFile.events[i].startTime << std::endl;
 			}
