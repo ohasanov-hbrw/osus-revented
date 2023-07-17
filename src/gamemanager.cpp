@@ -1319,6 +1319,15 @@ void GameManager::loadGame(std::string filename){
 				tempPoint.startX = gameFile.hitObjects[i - 1].x;
 				tempPoint.startY = gameFile.hitObjects[i - 1].y;
 			}
+			tempPoint.distance = std::sqrt(std::pow(std::abs(tempPoint.startX - tempPoint.endX),2) + std::pow(std::abs(tempPoint.startY - tempPoint.endY),2));
+			int numberOfPoints = tempPoint.distance / 32.0f;
+			float offset = (tempPoint.distance - numberOfPoints * 32.0f) / 2.0f;
+			for(int i = 0; i < numberOfPoints; i++){
+				float loc = offset + 16.0f + i * 32.0f;
+				loc = loc / tempPoint.distance;
+				Vector2 tempData = lerp({tempPoint.startX, tempPoint.startY}, {tempPoint.endX, tempPoint.endY}, loc);
+				tempPoint.points.push_back({tempData.x, tempData.y, loc});
+			}
 			followLines.push_back(tempPoint);
 			//std::cout << "followLine from between times " << tempPoint.startTime << " - " << tempPoint.endTime << " and between cords " << tempPoint.startX << ", " << tempPoint.startY << " - " << tempPoint.endX << ", " << tempPoint.endY << "\n";
 		}

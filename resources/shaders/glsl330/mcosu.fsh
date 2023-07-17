@@ -11,7 +11,7 @@ vec4 calculateColor(vec4 texel){
     vec4 outputColor = vec4(0,0,0,0);
     if(texel.r > 0.06){
         if(texel.a > 0.25){
-            outputColor = vec4(texel.a*0.3,texel.a*0.3,texel.a*0.3,0.7 * transparency);
+            outputColor = vec4(texel.a*0.3,texel.a*0.3,texel.a*0.4,0.7 * transparency);
         }
         else if(texel.a > 0.20){
             float tempData = (0.25 - texel.a) * 20.0;

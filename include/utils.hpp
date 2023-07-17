@@ -110,3 +110,5 @@ void updateTimer();
 
 bool IsTextureReady(Texture2D);
 bool IsRenderTextureReady(RenderTexture2D);
+
+float getAngle(Vector2, Vector2);

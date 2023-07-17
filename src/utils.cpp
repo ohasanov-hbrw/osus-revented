@@ -395,3 +395,7 @@ bool IsRenderTextureReady(RenderTexture2D target)
             IsTextureReady(target.depth) &&     // Validate FBO depth texture/renderbuffer
             IsTextureReady(target.texture));    // Validate FBO texture
 }
+
+float getAngle(Vector2 p1, Vector2 p2){
+    return atan2(p1.y - p2.y, p1.x - p2.x);
+}

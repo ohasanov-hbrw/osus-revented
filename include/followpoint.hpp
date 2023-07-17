@@ -19,8 +19,11 @@ class FollowPoint{
         float startX,startY,endX,endY;
         bool shouldRender = false;
         bool shouldDelete = false;
+        float distance = 0;
         float startLoc = 0.0f;
         float endLoc = 0.0f;
+        std::vector<Vector3> points;
+        float angle;
     private:
         
 };
