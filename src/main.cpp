@@ -134,7 +134,7 @@ int main() {
 
     Global.shdrOutline = LoadShader(0, TextFormat("resources/shaders/glsl%i/outline.fs", 100));
 
-    Global.shdrTest = LoadShader(0, TextFormat("resources/shaders/glsl%i/mcosu.fsh", 330));
+    Global.shdrTest = LoadShader(TextFormat("resources/shaders/glsl%i/mcosu.vsh", 330), TextFormat("resources/shaders/glsl%i/mcosu.fsh", 330));
     //Image cus;
     std::string lastPath = Global.Path;
 	Global.Path = "resources/default_skin/";
