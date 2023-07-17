@@ -784,6 +784,7 @@ void Slider::update(){
                     SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], (float)volume/100.0f);
                     PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
 			        PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);
+                    std::cout << "playing normal sound" << data.EdgeNormalSound[curRepeat] << " and addition sound " << data.EdgeAdditionSound[curRepeat] << std::endl;
                 }
                 else{
                     reverseclicked[curRepeat-1] = 0;

@@ -64,7 +64,7 @@ void FollowPoint::render(){
                 DrawCircle(ScaleCordX(points[i].x), ScaleCordY(points[i].y), Scale(3), {255,200,255,opacity});
 
             }
-            std::cout << std::endl;
+            //std::cout << std::endl;
         }
         else{
             Vector2 start = lerp({startX, startY}, {endX, endY}, startLoc);
