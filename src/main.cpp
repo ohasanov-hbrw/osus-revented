@@ -97,7 +97,7 @@ void RenderLoop(){
         
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
         double fps = (1000.0f / (elapsed.count()));
-        if(elapsed.count() > 16)
+        if(elapsed.count() > 16 and VSYNC == 0)
             std::cout << "dropped frame with " << elapsed.count() << "ms\n";
         avgFPSq.push(fps);
         avgFPSqueueSUM += fps;
@@ -120,11 +120,12 @@ int main() {
         if (Global.GamePath[i] == '\\')
             Global.GamePath[i] = '/';
     }
+
     SetTraceLogLevel(LOG_WARNING);
     InitAudioDevice();
     
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    //SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetAudioStreamBufferSizeDefault(128);
     InitWindow(640, 480, "aa");
     
@@ -197,9 +198,7 @@ int main() {
     //glfwSwapInterval( 0 );
     SDL_GL_SetSwapInterval(VSYNC);
     SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
-
     std::thread rend(RenderLoop);
-
     while(!WindowShouldClose()){
         double timerXXX = getTimer();
         auto t1 = std::chrono::steady_clock::now();
@@ -222,6 +221,7 @@ int main() {
         std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
         unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/1000.0) - sleepTime.count()) * 1000.0);
         SleepInUs(sleepTimeInt);
+        
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
         //avgHZ = (avgHZ + 1000.0f / (elapsed.count())) / 2.0;
         double hz = (1000.0f / (elapsed.count()));
