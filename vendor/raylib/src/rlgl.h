@@ -2047,10 +2047,18 @@ void rlClearDepth(float i){
 
 void rlCustomDepthFunc(bool enable){
     if(enable)
-        glDepthFunc(GL_GREATER);  
+        glDepthFunc(GL_LESS);  
     else
         glDepthFunc(GL_LEQUAL);  
 }
+
+/*void rlAlphaTest(bool enable){
+    if(enable)
+        glDepthFunc(GL_LESS);  
+    else
+        glDepthFunc(GL_LEQUAL);  
+}*/
+
 
 // Vertex Buffer Object deinitialization (memory free)
 void rlglClose(void)
@@ -3343,6 +3351,7 @@ unsigned int rlLoadFramebuffer(int width, int height)
 
 // Attach color buffer texture to an fbo (unloads previous attachment)
 // NOTE: Attach type: 0-Color, 1-Depth renderbuffer, 2-Depth texture
+
 void rlFramebufferAttach(unsigned int fboId, unsigned int texId, int attachType, int texType, int mipLevel)
 {
 #if (defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)) && defined(RLGL_RENDER_TEXTURES_HINT)

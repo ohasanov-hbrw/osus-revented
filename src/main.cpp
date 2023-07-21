@@ -23,6 +23,7 @@
 #include <queue>
 //#include "SDLutils.hpp"
 
+
 std::condition_variable cv;
 
 double avgFPS = Global.FPS;
@@ -121,14 +122,17 @@ int main() {
             Global.GamePath[i] = '/';
     }
 
-    SetTraceLogLevel(LOG_WARNING);
+    SetTraceLogLevel(LOG_WARNING); //LOG_WARNING
     InitAudioDevice();
     
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     //SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetAudioStreamBufferSizeDefault(128);
-    InitWindow(640, 480, "aa");
+    InitWindow(640, 480, "osus - amogus");
     
+    SDL_Surface* pIcon = SDL_CreateRGBSurface(0,64,64,32,0,0,0,0);;
+    SDL_SetWindowIcon((SDL_Window*)GetWindowSDL(), pIcon);
+    SDL_FreeSurface(pIcon);
 
     Global.DefaultFont = LoadFont("resources/telegrama_render.otf");
     Global.OsusLogo = LoadTexture("resources/osus.png");
@@ -198,6 +202,9 @@ int main() {
     //glfwSwapInterval( 0 );
     SDL_GL_SetSwapInterval(VSYNC);
     SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
+
+
+
     std::thread rend(RenderLoop);
     while(!WindowShouldClose()){
         double timerXXX = getTimer();
