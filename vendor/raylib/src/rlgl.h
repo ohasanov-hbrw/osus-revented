@@ -624,6 +624,8 @@ RLAPI void rlDisableStereoRender(void);                 // Disable stereo render
 RLAPI bool rlIsStereoRenderEnabled(void);               // Check if stereo render is enabled
 
 RLAPI void rlClearColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a); // Clear color buffer with color
+RLAPI void rlClearDepth(float i);
+RLAPI void rlCustomDepthFunc(bool enable);
 RLAPI void rlClearScreenBuffers(void);                  // Clear used screen buffers (color and depth)
 RLAPI void rlCheckErrors(void);                         // Check and log OpenGL error codes
 RLAPI void rlSetBlendMode(int mode);                    // Set blending mode
@@ -1365,6 +1367,8 @@ void rlEnd(void)
         for (int i = RLGL.State.stackCounter; i >= 0; i--) rlPopMatrix();
         rlDrawRenderBatch(RLGL.currentBatch);
     }
+
+
 }
 
 // Define one vertex (position)
@@ -2035,6 +2039,17 @@ void rlglInit(int width, int height)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);                   // Set clear color (black)
     glClearDepth(1.0f);                                     // Set clear depth value (default)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // Clear color and depth buffers (depth buffer required for 3D)
+}
+
+void rlClearDepth(float i){
+    glClearDepth(i); 
+}
+
+void rlCustomDepthFunc(bool enable){
+    if(enable)
+        glDepthFunc(GL_GREATER);  
+    else
+        glDepthFunc(GL_LEQUAL);  
 }
 
 // Vertex Buffer Object deinitialization (memory free)

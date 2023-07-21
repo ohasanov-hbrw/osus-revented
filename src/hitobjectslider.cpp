@@ -803,23 +803,32 @@ void Slider::update(){
 }
 
 void Slider::render(){
-    bool legacyRender = true;
+    bool legacyRender = Global.legacyRender;
     GameManager* gm = GameManager::getInstance();
     bool changeTex = false;
     if(data.textureReady == true and data.textureLoaded == false){
-        sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize),
+        if(legacyRender)
+            sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)*Global.sliderTexSize),
                                           (int)(((std::max(maxY-minY, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.height))+16)*Global.sliderTexSize));
-        
+        else
+            sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))+16)),
+                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.height))+16)));
         SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
         BeginTextureMode(sliderTexture);
+        //rlClearScreenBuffers();
         BeginBlendMode(BLEND_ALPHA_PREMUL);
+        /*if(legacyRender){
+            rlEnableDepthTest(); 
+            rlCustomDepthFunc(false);
+            rlEnableDepthMask();
+            rlClearDepth(0.0f);
+            rlDisableDepthTest();
+        }*/
         ClearBackground({0,0,0,0});
         EndBlendMode();
         EndTextureMode();
         changeTex = true;
-        if(!legacyRender){
-            
-        }
+        
     }
 
 
@@ -830,13 +839,17 @@ void Slider::render(){
     float clampedBigFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 100.0f);
     Color renderColor;
     data.textureLoaded = IsRenderTextureReady(sliderTexture);
+    //rlCustomDepthFunc(true);
+    
     if(data.textureLoaded and data.textureReady){
         
-        if(legacyRender){
+        if(legacyRender){   
             
             if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last != renderPoints.size() - 1){
                 BeginTextureMode(sliderTexture);
                 //BeginBlendMode(BLEND_ALPHA_PREMUL);
+                
+                
                 bool draw = true;
                 if(renderPoints.size() > 0){
                     for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
@@ -848,110 +861,80 @@ void Slider::render(){
                                 DrawTextureEx(gm->sliderout, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                                 (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderout.width)*Global.sliderTexSize,WHITE);
                                 */
+
+                                /*
                                 rlSetBlendFactorsSeparate(RL_ONE, RL_ONE_MINUS_SRC_ALPHA, RL_ONE, RL_ONE_MINUS_SRC_ALPHA, RL_MAX, RL_MAX);
                                 rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
-                                //BeginBlendMode(BLEND_ALPHA_PREMUL);
+                                
                                 DrawTextureEx(gm->sliderout, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                                 (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderout.width)*Global.sliderTexSize,WHITE);
-                                
-                                //DrawCircle((renderPoints[i].x+4-minX + gm->circlesize/2.0f), ((sliderTexture.texture.height - (renderPoints[i].y+4-minY + gm->circlesize/2.0f))), (gm->circlesize/4.0f), RED);
+                                */
 
+                                //DrawCircle((renderPoints[i].x+4-minX + gm->circlesize/2.0f), ((sliderTexture.texture.height - (renderPoints[i].y+4-minY + gm->circlesize/2.0f))), (gm->circlesize/4.0f), RED);
                                 
+
+                                Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX + gm->circlesize/2.0f) * Global.sliderTexSize, ((sliderTexture.texture.height - (renderPoints[i].y+4 * Global.sliderTexSize-minY + gm->circlesize/2.0f) * Global.sliderTexSize))};
                                 
-                                
+                                //BeginBlendMode(BLEND_ALPHA_PREMUL);
+
+                                rlEnableDepthTest(); 
+                                rlCustomDepthFunc(true);
+                                rlEnableDepthMask();
+
+                                DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.98)  * Global.sliderTexSize, 32, -0.1f, {255, 255, 255, 255});
+
+                                //rlSetBlendFactorsSeparate(RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_MIN, RL_MIN);
+                                //rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
+
+                                DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.79)  * Global.sliderTexSize, 32, -0.2f, {2, 0, 4, 128});
+
+                                rlDisableDepthTest();
+
+                                rlCustomDepthFunc(false);
                                 
                                 /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
                                 {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
                                 (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
-                                last = std::max(i, 0);
-                                if(last == renderPoints.size() - 1){
-                                    last = renderPoints.size();
-                                }
-                                renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
+
+                                
                             }
                         }
+                        last = std::max(i, 0);
+                        if(last == renderPoints.size() - 1){
+                            last = renderPoints.size();
+                        }
+                        renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
                     }
                 }
-                //disable temp
-                //if(draw and renderPoints.size() > 0 and last != renderPoints.size() - 1){
-                //    //std::cout << "wtf" << std::endl;
-                //    int i = renderPoints.size() - 1;
-                //    if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
-                //        DrawTextureEx(gm->sliderout, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
-                //        (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderout.width)*Global.sliderTexSize,WHITE);
-                //        DrawTextureEx(gm->sliderin, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
-                //        (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderin.width*(gm->circlesize/gm->sliderin.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderin.width)*Global.sliderTexSize,WHITE);
-                //        
-                //        /*DrawLineEx({(renderPoints[last].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[last].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                //        {(renderPoints[i].x+4*Global.sliderTexSize-minX+gm->circlesize/2.0)*Global.sliderTexSize, sliderTexture.texture.height-(renderPoints[i].y+4*Global.sliderTexSize-minY+gm->circlesize/2.0)*Global.sliderTexSize},
-                //        (312.0) * (gm->circlesize/gm->sliderin.width)*Global.sliderTexSize , Color{28,28,28,255});*/
-                //        last = std::max(i, 0);
-                //        renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151] = true;
-                //    }
-                //    last = renderPoints.size() - 1;
-                //    
-                //}
-                
                 
                 EndTextureMode();
-                /*if(draw and renderPoints.size() > 0){
-                    //GenTextureMipmaps(&sliderTexture.texture);
-                    SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR );
-                    //std::cout << "slider filter in use" << std::endl;
-                }*/
-            
             }
+            rlDisableDepthTest();
+            rlCustomDepthFunc(false);
             EndBlendMode();
             //EndShaderMode();
             float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
             float outlineColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };     // Normalized RED color 
             float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height};
-            
-            //// Get shader locations
-            //int outlineSizeLoc = GetShaderLocation(Global.shdrOutline, "outlineSize");
-            //int outlineColorLoc = GetShaderLocation(Global.shdrOutline, "outlineColor");
-            //int textureSizeLoc = GetShaderLocation(Global.shdrOutline, "textureSize");
-            //int transparency = GetShaderLocation(Global.shdrOutline, "transparency");
-            //float x = 1.0f;
-            //// Set shader values (they can be changed later)
-            //SetShaderValue(Global.shdrOutline, outlineSizeLoc, &outlineSize, SHADER_UNIFORM_FLOAT);
-            //SetShaderValue(Global.shdrOutline, outlineColorLoc, outlineColor, SHADER_UNIFORM_VEC4);
-            //SetShaderValue(Global.shdrOutline, textureSizeLoc, textureSize, SHADER_UNIFORM_VEC2);
-            //SetShaderValue(Global.shdrOutline, transparency, &x, SHADER_UNIFORM_FLOAT);
-
-            //BeginBlendMode(BLEND_ALPHA_PREMUL);
-
-            //BeginShaderMode(Global.shdrOutline);
+            //int transparency = GetShaderLocation(Global.shdrTest, "transparency");
+            //SetShaderValue(Global.shdrTest, transparency, &clampedFade, SHADER_UNIFORM_FLOAT);
 
 
-            /*int xSize = GetShaderLocation(Global.shdrTest, "xs");
-            int ySize = GetShaderLocation(Global.shdrTest, "ys");
-            int rSize = GetShaderLocation(Global.shdrTest, "r");
-
-            float Value = (float)sliderTexture.texture.width;
-            SetShaderValue(Global.shdrTest, xSize, &Value, SHADER_UNIFORM_FLOAT);
-            Value = (float)sliderTexture.texture.height;
-            SetShaderValue(Global.shdrTest, ySize, &Value, SHADER_UNIFORM_FLOAT);
-            Value = 5.0f;
-            SetShaderValue(Global.shdrTest, rSize, &Value, SHADER_UNIFORM_FLOAT);*/
-
-            int transparency = GetShaderLocation(Global.shdrTest, "transparency");
-            SetShaderValue(Global.shdrTest, transparency, &clampedFade, SHADER_UNIFORM_FLOAT);
-
-            //int textureSizeLoc = GetShaderLocation(Global.shdrTest, "textureSize");
-            //SetShaderValue(Global.shdrTest, textureSizeLoc, textureSize, SHADER_UNIFORM_VEC2);
-
-
-            BeginShaderMode(Global.shdrTest);
+            //BeginShaderMode(Global.shdrTest);
             DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,1), gm->circlesize);
-            EndShaderMode();
+            //EndShaderMode();
             //Vector2 tempPos2 = renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size()))];
             //DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y, gm->circlesize/gm->sliderin.width, RED);
         }
         else{
 
         }
+        
     }
+    
+    //rlCustomDepthFunc(false);
+    
+    
     int index = 0;
     int topla = 1;
     float angle = 0;
@@ -1065,11 +1048,11 @@ void Slider::dead_render(){
 
 
         BeginShaderMode(Global.shdrOutline);*/
-        int transparency = GetShaderLocation(Global.shdrTest, "transparency");
-        SetShaderValue(Global.shdrTest, transparency, &clampedFade2, SHADER_UNIFORM_FLOAT);
-        BeginShaderMode(Global.shdrTest);
+        //int transparency = GetShaderLocation(Global.shdrTest, "transparency");
+        //SetShaderValue(Global.shdrTest, transparency, &clampedFade2, SHADER_UNIFORM_FLOAT);
+        //BeginShaderMode(Global.shdrTest);
         DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade2), gm->circlesize);
-        EndShaderMode();
+        //EndShaderMode();
 
 
         float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);

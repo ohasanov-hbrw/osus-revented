@@ -115,7 +115,8 @@ struct Globals {
 
     Globals() = default;
 
-    float sliderTexSize = 1.0f;
+    float sliderTexSize = 3.0f;
+    bool legacyRender = true;
 
     long long errorSum = 0;
     long long errorLast = 0;
