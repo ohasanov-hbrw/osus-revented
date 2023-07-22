@@ -161,6 +161,7 @@ Wave WaveCopy(Wave wave);                                       // Copy a wave t
 void WaveCrop(Wave *wave, int initSample, int finalSample);     // Crop a wave to defined samples range
 float *LoadWaveSamples(Wave wave);                              // Load samples data from wave as a floats array
 void UnloadWaveSamples(float *samples);                         // Unload samples data loaded with LoadWaveSamples()
+bool IsSoundReady(Sound sound);
 
 // Music management functions
 Music LoadMusicStream(const char *fileName);                    // Load music stream from file

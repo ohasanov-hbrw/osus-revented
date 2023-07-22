@@ -399,3 +399,109 @@ bool IsRenderTextureReady(RenderTexture2D target)
 float getAngle(Vector2 p1, Vector2 p2){
     return atan2(p1.y - p2.y, p1.x - p2.x);
 }
+
+std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex, int defaultSampleSet, int normalSet, int additionSet, int hitSound, int index, std::string filename){
+    int defaultSampleSetForObject = 0;
+    int defaultSampleIndexForObject = timingSampleIndex;
+
+    if(timingSet == 1)
+        defaultSampleSetForObject = 0;
+    else if(timingSet == 2)
+        defaultSampleSetForObject = 1;
+    else if(timingSet == 3)
+        defaultSampleSetForObject = 2;
+    else
+        defaultSampleSetForObject = defaultSampleSet;
+    
+    int NormalSetForObject = 0;
+    
+    int HitSoundForObject = 0;
+    int SampleIndexForObject = 0;
+
+    if(normalSet == 1)
+        NormalSetForObject = 0;
+    else if(normalSet == 2)
+        NormalSetForObject = 1;
+    else if(normalSet == 3)
+        NormalSetForObject = 2;
+    else
+        NormalSetForObject = defaultSampleSetForObject;
+    
+    
+    if(hitSound == 2)
+        HitSoundForObject = 1;
+    else if(hitSound == 4)
+        HitSoundForObject = 2;
+    else if(hitSound == 8)
+        HitSoundForObject = 3;
+    else
+        HitSoundForObject = 0;
+    
+    if(index != 0)
+        SampleIndexForObject = index;
+    else
+        SampleIndexForObject = defaultSampleIndexForObject;
+    
+    std::string HitSoundIndex = "";
+
+    if(!(SampleIndexForObject == 0 or SampleIndexForObject == 1)){
+        HitSoundIndex = std::to_string(SampleIndexForObject);
+    }
+
+    std::string NormalFileName;
+
+    if(NormalSetForObject == 0)
+        NormalFileName = "normal-hitnormal";
+    else if(NormalSetForObject == 1)
+        NormalFileName = "soft-hitnormal";
+    else
+        NormalFileName = "drum-hitnormal";
+
+    std::vector<std::string> out;
+    
+    out.push_back(NormalFileName + HitSoundIndex);
+    out.push_back(NormalFileName);
+
+    std::string AdditionFilename;
+
+    int AdditionSetForObject = 0;
+
+    if(additionSet == 1)
+        AdditionSetForObject = 0;
+    else if(additionSet == 2)
+        AdditionSetForObject = 1;
+    else if(additionSet == 3)
+        AdditionSetForObject = 2;
+    else
+        AdditionSetForObject = NormalSetForObject;
+
+    if(AdditionSetForObject == 0)
+        AdditionFilename = "normal-hit";
+    else if(AdditionSetForObject == 1)
+        AdditionFilename = "soft-hit";
+    else
+        AdditionFilename = "drum-hit";
+
+    if(HitSoundForObject == 0)
+        AdditionFilename += "normal";
+    else if(HitSoundForObject == 1)
+        AdditionFilename += "whistle";
+    else if(HitSoundForObject == 2)
+        AdditionFilename += "finish";
+    else
+        AdditionFilename += "clap";
+
+    if(filename.size() > 4){
+        if(filename[filename.size() - 5] == '.'){
+            for(int i = 0; i < 4; i++)
+                filename.pop_back();
+        }
+        out.push_back(filename);
+        out.push_back(AdditionFilename);
+    }
+    else {
+        out.push_back(AdditionFilename + HitSoundIndex);
+        out.push_back(AdditionFilename);
+    }
+    return out;
+}

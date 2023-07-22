@@ -6,6 +6,7 @@
 #include "utils.hpp"
 #include <limits>
 
+
 struct dbool
 {
     bool value = false;
@@ -36,11 +37,16 @@ class GameManager{
 		void loadBeatmapSkin(std::string filename);
 		void loadBeatmapSound(std::string filename);
 		void loadGameTextures();
+		void loadGameSounds();
 		void unloadGameTextures();
 		void destroyHitObject(int index);
 		void destroyDeadHitObject(int index);
 		std::vector<int> sliderPreInit(HitObjectData data);
 		void render();
+
+		HitSound SoundFilesAll;
+
+
 		float windowScale = 2.0f;
         HitSound hitCircleHS;
 		int skip = 2;
@@ -105,6 +111,11 @@ class GameManager{
 		std::vector<HitObject*> dead_objects;
 		float clip(float value, float min, float max);
 		std::vector<timingSettings> timingSettingsForHitObject;
+
+		timingSettings currentTimingSettings;
+		int lastCurrentTiming;
+		double verytempbeat2;
+		int defaultSampleSet = 0;
 		int index;
 		float circlesize = 54.48*2.0f;
 		double verytempbeat;
@@ -114,7 +125,7 @@ class GameManager{
 		double TimerLast = 0;
 		double TimeLast = 0;
 		HitSound SoundFiles;
-
+		int lastTimingLoc;
 		Vector2 lastCords = {0,0};
 		double lastHitTime = 0;
 		Background backgroundTextures;
@@ -124,8 +135,10 @@ class GameManager{
 		bool temprenderSpinnerMetre = false;
 		bool temprenderSpinnerBack = false;
 
+
+
 		std::string lastPath;
-		
+		std::string GamePathWithSlash;
 
 		char *musicData;
 		long musicSize;

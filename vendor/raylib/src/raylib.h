@@ -1522,7 +1522,7 @@ RLAPI void WaveCrop(Wave *wave, int initSample, int finalSample);     // Crop a 
 RLAPI void WaveFormat(Wave *wave, int sampleRate, int sampleSize, int channels); // Convert wave data to desired format
 RLAPI float *LoadWaveSamples(Wave wave);                              // Load samples data from wave as a 32bit float data array
 RLAPI void UnloadWaveSamples(float *samples);                         // Unload samples data loaded with LoadWaveSamples()
-
+RLAPI bool IsSoundReady(Sound sound);
 // Music management functions
 RLAPI Music LoadMusicStream(const char *fileName);                    // Load music stream from file
 RLAPI Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data, int dataSize); // Load music stream from data

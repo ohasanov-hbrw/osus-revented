@@ -29,8 +29,8 @@ void Circle::update(){
         data.point = 0;
         //resets the combo
         if(gm->clickCombo > 30){
-            SetSoundVolume(gm->SoundFiles.data["combobreak"], 1.0f);
-            PlaySound(gm->SoundFiles.data["combobreak"]);
+            SetSoundVolume(gm->SoundFilesAll.data["combobreak"], 1.0f);
+            PlaySound(gm->SoundFilesAll.data["combobreak"]);
         }
         gm->clickCombo = 0;
         gm->destroyHitObject(data.index);

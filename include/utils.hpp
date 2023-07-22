@@ -112,3 +112,5 @@ bool IsTextureReady(Texture2D);
 bool IsRenderTextureReady(RenderTexture2D);
 
 float getAngle(Vector2, Vector2);
+
+std::vector<std::string> getAudioFilenames(int , int , int , int , int , int , int , std::string);

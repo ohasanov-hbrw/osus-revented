@@ -303,9 +303,9 @@ GameFile Parser::parse(std::string filename){
 								else
 									tempHitObject.additionSet = 0;
 								if(tempVectorHitSample.size() > 2)
-									tempHitObject.index = std::stoi(tempVectorHitSample[2]);
+									tempHitObject.hindex = std::stoi(tempVectorHitSample[2]);
 								else
-									tempHitObject.index = 0;
+									tempHitObject.hindex = 0;
 								if(tempVectorHitSample.size() > 3)
 									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
 								else
@@ -320,7 +320,7 @@ GameFile Parser::parse(std::string filename){
 							else{
 								tempHitObject.normalSet = 0;
 								tempHitObject.additionSet = 0;
-								tempHitObject.index = 0;
+								tempHitObject.hindex = 0;
 								tempHitObject.volume = 0;
 								tempHitObject.useDefaultHitSound = true;
 							}
@@ -386,9 +386,9 @@ GameFile Parser::parse(std::string filename){
 								else
 									tempHitObject.additionSet = 0;
 								if(tempVectorHitSample.size() > 2)
-									tempHitObject.index = std::stoi(tempVectorHitSample[2]);
+									tempHitObject.hindex = std::stoi(tempVectorHitSample[2]);
 								else
-									tempHitObject.index = 0;
+									tempHitObject.hindex = 0;
 								if(tempVectorHitSample.size() > 3)
 									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
 								else
@@ -403,7 +403,7 @@ GameFile Parser::parse(std::string filename){
 							else{
 								tempHitObject.normalSet = 0;
 								tempHitObject.additionSet = 0;
-								tempHitObject.index = 0;
+								tempHitObject.hindex = 0;
 								tempHitObject.volume = 0;
 								tempHitObject.useDefaultHitSound = true;
 							}
@@ -429,9 +429,9 @@ GameFile Parser::parse(std::string filename){
 								else
 									tempHitObject.additionSet = 0;
 								if(tempVectorHitSample.size() > 2)
-									tempHitObject.index = std::stoi(tempVectorHitSample[2]);
+									tempHitObject.hindex = std::stoi(tempVectorHitSample[2]);
 								else
-									tempHitObject.index = 0;
+									tempHitObject.hindex = 0;
 								if(tempVectorHitSample.size() > 3)
 									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
 								else
@@ -446,7 +446,7 @@ GameFile Parser::parse(std::string filename){
 							else{
 								tempHitObject.normalSet = 0;
 								tempHitObject.additionSet = 0;
-								tempHitObject.index = 0;
+								tempHitObject.hindex = 0;
 								tempHitObject.volume = 0;
 								tempHitObject.useDefaultHitSound = true;
 							}

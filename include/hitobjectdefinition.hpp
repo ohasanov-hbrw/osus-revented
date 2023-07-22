@@ -45,6 +45,7 @@ struct HitObjectData{
     int endTime;
     int normalSet;
     int additionSet;
+    int hindex;
     int index;
     int volume;
     std::string filename = "";

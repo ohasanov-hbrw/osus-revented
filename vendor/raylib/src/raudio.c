@@ -2507,3 +2507,12 @@ static bool SaveFileText(const char *fileName, char *text)
 #undef AudioBuffer
 
 #endif      // SUPPORT_MODULE_RAUDIO
+
+bool IsSoundReady(Sound sound)
+{
+    return ((sound.frameCount > 0) &&           // Validate frame count
+            (sound.stream.buffer != NULL) &&    // Validate stream buffer
+            (sound.stream.sampleRate > 0) &&    // Validate sample rate is supported
+            (sound.stream.sampleSize > 0) &&    // Validate sample size is supported
+            (sound.stream.channels > 0));       // Validate number of channels supported
+}
