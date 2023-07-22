@@ -59,8 +59,6 @@ void GameManager::update(){
 			break;
 	}
 
-	
-
 	for(int i = lastCurrentTiming; i >= 0; i--){
 		if(gameFile.timingPoints[i].time <= currentTime*1000.0f + 2.0f){
 			currentTimingSettings.renderTicks = gameFile.timingPoints[i].renderTicks;
@@ -121,7 +119,6 @@ void GameManager::update(){
 		else
 			break;
 	}
-
 	if(timingSettingsForHitObject.size() == 0){
 		int i = lastTimingLoc;
 		if(gameFile.timingPoints.size() == 0){
@@ -153,6 +150,7 @@ void GameManager::update(){
 		}
 	}
 	
+
 	//spawn the hitobjects when their time comes
 	int size = gameFile.hitObjects.size();	
 	for(int i = size-1; i >= 0; i--){
@@ -248,7 +246,7 @@ void GameManager::update(){
 					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 0;
 						if(clickCombo > 30){
-							SetSoundVolume(SoundFilesAll.data["combobreak"], 50/100.0f);
+							SetSoundVolume(SoundFilesAll.data["combobreak"], 1.0f);
 							PlaySound(SoundFilesAll.data["combobreak"]);
 						}
 						clickCombo = 0;
@@ -363,7 +361,7 @@ void GameManager::update(){
 							stop = false;
 							tempslider->earlyhit = true;
 							if(clickCombo > 30){
-								SetSoundVolume(SoundFilesAll.data["combobreak"], 50/100.0f);
+								SetSoundVolume(SoundFilesAll.data["combobreak"], 1.0f);
 								PlaySound(SoundFilesAll.data["combobreak"]);
 							}
 							clickCombo = 0;
@@ -2887,7 +2885,8 @@ void GameManager::loadGameSounds(){
 	//gameFile.configGeneral["AudioFilename"]
 
 
-
+	/*SetSoundVolume(SoundFilesAll.data["combobreak"], 1.0f);
+	PlaySound(SoundFilesAll.data["combobreak"]);*/
 	std::cout << "loaded " << loadedBytes / 1024 << "KB of sound data" << std::endl;
 	Global.Path = last;
 	

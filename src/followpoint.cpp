@@ -31,6 +31,10 @@ void FollowPoint::update(){
         shouldDelete = true;
         shouldRender = false;
     }
+
+    if(gm->currentTime*1000.0f < startTime or gm->currentTime*1000.0f > endTime2){
+        shouldRender = false;
+    }   
 }
 
 void FollowPoint::render(){

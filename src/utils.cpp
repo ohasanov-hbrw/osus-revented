@@ -490,6 +490,13 @@ std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
         AdditionFilename += "finish";
     else
         AdditionFilename += "clap";
+    
+    /*if(hitSound & (1 << 1))
+        AdditionFilename += "whistle";
+    else if(hitSound & (1 << 2))
+        AdditionFilename += "finish";
+    else if(hitSound & (1 << 3))
+        AdditionFilename += "clap";*/
 
     if(filename.size() > 4){
         if(filename[filename.size() - 5] == '.'){
@@ -503,5 +510,16 @@ std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
         out.push_back(AdditionFilename + HitSoundIndex);
         out.push_back(AdditionFilename);
     }
+    /*if(hitSound == 0);
+    else if(!(hitSound & (1 << 0))){
+        out[0] = " ";
+        out[1] = " ";
+    }
+
+    if(!(hitSound & (1 << 1)) and !(hitSound & (1 << 2)) and !(hitSound & (1 << 3))){
+        out[2] = " ";
+        out[3] = " ";
+    }*/
+
     return out;
 }

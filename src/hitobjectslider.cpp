@@ -695,9 +695,39 @@ void Slider::update(){
     }
 
     if(playtick){
-        /*SetSoundPan(gm->SoundFiles.data[data.NormalSound], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
-        SetSoundVolume(gm->SoundFiles.data[data.NormalSound], (float)volume/100.0f);
-        PlaySound(gm->SoundFiles.data[data.NormalSound]);*/
+
+        int defaultSampleSetForObject = 0;
+        if(gm->currentTimingSettings.sampleSet == 1)
+            defaultSampleSetForObject = 0;
+        else if(gm->currentTimingSettings.sampleSet == 2)
+            defaultSampleSetForObject = 1;
+        else if(gm->currentTimingSettings.sampleSet == 3)
+            defaultSampleSetForObject = 2;
+        else
+            defaultSampleSetForObject = gm->defaultSampleSet;
+
+        int NormalSetForObject = 0;
+
+		if(data.normalSet == 1)
+			NormalSetForObject = 0;
+		else if(data.normalSet == 2)
+			NormalSetForObject = 1;
+		else if(data.normalSet == 3)
+			NormalSetForObject = 2;
+		else
+			NormalSetForObject = defaultSampleSetForObject;
+
+        std::string NormalFileName;
+
+        if(NormalSetForObject == 0)
+            NormalFileName = "normal-slidertick";
+        else if(NormalSetForObject == 1)
+            NormalFileName = "soft-slidertick";
+        else
+            NormalFileName = "drum-slidertick";
+        SetSoundPan(gm->SoundFilesAll.data[NormalFileName], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+        SetSoundVolume(gm->SoundFilesAll.data[NormalFileName], (float)volume/100.0f);
+        PlaySound(gm->SoundFilesAll.data[NormalFileName]);
 
         
         playtick = false;
@@ -705,7 +735,7 @@ void Slider::update(){
 
 
 
-    if(durationNull or gm->currentTime*1000.0f > data.time + templength){
+    if(durationNull or gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
         
         //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
         //std::cout << "Killed slider at time " << data.time << "\n";
@@ -731,9 +761,6 @@ void Slider::update(){
         }
         else{
             float succ = ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f;
-            if(IsKeyDown(SDL_SCANCODE_LEFT)){
-                succ = 100.0f;
-            }
             if(AreSame(succ,0))
                 data.point = 0;
             if(succ > 0.0f)
@@ -771,7 +798,7 @@ void Slider::update(){
             SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
             PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
 			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);*/
-
+            
             std::vector<std::string> sounds = getAudioFilenames(gm->currentTimingSettings.sampleSet, gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet, data.edgeSets[data.edgeSets.size() - 1].first, data.edgeSets[data.edgeSets.size() - 1].second, data.edgeSounds[data.edgeSounds.size() - 1], data.hindex, data.filename);
             //std::cout << gm->currentTimingSettings.sampleSet << "  -  " << gm->currentTimingSettings.sampleIndex << "  -  " << gm->defaultSampleSet << "  -  " << data.edgeSets[data.edgeSets.size() - 1].first << "  -  " << data.edgeSets[data.edgeSets.size() - 1].second << "  -  " << data.edgeSounds[data.edgeSounds.size() - 1] << "  -  " << data.hindex << " - end at " << gm->currentTime*1000.0f << std::endl;
             
@@ -800,14 +827,12 @@ void Slider::update(){
                 PlaySound(gm->SoundFilesAll.data[sounds[3]]);
                 //std::cout << sounds[3] << " aplayed \n";
             }
-
         }
         lastPosition = renderPoints[calPos];
         Global.AutoMousePositionStart = renderPoints[calPos];
 		Global.AutoMouseStartTime = gm->currentTime*1000.0f;
 
         gm->destroyHitObject(data.index);
-
     }
     else{
         if(curRepeat > 0){
@@ -868,9 +893,6 @@ void Slider::update(){
             }
         }
     }
-
-
-
 }
 
 void Slider::render(){

@@ -364,6 +364,12 @@ GameFile Parser::parse(std::string filename){
 								for(size_t i = 0; i < tempVectorEdgeSounds.size(); i++)
 									tempHitObject.edgeSounds.push_back(std::stoi(tempVectorEdgeSounds[i]));
 							}
+							else{
+								for(int i = 0; i < tempHitObject.slides; i++){
+									std::vector<std::string> tempVectorEdgeSetsCords;
+									tempHitObject.edgeSounds.push_back(0);
+								}
+							}
 							if(tempVector.size() > 9){
 								std::vector<std::string> tempVectorEdgeSets;
 								tempVectorEdgeSets = parseSeperatedLists(tempVector[9], '|');
@@ -372,6 +378,12 @@ GameFile Parser::parse(std::string filename){
 									std::vector<std::string> tempVectorEdgeSetsCords;
 									tempVectorEdgeSetsCords = parseSeperatedLists(tempVectorEdgeSets[i], ':');
 									tempHitObject.edgeSets.push_back(std::make_pair(std::stoi(tempVectorEdgeSetsCords[0]), std::stoi(tempVectorEdgeSetsCords[1])));
+								}
+							}
+							else{
+								for(int i = 0; i < tempHitObject.slides; i++){
+									std::vector<std::string> tempVectorEdgeSetsCords;
+									tempHitObject.edgeSets.push_back(std::make_pair(0, 0));
 								}
 							}
 							if(tempVector.size() > 10){
