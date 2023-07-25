@@ -41,6 +41,7 @@ double avgHZqueueSUM = 0;
 std::queue<double> avgFPSq;
 std::queue<double> avgHZq;
 
+bool dumbsleep = false;
 
 
 //hello from arch!
@@ -71,8 +72,8 @@ void RenderLoop(){
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
         //std::cout << "Drawing mouse... " << Global.AutoMousePosition.x << " " << Global.AutoMousePosition.y << std::endl;
         renderMouse(); 
-        DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f",  avgFPS), {ScaleCordX(5), ScaleCordY(5)}, Scale(15), Scale(1), GREEN);
-        DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(35)}, Scale(15), Scale(1), GREEN);
+        DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {ScaleCordX(5), ScaleCordY(5)}, Scale(5), Scale(1), GREEN);
+        //DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(15)}, Scale(5), Scale(1), GREEN);
         Global.mutex.unlock();
 
         rlDrawRenderBatchActive();
@@ -82,14 +83,15 @@ void RenderLoop(){
 
         /*while(getTimer() - last < 1000.0/288.0 and getTimer() - last >= 0)
             continue;*/
-        //double tTime = getTimer();
+        //double tTime = getTimer()
         /*if(tTime - last >= 0 and (tTime - last) < 1000.0/288.0)
             std::this_thread::sleep_for(std::chrono::duration<double>((1000.0/288.0 - (tTime - last)) / 1000.0));*/
         if(VSYNC == 0){
             std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
             unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/Global.FPS) - (sleepTime.count())) * 800.0);
             //std::cout << "Sleeptime of  " << sleepTimeInt << " us ";
-            SleepInUs(sleepTimeInt);
+            if(!dumbsleep)
+                SleepInUs(sleepTimeInt);
             while(getTimer() - last < 1000.0/Global.FPS and getTimer() - last >= 0)
                 continue;
         }
@@ -102,7 +104,7 @@ void RenderLoop(){
             std::cout << "dropped frame with " << elapsed.count() << "ms\n";
         avgFPSq.push(fps);
         avgFPSqueueSUM += fps;
-        if(avgFPSq.size() > 1000){
+        if(avgFPSq.size() > 300){
             avgFPSqueueSUM -= avgFPSq.front();
             avgFPSq.pop();
         }
@@ -226,15 +228,19 @@ int main() {
         Global.mutex.unlock();
 
         std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
-        unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/1000.0) - sleepTime.count()) * 1000.0);
-        SleepInUs(sleepTimeInt);
+        unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/1000.0) - sleepTime.count()) * 900.0);
+        if(!dumbsleep)
+            SleepInUs(sleepTimeInt);
+        
+        while(getTimer() - timerXXX < 1000.0/1000.0 and getTimer() - timerXXX >= 0)
+            continue;
         
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
         //avgHZ = (avgHZ + 1000.0f / (elapsed.count())) / 2.0;
         double hz = (1000.0f / (elapsed.count()));
         avgHZq.push(hz);
         avgHZqueueSUM += hz;
-        if(avgHZq.size() > 1000){
+        if(avgHZq.size() > 300){
             avgHZqueueSUM -= avgHZq.front();
             avgHZq.pop();
         }
