@@ -249,11 +249,12 @@ void Game::init() {
     Global.parsedLines = 0;
     Global.loadingState = 0;
     initDone = -2;
+    initStartTime = getTimer();
     Global.mutex.unlock();
     Global.gameManager->loadGame(Global.selectedPath);
     Global.gameManager->timingSettingsForHitObject.clear();
     Global.mutex.lock();
-    Global.startTime = -2000.0f;
+    Global.startTime = -5000.0f;
     Global.errorSum = 0;
     Global.errorLast = 0;
     Global.errorDiv = 0;
@@ -272,10 +273,9 @@ void Game::update() {
     }
     else{
         if(initDone == 0 or Global.GameTextures != 0){
-            initStartTime = getTimer();
             initDone = -1;
         }
-        if(getTimer() - initStartTime > 4000.0f){
+        if(initDone == -1 and getTimer() - initStartTime > 0.0f){
             std::cout << "init done in " << getTimer() - initStartTime << " secs\n";
             initDone = true;
         }

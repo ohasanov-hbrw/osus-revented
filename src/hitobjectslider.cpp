@@ -802,7 +802,23 @@ void Slider::update(){
             std::vector<std::string> sounds = getAudioFilenames(gm->currentTimingSettings.sampleSet, gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet, data.edgeSets[data.edgeSets.size() - 1].first, data.edgeSets[data.edgeSets.size() - 1].second, data.edgeSounds[data.edgeSounds.size() - 1], data.hindex, data.filename);
             //std::cout << gm->currentTimingSettings.sampleSet << "  -  " << gm->currentTimingSettings.sampleIndex << "  -  " << gm->defaultSampleSet << "  -  " << data.edgeSets[data.edgeSets.size() - 1].first << "  -  " << data.edgeSets[data.edgeSets.size() - 1].second << "  -  " << data.edgeSounds[data.edgeSounds.size() - 1] << "  -  " << data.hindex << " - end at " << gm->currentTime*1000.0f << std::endl;
             
-            if(gm->SoundFilesAll.data.count(sounds[0]) == 1 and gm->SoundFilesAll.loaded[sounds[0]].value){
+            for(int i = 0; i < sounds.size(); i+=2){
+                if(gm->SoundFilesAll.data.count(sounds[i]) == 1 and gm->SoundFilesAll.loaded[sounds[i]].value){
+                    SetSoundPan(gm->SoundFilesAll.data[sounds[i]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
+                    SetSoundVolume(gm->SoundFilesAll.data[sounds[i]], (float)volume/100.0f);
+                    PlaySound(gm->SoundFilesAll.data[sounds[i]]);
+                    //std::cout << sounds[0] << " played \n";
+                }
+                else if(gm->SoundFilesAll.data.count(sounds[i+1]) == 1 and gm->SoundFilesAll.loaded[sounds[i+1]].value){
+                    SetSoundPan(gm->SoundFilesAll.data[sounds[i+1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
+                    SetSoundVolume(gm->SoundFilesAll.data[sounds[i+1]], (float)volume/100.0f);
+                    PlaySound(gm->SoundFilesAll.data[sounds[i+1]]);
+                    //std::cout << sounds[1] << " played \n";
+                }
+            }
+
+
+            /*if(gm->SoundFilesAll.data.count(sounds[0]) == 1 and gm->SoundFilesAll.loaded[sounds[0]].value){
                 SetSoundPan(gm->SoundFilesAll.data[sounds[0]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
                 SetSoundVolume(gm->SoundFilesAll.data[sounds[0]], (float)volume/100.0f);
                 PlaySound(gm->SoundFilesAll.data[sounds[0]]);
@@ -826,7 +842,7 @@ void Slider::update(){
                 SetSoundVolume(gm->SoundFilesAll.data[sounds[3]], (float)volume/100.0f);
                 PlaySound(gm->SoundFilesAll.data[sounds[3]]);
                 //std::cout << sounds[3] << " aplayed \n";
-            }
+            }*/
         }
         lastPosition = renderPoints[calPos];
         Global.AutoMousePositionStart = renderPoints[calPos];
@@ -855,7 +871,21 @@ void Slider::update(){
 
                     std::vector<std::string> sounds = getAudioFilenames(gm->currentTimingSettings.sampleSet, gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet, data.edgeSets[curRepeat].first, data.edgeSets[curRepeat].second, data.edgeSounds[curRepeat], data.hindex, data.filename);
                     //std::cout << gm->currentTimingSettings.sampleSet << " " << gm->currentTimingSettings.sampleIndex << " " << gm->defaultSampleSet << std::endl;
-                    if(gm->SoundFilesAll.data.count(sounds[0]) == 1 and gm->SoundFilesAll.loaded[sounds[0]].value){
+                    for(int i = 0; i < sounds.size(); i+=2){
+                        if(gm->SoundFilesAll.data.count(sounds[i]) == 1 and gm->SoundFilesAll.loaded[sounds[i]].value){
+                            SetSoundPan(gm->SoundFilesAll.data[sounds[i]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
+                            SetSoundVolume(gm->SoundFilesAll.data[sounds[i]], (float)volume/100.0f);
+                            PlaySound(gm->SoundFilesAll.data[sounds[i]]);
+                            //std::cout << sounds[0] << " played \n";
+                        }
+                        else if(gm->SoundFilesAll.data.count(sounds[i+1]) == 1 and gm->SoundFilesAll.loaded[sounds[i+1]].value){
+                            SetSoundPan(gm->SoundFilesAll.data[sounds[i+1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
+                            SetSoundVolume(gm->SoundFilesAll.data[sounds[i+1]], (float)volume/100.0f);
+                            PlaySound(gm->SoundFilesAll.data[sounds[i+1]]);
+                            //std::cout << sounds[1] << " played \n";
+                        }
+                    }
+                    /*if(gm->SoundFilesAll.data.count(sounds[0]) == 1 and gm->SoundFilesAll.loaded[sounds[0]].value){
                         SetSoundPan(gm->SoundFilesAll.data[sounds[0]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
                         SetSoundVolume(gm->SoundFilesAll.data[sounds[0]], (float)volume/100.0f);
                         PlaySound(gm->SoundFilesAll.data[sounds[0]]);
@@ -879,7 +909,7 @@ void Slider::update(){
                         SetSoundVolume(gm->SoundFilesAll.data[sounds[3]], (float)volume/100.0f);
                         PlaySound(gm->SoundFilesAll.data[sounds[3]]);
                         //std::cout << sounds[3] << " aplayed \n";
-                    }
+                    }*/
                 
                 }
                 else{

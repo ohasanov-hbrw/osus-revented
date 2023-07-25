@@ -444,7 +444,7 @@ std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
     
     std::string HitSoundIndex = "";
 
-    if(!(SampleIndexForObject == 0 or SampleIndexForObject == 1)){
+    if(!(SampleIndexForObject == 0)){
         HitSoundIndex = std::to_string(SampleIndexForObject);
     }
 
@@ -461,6 +461,8 @@ std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
     
     out.push_back(NormalFileName + HitSoundIndex);
     out.push_back(NormalFileName);
+
+
 
     std::string AdditionFilename;
 
@@ -482,22 +484,6 @@ std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
     else
         AdditionFilename = "drum-hit";
 
-    if(HitSoundForObject == 0)
-        AdditionFilename += "normal";
-    else if(HitSoundForObject == 1)
-        AdditionFilename += "whistle";
-    else if(HitSoundForObject == 2)
-        AdditionFilename += "finish";
-    else
-        AdditionFilename += "clap";
-    
-    /*if(hitSound & (1 << 1))
-        AdditionFilename += "whistle";
-    else if(hitSound & (1 << 2))
-        AdditionFilename += "finish";
-    else if(hitSound & (1 << 3))
-        AdditionFilename += "clap";*/
-
     if(filename.size() > 4){
         if(filename[filename.size() - 5] == '.'){
             for(int i = 0; i < 4; i++)
@@ -507,19 +493,19 @@ std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
         out.push_back(AdditionFilename);
     }
     else {
-        out.push_back(AdditionFilename + HitSoundIndex);
-        out.push_back(AdditionFilename);
+        if((hitSound & (1 << 1)) != 0){
+            out.push_back(AdditionFilename + "whistle" + HitSoundIndex);
+            out.push_back(AdditionFilename + "whistle");
+        }
+        if((hitSound & (1 << 2)) != 0){
+            out.push_back(AdditionFilename + "finish" + HitSoundIndex);
+            out.push_back(AdditionFilename + "finish");
+        }
+        if((hitSound & (1 << 3)) != 0){
+            out.push_back(AdditionFilename + "clap" + HitSoundIndex);
+            out.push_back(AdditionFilename + "clap");
+        }
     }
-    /*if(hitSound == 0);
-    else if(!(hitSound & (1 << 0))){
-        out[0] = " ";
-        out[1] = " ";
-    }
-
-    if(!(hitSound & (1 << 1)) and !(hitSound & (1 << 2)) and !(hitSound & (1 << 3))){
-        out[2] = " ";
-        out[3] = " ";
-    }*/
 
     return out;
 }
