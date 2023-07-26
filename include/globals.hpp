@@ -94,6 +94,7 @@ struct Globals {
     Texture2D OsusLogo;
 
     double volume = 1.0f;
+    double hitVolume = 0.3f;
 
     bool Key1P = false;
     bool Key1D = false;

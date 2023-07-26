@@ -584,7 +584,7 @@ void Slider::update(){
 
     int volume = data.volume;
     if(volume == 0){
-        data.volume = data.timing.volume;
+        data.volume = gm->currentTimingSettings.volume;
         volume = data.volume;
     }
 
@@ -726,7 +726,7 @@ void Slider::update(){
         else
             NormalFileName = "drum-slidertick";
         SetSoundPan(gm->SoundFilesAll.data[NormalFileName], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
-        SetSoundVolume(gm->SoundFilesAll.data[NormalFileName], (float)volume/100.0f);
+        SetSoundVolume(gm->SoundFilesAll.data[NormalFileName], ((float)volume/100.0f) * Global.hitVolume);
         PlaySound(gm->SoundFilesAll.data[NormalFileName]);
 
         
@@ -792,57 +792,23 @@ void Slider::update(){
 
         bool debugf = IsKeyDown(SDL_SCANCODE_LEFT);
         if(is_hit_at_end || debugf){
-            /*SetSoundPan(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
-            SetSoundPan(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
-            SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]], (float)volume/100.0f);
-            SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]], (float)volume/100.0f);
-            PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[data.EdgeNormalSound.size() - 1]]);
-			PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[data.EdgeAdditionSound.size() - 1]]);*/
-            
             std::vector<std::string> sounds = getAudioFilenames(gm->currentTimingSettings.sampleSet, gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet, data.edgeSets[data.edgeSets.size() - 1].first, data.edgeSets[data.edgeSets.size() - 1].second, data.edgeSounds[data.edgeSounds.size() - 1], data.hindex, data.filename);
             //std::cout << gm->currentTimingSettings.sampleSet << "  -  " << gm->currentTimingSettings.sampleIndex << "  -  " << gm->defaultSampleSet << "  -  " << data.edgeSets[data.edgeSets.size() - 1].first << "  -  " << data.edgeSets[data.edgeSets.size() - 1].second << "  -  " << data.edgeSounds[data.edgeSounds.size() - 1] << "  -  " << data.hindex << " - end at " << gm->currentTime*1000.0f << std::endl;
             
             for(int i = 0; i < sounds.size(); i+=2){
                 if(gm->SoundFilesAll.data.count(sounds[i]) == 1 and gm->SoundFilesAll.loaded[sounds[i]].value){
                     SetSoundPan(gm->SoundFilesAll.data[sounds[i]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                    SetSoundVolume(gm->SoundFilesAll.data[sounds[i]], (float)volume/100.0f);
+                    SetSoundVolume(gm->SoundFilesAll.data[sounds[i]], ((float)volume/100.0f) * Global.hitVolume);
                     PlaySound(gm->SoundFilesAll.data[sounds[i]]);
                     //std::cout << sounds[0] << " played \n";
                 }
                 else if(gm->SoundFilesAll.data.count(sounds[i+1]) == 1 and gm->SoundFilesAll.loaded[sounds[i+1]].value){
                     SetSoundPan(gm->SoundFilesAll.data[sounds[i+1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                    SetSoundVolume(gm->SoundFilesAll.data[sounds[i+1]], (float)volume/100.0f);
+                    SetSoundVolume(gm->SoundFilesAll.data[sounds[i+1]], ((float)volume/100.0f) * Global.hitVolume);
                     PlaySound(gm->SoundFilesAll.data[sounds[i+1]]);
                     //std::cout << sounds[1] << " played \n";
                 }
             }
-
-
-            /*if(gm->SoundFilesAll.data.count(sounds[0]) == 1 and gm->SoundFilesAll.loaded[sounds[0]].value){
-                SetSoundPan(gm->SoundFilesAll.data[sounds[0]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                SetSoundVolume(gm->SoundFilesAll.data[sounds[0]], (float)volume/100.0f);
-                PlaySound(gm->SoundFilesAll.data[sounds[0]]);
-                //std::cout << sounds[0] << " played \n";
-            }
-            else if(gm->SoundFilesAll.data.count(sounds[1]) == 1 and gm->SoundFilesAll.loaded[sounds[1]].value){
-                SetSoundPan(gm->SoundFilesAll.data[sounds[1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                SetSoundVolume(gm->SoundFilesAll.data[sounds[1]], (float)volume/100.0f);
-                PlaySound(gm->SoundFilesAll.data[sounds[1]]);
-                //std::cout << sounds[1] << " played \n";
-            }
-
-            if(gm->SoundFilesAll.data.count(sounds[2]) == 1 and gm->SoundFilesAll.loaded[sounds[2]].value){
-                SetSoundPan(gm->SoundFilesAll.data[sounds[2]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                SetSoundVolume(gm->SoundFilesAll.data[sounds[2]], (float)volume/100.0f);
-                PlaySound(gm->SoundFilesAll.data[sounds[2]]);
-                //std::cout << sounds[2] << " aplayed \n";
-            }
-            else if(gm->SoundFilesAll.data.count(sounds[3]) == 1 and gm->SoundFilesAll.loaded[sounds[3]].value){
-                SetSoundPan(gm->SoundFilesAll.data[sounds[3]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                SetSoundVolume(gm->SoundFilesAll.data[sounds[3]], (float)volume/100.0f);
-                PlaySound(gm->SoundFilesAll.data[sounds[3]]);
-                //std::cout << sounds[3] << " aplayed \n";
-            }*/
         }
         lastPosition = renderPoints[calPos];
         Global.AutoMousePositionStart = renderPoints[calPos];
@@ -857,60 +823,22 @@ void Slider::update(){
                     reverseclicked[curRepeat-1] = 1;
                     reversenumber++;
                     gm->clickCombo++;
-
-                    
-
-                    /*SetSoundPan(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
-                    SetSoundPan(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
-                    SetSoundVolume(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]], (float)volume/100.0f);
-                    SetSoundVolume(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]], (float)volume/100.0f);
-                    PlaySound(gm->SoundFiles.data[data.EdgeNormalSound[curRepeat]]);
-			        PlaySound(gm->SoundFiles.data[data.EdgeAdditionSound[curRepeat]]);*/
-                    //std::cout << "playing normal sound" << data.EdgeNormalSound[curRepeat] << " and addition sound " << data.EdgeAdditionSound[curRepeat] << std::endl;
-
-
                     std::vector<std::string> sounds = getAudioFilenames(gm->currentTimingSettings.sampleSet, gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet, data.edgeSets[curRepeat].first, data.edgeSets[curRepeat].second, data.edgeSounds[curRepeat], data.hindex, data.filename);
                     //std::cout << gm->currentTimingSettings.sampleSet << " " << gm->currentTimingSettings.sampleIndex << " " << gm->defaultSampleSet << std::endl;
                     for(int i = 0; i < sounds.size(); i+=2){
                         if(gm->SoundFilesAll.data.count(sounds[i]) == 1 and gm->SoundFilesAll.loaded[sounds[i]].value){
                             SetSoundPan(gm->SoundFilesAll.data[sounds[i]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                            SetSoundVolume(gm->SoundFilesAll.data[sounds[i]], (float)volume/100.0f);
+                            SetSoundVolume(gm->SoundFilesAll.data[sounds[i]], ((float)volume/100.0f) * Global.hitVolume);
                             PlaySound(gm->SoundFilesAll.data[sounds[i]]);
                             //std::cout << sounds[0] << " played \n";
                         }
                         else if(gm->SoundFilesAll.data.count(sounds[i+1]) == 1 and gm->SoundFilesAll.loaded[sounds[i+1]].value){
                             SetSoundPan(gm->SoundFilesAll.data[sounds[i+1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                            SetSoundVolume(gm->SoundFilesAll.data[sounds[i+1]], (float)volume/100.0f);
+                            SetSoundVolume(gm->SoundFilesAll.data[sounds[i+1]], ((float)volume/100.0f) * Global.hitVolume);
                             PlaySound(gm->SoundFilesAll.data[sounds[i+1]]);
                             //std::cout << sounds[1] << " played \n";
                         }
                     }
-                    /*if(gm->SoundFilesAll.data.count(sounds[0]) == 1 and gm->SoundFilesAll.loaded[sounds[0]].value){
-                        SetSoundPan(gm->SoundFilesAll.data[sounds[0]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                        SetSoundVolume(gm->SoundFilesAll.data[sounds[0]], (float)volume/100.0f);
-                        PlaySound(gm->SoundFilesAll.data[sounds[0]]);
-                        //std::cout << sounds[0] << " played \n";
-                    }
-                    else if(gm->SoundFilesAll.data.count(sounds[1]) == 1 and gm->SoundFilesAll.loaded[sounds[1]].value){
-                        SetSoundPan(gm->SoundFilesAll.data[sounds[1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                        SetSoundVolume(gm->SoundFilesAll.data[sounds[1]], (float)volume/100.0f);
-                        PlaySound(gm->SoundFilesAll.data[sounds[1]]);
-                        //std::cout << sounds[1] << " played \n";
-                    }
-
-                    if(gm->SoundFilesAll.data.count(sounds[2]) == 1 and gm->SoundFilesAll.loaded[sounds[2]].value){
-                        SetSoundPan(gm->SoundFilesAll.data[sounds[2]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                        SetSoundVolume(gm->SoundFilesAll.data[sounds[2]], (float)volume/100.0f);
-                        PlaySound(gm->SoundFilesAll.data[sounds[2]]);
-                        //std::cout << sounds[2] << " aplayed \n";
-                    }
-                    else if(gm->SoundFilesAll.data.count(sounds[3]) == 1 and gm->SoundFilesAll.loaded[sounds[3]].value){
-                        SetSoundPan(gm->SoundFilesAll.data[sounds[3]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                        SetSoundVolume(gm->SoundFilesAll.data[sounds[3]], (float)volume/100.0f);
-                        PlaySound(gm->SoundFilesAll.data[sounds[3]]);
-                        //std::cout << sounds[3] << " aplayed \n";
-                    }*/
-                
                 }
                 else{
                     reverseclicked[curRepeat-1] = 0;

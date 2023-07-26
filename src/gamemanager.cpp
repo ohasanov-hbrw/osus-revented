@@ -289,21 +289,6 @@ void GameManager::update(){
 						volume = objects[i]->data.volume;
 					}
 
-					/*SetSoundPan(SoundFiles.data[objects[i]->data.NormalSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-					SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
-					PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
-					if(objects[i]->data.PlayAddition){
-						SetSoundPan(SoundFiles.data[objects[i]->data.AdditionSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-						SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
-						PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
-					}
-					if(objects[i]->data.PlayCustom){
-						SetSoundPan(SoundFiles.data[objects[i]->data.CustomSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-						SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
-						PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
-					}*/ //SOUND PART
-
-					// NEW SOUND SYSTEM
 
 					std::vector<std::string> sounds = getAudioFilenames(currentTimingSettings.sampleSet, currentTimingSettings.sampleIndex, defaultSampleSet, objects[i]->data.normalSet, objects[i]->data.additionSet, objects[i]->data.hitSound, objects[i]->data.hindex, objects[i]->data.filename);
 
@@ -311,43 +296,17 @@ void GameManager::update(){
 					for(int soundIndex = 0; soundIndex < sounds.size(); soundIndex+=2){
 						if(SoundFilesAll.data.count(sounds[soundIndex]) == 1 and SoundFilesAll.loaded[sounds[soundIndex]].value){
 							SetSoundPan(SoundFilesAll.data[sounds[soundIndex]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFilesAll.data[sounds[soundIndex]], (float)volume/100.0f);
+							SetSoundVolume(SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f));
 							PlaySound(SoundFilesAll.data[sounds[soundIndex]]);
 							//std::cout << sounds[0] << " played \n";
 						}
 						else if(SoundFilesAll.data.count(sounds[soundIndex+1]) == 1 and SoundFilesAll.loaded[sounds[soundIndex+1]].value){
 							SetSoundPan(SoundFilesAll.data[sounds[soundIndex+1]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFilesAll.data[sounds[soundIndex+1]], (float)volume/100.0f);
+							SetSoundVolume(SoundFilesAll.data[sounds[soundIndex+1]], Global.hitVolume * ((float)volume/100.0f));
 							PlaySound(SoundFilesAll.data[sounds[soundIndex+1]]);
 							//std::cout << sounds[1] << " played \n";
 						}
 					}
-					/*if(SoundFilesAll.data.count(sounds[0]) == 1 and SoundFilesAll.loaded[sounds[0]].value){
-						SetSoundPan(SoundFilesAll.data[sounds[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-						SetSoundVolume(SoundFilesAll.data[sounds[0]], (float)volume/100.0f);
-						PlaySound(SoundFilesAll.data[sounds[0]]);
-						//std::cout << sounds[0] << " played \n";
-					}
-					else if(SoundFilesAll.data.count(sounds[1]) == 1 and SoundFilesAll.loaded[sounds[1]].value){
-						SetSoundPan(SoundFilesAll.data[sounds[1]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-						SetSoundVolume(SoundFilesAll.data[sounds[1]], (float)volume/100.0f);
-						PlaySound(SoundFilesAll.data[sounds[1]]);
-						//std::cout << sounds[1] << " played \n";
-					}
-
-					if(SoundFilesAll.data.count(sounds[2]) == 1 and SoundFilesAll.loaded[sounds[2]].value){
-						SetSoundPan(SoundFilesAll.data[sounds[2]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-						SetSoundVolume(SoundFilesAll.data[sounds[2]], (float)volume/100.0f);
-						PlaySound(SoundFilesAll.data[sounds[2]]);
-						//std::cout << sounds[2] << " aplayed \n";
-					}
-					else if(SoundFilesAll.data.count(sounds[3]) == 1 and SoundFilesAll.loaded[sounds[3]].value){
-						SetSoundPan(SoundFilesAll.data[sounds[3]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-						SetSoundVolume(SoundFilesAll.data[sounds[3]], (float)volume/100.0f);
-						PlaySound(SoundFilesAll.data[sounds[3]]);
-						//std::cout << sounds[3] << " aplayed \n";
-					}*/
-
 
 					objects[i]->data.time = currentTime*1000.0f;
 					destroyHitObject(i);
@@ -395,17 +354,6 @@ void GameManager::update(){
 							tempslider->data.volume = tempslider->data.timing.volume;
 							volume = tempslider->data.volume;
 						}
-						/*SetSoundPan(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-						SetSoundPan(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
-						SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
-						PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
-						PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
-						if(tempslider->data.PlayCustom){
-							SetSoundPan(SoundFiles.data[tempslider->data.CustomSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFiles.data[tempslider->data.CustomSound], (float)volume/100.0f);
-							PlaySound(SoundFiles.data[tempslider->data.CustomSound]);
-						}*/ //SOUND PART
 
 
 						std::vector<std::string> sounds = getAudioFilenames(currentTimingSettings.sampleSet, currentTimingSettings.sampleIndex, defaultSampleSet, objects[i]->data.edgeSets[0].first, objects[i]->data.edgeSets[0].second, objects[i]->data.edgeSounds[0], objects[i]->data.hindex, objects[i]->data.filename);
@@ -413,45 +361,17 @@ void GameManager::update(){
 						for(int soundIndex = 0; soundIndex < sounds.size(); soundIndex+=2){
 							if(SoundFilesAll.data.count(sounds[soundIndex]) == 1 and SoundFilesAll.loaded[sounds[soundIndex]].value){
 								SetSoundPan(SoundFilesAll.data[sounds[soundIndex]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[soundIndex]], (float)volume/100.0f);
+								SetSoundVolume(SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f) );
 								PlaySound(SoundFilesAll.data[sounds[soundIndex]]);
 								//std::cout << sounds[0] << " played \n";
 							}
 							else if(SoundFilesAll.data.count(sounds[soundIndex+1]) == 1 and SoundFilesAll.loaded[sounds[soundIndex+1]].value){
 								SetSoundPan(SoundFilesAll.data[sounds[soundIndex+1]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[soundIndex+1]], (float)volume/100.0f);
+								SetSoundVolume(SoundFilesAll.data[sounds[soundIndex+1]], Global.hitVolume * ((float)volume/100.0f));
 								PlaySound(SoundFilesAll.data[sounds[soundIndex+1]]);
 								//std::cout << sounds[1] << " played \n";
 							}
 						}
-						/*if(SoundFilesAll.data.count(sounds[0]) == 1 and SoundFilesAll.loaded[sounds[0]].value){
-							SetSoundPan(SoundFilesAll.data[sounds[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFilesAll.data[sounds[0]], (float)volume/100.0f);
-							PlaySound(SoundFilesAll.data[sounds[0]]);
-							//std::cout << sounds[0] << " played \n";
-						}
-						else if(SoundFilesAll.data.count(sounds[1]) == 1 and SoundFilesAll.loaded[sounds[1]].value){
-							SetSoundPan(SoundFilesAll.data[sounds[1]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFilesAll.data[sounds[1]], (float)volume/100.0f);
-							PlaySound(SoundFilesAll.data[sounds[1]]);
-							//std::cout << sounds[1] << " played \n";
-						}
-
-						if(SoundFilesAll.data.count(sounds[2]) == 1 and SoundFilesAll.loaded[sounds[2]].value){
-							SetSoundPan(SoundFilesAll.data[sounds[2]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFilesAll.data[sounds[2]], (float)volume/100.0f);
-							PlaySound(SoundFilesAll.data[sounds[2]]);
-							//std::cout << sounds[2] << " aplayed \n";
-						}
-						else if(SoundFilesAll.data.count(sounds[3]) == 1 and SoundFilesAll.loaded[sounds[3]].value){
-							SetSoundPan(SoundFilesAll.data[sounds[3]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFilesAll.data[sounds[3]], (float)volume/100.0f);
-							PlaySound(SoundFilesAll.data[sounds[3]]);
-							//std::cout << sounds[3] << " aplayed \n";
-						}*/
-
-
-
 
 					}
 				}
@@ -498,20 +418,6 @@ void GameManager::update(){
 								objects[i]->data.volume = objects[i]->data.timing.volume;
 								volume = objects[i]->data.volume;
 							}
-							/*
-							SetSoundPan(SoundFiles.data[objects[i]->data.NormalSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFiles.data[objects[i]->data.NormalSound], (float)volume/100.0f);
-							PlaySound(SoundFiles.data[objects[i]->data.NormalSound]);
-							if(objects[i]->data.PlayAddition){
-								SetSoundPan(SoundFiles.data[objects[i]->data.AdditionSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFiles.data[objects[i]->data.AdditionSound], (float)volume/100.0f);
-								PlaySound(SoundFiles.data[objects[i]->data.AdditionSound]);
-							}
-							if(objects[i]->data.PlayCustom){
-								SetSoundPan(SoundFiles.data[objects[i]->data.CustomSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFiles.data[objects[i]->data.CustomSound], (float)volume/100.0f);
-								PlaySound(SoundFiles.data[objects[i]->data.CustomSound]);
-							}*/ //SOUND PART
 
 							std::vector<std::string> sounds = getAudioFilenames(currentTimingSettings.sampleSet, currentTimingSettings.sampleIndex, defaultSampleSet, objects[i]->data.normalSet, objects[i]->data.additionSet, objects[i]->data.hitSound, objects[i]->data.hindex, objects[i]->data.filename);
 							
@@ -520,43 +426,18 @@ void GameManager::update(){
 							for(int soundIndex = 0; soundIndex < sounds.size(); soundIndex+=2){
 								if(SoundFilesAll.data.count(sounds[soundIndex]) == 1 and SoundFilesAll.loaded[sounds[soundIndex]].value){
 									SetSoundPan(SoundFilesAll.data[sounds[soundIndex]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-									SetSoundVolume(SoundFilesAll.data[sounds[soundIndex]], (float)volume/100.0f);
+									SetSoundVolume(SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f));
 									PlaySound(SoundFilesAll.data[sounds[soundIndex]]);
 									//std::cout << sounds[0] << " played \n";
 								}
 								else if(SoundFilesAll.data.count(sounds[soundIndex+1]) == 1 and SoundFilesAll.loaded[sounds[soundIndex+1]].value){
 									SetSoundPan(SoundFilesAll.data[sounds[soundIndex+1]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-									SetSoundVolume(SoundFilesAll.data[sounds[soundIndex+1]], (float)volume/100.0f);
+									SetSoundVolume(SoundFilesAll.data[sounds[soundIndex+1]], Global.hitVolume * ((float)volume/100.0f));
 									PlaySound(SoundFilesAll.data[sounds[soundIndex+1]]);
 									//std::cout << sounds[1] << " played \n";
 								}
 							}
 
-							/*if(SoundFilesAll.data.count(sounds[0]) == 1 and SoundFilesAll.loaded[sounds[0]].value){
-								SetSoundPan(SoundFilesAll.data[sounds[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[0]], (float)volume/100.0f);
-								PlaySound(SoundFilesAll.data[sounds[0]]);
-								//std::cout << sounds[0] << " played \n";
-							}
-							else if(SoundFilesAll.data.count(sounds[1]) == 1 and SoundFilesAll.loaded[sounds[1]].value){
-								SetSoundPan(SoundFilesAll.data[sounds[1]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[1]], (float)volume/100.0f);
-								PlaySound(SoundFilesAll.data[sounds[1]]);
-								//std::cout << sounds[1] << " played \n";
-							}
-
-							if(SoundFilesAll.data.count(sounds[2]) == 1 and SoundFilesAll.loaded[sounds[2]].value){
-								SetSoundPan(SoundFilesAll.data[sounds[2]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[2]], (float)volume/100.0f);
-								PlaySound(SoundFilesAll.data[sounds[2]]);
-								//std::cout << sounds[2] << " aplayed \n";
-							}
-							else if(SoundFilesAll.data.count(sounds[3]) == 1 and SoundFilesAll.loaded[sounds[3]].value){
-								SetSoundPan(SoundFilesAll.data[sounds[3]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[3]], (float)volume/100.0f);
-								PlaySound(SoundFilesAll.data[sounds[3]]);
-								//std::cout << sounds[3] << " aplayed \n";
-							}*/
 
 
 							objects[i]->data.time = currentTime*1000.0f;
@@ -583,18 +464,6 @@ void GameManager::update(){
 								tempslider->data.volume = tempslider->data.timing.volume;
 								volume = tempslider->data.volume;
 							}
-							/*
-							SetSoundPan(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundPan(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-							SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]], (float)volume/100.0f);
-							SetSoundVolume(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]], (float)volume/100.0f);
-							PlaySound(SoundFiles.data[objects[i]->data.EdgeNormalSound[0]]);
-							PlaySound(SoundFiles.data[objects[i]->data.EdgeAdditionSound[0]]);
-							if(tempslider->data.PlayCustom){
-								SetSoundPan(SoundFiles.data[tempslider->data.CustomSound], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFiles.data[tempslider->data.CustomSound], (float)volume/100.0f);
-								PlaySound(SoundFiles.data[tempslider->data.CustomSound]);
-							}*/ //SOUND PART
 
 							std::vector<std::string> sounds = getAudioFilenames(currentTimingSettings.sampleSet, currentTimingSettings.sampleIndex, defaultSampleSet, objects[i]->data.edgeSets[0].first, objects[i]->data.edgeSets[0].second, objects[i]->data.edgeSounds[0], objects[i]->data.hindex, objects[i]->data.filename);
 							
@@ -602,44 +471,17 @@ void GameManager::update(){
 							for(int soundIndex = 0; soundIndex < sounds.size(); soundIndex+=2){
 								if(SoundFilesAll.data.count(sounds[soundIndex]) == 1 and SoundFilesAll.loaded[sounds[soundIndex]].value){
 									SetSoundPan(SoundFilesAll.data[sounds[soundIndex]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-									SetSoundVolume(SoundFilesAll.data[sounds[soundIndex]], (float)volume/100.0f);
+									SetSoundVolume(SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f));
 									PlaySound(SoundFilesAll.data[sounds[soundIndex]]);
 									//std::cout << sounds[0] << " played \n";
 								}
 								else if(SoundFilesAll.data.count(sounds[soundIndex+1]) == 1 and SoundFilesAll.loaded[sounds[soundIndex+1]].value){
 									SetSoundPan(SoundFilesAll.data[sounds[soundIndex+1]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-									SetSoundVolume(SoundFilesAll.data[sounds[soundIndex+1]], (float)volume/100.0f);
+									SetSoundVolume(SoundFilesAll.data[sounds[soundIndex+1]], Global.hitVolume * ((float)volume/100.0f));
 									PlaySound(SoundFilesAll.data[sounds[soundIndex+1]]);
 									//std::cout << sounds[1] << " played \n";
 								}
 							}
-
-							/*if(SoundFilesAll.data.count(sounds[0]) == 1 and SoundFilesAll.loaded[sounds[0]].value){
-								SetSoundPan(SoundFilesAll.data[sounds[0]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[0]], (float)volume/100.0f);
-								PlaySound(SoundFilesAll.data[sounds[0]]);
-								//std::cout << sounds[0] << " played \n";
-							}
-							else if(SoundFilesAll.data.count(sounds[1]) == 1 and SoundFilesAll.loaded[sounds[1]].value){
-								SetSoundPan(SoundFilesAll.data[sounds[1]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[1]], (float)volume/100.0f);
-								PlaySound(SoundFilesAll.data[sounds[1]]);
-								//std::cout << sounds[1] << " played \n";
-							}
-
-							if(SoundFilesAll.data.count(sounds[2]) == 1 and SoundFilesAll.loaded[sounds[2]].value){
-								SetSoundPan(SoundFilesAll.data[sounds[2]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[2]], (float)volume/100.0f);
-								PlaySound(SoundFilesAll.data[sounds[2]]);
-								//std::cout << sounds[2] << " aplayed \n";
-							}
-							else if(SoundFilesAll.data.count(sounds[3]) == 1 and SoundFilesAll.loaded[sounds[3]].value){
-								SetSoundPan(SoundFilesAll.data[sounds[3]], 1-clip(objects[i]->data.x / 640.0, 0, 1));
-								SetSoundVolume(SoundFilesAll.data[sounds[3]], (float)volume/100.0f);
-								PlaySound(SoundFilesAll.data[sounds[3]]);
-								//std::cout << sounds[3] << " aplayed \n";
-							}*/
-
 
 							objects[i]->data.index = i;
 							objects[i]->update();
@@ -1577,503 +1419,7 @@ void GameManager::loadGame(std::string filename){
 	SoundFiles.loaded.clear();
 	
 	Global.loadingState = 3;
-	/*
-	if(SoundFiles.loaded["combobreak"].value == false){
-		Global.Path = "resources/skin/";
-		std::vector<std::string> ComboBreak = ls(".mp3");
-		for(int i = 0; i < ComboBreak.size(); i++){
-			if(ComboBreak[i] == "combobreak.mp3"){
-				SoundFiles.data["combobreak"] = LoadSound(("resources/skin/" + ComboBreak[i]).c_str());
-				SoundFiles.loaded["combobreak"].value = true;
-				std::cout << "loaded combobreak.mp3 from skin\n";
-			}
-		}
-		ComboBreak = ls(".wav");
-		for(int i = 0; i < ComboBreak.size(); i++){
-			if(ComboBreak[i] == "combobreak.wav"){
-				SoundFiles.data["combobreak"] = LoadSound(("resources/skin/" + ComboBreak[i]).c_str());
-				SoundFiles.loaded["combobreak"].value = true;
-				std::cout << "loaded combobreak.wav from skin\n";
-			}
-		}
-		ComboBreak = ls(".ogg");
-		for(int i = 0; i < ComboBreak.size(); i++){
-			if(ComboBreak[i] == "combobreak.ogg"){
-				SoundFiles.data["combobreak"] = LoadSound(("resources/skin/" + ComboBreak[i]).c_str());
-				SoundFiles.loaded["combobreak"].value = true;
-				std::cout << "loaded combobreak.ogg from skin\n";
-			}
-		}
-	}
 
-	
-	if(SoundFiles.loaded["combobreak"].value == false){
-		Global.Path = "resources/default_skin/";
-		std::vector<std::string> ComboBreak = ls(".mp3");
-		for(int i = 0; i < ComboBreak.size(); i++){
-			if(ComboBreak[i] == "combobreak.mp3"){
-				SoundFiles.data["combobreak"] = LoadSound(("resources/default_skin/" + ComboBreak[i]).c_str());
-				SoundFiles.loaded["combobreak"].value = true;
-				std::cout << "loaded combobreak.mp3 from default skin\n";
-			}
-		}
-		ComboBreak = ls(".wav");
-		for(int i = 0; i < ComboBreak.size(); i++){
-			if(ComboBreak[i] == "combobreak.wav"){
-				SoundFiles.data["combobreak"] = LoadSound(("resources/default_skin/" + ComboBreak[i]).c_str());
-				SoundFiles.loaded["combobreak"].value = true;
-				std::cout << "loaded combobreak.wav from default skin\n";
-			}
-		}
-		ComboBreak = ls(".ogg");
-		for(int i = 0; i < ComboBreak.size(); i++){
-			if(ComboBreak[i] == "combobreak.ogg"){
-				SoundFiles.data["combobreak"] = LoadSound(("resources/default_skin/" + ComboBreak[i]).c_str());
-				SoundFiles.loaded["combobreak"].value = true;
-				std::cout << "loaded combobreak.ogg from default skin\n";
-			}
-		}
-	}
-
-
-	Global.loadingState = 4;
-
-	std::cout << filename << std::endl;
-	Global.Path = "resources/default_skin/";
-	std::vector<std::string> defaultSounds = ls(".wav");
-	Global.Path = "resources/skin/";
-	std::vector<std::string> skinSounds = ls(".wav");
-	Global.Path = lastPath + '/';
-	std::vector<std::string> beatmapSounds = ls(".wav");
-	std::vector<std::string> beatmapSoundsOgg = ls(".ogg");
-	std::cout << beatmapSoundsOgg.size() << std::endl;
-
-	int TimingPointIndex = gameFile.timingPoints.size() - 1;
-	int HitObjectIndex = gameFile.hitObjects.size() - 1;
-    Global.parsedLines = 0;
-	for(; HitObjectIndex >= 0; HitObjectIndex--){
-		Global.parsedLines++;
-		for(int amog = TimingPointIndex; amog >= 0; amog--){
-			if(times[amog].time > gameFile.hitObjects[HitObjectIndex].time)
-				break;
-			TimingPointIndex = amog;
-			
-		}
-
-		int defaultSampleSetForObject = 0;
-		int defaultSampleIndexForObject = times[TimingPointIndex].sampleIndex;
-		int defaultVolumeForObject = times[TimingPointIndex].volume;
-
-		if(times[TimingPointIndex].sampleSet == 1)
-			defaultSampleSetForObject = 0;
-		else if(times[TimingPointIndex].sampleSet == 2)
-			defaultSampleSetForObject = 1;
-		else if(times[TimingPointIndex].sampleSet == 3)
-			defaultSampleSetForObject = 2;
-		else
-			defaultSampleSetForObject = defaultSampleSet;
-		
-		int NormalSetForObject = 0;
-		int AdditionSetForObject = 0;
-		int HitSoundForObject = 0;
-		int SampleIndexForObject = 0;
-
-		if(gameFile.hitObjects[HitObjectIndex].normalSet == 1)
-			NormalSetForObject = 0;
-		else if(gameFile.hitObjects[HitObjectIndex].normalSet == 2)
-			NormalSetForObject = 1;
-		else if(gameFile.hitObjects[HitObjectIndex].normalSet == 3)
-			NormalSetForObject = 2;
-		else
-			NormalSetForObject = defaultSampleSetForObject;
-		
-		if(gameFile.hitObjects[HitObjectIndex].additionSet == 1)
-			AdditionSetForObject = 0;
-		else if(gameFile.hitObjects[HitObjectIndex].additionSet == 2)
-			AdditionSetForObject = 1;
-		else if(gameFile.hitObjects[HitObjectIndex].additionSet == 3)
-			AdditionSetForObject = 2;
-		else
-			AdditionSetForObject = NormalSetForObject;
-		
-		if(gameFile.hitObjects[HitObjectIndex].hitSound == 2)
-			HitSoundForObject = 1;
-		else if(gameFile.hitObjects[HitObjectIndex].hitSound == 4)
-			HitSoundForObject = 2;
-		else if(gameFile.hitObjects[HitObjectIndex].hitSound == 8)
-			HitSoundForObject = 3;
-		else
-			HitSoundForObject = 0;
-		
-		if(gameFile.hitObjects[HitObjectIndex].index != 0)
-			SampleIndexForObject = gameFile.hitObjects[HitObjectIndex].index;
-		else
-			SampleIndexForObject = defaultSampleIndexForObject;
-
-		if(gameFile.hitObjects[HitObjectIndex].filename.size() > 1){
-			gameFile.hitObjects[HitObjectIndex].PlayAddition = false;
-			gameFile.hitObjects[HitObjectIndex].PlayCustom = true;
-			gameFile.hitObjects[HitObjectIndex].CustomSound = gameFile.hitObjects[HitObjectIndex].filename;
-		}
-		else{
-			gameFile.hitObjects[HitObjectIndex].PlayAddition = true;
-			gameFile.hitObjects[HitObjectIndex].PlayCustom = false;
-		}
-		
-		std::string HitSoundIndex = "";
-
-		if(!(SampleIndexForObject == 0 or SampleIndexForObject == 1)){
-			HitSoundIndex = std::to_string(SampleIndexForObject);
-		}
-
-		std::string NormalFileName;
-
-		if(NormalSetForObject == 0)
-			NormalFileName = "normal-hitnormal";
-		else if(NormalSetForObject == 1)
-			NormalFileName = "soft-hitnormal";
-		else
-			NormalFileName = "drum-hitnormal";
-
-		std::string tempNoIndex = NormalFileName + ".wav";
-		std::string temp = NormalFileName + HitSoundIndex + ".wav";
-		std::string tempogg = NormalFileName + HitSoundIndex + ".ogg";
-		if(SoundFiles.loaded[temp].value == false){
-			for(int i = 0; i < defaultSounds.size(); i++){
-				if(defaultSounds[i] == tempNoIndex){
-					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-					SoundFiles.loaded[temp].value = true;
-				}
-			}
-			
-			for(int i = 0; i < skinSounds.size(); i++){
-				if(skinSounds[i] == tempNoIndex){
-					SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-					SoundFiles.loaded[temp].value = true;
-				}
-			}
-			if(!Global.settings.useDefaultSounds){
-				for(int i = 0; i < beatmapSounds.size(); i++){
-					if(beatmapSounds[i] == temp){
-						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
-					}
-				}
-				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-					if(beatmapSoundsOgg[i] == tempogg){
-						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
-					}
-				}
-			}
-			if(SoundFiles.loaded[temp].value == true){
-				std::cout << "loaded "  << temp << std::endl;
-				if(SoundFiles.data[temp].frameCount == 0){
-					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
-				}
-				std::cout << SoundFiles.data[temp].frameCount << std::endl;
-			}
-		}
-		gameFile.hitObjects[HitObjectIndex].NormalSound = temp;
-
-		std::string AdditionFilename;
-
-		if(AdditionSetForObject == 0)
-			AdditionFilename = "normal-hit";
-		else if(AdditionSetForObject == 1)
-			AdditionFilename = "soft-hit";
-		else
-			AdditionFilename = "drum-hit";
-
-		if(HitSoundForObject == 0)
-			AdditionFilename += "normal";
-		else if(HitSoundForObject == 1)
-			AdditionFilename += "whistle";
-		else if(HitSoundForObject == 2)
-			AdditionFilename += "finish";
-		else
-			AdditionFilename += "clap";
-
-		tempNoIndex = AdditionFilename + ".wav";
-		temp = AdditionFilename + HitSoundIndex + ".wav";
-		tempogg = AdditionFilename + HitSoundIndex + ".ogg";
-		if(SoundFiles.loaded[temp].value == false){
-			for(int i = 0; i < defaultSounds.size(); i++){
-				if(defaultSounds[i] == tempNoIndex){
-					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-					SoundFiles.loaded[temp].value = true;
-				}
-			}
-			for(int i = 0; i < skinSounds.size(); i++){
-				if(skinSounds[i] == tempNoIndex){
-					SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-					SoundFiles.loaded[temp].value = true;
-				}
-			}
-			if(!Global.settings.useDefaultSounds){
-				for(int i = 0; i < beatmapSounds.size(); i++){
-					if(beatmapSounds[i] == temp){
-						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
-					}
-				}
-				for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-					if(beatmapSoundsOgg[i] == tempogg){
-						SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
-					}
-				}
-			}
-			if(SoundFiles.loaded[temp].value == true){
-				std::cout << "loaded "  << temp << std::endl;
-				if(SoundFiles.data[temp].frameCount == 0){
-					SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
-				}
-				std::cout << SoundFiles.data[temp].frameCount << std::endl;
-			}
-		}
-
-		gameFile.hitObjects[HitObjectIndex].AdditionSound = temp;
-		if(gameFile.hitObjects[HitObjectIndex].PlayCustom == true){
-			temp = gameFile.hitObjects[HitObjectIndex].CustomSound;
-			if(SoundFiles.loaded[temp].value == false){
-				if(!Global.settings.useDefaultSounds){
-					for(int i = 0; i < beatmapSounds.size(); i++){
-						if(beatmapSounds[i] == temp){
-							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
-						}
-					}
-					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-						if(beatmapSoundsOgg[i] == temp){
-							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
-						}
-					}
-				}
-				if(SoundFiles.loaded[temp].value == true){
-					std::cout << "loaded "  << temp << std::endl;
-					if(SoundFiles.data[temp].frameCount == 0){
-						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
-					}
-					std::cout << SoundFiles.data[temp].frameCount << std::endl;
-				}
-			}
-		}
-
-
-		//SLIDERS ---------------------------------------------------------------------------------------------------------------------------
-		if(gameFile.hitObjects[HitObjectIndex].type == 2){
-			if(NormalSetForObject == 0)
-				NormalFileName = "normal-slidertick";
-			else if(NormalSetForObject == 1)
-				NormalFileName = "soft-slidertick";
-			else
-				NormalFileName = "drum-slidertick";
-
-			tempNoIndex = NormalFileName + ".wav";
-			temp = NormalFileName + HitSoundIndex + ".wav";
-			tempogg = NormalFileName + HitSoundIndex + ".ogg";
-			if(SoundFiles.loaded[temp].value == false){
-				for(int i = 0; i < defaultSounds.size(); i++){
-					if(defaultSounds[i] == tempNoIndex){
-						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
-					}
-				}
-				for(int i = 0; i < skinSounds.size(); i++){
-					if(skinSounds[i] == tempNoIndex){
-						SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-						SoundFiles.loaded[temp].value = true;
-					}
-				}
-				if(!Global.settings.useDefaultSounds){
-					for(int i = 0; i < beatmapSounds.size(); i++){
-						if(beatmapSounds[i] == temp){
-							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
-						}
-					}
-					for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-						if(beatmapSoundsOgg[i] == tempogg){
-							SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
-						}
-					}
-				}
-				if(SoundFiles.loaded[temp].value == true){
-					std::cout << "loaded "  << temp << std::endl;
-					if(SoundFiles.data[temp].frameCount == 0){
-						SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
-					}
-					std::cout << SoundFiles.data[temp].frameCount << std::endl;
-				}
-			}
-			gameFile.hitObjects[HitObjectIndex].NormalSound = temp;
-			for(int i = 0; i < gameFile.hitObjects[HitObjectIndex].slides + 1; i++){
-				NormalSetForObject = 0;
-				AdditionSetForObject = 0;
-				HitSoundForObject = 0;
-				//SampleIndexForObject = 0;
-				//if(i > gameFile.hitObjects[HitObjectIndex].edgeSets.size() - 1 && i > 0){
-				//	gameFile.hitObjects[HitObjectIndex].edgeSets.push_back(gameFile.hitObjects[HitObjectIndex].edgeSets[i - 1]);
-				//}
-				if(i < gameFile.hitObjects[HitObjectIndex].edgeSets.size()){
-					if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 1)
-						NormalSetForObject = 0;
-					else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 2)
-						NormalSetForObject = 1;
-					else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].first == 3)
-						NormalSetForObject = 2;
-					else
-						NormalSetForObject = defaultSampleSetForObject;
-					
-					if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 1)
-						AdditionSetForObject = 0;
-					else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 2)
-						AdditionSetForObject = 1;
-					else if(gameFile.hitObjects[HitObjectIndex].edgeSets[i].second == 3)
-						AdditionSetForObject = 2;
-					else
-						AdditionSetForObject = NormalSetForObject;
-				}
-				else{
-					NormalSetForObject = defaultSampleSetForObject;
-					AdditionSetForObject = NormalSetForObject;
-				}
-
-				if(i < gameFile.hitObjects[HitObjectIndex].edgeSounds.size()){
-				if(gameFile.hitObjects[HitObjectIndex].edgeSounds[i] == 2)
-					HitSoundForObject = 1;
-				else if(gameFile.hitObjects[HitObjectIndex].edgeSounds[i] == 4)
-					HitSoundForObject = 2;
-				else if(gameFile.hitObjects[HitObjectIndex].edgeSounds[i] == 8)
-					HitSoundForObject = 3;
-				else
-					HitSoundForObject = 0;
-				}
-				else{
-					HitSoundForObject = 0;
-				}
-				if(NormalSetForObject == 0)
-					NormalFileName = "normal-hitnormal";
-				else if(NormalSetForObject == 1)
-					NormalFileName = "soft-hitnormal";
-				else
-					NormalFileName = "drum-hitnormal";
-
-				tempNoIndex = NormalFileName + ".wav";
-				temp = NormalFileName + HitSoundIndex + ".wav";
-				tempogg = NormalFileName + HitSoundIndex + ".ogg";
-				if(SoundFiles.loaded[temp].value == false){
-					for(int i = 0; i < defaultSounds.size(); i++){
-						if(defaultSounds[i] == tempNoIndex){
-							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
-						}
-					}
-					for(int i = 0; i < skinSounds.size(); i++){
-						if(skinSounds[i] == tempNoIndex){
-							SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
-						}
-					}
-					if(!Global.settings.useDefaultSounds){
-						for(int i = 0; i < beatmapSounds.size(); i++){
-							if(beatmapSounds[i] == temp){
-								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-								SoundFiles.loaded[temp].value = true;
-							}
-						}
-						for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-							if(beatmapSoundsOgg[i] == tempogg){
-								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-								SoundFiles.loaded[temp].value = true;
-							}
-						}
-					}
-					if(SoundFiles.loaded[temp].value == true){
-						std::cout << "loaded "  << temp << std::endl;
-						if(SoundFiles.data[temp].frameCount == 0){
-							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
-						}
-						std::cout << SoundFiles.data[temp].frameCount << std::endl;
-					}
-				}
-				gameFile.hitObjects[HitObjectIndex].EdgeNormalSound.push_back(temp);
-
-				std::string AdditionFilename;
-
-				if(AdditionSetForObject == 0)
-					AdditionFilename = "normal-hit";
-				else if(AdditionSetForObject == 1)
-					AdditionFilename = "soft-hit";
-				else
-					AdditionFilename = "drum-hit";
-
-				if(HitSoundForObject == 0)
-					AdditionFilename += "normal";
-				else if(HitSoundForObject == 1)
-					AdditionFilename += "whistle";
-				else if(HitSoundForObject == 2)
-					AdditionFilename += "finish";
-				else
-					AdditionFilename += "clap";
-
-				tempNoIndex = AdditionFilename + ".wav";
-				temp = AdditionFilename + HitSoundIndex + ".wav";
-				tempogg = AdditionFilename + HitSoundIndex + ".ogg";
-				if(SoundFiles.loaded[temp].value == false){
-					for(int i = 0; i < defaultSounds.size(); i++){
-						if(defaultSounds[i] == tempNoIndex){
-							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + defaultSounds[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
-						}
-					}
-					for(int i = 0; i < skinSounds.size(); i++){
-						if(skinSounds[i] == tempNoIndex){
-							SoundFiles.data[temp] = LoadSound(("resources/skin/" + skinSounds[i]).c_str());
-							SoundFiles.loaded[temp].value = true;
-						}
-					}
-					if(!Global.settings.useDefaultSounds){
-						for(int i = 0; i < beatmapSounds.size(); i++){
-							if(beatmapSounds[i] == temp){
-								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSounds[i]).c_str());
-								SoundFiles.loaded[temp].value = true;
-							}
-						}
-						for(int i = 0; i < beatmapSoundsOgg.size(); i++){
-							if(beatmapSoundsOgg[i] == tempogg){
-								SoundFiles.data[temp] = LoadSound((lastPath + '/' + beatmapSoundsOgg[i]).c_str());
-								SoundFiles.loaded[temp].value = true;
-							}
-						}
-					}
-					if(SoundFiles.loaded[temp].value == true){
-						std::cout << "loaded "  << temp << std::endl;
-						if(SoundFiles.data[temp].frameCount == 0){
-							SoundFiles.data[temp] = LoadSound(("resources/default_skin/" + tempNoIndex).c_str());
-						}
-						std::cout << SoundFiles.data[temp].frameCount << std::endl;
-					}
-				}
-				gameFile.hitObjects[HitObjectIndex].EdgeAdditionSound.push_back(temp);
-			}
-		}
-		//std::cout << gameFile.hitObjects[HitObjectIndex].slides << " - " << gameFile.hitObjects[HitObjectIndex].edgeSounds.size() << " - " << gameFile.hitObjects[HitObjectIndex].edgeSets.size() << std::endl;
-		//for(int i = 0; i < gameFile.hitObjects[HitObjectIndex].edgeSounds.size(); i++){
-		//	std::cout << gameFile.hitObjects[HitObjectIndex].edgeSounds[i] << " ";
-		//}
-		//std::cout << "EdgeSounds\n";
-		//for(int i = 0; i < gameFile.hitObjects[HitObjectIndex].edgeSets.size(); i++){
-		//	std::cout << gameFile.hitObjects[HitObjectIndex].edgeSets[i].first << ":" << gameFile.hitObjects[HitObjectIndex].edgeSets[i].second << " ";
-		//}
-		//std::cout << "EdgeSounds\n";
-
-	}
-	
-	*/
 	Global.loadingState = 7;
 
 	Global.Path = lastPath;
