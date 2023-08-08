@@ -3237,6 +3237,9 @@ void GenTextureMipmaps(Texture2D *texture)
     #if defined(GRAPHICS_API_OPENGL_11)
         return;
     #endif
+    #if defined(GRAPHICS_API_OPENGL_21)
+        return;
+    #endif
     rlGenTextureMipmaps(texture->id, texture->width, texture->height, texture->format, &texture->mipmaps);
 }
 

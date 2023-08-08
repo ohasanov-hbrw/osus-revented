@@ -109,6 +109,8 @@
 
 #define RLGL_VERSION  "4.0"
 
+#define GRAPHICS_API_OPENGL_21
+
 // Function specifiers in case library is build/used as a shared library (Windows)
 // NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
 #if defined(_WIN32)
@@ -192,6 +194,8 @@
 //----------------------------------------------------------------------------------
 // Defines and Macros
 //----------------------------------------------------------------------------------
+
+#define GRAPHICS_API_OPENGL_21
 
 // Default internal render batch elements limits
 #ifndef RL_DEFAULT_BATCH_BUFFER_ELEMENTS
@@ -2080,7 +2084,10 @@ void rlLoadExtensions(void *loader)
 #if defined(GRAPHICS_API_OPENGL_33)     // Also defined for GRAPHICS_API_OPENGL_21
     // NOTE: glad is generated and contains only required OpenGL 3.3 Core extensions (and lower versions)
     #if !defined(__APPLE__)
-        if (gladLoadGL((GLADloadfunc)loader) == 0) TRACELOG(RL_LOG_WARNING, "GLAD: Cannot load OpenGL extensions");
+        TRACELOG(RL_LOG_INFO, "GL: Trying to load functions");
+        int amogus = gladLoadGL((GLADloadfunc)loader);
+        TRACELOG(RL_LOG_INFO, "GL: %i reported", amogus);
+        if (amogus == 0) TRACELOG(RL_LOG_WARNING, "GLAD: Cannot load OpenGL extensions");
         else TRACELOG(RL_LOG_INFO, "GLAD: OpenGL extensions loaded successfully");
     #endif
 
@@ -2098,7 +2105,9 @@ void rlLoadExtensions(void *loader)
 
     // Register supported extensions flags
     // OpenGL 3.3 extensions supported by default (core)
-    RLGL.ExtSupported.vao = true;
+    bool oldPc = true;
+    RLGL.ExtSupported.vao = !oldPc;
+
     RLGL.ExtSupported.instancing = true;
     RLGL.ExtSupported.texNPOT = true;
     RLGL.ExtSupported.texFloat32 = true;
@@ -2439,21 +2448,29 @@ rlRenderBatch rlLoadRenderBatch(int numBuffers, int bufferElements)
     }
 
     TRACELOG(RL_LOG_INFO, "RLGL: Render batch vertex buffers loaded successfully in RAM (CPU)");
+    bool oldPc = true;
+    RLGL.ExtSupported.vao = !oldPc;
     //--------------------------------------------------------------------------------------------
 
     // Upload to GPU (VRAM) vertex data and initialize VAOs/VBOs
     //--------------------------------------------------------------------------------------------
     for (int i = 0; i < numBuffers; i++)
     {
+        TRACELOG(RL_LOG_INFO, "OHASANOV: trying for batch num: %i", i);
+        
         if (RLGL.ExtSupported.vao)
         {
             // Initialize Quads VAO
+            TRACELOG(RL_LOG_INFO, "OHASANOV: Initialize Quads VAO");
             glGenVertexArrays(1, &batch.vertexBuffer[i].vaoId);
             glBindVertexArray(batch.vertexBuffer[i].vaoId);
+            TRACELOG(RL_LOG_INFO, "OHASANOV: Initialized Quads VAO");
+
         }
 
         // Quads - Vertex buffers binding and attributes enable
         // Vertex position buffer (shader-location = 0)
+        TRACELOG(RL_LOG_INFO, "OHASANOV: Try to glGenBuffer");
         glGenBuffers(1, &batch.vertexBuffer[i].vboId[0]);
         TRACELOG(RL_LOG_INFO, "OHASANOV: 1");
         glBindBuffer(GL_ARRAY_BUFFER, batch.vertexBuffer[i].vboId[0]);
@@ -3340,11 +3357,12 @@ unsigned char *rlReadScreenPixels(int width, int height)
 unsigned int rlLoadFramebuffer(int width, int height)
 {
     unsigned int fboId = 0;
-
+    
 #if (defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)) && defined(RLGL_RENDER_TEXTURES_HINT)
     glGenFramebuffers(1, &fboId);       // Create the framebuffer object
     glBindFramebuffer(GL_FRAMEBUFFER, 0);   // Unbind any framebuffer
 #endif
+
 
     return fboId;
 }
@@ -4419,6 +4437,7 @@ static void rlLoadShaderDefault(void)
     for (int i = 0; i < RL_MAX_SHADER_LOCATIONS; i++) RLGL.State.defaultShaderLocs[i] = -1;
 
     // Vertex shader directly defined, no external file required
+    #define GRAPHICS_API_OPENGL_21
     const char *defaultVShaderCode =
 #if defined(GRAPHICS_API_OPENGL_21)
     "#version 110                       \n"

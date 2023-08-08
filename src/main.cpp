@@ -3,6 +3,8 @@
 //#define GRAPHICS_API_OPENGL_33
 
 
+
+
 #include <math.h>
 #include <vector>
 #include <algorithm>
@@ -22,7 +24,6 @@
 #include "time_util.hpp"
 #include <queue>
 //#include "SDLutils.hpp"
-
 
 std::condition_variable cv;
 
@@ -50,10 +51,23 @@ Globals Global;
 
 void RenderLoop(){
     double last = 0;
-    
     SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
-    while(!WindowShouldClose()){
+    std::cout << "Render make gl current\n";
+    BeginDrawing();
+    ClearBackground(Global.Background);
+    rlDrawRenderBatchActive();
+    SDL_GL_SwapWindow((SDL_Window*)GetWindowSDL());
 
+    std::cout << "Clear first bg\n";
+
+    RenderTexture2D frameGraph = LoadRenderTexture(512, 512);
+
+    std::cout << "loadframegraph\n";
+
+
+    int loc = 0;
+    int lastFPS = 0;
+    while(!WindowShouldClose()){
         auto t1 = std::chrono::steady_clock::now();
         last = getTimer();
         rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
@@ -62,44 +76,32 @@ void RenderLoop(){
         if(Global.NeedForBackgroundClear)
             ClearBackground(Global.Background);
         Global.CurrentState->render();
-        //std::cout << "gamemanager render done\n";
         if(Global.GameTextures == -1)
             Global.gameManager->unloadGameTextures();
         else if(Global.GameTextures == 1)
             Global.gameManager->loadGameTextures();
-        //std::cout << "load-unload render done\n";
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
-        //std::cout << "Drawing mouse... " << Global.AutoMousePosition.x << " " << Global.AutoMousePosition.y << std::endl;
         renderMouse(); 
         DrawTextEx(Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {ScaleCordX(5), ScaleCordY(5)}, Scale(5), Scale(1), GREEN);
-        //DrawTextEx(Global.DefaultFont, TextFormat("TPS: %.3f",  avgHZ), {ScaleCordX(5), ScaleCordY(15)}, Scale(5), Scale(1), GREEN);
         Global.mutex.unlock();
-
         rlDrawRenderBatchActive();
-        //SwapScreenBuffer();
         SDL_GL_SwapWindow((SDL_Window*)GetWindowSDL());
-        //SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
 
-        /*while(getTimer() - last < 1000.0/288.0 and getTimer() - last >= 0)
-            continue;*/
-        //double tTime = getTimer()
-        /*if(tTime - last >= 0 and (tTime - last) < 1000.0/288.0)
-            std::this_thread::sleep_for(std::chrono::duration<double>((1000.0/288.0 - (tTime - last)) / 1000.0));*/
         if(VSYNC == 0){
             std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
             unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/Global.FPS) - (sleepTime.count())) * 800.0);
-            //std::cout << "Sleeptime of  " << sleepTimeInt << " us ";
             if(!dumbsleep)
                 SleepInUs(sleepTimeInt);
             while(getTimer() - last < 1000.0/Global.FPS and getTimer() - last >= 0)
                 continue;
         }
 
-        
-        
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
         double fps = (1000.0f / (elapsed.count()));
+        lastFPS = fps;
+        if(lastFPS > 511)
+            lastFPS = 511;
         if(elapsed.count() > 16 and VSYNC == 0)
             std::cout << "dropped frame with " << elapsed.count() << "ms\n";
         avgFPSq.push(fps);
@@ -109,14 +111,16 @@ void RenderLoop(){
             avgFPSq.pop();
         }
         avgFPS = avgFPSqueueSUM / (double)(avgFPSq.size());
+
     }
-    
+    UnloadRenderTexture(frameGraph);
 }
 
 
 
 
 int main() {
+
     SDL_SetMainReady();
     Global.CurrentState = std::make_shared<MainMenu>();
     for(int i = 0; i < Global.GamePath.size(); i++) {
@@ -179,35 +183,31 @@ int main() {
 	}
 	files.clear();
     Global.Path = lastPath;
-    GenTextureMipmaps(&Global.OsusLogo);
+    /*GenTextureMipmaps(&Global.OsusLogo);
     GenTextureMipmaps(&Global.cursor);
-    GenTextureMipmaps(&Global.DefaultFont.texture); //OPENGL1.1 DOESNT SUPPORT THIS
-    SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_TRILINEAR );
+    GenTextureMipmaps(&Global.DefaultFont.texture); //OPENGL1.1 DOESNT SUPPORT THIS*/
+    SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(Global.cursor, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(Global.OsusLogo, TEXTURE_FILTER_BILINEAR );
+
+    std::cout << "Loaded all files and filters\n";
+
     double avgFrameTime;
     HideCursor();
     initMouseTrail();
+
+    std::cout << "Cursor init done\n";
+
     Global.LastFrameTime = getTimer();
     double lastFrame = getTimer();
     Global.GameTextures = 0;
-    
-
-    //initSDL();
-
-    
-    //
-    //CORE.Window.handle;
-
-
-
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    //glfwSwapInterval( 0 );
     SDL_GL_SetSwapInterval(VSYNC);
+    std::cout << "SetVsync\n";
     SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
-
-
-
+    std::cout << "Make sdl current gl\n";
+    std::cout << "Start render loop\n";
     std::thread rend(RenderLoop);
+    
     while(!WindowShouldClose()){
         double timerXXX = getTimer();
         auto t1 = std::chrono::steady_clock::now();
@@ -236,7 +236,6 @@ int main() {
             continue;
         
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
-        //avgHZ = (avgHZ + 1000.0f / (elapsed.count())) / 2.0;
         double hz = (1000.0f / (elapsed.count()));
         avgHZq.push(hz);
         avgHZqueueSUM += hz;
@@ -250,7 +249,5 @@ int main() {
 
     UnloadTexture(Global.OsusLogo);
     UnloadFont(Global.DefaultFont);
-    //UnloadShader(Global.shdrOutline);
     CloseWindow();
-    //quitSDL();
 }

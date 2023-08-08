@@ -49,7 +49,7 @@ struct Globals {
 
     //Color Background = {42,22,33,255};
     int skinNumberOverlap = 18;
-    double FPS = 4.0f * 72.0f;
+    double FPS = 4.0f * 100.0f;
     int Width = 640;
     int Height = 480;
     float offset = 45.0f;
@@ -94,7 +94,7 @@ struct Globals {
     Texture2D OsusLogo;
 
     double volume = 1.0f;
-    double hitVolume = 0.3f;
+    double hitVolume = 0.5f;
 
     bool Key1P = false;
     bool Key1D = false;

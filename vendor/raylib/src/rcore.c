@@ -2882,6 +2882,10 @@ static bool InitGraphicsDevice(int width, int height)
 
     // NOTE: Framebuffer (render area - CORE.Window.render.width, CORE.Window.render.height) could include black bars...
     // ...in top-down or left-right to match display aspect ratio (no weird scalings)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    
     SDL_Init(SDL_INIT_EVERYTHING);
 
 
@@ -2890,24 +2894,27 @@ static bool InitGraphicsDevice(int width, int height)
     if ((CORE.Window.flags & FLAG_WINDOW_RESIZABLE) > 0) flags |= SDL_WINDOW_RESIZABLE;
     flags |= SDL_WINDOW_OPENGL;
     
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    
 
-
+    TRACELOG(LOG_INFO, "SDL: Creating Window");
     CORE.Window.handle = SDL_CreateWindow((CORE.Window.title != 0)? CORE.Window.title : " ", 40, 40, CORE.Window.screen.width, CORE.Window.screen.height, flags);
-
+    TRACELOG(LOG_INFO, "SDL: Created Window");
     if (!CORE.Window.handle)
     {
         SDL_Quit();
         TRACELOG(LOG_WARNING, "SDL: Failed to initialize Window");
         return false;
     }
-
+    
+    TRACELOG(LOG_INFO, "SDL: Creating GL Context");
     CORE.Window.context = SDL_GL_CreateContext(CORE.Window.handle);
-    SDL_GL_SetSwapInterval(0);
+    TRACELOG(LOG_INFO, "SDL: Created GL Context");
+    //SDL_GL_SetSwapInterval(0);
+
     printf(SDL_GetError());
+
     rlLoadExtensions(SDL_GL_GetProcAddress);
+
     rlglInit(CORE.Window.screen.width, CORE.Window.screen.height);
 
     printf("rlgl version:");
@@ -2918,10 +2925,7 @@ static bool InitGraphicsDevice(int width, int height)
     ClearBackground(RAYWHITE);      // Default background color for raylib games :P
 
     if ((CORE.Window.flags & FLAG_WINDOW_MINIMIZED) > 0) MinimizeWindow();
-
-   
-
-
+    //-mwindows
 
     return true;
 }

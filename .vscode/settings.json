@@ -5,5 +5,6 @@
         "string": "cpp",
         "iostream": "cpp",
         "algorithm": "cpp"
-    }
+    },
+    "C_Cpp.dimInactiveRegions": false
 }

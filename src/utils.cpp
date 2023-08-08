@@ -8,10 +8,6 @@
 #include <ctype.h>
 #include <parser.hpp>
 
-
-
-
-
 void updateUpDown(){
     //Get the current state of the mouse wheel
     Global.Wheel = GetMouseWheelMove();
@@ -82,13 +78,6 @@ void GetKeys(){
         Global.Key2R = true;
     else
         Global.Key2R = false;
-
-    /*Global.Key1P = Global.Input.k1p;
-    Global.Key2P = Global.Input.k2p;
-    Global.Key1D = Global.Input.k1d;
-    Global.Key2D = Global.Input.k2d;
-    Global.Key1R = Global.Input.k1r;
-    Global.Key2R = Global.Input.k2r;*/
 }
 
 float Scale(float a){
@@ -141,8 +130,6 @@ Vector2 lerp(Vector2 a, Vector2 b, float t){
     return { .x = (1 - t) * a.x + t * b.x, .y = (1 - t) * a.y + t * b.y};
 }
 
-
-
 Vector2 vectorize(float i) {
     //Really dumb but raylib needs it
     return Vector2{i, i};
@@ -172,6 +159,7 @@ void DrawTextureCenter(Texture2D tex, float x, float y, float s, Color color){
     //Make the necessary calculations inside the function
     DrawTextureEx(tex, ScaleCords(GetRaylibOrigin({x,y,tex.width*s,tex.height*s})), 0, Scale(s), color);
 }
+
 void DrawTextureSlider(Texture2D tex, float x, float y, Color color, float s){
     //Same thing as the DrawTextureCenter() function above
     DrawTextureEx(tex, ScaleCords({x-s/2.0f-4.0f*Global.sliderTexSize,y-s/2.0f-4.0f*Global.sliderTexSize}),0,Scale(1.0f/Global.sliderTexSize), color);
@@ -200,12 +188,15 @@ void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
         DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x - (float)i * s + k * 18 * s * 2, y, s, color);
     }
 }
-std::string getSampleSetFromInt(int s) {
+std::string getSampleSetFromInt(int s){
+    //simple map for sound loading
     if (s == 1) return "normal"; 
     else if (s == 2) return "soft"; 
     else if (s == 3) return "drum"; 
 }
+
 void DrawSpinnerMeter(Texture2D tex, float per){
+    //currently broken, TODO
     per = clip(per, 0.001f, 0.999f);
     float x = 0;
     float y = 0;
@@ -217,12 +208,13 @@ void DrawSpinnerMeter(Texture2D tex, float per){
     else{
         y = 480.0f - 640.0f / ratio;
     }
-    //std::cout << tex.height*(1.0f-per) << " " << tex.height*per << " " << 480.0f*(1.0f-per) << " " << (480.0f-y)*per << std::endl;
     Rectangle source = {0,tex.height*(1.0f-per),tex.width, tex.height*per};
     DrawTexturePro(tex, Rectangle{0,0,tex.width, tex.height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,(480.0f-y)*(1.0f-per)+y/2.0f,640-x,(480.0f-y)*per}), Vector2{0,0}, 0, WHITE);
 }
+
 void DrawSpinnerBack(Texture2D tex, Color color){
+    //currently broken, TODO
     float x = 0;
     float y = 0;
     float ratio = (float)tex.width / (float)tex.height;
@@ -236,21 +228,29 @@ void DrawSpinnerBack(Texture2D tex, Color color){
     Rectangle source = {0,0,tex.width, tex.height};
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,y/2.0f,640-x,(480.0f-y)}), Vector2{0,0}, 0, color);
 }
+
 Vector2 getPointOnCircle(float x, float y, float radius, float angle){
+    //gets a point on a circle with a defined radius
     angle= (angle * M_PI) / 180;
     float xdiff = radius * cos(angle);
     float ydiff = radius * sin(angle);
     return Vector2{x + xdiff, y + ydiff};
 }
+
 void DrawTextureOnCircle(Texture2D tex, float x, float y, float rad, float s, float r, float ang, Color color){
+    //draw texture on a circular path
     Vector2 pos = getPointOnCircle(x, y, rad, ang);
     DrawTextureRotate(tex, pos.x, pos.y, s, r, color);
 }
+
 void DrawTextCenter(const char *text, float x, float y, float s, Color color){
+    //draw centered text
     Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
     DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x - size.x / 2.0f, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
 }
+
 void DrawTextLeft(const char *text, float x, float y, float s, Color color){
+    //draw text LTR
     Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
     DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
 }
@@ -266,14 +266,17 @@ void DrawCNumbersLeft(int n, float x, float y, float s, Color color){
 }
 
 float easeInOutCubic(float x){
+    //ease function
     return x < 0.5f ? 4.0f * x * x * x : 1.0f - std::pow(-2.0f * x + 2.0f, 3) / 2.0f;
 }
 
-bool AreSame(double a, double b) {
+bool AreSame(double a, double b){
+    //float errors
     return std::fabs(a - b) < 0.0001f;
 }
 
 std::vector<std::string> ParseNameFolder(std::string folder){
+    //parse the normal osu folder names, they give a lot of info WIP
     std::vector<std::string> output;
     if(folder[folder.size() - 1] == '/'){
         folder.pop_back();
@@ -318,22 +321,15 @@ std::vector<std::string> ParseNameFolder(std::string folder){
     else{
         output.push_back(folder);
     }
-    
-    if(output.size() > 0)
-        std::cout << output[0] << " - ";
-    if(output.size() > 1)
-        std::cout << output[1] << " - ";
-    if(output.size() > 2)
-        std::cout << output[2];
+
     if(output.size() == 0){
-        std::cout << folder;
         output.push_back(folder);
     }
-    
-    std::cout << std::endl;
     return output;
 }
+
 std::vector<std::string> ParseNameFile(std::string file){
+    //get get metadata from file WIP
     std::vector<std::string> output;
     Parser parser = Parser();
     GameFile geym = parser.parseMetadata(file);
@@ -342,44 +338,39 @@ std::vector<std::string> ParseNameFile(std::string file){
     output.push_back(geym.configMetadata["Creator"]);
     output.push_back(geym.configMetadata["Version"]);
     output.push_back(geym.configMetadata["BeatmapSetID"]);
-    for(int i = 0; i < output.size(); i++){
-        std::cout << output[i] << " - ";
-    }
-    std::cout << std::endl;
     return output;
 }
 
 void initTimer(){
+    //init the timer
     Global.start = std::chrono::steady_clock::now();
 }
 
 void pauseTimer(){
-    
+    //currently not in use
 }
 
 void resumeTimer(){
-    
+    //currently not in use
 }
 
 
 double getTimer(){
+    //get the current time elapsed
     Global.end = std::chrono::steady_clock::now();
-
     return (Global.end - Global.start).count() / 1000000.0;
 }
 
 void addOffsetTimer(unsigned long long int time){
+    //currently not in use
     Global.pausedFor += time;
 }
 
 void updateTimer(){
-    if(!Global.paused){
-        
-    }
+    //currently not in use
 }
 
-bool IsTextureReady(Texture2D texture)
-{
+bool IsTextureReady(Texture2D texture){
     // TODO: Validate maximum texture size supported by GPU?
 
     return ((texture.id > 0) &&         // Validate OpenGL id
@@ -389,18 +380,19 @@ bool IsTextureReady(Texture2D texture)
             (texture.mipmaps > 0));     // Validate texture mipmaps (at least 1 for basic mipmap level)
 }
 
-bool IsRenderTextureReady(RenderTexture2D target)
-{
+bool IsRenderTextureReady(RenderTexture2D target){
     return ((target.id > 0) &&                  // Validate OpenGL id
             IsTextureReady(target.depth) &&     // Validate FBO depth texture/renderbuffer
             IsTextureReady(target.texture));    // Validate FBO texture
 }
 
 float getAngle(Vector2 p1, Vector2 p2){
+    //get angle from two points
     return atan2(p1.y - p2.y, p1.x - p2.x);
 }
 
 std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex, int defaultSampleSet, int normalSet, int additionSet, int hitSound, int index, std::string filename){
+    //simple function to get filenames from basic integers
     int defaultSampleSetForObject = 0;
     int defaultSampleIndexForObject = timingSampleIndex;
 

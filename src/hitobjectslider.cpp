@@ -989,13 +989,12 @@ void Slider::render(){
                 //BeginBlendMode(BLEND_ALPHA_PREMUL);
                 bool draw = true;
                 if(renderPoints.size() > 0){
-                    for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=gm->skip){
+                    for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.5f)), (float)(renderPoints.size())); i+=gm->skip){
                         draw = false;
                         if(i < renderPoints.size() and renderPoints[i].x > -150 and renderPoints[i].x < 790 and renderPoints[i].y > -150 and renderPoints[i].y < 630){
                             if(!renderedLocations[(int)renderPoints[i].x + 151][(int)renderPoints[i].y + 151]){
                                 rlSetBlendFactorsSeparate(RL_ONE, RL_ONE_MINUS_SRC_ALPHA, RL_ONE, RL_ONE_MINUS_SRC_ALPHA, RL_MAX, RL_MAX);
                                 rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
-                                
                                 DrawTextureEx(gm->sliderout, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
                                 (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderout.width)*Global.sliderTexSize,WHITE);
                                 last = std::max(i, 0);
@@ -1021,7 +1020,6 @@ void Slider::render(){
         
     }
     rlDisableDepthTest();
-    
     
     int index = 0;
     int topla = 1;
@@ -1088,6 +1086,7 @@ void Slider::render(){
                 ticksrendered++;
             }
         }
+        
         DrawTextureRotate(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderb.width)*(gm->sliderb.width/128.0f), angle, Fade(renderColor,clampedFade));
         if(inSlider)
             DrawTextureRotate(gm->sliderfollow, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderfollow.width)*2*(gm->sliderfollow.width/256.0f) , angle, Fade(WHITE,clampedFade));
@@ -1167,6 +1166,7 @@ void Slider::dead_render(){
             renderColor =  Fade(Color{255,255,255}, clampedFade2);
         DrawTextureCenter(gm->hitCircle, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
         //DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade2));
+        //DrawTextureRotate(gm->sliderb, x, y, (gm->circlesize/gm->sliderb.width)*(gm->sliderb.width/128.0f), angle, Fade(renderColor,clampedFade));
         DrawTextureCenter(gm->hitCircleOverlay, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f) , Fade(WHITE,clampedFade2));
         if(data.point != 0)
             DrawTextureCenter(gm->selectCircle, x, y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);
