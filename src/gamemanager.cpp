@@ -1425,44 +1425,6 @@ void GameManager::loadGame(std::string filename){
 	Global.Path = lastPath;
 	Global.GameTextures = 1;
 	std::cout << "mark text for loading" << std::endl;
-
-	/*GenTextureMipmaps(&hit0);
-	SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&hit50);
-	SetTextureFilter(hit50, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&hit100);
-	SetTextureFilter(hit100, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&hit300);
-	SetTextureFilter(hit300, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&approachCircle);
-	SetTextureFilter(approachCircle, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&selectCircle);
-	SetTextureFilter(selectCircle, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&hitCircleOverlay);
-	SetTextureFilter(hitCircleOverlay, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&hitCircle);
-	SetTextureFilter(hitCircle, TEXTURE_FILTER_TRILINEAR );
-	GenTextureMipmaps(&sliderb);
-	SetTextureFilter(sliderb, TEXTURE_FILTER_TRILINEAR );
-
-
-	SetTextureFilter(sliderin, TEXTURE_FILTER_POINT);
-	SetTextureFilter(sliderout, TEXTURE_FILTER_POINT);
-
-	GenTextureMipmaps(&sliderscorepoint);
-	SetTextureFilter(sliderscorepoint, TEXTURE_FILTER_TRILINEAR );
-	
-	//GenTextureMipmaps(&sliderout);
-	//SetTextureFilter(sliderout, TEXTURE_FILTER_TRILINEAR );
-	
-	
-
-	GenTextureMipmaps(&reverseArrow);
-	SetTextureFilter(reverseArrow, TEXTURE_FILTER_TRILINEAR );
-	for(int i = 0; i < 10; i++){
-		GenTextureMipmaps(&numbers[i]);
-		SetTextureFilter(numbers[i], TEXTURE_FILTER_TRILINEAR );  //OPENGL1.1 DOESNT SUPPORT THIS
-	}*/
 	startMusic = true;
 	stop = false;
 }
@@ -1562,38 +1524,25 @@ void GameManager::loadGameTextures(){
     if(!Global.settings.useDefaultSkin){
         loadBeatmapSkin(Global.selectedPath); // LOADING THE BEATMAP SKIN USING A SEPERATE FUNCTION
     }
-    GenTextureMipmaps(&hit0);
-    SetTextureFilter(hit0, TEXTURE_FILTER_TRILINEAR );
-    GenTextureMipmaps(&hit50);
-    SetTextureFilter(hit50, TEXTURE_FILTER_TRILINEAR );
-    GenTextureMipmaps(&hit100);
-    SetTextureFilter(hit100, TEXTURE_FILTER_TRILINEAR );
-    GenTextureMipmaps(&hit300);
-    SetTextureFilter(hit300, TEXTURE_FILTER_TRILINEAR );
-    GenTextureMipmaps(&approachCircle);
-    SetTextureFilter(approachCircle, TEXTURE_FILTER_TRILINEAR );
-    GenTextureMipmaps(&selectCircle);
-    SetTextureFilter(selectCircle, TEXTURE_FILTER_TRILINEAR );
-    GenTextureMipmaps(&hitCircleOverlay);
-    SetTextureFilter(hitCircleOverlay, TEXTURE_FILTER_TRILINEAR );
-    GenTextureMipmaps(&hitCircle);
-    SetTextureFilter(hitCircle, TEXTURE_FILTER_TRILINEAR );
-    GenTextureMipmaps(&sliderb);
-    SetTextureFilter(sliderb, TEXTURE_FILTER_TRILINEAR );
+    SetTextureFilter(hit0, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(hit50, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(hit100, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(hit300, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(approachCircle, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(selectCircle, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(hitCircleOverlay, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(hitCircle, TEXTURE_FILTER_BILINEAR );
+    SetTextureFilter(sliderb, TEXTURE_FILTER_BILINEAR );
 
 
     SetTextureFilter(sliderin, TEXTURE_FILTER_POINT);
 	SetTextureFilter(sliderblank, TEXTURE_FILTER_POINT);
     SetTextureFilter(sliderout, TEXTURE_FILTER_POINT);
+    SetTextureFilter(sliderscorepoint, TEXTURE_FILTER_BILINEAR );
 
-    GenTextureMipmaps(&sliderscorepoint);
-    SetTextureFilter(sliderscorepoint, TEXTURE_FILTER_TRILINEAR );
-
-    GenTextureMipmaps(&reverseArrow);
-    SetTextureFilter(reverseArrow, TEXTURE_FILTER_TRILINEAR );
+    SetTextureFilter(reverseArrow, TEXTURE_FILTER_BILINEAR );
     for(int i = 0; i < 10; i++){
-        GenTextureMipmaps(&numbers[i]);
-        SetTextureFilter(numbers[i], TEXTURE_FILTER_TRILINEAR );  //OPENGL1.1 DOESNT SUPPORT THIS
+        SetTextureFilter(numbers[i], TEXTURE_FILTER_BILINEAR );  //OPENGL1.1 DOESNT SUPPORT THIS
     }
 
     backgroundTextures.data.clear();
@@ -1654,8 +1603,7 @@ void GameManager::loadGameTextures(){
 					if(backgroundTextures.data[gameFile.events[j].filename].width != 0){
 						backgroundTextures.loaded[gameFile.events[j].filename].value = true;
 						std::cout << "Loaded: Background with filename: " << gameFile.events[j].filename << std::endl;
-						GenTextureMipmaps(&backgroundTextures.data[gameFile.events[j].filename]);
-						SetTextureFilter(backgroundTextures.data[gameFile.events[j].filename], TEXTURE_FILTER_TRILINEAR );
+						SetTextureFilter(backgroundTextures.data[gameFile.events[j].filename], TEXTURE_FILTER_BILINEAR );
 					}
 				}
 			}

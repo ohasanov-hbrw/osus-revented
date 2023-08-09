@@ -894,11 +894,11 @@ void Slider::render(){
     }
 
 
-    float approachScale = 3.5*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    float approachScale = 3.5*easeInOutCubic((1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt))+1;
     if (approachScale <= 1)
         approachScale = 1;
-    float clampedFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 1.0f);
-    float clampedBigFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.4f, 0, 100.0f);
+    float clampedFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.0f, 0, 1.0f);
+    float clampedBigFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.0f, 0, 100.0f);
     Color renderColor;
     data.textureLoaded = IsRenderTextureReady(sliderTexture);
     //rlCustomDepthFunc(true);
@@ -977,7 +977,9 @@ void Slider::render(){
 
 
             //BeginShaderMode(Global.shdrTest);
-            DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,1), gm->circlesize);
+
+            float amog = easeInOutCubic(clampedFade) * 0.7;
+            DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,amog), gm->circlesize);
             //EndShaderMode();
             //Vector2 tempPos2 = renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size()))];
             //DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y, gm->circlesize/gm->sliderin.width, RED);
@@ -1010,9 +1012,11 @@ void Slider::render(){
                 EndTextureMode();
             }
             EndBlendMode();
-
+            
+            
+            float amog = easeInOutCubic(clampedFade) * 0.7;
             int transparency = GetShaderLocation(Global.shdrTest, "transparency");
-            SetShaderValue(Global.shdrTest, transparency, &clampedFade, SHADER_UNIFORM_FLOAT);
+            SetShaderValue(Global.shdrTest, transparency, &amog, SHADER_UNIFORM_FLOAT);
             BeginShaderMode(Global.shdrTest);
             DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,1), gm->circlesize);
             EndShaderMode();
@@ -1021,6 +1025,9 @@ void Slider::render(){
     }
     rlDisableDepthTest();
     
+    clampedFade = clip(clampedFade, 0.0f, 1.0f);
+    clampedFade = easeInOutCubic(clampedFade);
+
     int index = 0;
     int topla = 1;
     float angle = 0;
@@ -1094,6 +1101,7 @@ void Slider::render(){
 
     clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
+    clampedFade = easeInOutCubic(clampedFade);
 
     if(state){
         DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
@@ -1120,8 +1128,14 @@ void Slider::dead_render(){
             UnloadRenderTexture(sliderTexture);
         data.textureReady = false;
     }
-    clampedFade2 = clip(clampedFade2, 0.0f, 0.7f);
 
+    clampedFade = clip(clampedFade, 0.0f, 1.0f);
+    clampedFade = easeInOutCubic(clampedFade);
+
+    clampedFade2 = clip(clampedFade2, 0.0f, 1.0f);
+    clampedFade2 = easeInOutCubic(clampedFade2);
+    clampedFade2 = clampedFade2 * 0.7;
+    
     if(data.textureReady and data.textureLoaded){
         float outlineSize = 4.0 * gm->circlesize/gm->sliderin.width;
         float outlineColor[4] = { 1.0f, 1.0f, 1.0f, clampedFade2 };     // Normalized RED color 
@@ -1146,7 +1160,7 @@ void Slider::dead_render(){
             int transparency = GetShaderLocation(Global.shdrTest, "transparency");
             SetShaderValue(Global.shdrTest, transparency, &clampedFade2, SHADER_UNIFORM_FLOAT);
             BeginShaderMode(Global.shdrTest);
-            DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,clampedFade2), gm->circlesize);
+            DrawTextureSlider(sliderTexture.texture, minX, minY, Fade(WHITE,1), gm->circlesize);
             EndShaderMode();
         }
         else{
@@ -1157,6 +1171,10 @@ void Slider::dead_render(){
 
         float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
         scale = clip(scale,1,2);
+        scale -= 1.0;
+        scale = easeInOutCubic(scale);
+        scale += 1.0;
+
         Color renderColor;
         float x = lastPosition.x;
         float y = lastPosition.y;

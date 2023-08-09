@@ -183,9 +183,6 @@ int main() {
 	}
 	files.clear();
     Global.Path = lastPath;
-    /*GenTextureMipmaps(&Global.OsusLogo);
-    GenTextureMipmaps(&Global.cursor);
-    GenTextureMipmaps(&Global.DefaultFont.texture); //OPENGL1.1 DOESNT SUPPORT THIS*/
     SetTextureFilter(Global.DefaultFont.texture, TEXTURE_FILTER_BILINEAR );
     SetTextureFilter(Global.cursor, TEXTURE_FILTER_BILINEAR );
     SetTextureFilter(Global.OsusLogo, TEXTURE_FILTER_BILINEAR );

@@ -3043,6 +3043,23 @@ Texture2D LoadTexture(const char *fileName)
     return texture;
 }
 
+Texture2D LoadTexturePOT(const char *fileName)
+{
+    Texture2D texture = { 0 };
+
+    Image image = LoadImage(fileName);
+
+    ImageToPOT(&image, (Color){0,0,0,0});
+
+    if (image.data != NULL)
+    {
+        texture = LoadTextureFromImage(image);
+        UnloadImage(image);
+    }
+
+    return texture;
+}
+
 // Load a texture from image data
 // NOTE: image is not unloaded, it must be done manually
 Texture2D LoadTextureFromImage(Image image)

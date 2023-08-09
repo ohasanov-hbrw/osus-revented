@@ -40,11 +40,14 @@ void Circle::update(){
 //renders the Circle
 void Circle::render(){
     GameManager* gm = GameManager::getInstance();
-    float approachScale = 3.5*(1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt)+1;
+    float approachScale = 3.5*easeInOutCubic((1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt))+1;
     if (approachScale <= 1)
         approachScale = 1;
     float clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
+
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
+    clampedFade = easeInOutCubic(clampedFade);
+
     Color renderColor;
     if(data.colour.size() > 2)
         renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
@@ -64,8 +67,19 @@ void Circle::dead_render(){
     GameManager* gm = GameManager::getInstance();
     float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
     float clampedFade2 = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/2.0f);
+
+    clampedFade = clip(clampedFade, 0.0f, 1.0f);
+    clampedFade = easeInOutCubic(clampedFade);
+
+    clampedFade2 = clip(clampedFade2, 0.0f, 1.0f);
+    clampedFade2 = easeInOutCubic(clampedFade2);
+
     float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
     scale = clip(scale,1,2);
+    scale -= 1.0;
+    scale = easeInOutCubic(scale);
+    scale += 1.0;
+    
     Color renderColor;
     if(data.colour.size() > 2)
         renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);

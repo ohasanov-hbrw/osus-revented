@@ -1041,7 +1041,7 @@ static void rlUnloadShaderDefault(void);    // Unload default shader
 static char *rlGetCompressedFormatName(int format); // Get compressed format official GL identifier name
 #endif  // RLGL_SHOW_GL_DETAILS_INFO
 #endif  // GRAPHICS_API_OPENGL_33 || GRAPHICS_API_OPENGL_ES2
-#if defined(GRAPHICS_API_OPENGL_11)
+#if (defined(GRAPHICS_API_OPENGL_11) || defined(GRAPHICS_API_OPENGL_21))
 static int rlGenTextureMipmapsData(unsigned char *data, int baseWidth, int baseHeight);         // Generate mipmaps data on CPU side
 static unsigned char *rlGenNextMipmapData(unsigned char *srcData, int srcWidth, int srcHeight); // Generate next mipmap level on CPU side
 #endif
@@ -3195,7 +3195,7 @@ void rlGenTextureMipmaps(unsigned int id, int width, int height, int format, int
     if (((width > 0) && ((width & (width - 1)) == 0)) &&
         ((height > 0) && ((height & (height - 1)) == 0))) texIsPOT = true;
 
-#if defined(GRAPHICS_API_OPENGL_11)
+#if (defined(GRAPHICS_API_OPENGL_11) || defined(GRAPHICS_API_OPENGL_21))
     if (texIsPOT)
     {
         // WARNING: Manual mipmap generation only works for RGBA 32bit textures!
@@ -3234,7 +3234,7 @@ void rlGenTextureMipmaps(unsigned int id, int width, int height, int format, int
         else TRACELOG(RL_LOG_WARNING, "TEXTURE: [ID %i] Failed to generate mipmaps for provided texture format", id);
     }
 #endif
-#if defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)
+#if (!defined(GRAPHICS_API_OPENGL_21) && defined(GRAPHICS_API_OPENGL_33)) || defined(GRAPHICS_API_OPENGL_ES2)
     if ((texIsPOT) || (RLGL.ExtSupported.texNPOT))
     {
         //glHint(GL_GENERATE_MIPMAP_HINT, GL_DONT_CARE);   // Hint for mipmaps generation algorithm: GL_FASTEST, GL_NICEST, GL_DONT_CARE
@@ -4630,7 +4630,7 @@ static char *rlGetCompressedFormatName(int format)
 
 #endif  // GRAPHICS_API_OPENGL_33 || GRAPHICS_API_OPENGL_ES2
 
-#if defined(GRAPHICS_API_OPENGL_11)
+#if (defined(GRAPHICS_API_OPENGL_11) || defined(GRAPHICS_API_OPENGL_21))
 // Mipmaps data is generated after image data
 // NOTE: Only works with RGBA (4 bytes) data!
 static int rlGenTextureMipmapsData(unsigned char *data, int baseWidth, int baseHeight)
