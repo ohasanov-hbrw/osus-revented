@@ -241,7 +241,7 @@ void GameManager::update(){
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
-				Global.amogus2 = 0.0f;
+				Global.amogus2 = 16.0f;
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
 						objects[i]->data.point = 0;
@@ -438,8 +438,7 @@ void GameManager::update(){
 								}
 							}
 
-
-
+							//std::cout << 3.5*easeInOutCubic((1-(currentTime*1000.0f - objects[i]->data.time + gameFile.preempt)/gameFile.preempt))+1 << std::endl;
 							objects[i]->data.time = currentTime*1000.0f;
 
 							Global.AutoMousePositionStart = {objects[i]->data.x, objects[i]->data.y};
@@ -1614,7 +1613,7 @@ void GameManager::loadGameTextures(){
 }
 void GameManager::unloadGameTextures(){
 	std::cout << "UnloadingTextures" << std::endl;
-    Global.GameTextures = 0;
+    Global.GameTextures = 2;
     UnloadTexture(hitCircleOverlay);
     UnloadTexture(hitCircle);
     UnloadTexture(sliderscorepoint);

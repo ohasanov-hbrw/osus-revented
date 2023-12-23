@@ -271,7 +271,19 @@ float easeInOutCubic(float x){
     /*x = x / 2;
     x += 0.25;
     return ((x * x * (3.0f - 2.0f * x)) - 0.25) * 2.0f;*/
+    //return 1.0f - ((1.0f - x) * (1.0f - x));
     return x;
+    //return std::sin((x * M_PI) / 2.0);
+}
+
+float easeOutQuad(float x){
+    //ease function
+    //return x < 0.5f ? 4.0f * x * x * x : 1.0f - std::pow(-2.0f * x + 2.0f, 3) / 2.0f;
+    /*x = x / 2;
+    x += 0.25;
+    return ((x * x * (3.0f - 2.0f * x)) - 0.25) * 2.0f;*/
+    return 1.0f - ((1.0f - x) * (1.0f - x));
+    //return x;
     //return std::sin((x * M_PI) / 2.0);
 }
 

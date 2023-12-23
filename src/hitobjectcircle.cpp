@@ -40,9 +40,9 @@ void Circle::update(){
 //renders the Circle
 void Circle::render(){
     GameManager* gm = GameManager::getInstance();
-    float approachScale = 3.5*easeInOutCubic((1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt))+1;
-    if (approachScale <= 1)
-        approachScale = 1;
+    float approachScale = 3.5f*easeInOutCubic((1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt))+1.0f;
+    if (approachScale <= 1.0f)
+        approachScale = 1.0f;
     float clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
 
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
@@ -55,10 +55,10 @@ void Circle::render(){
         renderColor =  Fade(Color{255,255,255}, clampedFade);
     
 
-    DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
-    DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade));
-    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width*(gm->hitCircleOverlay.width/128.0f) , Fade(WHITE,clampedFade));
-    DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width*(gm->approachCircle.width/128.0f) , renderColor);
+    DrawTextureCenter(gm->hitCircle, data.x, data.y, gm->circlesize/(float)Global.textureSize.hitCircle , renderColor);
+    DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/(float)Global.textureSize.comboNumber, Fade(WHITE,clampedFade));
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/(float)Global.textureSize.hitCircleOverlay , Fade(WHITE,clampedFade));
+    DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*(gm->circlesize/(float)Global.textureSize.approachCircle) , renderColor);
 
 }
 
@@ -66,7 +66,7 @@ void Circle::render(){
 void Circle::dead_render(){
     GameManager* gm = GameManager::getInstance();
     float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
-    float clampedFade2 = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/2.0f);
+    float clampedFade2 = (gm->gameFile.fade_in/4.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/4.0f);
 
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
     clampedFade = easeInOutCubic(clampedFade);
@@ -77,26 +77,27 @@ void Circle::dead_render(){
     float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
     scale = clip(scale,1,2);
     scale -= 1.0;
-    scale = easeInOutCubic(scale);
-    scale += 1.0;
+    scale = easeOutQuad(scale);
+    scale = scale * 0.4f;
+    scale += 1.0f;
     
     Color renderColor;
     if(data.colour.size() > 2)
         renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
     else
         renderColor =  Fade(Color{255,255,255}, clampedFade2);
-    DrawTextureCenter(gm->hitCircle, data.x, data.y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
-    //DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade2));
-    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f) , Fade(WHITE,clampedFade2));
-    if(data.point != 0)
-        DrawTextureCenter(gm->selectCircle, data.x, data.y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);
+    DrawTextureCenter(gm->hitCircle, data.x, data.y, clip(scale,1,2)*gm->circlesize/(float)Global.textureSize.hitCircle , renderColor);
+    DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/(float)Global.textureSize.comboNumber, Fade(WHITE,clampedFade2));
+    DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, clip(scale,1,2)*gm->circlesize/(float)Global.textureSize.hitCircleOverlay , Fade(WHITE,clampedFade2));
+    /*if(data.point != 0)
+        DrawTextureCenter(gm->selectCircle, data.x, data.y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);*/
     if(data.point == 0)
         DrawTextureCenter(gm->hit0, data.x, data.y, (gm->circlesize/gm->hit0.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 1)
         DrawTextureCenter(gm->hit50, data.x, data.y, (gm->circlesize/gm->hit50.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 2)
         DrawTextureCenter(gm->hit100, data.x, data.y, (gm->circlesize/gm->hit100.width)*0.7f , Fade(WHITE,clampedFade));
-    else if(data.point == 3)
+    else if(data.point == 3 && Global.textureSize.render300)
         DrawTextureCenter(gm->hit300, data.x, data.y, (gm->circlesize/gm->hit300.width)*0.7f , Fade(WHITE,clampedFade));
 }
 

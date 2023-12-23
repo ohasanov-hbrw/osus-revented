@@ -96,6 +96,7 @@ inline Vector2 operator / (Vector2 p0, Vector2 p1){
 }
 
 float easeInOutCubic(float);
+float easeOutQuad(float);
 bool AreSame(double, double);
 
 std::vector<std::string> ParseNameFolder(std::string);

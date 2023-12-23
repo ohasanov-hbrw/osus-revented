@@ -15,7 +15,7 @@ Spinner::Spinner(HitObjectData data){
 //initilizes a circle
 void Spinner::init(){
     GameManager* gm = GameManager::getInstance();
-    neededAngle = ((gm->spinsPerSecond) * (data.endTime - data.time) * 360) / 1000.0f;
+    neededAngle = (((gm->spinsPerSecond) * (data.endTime - data.time) * 360) / 1000.0f ) / 3.0f;
     data.ex = data.x;
     data.ey = data.y;
 }
@@ -151,7 +151,7 @@ void Spinner::dead_render(){
         DrawTextureCenter(gm->hit50, data.x, data.y, (gm->circlesize/gm->hit50.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 2)
         DrawTextureCenter(gm->hit100, data.x, data.y, (gm->circlesize/gm->hit100.width)*0.7f , Fade(WHITE,clampedFade));
-    else if(data.point == 3)
+    else if(data.point == 3 && Global.textureSize.render300)
         DrawTextureCenter(gm->hit300, data.x, data.y, (gm->circlesize/gm->hit300.width)*0.7f , Fade(WHITE,clampedFade));
 }
 

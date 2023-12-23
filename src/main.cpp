@@ -75,11 +75,12 @@ void RenderLoop(){
         Global.mutex.lock();
         if(Global.NeedForBackgroundClear)
             ClearBackground(Global.Background);
-        Global.CurrentState->render();
         if(Global.GameTextures == -1)
             Global.gameManager->unloadGameTextures();
         else if(Global.GameTextures == 1)
             Global.gameManager->loadGameTextures();
+        Global.CurrentState->render();
+        
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
         renderMouse(); 

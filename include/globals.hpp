@@ -36,6 +36,13 @@ struct InputHandler {
 };
 
 class State;
+struct TextureSizes{
+    int hitCircle = 128;
+    int comboNumber = 140;
+    int hitCircleOverlay = 128;
+    int approachCircle = 128;
+    bool render300 = false;
+};
 
 struct Globals {
     float Scale = 1.f;
@@ -154,6 +161,9 @@ struct Globals {
                              &amogs,
                              1, 1, 1,
                              1);*/
+
+    TextureSizes textureSize;
+
     InputHandler Input;
     bool renderFrame;
     std::mutex mutex;

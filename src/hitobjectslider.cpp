@@ -1093,10 +1093,27 @@ void Slider::render(){
                 ticksrendered++;
             }
         }
-        
-        DrawTextureRotate(gm->sliderb, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderb.width)*(gm->sliderb.width/128.0f), angle, Fade(renderColor,clampedFade));
+        Vector2 texturePositionSmooth;
+        if(position > calPos){
+            if(calPos + 1 < renderPoints.size()){
+                texturePositionSmooth = lerp(renderPoints[calPos], renderPoints[calPos + 1], position - (double)calPos);
+            }
+            else{
+                texturePositionSmooth = renderPoints[calPos];
+            }
+        }
+        else{
+            if(calPos - 1 >= 0){
+                texturePositionSmooth = lerp(renderPoints[calPos], renderPoints[calPos - 1], (double)calPos - position);
+            }
+            else{
+                texturePositionSmooth = renderPoints[calPos];
+            }
+        }
+
+        DrawTextureRotate(gm->sliderb, texturePositionSmooth.x, texturePositionSmooth.y, (gm->circlesize/gm->sliderb.width)*(gm->sliderb.width/128.0f), angle, Fade(renderColor,clampedFade));
         if(inSlider)
-            DrawTextureRotate(gm->sliderfollow, renderPoints[calPos].x, renderPoints[calPos].y, (gm->circlesize/gm->sliderfollow.width)*2*(gm->sliderfollow.width/256.0f) , angle, Fade(WHITE,clampedFade));
+            DrawTextureRotate(gm->sliderfollow, texturePositionSmooth.x, texturePositionSmooth.y, (gm->circlesize/gm->sliderfollow.width)*2*(gm->sliderfollow.width/256.0f) , angle, Fade(WHITE,clampedFade));
     }
 
     clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
@@ -1108,6 +1125,32 @@ void Slider::render(){
         DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, gm->circlesize/gm->hitCircleOverlay.width*(gm->hitCircleOverlay.width/128.0f) , Fade(WHITE,clampedFade));
         DrawTextureCenter(gm->approachCircle, data.x, data.y, approachScale*gm->circlesize/gm->approachCircle.width*(gm->approachCircle.width/128.0f) , renderColor);
+    }
+    else if(data.time+gm->gameFile.fade_in/1.0f > gm->currentTime*1000.0f){
+        float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
+        float clampedFade2 = (gm->gameFile.fade_in/4.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/4.0f);
+
+        clampedFade = clip(clampedFade, 0.0f, 1.0f);
+        clampedFade = easeInOutCubic(clampedFade);
+
+        clampedFade2 = clip(clampedFade2, 0.0f, 1.0f);
+        clampedFade2 = easeInOutCubic(clampedFade2);
+
+        float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
+        scale = clip(scale,1,2);
+        scale -= 1.0;
+        scale = easeOutQuad(scale);
+        scale = scale * 0.4f;
+        scale += 1.0f;
+        
+        Color renderColor;
+        if(data.colour.size() > 2)
+            renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
+        else
+            renderColor =  Fade(Color{255,255,255}, clampedFade2);
+        DrawTextureCenter(gm->hitCircle, data.x, data.y, clip(scale,1,2)*gm->circlesize/(float)Global.textureSize.hitCircle , renderColor);
+        DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/(float)Global.textureSize.comboNumber, Fade(WHITE,clampedFade2));
+        DrawTextureCenter(gm->hitCircleOverlay, data.x, data.y, clip(scale,1,2)*gm->circlesize/(float)Global.textureSize.hitCircleOverlay , Fade(WHITE,clampedFade2));
     }
     /*if(changeTex == true)
         data.textureLoaded = true;*/
@@ -1182,13 +1225,16 @@ void Slider::dead_render(){
             renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
         else
             renderColor =  Fade(Color{255,255,255}, clampedFade2);
-        DrawTextureCenter(gm->hitCircle, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
+        DrawTextureCenter(gm->hitCircle, x, y, /*clip(scale/1.5f,1,2)**/gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f) , renderColor);
         //DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade2));
         //DrawTextureRotate(gm->sliderb, x, y, (gm->circlesize/gm->sliderb.width)*(gm->sliderb.width/128.0f), angle, Fade(renderColor,clampedFade));
-        DrawTextureCenter(gm->hitCircleOverlay, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f) , Fade(WHITE,clampedFade2));
+        /*DrawTextureCenter(gm->hitCircleOverlay, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f) , Fade(WHITE,clampedFade2));
         if(data.point != 0)
-            DrawTextureCenter(gm->selectCircle, x, y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);
-
+            DrawTextureCenter(gm->selectCircle, x, y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);*/
+        if(is_hit_at_end){
+            if(inSlider)
+            DrawTextureRotate(gm->sliderfollow, renderPoints[position].x, renderPoints[position].y, (clip(clampedFade,0.7,2))*(gm->circlesize/gm->sliderfollow.width)*2*(gm->sliderfollow.width/256.0f) , 0, Fade(WHITE,clampedFade2));
+        }
 
         if(data.point == 0)
             DrawTextureCenter(gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
@@ -1196,7 +1242,7 @@ void Slider::dead_render(){
             DrawTextureCenter(gm->hit50, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit50.width)*0.5f , Fade(WHITE,clampedFade));
         else if(data.point == 2)
             DrawTextureCenter(gm->hit100, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit100.width)*0.5f , Fade(WHITE,clampedFade));
-        else if(data.point == 3)
+        else if(data.point == 3 && Global.textureSize.render300)
             DrawTextureCenter(gm->hit300, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit300.width)*0.5f , Fade(WHITE,clampedFade));
     }
 }

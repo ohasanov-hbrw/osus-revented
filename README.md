@@ -41,6 +41,11 @@ Expect to see many bugs and slowdowns, as this is a "Work In Progress" project, 
 When you encounter a bug, or see something missing, just report it using the "Issues" tab on github! We will check the issue as fast as we can and we will try to fix it :D
 
 
+Some interesting things: 
+-> make sure that the skins are uniform. i will implement some "dividers" to the global variables, if you absolutely need to use a skin that is non-standard. OSU!'s skin management is honestly not good. not good at all. even though some objects need to be 128x128 pixels for example, there are some skins that just have 160x160 pixel objects for no apparent reason. i will not try to support this BS. just rescale them yourselves. 
+-> some maps are also offset for some reason, i cant figure out why. i will try to implement a per-map-offset feature but yeah... cringe moment.
+-> this will be ported to the 3ds. the code already has opengl1.1 support... this is why the spinny menu is still wip, since the 3ds doesnt have enough vram to render that :)
+-> this clone also uses OS sleep. This may lead to innacuracies or stutters. i really dont want to spin-lock, since that kills the performance.
 
 
 ![alt text](https://github.com/ohasanov-hbrw/osus-revented/blob/master/resources/osus.png?raw=true)

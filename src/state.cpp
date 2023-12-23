@@ -272,7 +272,7 @@ void Game::update() {
         }
     }
     else{
-        if(initDone == 0 or Global.GameTextures != 0){
+        if(initDone == 0 or Global.GameTextures == 0){
             initDone = -1;
         }
         if(initDone == -1 and getTimer() - initStartTime > 0.0f){
