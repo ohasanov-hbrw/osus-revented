@@ -1014,7 +1014,7 @@ void Slider::render(){
             EndBlendMode();
             
             
-            float amog = easeInOutCubic(clampedFade) * 0.7;
+            float amog = easeInOutCubic(clampedFade);
             int transparency = GetShaderLocation(Global.shdrTest, "transparency");
             SetShaderValue(Global.shdrTest, transparency, &amog, SHADER_UNIFORM_FLOAT);
             BeginShaderMode(Global.shdrTest);

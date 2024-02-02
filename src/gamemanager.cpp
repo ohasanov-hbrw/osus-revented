@@ -41,12 +41,18 @@ void GameManager::init(){
 
 //main game loop
 void GameManager::update(){
+	//for now the left key on the keyboard plays the map automatically
+	//this is pretty useful when you need to quickly test the timings
+	//since the bot is always pressing in the correct time window
 	if(IsKeyDown(SDL_SCANCODE_LEFT)){
 		Global.useAuto = true;
 	}
 	else{
 		Global.useAuto = false;
 	}
+
+	
+	//current implementation of the backgrounds
 	int eventSize = gameFile.events.size();
 	for(int i = eventSize-1; i >= 0; i--){
 		if(gameFile.events[i].startTime <= currentTime*1000.0f){
@@ -761,7 +767,7 @@ Vector2 get2BezierPoint(std::vector<Vector2> &points, int numPoints, float t){
 
 //load the beatmap
 void GameManager::loadDefaultSkin(std::string filename){
-
+	currentComboIndex = 0;
 	std::vector<std::string> files;
 	files.clear();
 	Global.Path = "resources/default_skin/";
@@ -999,6 +1005,8 @@ void GameManager::loadBeatmapSound(std::string filename){
 void GameManager::loadGame(std::string filename){
 	//create a parser and parse the file
 	currentBackgroundTexture = "";
+
+	//misc variables
 	Global.amogus = 0;
 	Global.amogus2 = 0;
 	Global.amogus3 = 0;
@@ -1025,17 +1033,18 @@ void GameManager::loadGame(std::string filename){
 	//------------------------------------------------------------------|LOADING BACKGROUNDS|------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+	//clear all the backgrounds we have
 	backgroundTextures.data.clear();
 	backgroundTextures.pos.clear();
 	backgroundTextures.loaded.clear();
 
+	//check for png backgrounds
 	std::vector<std::string> files;
 	files.clear();
 	Global.Path = lastPath + '/';
 	files = ls(".png");
 
-	
+	//precalculate all the sliders and check how long we need to wait for it
 	double start = getTimer();
 	for(int i = 0; i < gameFile.hitObjects.size(); i++){
 		if(gameFile.hitObjects[i].type == 2){
@@ -1178,13 +1187,13 @@ void GameManager::loadGame(std::string filename){
 
 		}
 	}
-	std::cout << getTimer() - start << "ms -> The time it took for you to finish :)" << std::endl;
+	std::cout << "Sliders precalculated in " << getTimer() - start << "ms" << std::endl;
 	Global.loadingState = 2;
 	
 	
 
 	
-	//calculate all the variables for the game (these may be a bit wrong but they feel right)
+	//calculate all the variables for the game (these are mathematically correct but they feel weird?)
 	if(std::stof(gameFile.configDifficulty["ApproachRate"]) < 5.0f){
 		gameFile.preempt = 1200.0f + 600.0f * (5.0f - std::stof(gameFile.configDifficulty["ApproachRate"])) / 5.0f;
 		gameFile.fade_in = 800.0f + 400.0f * (5.0f - std::stof(gameFile.configDifficulty["ApproachRate"])) / 5.0f;
@@ -1197,6 +1206,7 @@ void GameManager::loadGame(std::string filename){
 		gameFile.preempt = 1200.0f;
 		gameFile.fade_in = 800.0f;
 	}
+	//TODO: Spinners are still in their initial state, this is probably pretty wrong
 	float od = std::stoi(gameFile.configDifficulty["OverallDifficulty"]);
 	if(od < 5){
 		spinsPerSecond = 5.0f - 2.0f * (5.0f - od) / 5.0f;
@@ -1207,49 +1217,49 @@ void GameManager::loadGame(std::string filename){
 	else{
 		spinsPerSecond = 5.0f;
 	}
+	
+	//calculate the time windows for 300-100-50 points
 	gameFile.p300Final = gameFile.p300 - std::stof(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p300Change;
 	gameFile.p100Final = gameFile.p100 - std::stof(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p100Change;
 	gameFile.p50Final = gameFile.p50 - std::stof(gameFile.configDifficulty["OverallDifficulty"]) * gameFile.p50Change;
 
+	//debug lines
 	std::cout << gameFile.p300Final << " " << gameFile.p100Final << " " << gameFile.p50Final << " " << gameFile.preempt << std::endl;
 	std::cout << std::stof(gameFile.configDifficulty["OverallDifficulty"]) << " " << gameFile.configDifficulty["OverallDifficulty"] << std::endl;
 	std::cout << std::stof(gameFile.configDifficulty["ApproachRate"]) << " " << gameFile.configDifficulty["ApproachRate"] << std::endl;
+	
 	//debug, just say what the name of the music file is and load it
 	//std::cout << (Global.Path + '/' + gameFile.configGeneral["AudioFilename"]) << std::endl;
-
-
-
-
 	//backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
 
-
-
-	
-
-	
+	//get the file size of the music file and allocate memory for it
 	FILE *music = fopen((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str(), "rb");
 	fseek(music, 0, SEEK_END);
 	musicSize = ftell(music);
 	fseek(music, 0, SEEK_SET);  /* same as rewind(f); */
-
 	musicData = (char *)malloc(musicSize + 1);
 	fread(musicData, musicSize, 1, music);
 	fclose(music);
-
 	musicData[musicSize] = 0;
-
+	//load the music as a raylib music file
 	backgroundMusic = LoadMusicStreamFromMemory(GetFileExtension((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str()), (const unsigned char *)musicData, musicSize);
+	
 	Global.loadingState = 6;
+
+	//reset the score and the combo
 	score = 0;
 	clickCombo = 0;
+
     //TODO: these are not used right now, USE THEM
 	float hpdrainrate = std::stof(gameFile.configDifficulty["HPDrainRate"]);
+
+	//circle size calculations
 	circlesize = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
 	slidertickrate = std::stof(gameFile.configDifficulty["SliderTickRate"]);
 	circlesize *= 2.0f;
-	//std::cout << circlesize << std::endl;
-	float overalldifficulty = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
+	
 	//more difficulty stuff, may also be wrong
+	float overalldifficulty = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
 	difficultyMultiplier = ((hpdrainrate + circlesize + overalldifficulty + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
 	if (gameFile.configDifficulty.find("SliderMultiplier") != gameFile.configDifficulty.end())
 		sliderSpeed = std::stof(gameFile.configDifficulty["SliderMultiplier"]);
@@ -1267,7 +1277,7 @@ void GameManager::loadGame(std::string filename){
 
 
 
-
+	//spinner debug lines
 	if(temprenderSpinnerCircle == true){
 		renderSpinnerCircle = true;
 		std::cout << "================================== RENDERING THE SPINNER CIRCLE ==================================\n";
@@ -1290,22 +1300,21 @@ void GameManager::loadGame(std::string filename){
 		renderSpinnerBack = false;
 	}
 
-	
-
-
-
+	//load all of the hitsounds into memory
 	loadGameSounds();
 
-
+	//redundant but meh...
 	files.clear();
 	Global.Path = "resources/skin/";
 	files = ls(".wav");
 
 
+	//followpoint precalculations/creation. These values are wrong.
+	//TODO: fix this bs
 	std::reverse(gameFile.timingPoints.begin(),gameFile.timingPoints.end());
 	std::reverse(gameFile.events.begin(),gameFile.events.end());
 
-
+	//create temporary timing points for the follow points (useful for sliders)
     timingSettings tempTiming;
     std::vector<timingSettings> times;
     double amogus;
@@ -1336,6 +1345,8 @@ void GameManager::loadGame(std::string filename){
 	
 	int index = 0;
 
+	//fade in time for followpoints, this part i dont really understand since its not really documented
+	
 	float followPointFadeTime = gameFile.preempt - gameFile.fade_in;
 	followLines.clear();
 	for(int i = 1; i < gameFile.hitObjects.size(); i++){
