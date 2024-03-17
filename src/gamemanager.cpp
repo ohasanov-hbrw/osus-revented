@@ -247,9 +247,8 @@ void GameManager::update(){
 		}
 		if (stop && i == 0 && (Global.Key1P or Global.Key2P)){
 			if (objects[i]->data.type != 2){
-				Global.amogus2 = 16.0f;
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f)){
-					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
+					if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p50Final + Global.extraJudgementTime/2.0f){
 						objects[i]->data.point = 0;
 						if(clickCombo > 30){
 							SetSoundVolume(SoundFilesAll.data["combobreak"], 1.0f);
@@ -259,7 +258,7 @@ void GameManager::update(){
 						Global.Key1P = false;
 						Global.Key2P = false;
 					}
-					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final + Global.amogus2/2.0f){
+					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p100Final + Global.extraJudgementTime/2.0f){
 						objects[i]->data.point = 1;
 						score+= 50 + (50 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
@@ -269,7 +268,7 @@ void GameManager::update(){
 						Global.Key1P = false;
 						Global.Key2P = false;
 					}
-					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final + Global.amogus2/2.0f){
+					else if(std::abs(currentTime*1000.0f - objects[i]->data.time) > gameFile.p300Final + Global.extraJudgementTime/2.0f){
 						objects[i]->data.point = 2;
 						score+= 100 + (100 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
 						clickCombo++;
@@ -336,7 +335,7 @@ void GameManager::update(){
 			else if (objects[i]->data.type == 2){
 				if(Slider* tempslider = dynamic_cast<Slider*>(objects[i])){
 					if(CheckCollisionPointCircle(Global.MousePosition,Vector2{objects[i]->data.x,(float)objects[i]->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
-						if(std::abs(currentTime*1000.0f - tempslider->data.time) > gameFile.p50Final + Global.amogus2/2.0f){
+						if(std::abs(currentTime*1000.0f - tempslider->data.time) > gameFile.p50Final + Global.extraJudgementTime/2.0f){
 							tempslider->is_hit_at_first = true;
 							stop = false;
 							tempslider->earlyhit = true;
@@ -625,8 +624,6 @@ void GameManager::run(){
 	//ms = getTimer() / 1000.0;
 
 	if(Global.startTime < 0){
-		Global.amogus2 = 0;
-		Global.amogus3 = 0.0f;
 		Global.startTime += Global.FrameTime;
 		Time = Global.startTime;
 		//std::cout << Time << std::endl;
@@ -634,13 +631,12 @@ void GameManager::run(){
 	if(Global.startTime >= 0 and startMusic){
 		std::cout << "trying to start music" << std::endl;
 		PlayMusicStream(backgroundMusic);
-		Global.volume = 1.0f;
+		//Global.volume = 1.0f;
 		std::cout << Global.volume << std::endl;
     	SetMusicVolume(backgroundMusic, Global.volume); //Global.volume
 		SeekMusicStream(backgroundMusic, 0.0f);
 		UpdateMusicStream(backgroundMusic);
 		initTimer();
-		std::cout << Global.amogus << std::endl;
 		std::cout << "started music" << std::endl;
 		std::cout << "first update" << std::endl;
 		Global.CurrentInterpolatedTime = 0;
@@ -650,12 +646,8 @@ void GameManager::run(){
 		Global.startTime2 = ms;
 		double Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 		double amog = getTimer();
-		Global.amogus4 = getTimer();
-		Global.amogus2 = 0;
-		Global.amogus3 = 0.0f;
-		std::cout << "time delay??? " << Global.amogus2 << std::endl;
+		std::cout << "Extra Time in ms " << Global.extraJudgementTime << std::endl;
 		std::cout << "Time:" << Time << std::endl;
-		std::cout << "amog?:" << amog << std::endl;
 		Global.avgSum = 0;
     	Global.avgNum = 0;
     	Global.avgTime = 0;
@@ -663,6 +655,10 @@ void GameManager::run(){
 		Global.LastFrameTime = getTimer();
 	}
 	if(true){
+		if(Global.volumeChanged){
+			SetMusicVolume(backgroundMusic, Global.volume);
+			Global.volumeChanged = false;
+		}
 		UpdateMusicStream(backgroundMusic);
 		if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 			//DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
@@ -680,9 +676,7 @@ void GameManager::run(){
 		if (IsMusicStreamPlaying(backgroundMusic)){
 			Time = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 			if(!AreSame(TimerLast, Time)){
-				//Global.amogus2 = std::abs((Time - TimerLast) / 1.5f);
-				Global.amogus3 = Time - TimerLast;
-
+				//Global.extraJudgementTime = std::abs((Time - TimerLast) / 1.5f);
 				TimerLast = (double)GetMusicTimePlayed(backgroundMusic) * 1000.0;
 				TimeLast = ms;
 			}
@@ -721,7 +715,7 @@ void GameManager::run(){
 
 		currentTime = (double)Time / 1000.0;
 		if(IsMusicStreamPlaying(backgroundMusic)){
-			currentTime = Global.currentOsuTime / 1000.0;
+			currentTime = (Global.currentOsuTime + Global.offsetTime) / 1000.0;
 		}
 
 		//currentTime -= 8/1000.0f;
@@ -1007,9 +1001,6 @@ void GameManager::loadGame(std::string filename){
 	currentBackgroundTexture = "";
 
 	//misc variables
-	Global.amogus = 0;
-	Global.amogus2 = 0;
-	Global.amogus3 = 0;
 	spawnedHitObjects = 0;
 	Parser parser = Parser();
 	Global.loadingState = 5;
@@ -1317,7 +1308,7 @@ void GameManager::loadGame(std::string filename){
 	//create temporary timing points for the follow points (useful for sliders)
     timingSettings tempTiming;
     std::vector<timingSettings> times;
-    double amogus;
+    double preCalcLength;
     for(int i = gameFile.timingPoints.size()-1; i >= 0; i--){
         tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
         tempTiming.sliderSpeedOverride = 1;
@@ -1326,12 +1317,12 @@ void GameManager::loadGame(std::string filename){
         tempBeatLength = gameFile.timingPoints[i].beatLength;
         if(tempBeatLength >= 0){
             tempTiming.beatLength = tempBeatLength;
-            amogus = tempBeatLength;
+            preCalcLength = tempBeatLength;
             tempTiming.sliderSpeedOverride = 1;
         }
         if(tempBeatLength < 0){
             tempTiming.sliderSpeedOverride = (100 / tempBeatLength * (-1));
-            tempTiming.beatLength = amogus;
+            tempTiming.beatLength = preCalcLength;
         }
         tempTiming.meter = gameFile.timingPoints[i].meter;
         tempTiming.sampleSet = gameFile.timingPoints[i].sampleSet;

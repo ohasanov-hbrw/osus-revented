@@ -11,15 +11,15 @@
 
 
 PlayMenu::PlayMenu() {
-    description = TextBox({320,140}, {520,40}, {240,98,161,255}, "Select a Beatmap\n    to play!", WHITE, 15, 50);
+    description = TextBox({320,140}, {520,40}, {240,98,161,255}, "Select a Beatmap to play!", WHITE, 15, 50);
     bg = TextBox({320,240}, {530,290}, {240,98,161,255}, "", {240,98,161,255}, 15, 10);
     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 15);
     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 15);
     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 15);
     skin = Switch({310,350}, {40,20}, RED, GREEN, {255,135,198,255}, BLACK);
     sound = Switch({310,370}, {40,20}, RED, GREEN, {255,135,198,255}, BLACK);
-    usedskin = TextBox({200,350}, {100,20}, {240,98,161,255}, "Use default skin", WHITE, 10, 50);
-    usedsound = TextBox({200,370}, {100,20}, {240,98,161,255}, "Use default sound", WHITE, 10, 50);
+    usedskin = TextBox({200,350}, {150,20}, {240,98,161,255}, "Use default skin", WHITE, 10, 50);
+    usedsound = TextBox({200,370}, {150,20}, {240,98,161,255}, "Use default sound", WHITE, 10, 50);
     skin.state = Global.settings.useDefaultSkin;
     sound.state = Global.settings.useDefaultSounds;
 }
@@ -204,21 +204,29 @@ void MainMenu::update() {
         Global.CurrentState->unload();
         Global.CurrentState.reset(new WIPMenu());
         Global.CurrentState->init();
+        return;
     }
     else if(play.action){
         Global.CurrentState->unload();
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
+        return;
     }
     else if(load.action){
         Global.CurrentState->unload();
         Global.CurrentState.reset(new LoadMenu());
         Global.CurrentState->init();
+        return;
     }
 
     if(IsKeyDown(SDL_SCANCODE_LALT ))
         volume.update();
+    float lastVolume = Global.volume;
     Global.volume = volume.location / 100.0f;
+    if(!AreSame(lastVolume, Global.volume)){
+        std::cout << "Volume: " << Global.volume << std::endl;
+        Global.volumeChanged = true;
+    }
 }
 void MainMenu::render() {
     //Global.mutex.lock();
@@ -237,7 +245,7 @@ void MainMenu::unload() {
 }
 
 Game::Game() {
-    volume = TestSlider({320,240}, {240,60}, BLUE, PURPLE, BLACK, BLACK);
+    volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
 }
 void Game::init() {
     Global.NeedForBackgroundClear = true;
@@ -258,6 +266,9 @@ void Game::init() {
     Global.errorSum = 0;
     Global.errorLast = 0;
     Global.errorDiv = 0;
+
+    volume.location = Global.volume * 100.0f;
+    std::cout << volume.location << std::endl;
     std::cout << "done init" << std::endl;
 }
 void Game::update() {
@@ -269,6 +280,7 @@ void Game::update() {
             Global.CurrentState->unload();
             Global.CurrentState.reset(new PlayMenu());
             Global.CurrentState->init();
+            return;
         }
     }
     else{
@@ -282,6 +294,12 @@ void Game::update() {
     }
     if(IsKeyDown(SDL_SCANCODE_LALT ))
         volume.update();
+    float lastVolume = Global.volume;
+    Global.volume = volume.location / 100.0f;
+    if(!AreSame(lastVolume, Global.volume)){
+        std::cout << "Volume: " << Global.volume << std::endl;
+        Global.volumeChanged = true;
+    }
 }
 void Game::render() {
     
@@ -290,14 +308,13 @@ void Game::render() {
         Global.gameManager->render();
         //Global.mutex.lock();
         if(IsMusicStreamPlaying(Global.gameManager->backgroundMusic)){
-            DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(10)}, Scale(5) , Scale(1), WHITE);
-            //DrawTextEx(Global.DefaultFont, TextFormat("Update rate: %.3f ms", Global.amogus3), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
+            DrawTextEx(Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(15)}, Scale(10) , Scale(1), WHITE);
             //DrawTextEx(Global.DefaultFont, TextFormat("Timer: %.3f ms", getTimer()), {ScaleCordX(5), ScaleCordY(55)}, Scale(10) , Scale(1), WHITE);
             //DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %.3f ms", Global.errorLast/1000.0f), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
             //DrawTextEx(Global.DefaultFont, TextFormat("Avg Time Difference in the First Second: %.3f ms", Global.avgTime), {ScaleCordX(5), ScaleCordY(75)}, Scale(10) , Scale(1), WHITE);
         }
         else{
-            DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(10)}, Scale(5) , Scale(1), WHITE);
+            DrawTextEx(Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(Global.gameManager->backgroundMusic)), {ScaleCordX(5), ScaleCordY(15)}, Scale(10) , Scale(1), WHITE);
             if(Global.errorDiv != 0)
                 DrawTextEx(Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {ScaleCordX(5), ScaleCordY(40)}, Scale(15) , Scale(1), WHITE);
         }

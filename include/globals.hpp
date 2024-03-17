@@ -71,16 +71,19 @@ struct Globals {
     double curTime = 0;
     double startTime = -1;
     double curTime2 = 0;
-    double amogus;
-    double amogus2;
-    double amogus3;
-    double amogus4;
+    
+    double extraJudgementTime = 16.0;
+
+    double offsetTime = -50;
+
     unsigned long long int startsTime = 0;
     unsigned long long int pausedFor = 0;
     Texture2D cursor;
     Texture2D cursorTrail;
+
     bool MouseInFocus = false;
     int MouseBlur = 20;
+
     Vector2 MousePosition;
     Vector2 AutoMousePosition = {0,0};
     Vector2 AutoMousePositionStart = {-1, -1};
@@ -90,7 +93,7 @@ struct Globals {
     Font DefaultFont;
 
     std::string Path = std::filesystem::current_path().string();
-    std::string BeatmapLocation = /*"C:/Users/renot/AppData/Local/osu!/Songs";*/ std::filesystem::current_path().string() + "/beatmaps";
+    std::string BeatmapLocation = "C:/Users/renot/AppData/Local/osu!/Songs"; //std::filesystem::current_path().string() + "/beatmaps";
     std::string GamePath = std::filesystem::current_path().string();
     std::string selectedPath = "";
     std::string CurrentLocation = std::filesystem::current_path().string();
@@ -100,8 +103,9 @@ struct Globals {
 
     Texture2D OsusLogo;
 
-    double volume = 1.0f;
-    double hitVolume = 0.5f;
+    double volume = 0.4f;
+    double hitVolume = 0.7f;
+    bool volumeChanged = true;
 
     bool Key1P = false;
     bool Key1D = false;
@@ -149,18 +153,8 @@ struct Globals {
 
     int loadingState = 0;
 
-    int glfwWindowSizeX = 640;
-    int glfwWindowSizeY = 480;
-    int glfwWindowPosX = 0;
-    int glfwWindowPosY = 0;
-
     SDL_Window* win;
     bool quit = false;
-    uint8_t amogs = 0;
-    /*SDL_Cursor* amog = SDL_CreateCursor(&amogs,
-                             &amogs,
-                             1, 1, 1,
-                             1);*/
 
     TextureSizes textureSize;
 

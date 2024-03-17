@@ -102,6 +102,18 @@ void TextBox::render() {
 }
 void TextBox::init() {
     rendertext = text;
+    maxlength = rendertext.length();
+    while(true){
+        if(maxlength <= 0)
+            break;
+        Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, rendertext.substr(1,maxlength).c_str(), textsize, 1);
+        //std::cout << TextBoxSize.x << " size?" << std::endl;
+        if(TextBoxSize.x > (size.x * 0.95f))
+            maxlength--;
+        else
+            break;
+    }
+    std::cout << maxlength << std::endl;
     if(text.length() > maxlength){
         rendertext = text;
         while(rendertext.length() > 0 and rendertext.length() > maxlength - 3){
@@ -214,11 +226,13 @@ void SelectableList::update() {
 
 void SelectableList::init() {
     for(int i = 0; i < text.size(); i++) {
-        objects.push_back(TextBox({0,0}, {size.x, (float)objectsize}, color, text[i], textcolor, textsize, maxlength));
+        //std::cout << "init of amogus nuumero " << i << std::endl;
+        objects.push_back(TextBox({0,0}, {size.x, (float)objectsize}, color, text[i].c_str(), textcolor, textsize, maxlength));
         objects[objects.size()-1].init();
     }
     text.clear();
     bg = TextBox({position.x, position.y}, {size.x, size.y}, color, " ", BLACK, 0, 50);
+    //std::cout << "init of amogus done\n";
 }
 
 
