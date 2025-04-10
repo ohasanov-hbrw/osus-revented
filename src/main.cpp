@@ -320,7 +320,6 @@ int main(){
     MutexLock(RENDER_BLOCK);
     MutexLock(ACCESSING_OBJECTS);
     MutexUnlock(RENDER_BLOCK);
-
     MutexLock(SWITCHING_STATE);
     std::cout << "locked the switching state\n";
     Global.CurrentState->unload();

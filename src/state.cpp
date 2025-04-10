@@ -1229,6 +1229,14 @@ WipMenu2::WipMenu2() {
 }
 
 void WipMenu2::init() {
+    locations.clear();
+    locations = std::list<MenuItem>();
+
+    folderNames.clear();
+    folderNames = std::vector<std::string>();
+
+    itemNames.clear();
+    itemNames = std::vector<std::string>();
     position = minimumPosition;
     const std::lock_guard<std::mutex> lock(scaryMulti);
     for(int i = 0; i < 16; i++){
@@ -1446,6 +1454,14 @@ void WipMenu2::update() {
     }
     
     MutexUnlock(ACCESSING_OBJECTS);
+    if(IsKeyPressed(Global.GO_BACK_KEY)){
+        MutexLock(SWITCHING_STATE);
+        Global.CurrentState->unload();
+        Global.CurrentState.reset(new MainMenu());
+        Global.CurrentState->init();
+        MutexUnlock(SWITCHING_STATE);
+        return;
+    }
 }
 void WipMenu2::render(){
     MutexLock(ACCESSING_OBJECTS);
@@ -1501,7 +1517,11 @@ void WipMenu2::render(){
 }
 void WipMenu2::unload() {
     //MutexLock(SWITCHING_STATE);
+    MutexLock(RENDER_BLOCK);
+    std::cout << "locking render\n";
+    MutexUnlock(ACCESSING_OBJECTS);
     MutexLock(ACCESSING_OBJECTS);
+    std::cout << "starting menu unload\n";
     locations.clear();
     locations = std::list<MenuItem>();
 
@@ -1511,15 +1531,16 @@ void WipMenu2::unload() {
     itemNames.clear();
     itemNames = std::vector<std::string>();
     MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(RENDER_BLOCK);
     //MutexUnlock(SWITCHING_STATE);
 }
 void WipMenu2::textureOps() {
-    locations.clear();
-    locations = std::list<MenuItem>();
 
-    folderNames.clear();
-    folderNames = std::vector<std::string>();
 
-    itemNames.clear();
-    itemNames = std::vector<std::string>();
+
+
+
+
+
+
 }

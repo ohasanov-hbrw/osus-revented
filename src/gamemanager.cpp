@@ -880,7 +880,7 @@ void GameManager::run(){
 		currentTime = (double)Time / 1000.0;
 		#ifndef THREEDS_BUILD
 			if(IsMusicStreamPlaying(&backgroundMusic)){
-				//currentTime = (Global.currentOsuTime + Global.offsetTime) / 1000.0;
+				currentTime = (Global.currentOsuTime + Global.offsetTime) / 1000.0;
 				//currentTime = GetMusicTimePlayed(&backgroundMusic);
 				//std::cout << "music playin\n";
 			}
