@@ -1,0 +1,256 @@
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/state.o -c src/state.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/state.hpp:4,
+                 from src/state.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/gui.hpp:3,
+                 from include/state.hpp:3:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/state.cpp: In constructor ‘PlayMenu::PlayMenu()’:
+src/state.cpp:22:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   22 |     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 20);
+      |                                                           ^~~~~~
+src/state.cpp:23:61: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   23 |     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 20);
+      |                                                             ^~~~~~~~
+src/state.cpp:24:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   24 |     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 20);
+      |                                                           ^~~
+src/state.cpp: In member function ‘virtual void PlayMenu::init()’:
+src/state.cpp:42:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   42 |     std::vector<std::string> dir = ls(".osu");
+      |                                       ^~~~~~
+src/state.cpp: In member function ‘virtual void PlayMenu::update()’:
+src/state.cpp:107:31: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  107 |                 auto dir = ls(".osu");
+      |                               ^~~~~~
+src/state.cpp:129:23: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  129 |         auto dir = ls(".osu");
+      |                       ^~~~~~
+src/state.cpp: In constructor ‘LoadMenu::LoadMenu()’:
+src/state.cpp:148:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  148 |     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 20);
+      |                                                           ^~~~~~
+src/state.cpp:149:61: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  149 |     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 20);
+      |                                                             ^~~~~~~~
+src/state.cpp:150:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  150 |     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 20);
+      |                                                           ^~~
+src/state.cpp:151:19: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  151 |     auto dir = ls(".osz");
+      |                   ^~~~~~
+src/state.cpp: In member function ‘virtual void LoadMenu::update()’:
+src/state.cpp:206:31: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  206 |                 auto dir = ls(".osz");
+      |                               ^~~~~~
+src/state.cpp:231:23: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  231 |         auto dir = ls(".osz");
+      |                       ^~~~~~
+src/state.cpp: In constructor ‘MainMenu::MainMenu()’:
+src/state.cpp:249:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  249 |     play = Button({250,420}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
+      |                                                           ^~~~~~
+src/state.cpp:250:56: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  250 |     wip = Button({320,340}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
+      |                                                        ^~~~~
+src/state.cpp:251:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  251 |     wip2 = Button({320,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
+      |                                                         ^~~~~~
+src/state.cpp:252:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  252 |     load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
+      |                                                           ^~~~~~
+src/state.cpp: In member function ‘virtual void MainMenu::update()’:
+src/state.cpp:394:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  394 |         files = ls(".db");
+      |                    ^~~~~
+src/state.cpp:441:18: error: ‘KEY_SELECT’ was not declared in this scope; did you mean ‘KEY_SEVEN’?
+  441 |     if(IsKeyDown(KEY_SELECT ))
+      |                  ^~~~~~~~~~
+      |                  KEY_SEVEN
+src/state.cpp: In member function ‘virtual void MainMenu::render()’:
+src/state.cpp:463:18: error: ‘KEY_SELECT’ was not declared in this scope; did you mean ‘KEY_SEVEN’?
+  463 |     if(IsKeyDown(KEY_SELECT ))
+      |                  ^~~~~~~~~~
+      |                  KEY_SEVEN
+src/state.cpp: In member function ‘virtual void Game::update()’:
+src/state.cpp:522:18: error: ‘KEY_SELECT’ was not declared in this scope; did you mean ‘KEY_SEVEN’?
+  522 |     if(IsKeyDown(KEY_SELECT ))
+      |                  ^~~~~~~~~~
+      |                  KEY_SEVEN
+src/state.cpp:534:62: error: ‘aptMainLoop’ was not declared in this scope
+  534 |         if(IsKeyPressed(KEY_B) || !(!WindowShouldClose() and aptMainLoop())){
+      |                                                              ^~~~~~~~~~~
+src/state.cpp: In member function ‘virtual void Game::render()’:
+src/state.cpp:573:170: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  573 |             DrawTextEx(&Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                                                          ^~~~~~~~~~~~~~~~~~
+src/state.cpp:573:190: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)25)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  573 |             DrawTextEx(&Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                                                                              ^~~~~~~~~~~~~~~~~~~
+src/state.cpp:579:208: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  579 |             DrawTextEx(&Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(&Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                                                                                                ^~~~~~~~~~~~~~~~~~
+src/state.cpp:579:228: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)25)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  579 |             DrawTextEx(&Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(&Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                                                                                                                    ^~~~~~~~~~~~~~~~~~~
+src/state.cpp:581:123: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  581 |                 DrawTextEx(&Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {(int)ScaleCordX(5), (int)ScaleCordY(40)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                           ^~~~~~~~~~~~~~~~~~
+src/state.cpp:581:143: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)40)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  581 |                 DrawTextEx(&Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {(int)ScaleCordX(5), (int)ScaleCordY(40)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                               ^~~~~~~~~~~~~~~~~~~
+src/state.cpp:584:77: warning: narrowing conversion of ‘((double)GetScreenWidth()() * ((Global.Globals::currentOsuTime / 1.0e+3) / ((double)GetMusicTimeLength((& Global.Globals::gameManager->GameManager::backgroundMusic)))))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  584 |             DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(&Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
+      |                                                            ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:605:59: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)320 - (float)message.std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size()() * 7.5e+0f)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  605 |         DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:605:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)220)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  605 |         DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~
+src/state.cpp:638:59: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)320 - (float)message.std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size()() * 7.5e+0f)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  638 |         DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:638:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)220)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  638 |         DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~
+src/state.cpp:641:18: error: ‘KEY_SELECT’ was not declared in this scope; did you mean ‘KEY_SEVEN’?
+  641 |     if(IsKeyDown(KEY_SELECT ))
+      |                  ^~~~~~~~~~
+      |                  KEY_SEVEN
+src/state.cpp: In member function ‘virtual void WIPMenu::init()’:
+src/state.cpp:678:14: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  678 |     dir = ls(".osu");
+      |              ^~~~~~
+src/state.cpp:703:24: error: ‘C3D_FRAME_SYNCDRAW’ was not declared in this scope
+  703 |         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                        ^~~~~~~~~~~~~~~~~~
+src/state.cpp:703:9: error: ‘C3D_FrameBegin’ was not declared in this scope
+  703 |         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |         ^~~~~~~~~~~~~~
+src/state.cpp:704:9: error: ‘C2D_SceneBegin’ was not declared in this scope
+  704 |         C2D_SceneBegin(Global.window);
+      |         ^~~~~~~~~~~~~~
+src/state.cpp:748:76: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  748 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                            ^~~~~~~~~~~~~~~~~~
+src/state.cpp:748:96: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  748 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                ^~~~~~~~~~~~~~~~~~
+src/state.cpp:749:9: error: ‘C2D_Flush’ was not declared in this scope
+  749 |         C2D_Flush();  //test
+      |         ^~~~~~~~~
+src/state.cpp:750:9: error: ‘C3D_FrameEnd’ was not declared in this scope
+  750 |         C3D_FrameEnd(0);
+      |         ^~~~~~~~~~~~
+src/state.cpp: In member function ‘virtual void WIPMenu::render()’:
+src/state.cpp:796:69: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  796 |     DrawTextureCenter(&back, 145, 240, 0.45f, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                 ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:798:78: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  798 |         DrawTextLeft((TempMeta[0]).c_str(), 25, 55, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                          ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:799:78: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  799 |         DrawTextLeft((TempMeta[1]).c_str(), 25, 70, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                          ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:800:78: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  800 |         DrawTextLeft((TempMeta[2]).c_str(), 25, 85, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                          ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:801:79: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  801 |         DrawTextLeft((TempMeta[3]).c_str(), 25, 100, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                           ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:802:79: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  802 |         DrawTextLeft((TempMeta[4]).c_str(), 25, 115, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                           ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp: In member function ‘virtual void WIPMenu::update()’:
+src/state.cpp:885:36: error: ‘C3D_FRAME_SYNCDRAW’ was not declared in this scope
+  885 |                     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                                    ^~~~~~~~~~~~~~~~~~
+src/state.cpp:885:21: error: ‘C3D_FrameBegin’ was not declared in this scope
+  885 |                     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                     ^~~~~~~~~~~~~~
+src/state.cpp:886:21: error: ‘C2D_SceneBegin’ was not declared in this scope
+  886 |                     C2D_SceneBegin(Global.window);
+      |                     ^~~~~~~~~~~~~~
+src/state.cpp:931:88: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  931 |                     DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                        ^~~~~~~~~~~~~~~~~~
+src/state.cpp:931:108: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  931 |                     DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                            ^~~~~~~~~~~~~~~~~~
+src/state.cpp:932:21: error: ‘C2D_Flush’ was not declared in this scope
+  932 |                     C2D_Flush();  //test
+      |                     ^~~~~~~~~
+src/state.cpp:933:21: error: ‘C3D_FrameEnd’ was not declared in this scope
+  933 |                     C3D_FrameEnd(0);
+      |                     ^~~~~~~~~~~~
+src/state.cpp:961:36: error: ‘C3D_FRAME_SYNCDRAW’ was not declared in this scope
+  961 |                     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                                    ^~~~~~~~~~~~~~~~~~
+src/state.cpp:961:21: error: ‘C3D_FrameBegin’ was not declared in this scope
+  961 |                     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                     ^~~~~~~~~~~~~~
+src/state.cpp:962:21: error: ‘C2D_SceneBegin’ was not declared in this scope
+  962 |                     C2D_SceneBegin(Global.window);
+      |                     ^~~~~~~~~~~~~~
+src/state.cpp:1006:88: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1006 |                     DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                        ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1006:108: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1006 |                     DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                            ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1007:21: error: ‘C2D_Flush’ was not declared in this scope
+ 1007 |                     C2D_Flush();  //test
+      |                     ^~~~~~~~~
+src/state.cpp:1008:21: error: ‘C3D_FrameEnd’ was not declared in this scope
+ 1008 |                     C3D_FrameEnd(0);
+      |                     ^~~~~~~~~~~~
+src/state.cpp:1092:28: error: ‘C3D_FRAME_SYNCDRAW’ was not declared in this scope
+ 1092 |             C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                            ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1092:13: error: ‘C3D_FrameBegin’ was not declared in this scope
+ 1092 |             C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |             ^~~~~~~~~~~~~~
+src/state.cpp:1093:13: error: ‘C2D_SceneBegin’ was not declared in this scope
+ 1093 |             C2D_SceneBegin(Global.window);
+      |             ^~~~~~~~~~~~~~
+src/state.cpp:1137:80: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1137 |             DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1137:100: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1137 |             DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                    ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1138:13: error: ‘C2D_Flush’ was not declared in this scope
+ 1138 |             C2D_Flush();  //test
+      |             ^~~~~~~~~
+src/state.cpp:1139:13: error: ‘C3D_FrameEnd’ was not declared in this scope
+ 1139 |             C3D_FrameEnd(0);
+      |             ^~~~~~~~~~~~
+src/state.cpp: In constructor ‘ResultsMenu::ResultsMenu()’:
+src/state.cpp:1169:61: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1169 |     close = Button({480, 440}, {160,30}, {255,135,198,255}, "Back to menu", BLACK, 20);
+      |                                                             ^~~~~~~~~~~~~~
+src/state.cpp: In member function ‘virtual void WipMenu2::render()’:
+src/state.cpp:1495:60: warning: narrowing conversion of ‘(int)ScaleCordX(float)(r.Rectangle::x + (float)10)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1495 |             DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+      |                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:1495:87: warning: narrowing conversion of ‘(int)ScaleCordY(float)(r.Rectangle::y + (float)18 - (float)10)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1495 |             DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+      |                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:1504:60: warning: narrowing conversion of ‘(int)ScaleCordX(float)(r.Rectangle::x + (float)10)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1504 |             DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+      |                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:1504:87: warning: narrowing conversion of ‘(int)ScaleCordY(float)(r.Rectangle::y + (float)18 - (float)10)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1504 |             DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+      |                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+make: *** [MakefilePC:31: object/state.o] Error 1

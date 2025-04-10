@@ -1,0 +1,25 @@
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fs.o -c src/fs.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/fs.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from include/platformspesifics.hpp:7,
+                 from include/globals.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/fs.cpp: In function ‘std::vector<std::__cxx11::basic_string<char> > ls(char*)’:
+src/fs.cpp:29:24: error: ‘struct dirent’ has no member named ‘d_type’
+   29 |                 if(de->d_type == DT_DIR){
+      |                        ^~~~~~
+src/fs.cpp:29:34: error: ‘DT_DIR’ was not declared in this scope
+   29 |                 if(de->d_type == DT_DIR){
+      |                                  ^~~~~~
+make: *** [MakefilePC:31: object/fs.o] Error 1

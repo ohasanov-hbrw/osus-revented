@@ -4669,8 +4669,8 @@ static Model LoadGLTF(const char *fileName)
                     Image imAlbedo = LoadImageFromCgltfImage(data->materials[i].pbr_metallic_roughness.base_color_texture.texture->image, texPath);
                     if (imAlbedo.data != NULL)
                     {
-                        model.materials[j].maps[MATERIAL_MAP_ALBEDO].texture = LoadTextureFromImage(imAlbedo);
-                        UnloadImage(imAlbedo);
+                        model.materials[j].maps[MATERIAL_MAP_ALBEDO].texture = LoadTextureFromImage(&imAlbedo);
+                        UnloadImage(&imAlbedo);
                     }
                 }
                 // Load base color factor (tint)
@@ -4685,8 +4685,8 @@ static Model LoadGLTF(const char *fileName)
                     Image imMetallicRoughness = LoadImageFromCgltfImage(data->materials[i].pbr_metallic_roughness.metallic_roughness_texture.texture->image, texPath);
                     if (imMetallicRoughness.data != NULL)
                     {
-                        model.materials[j].maps[MATERIAL_MAP_ROUGHNESS].texture = LoadTextureFromImage(imMetallicRoughness);
-                        UnloadImage(imMetallicRoughness);
+                        model.materials[j].maps[MATERIAL_MAP_ROUGHNESS].texture = LoadTextureFromImage(&imMetallicRoughness);
+                        UnloadImage(&imMetallicRoughness);
                     }
 
                     // Load metallic/roughness material properties
@@ -4703,8 +4703,8 @@ static Model LoadGLTF(const char *fileName)
                     Image imNormal = LoadImageFromCgltfImage(data->materials[i].normal_texture.texture->image, texPath);
                     if (imNormal.data != NULL)
                     {
-                        model.materials[j].maps[MATERIAL_MAP_NORMAL].texture = LoadTextureFromImage(imNormal);
-                        UnloadImage(imNormal);
+                        model.materials[j].maps[MATERIAL_MAP_NORMAL].texture = LoadTextureFromImage(&imNormal);
+                        UnloadImage(&imNormal);
                     }
                 }
 
@@ -4714,8 +4714,8 @@ static Model LoadGLTF(const char *fileName)
                     Image imOcclusion = LoadImageFromCgltfImage(data->materials[i].occlusion_texture.texture->image, texPath);
                     if (imOcclusion.data != NULL)
                     {
-                        model.materials[j].maps[MATERIAL_MAP_OCCLUSION].texture = LoadTextureFromImage(imOcclusion);
-                        UnloadImage(imOcclusion);
+                        model.materials[j].maps[MATERIAL_MAP_OCCLUSION].texture = LoadTextureFromImage(&imOcclusion);
+                        UnloadImage(&imOcclusion);
                     }
                 }
 
@@ -4725,8 +4725,8 @@ static Model LoadGLTF(const char *fileName)
                     Image imEmissive = LoadImageFromCgltfImage(data->materials[i].emissive_texture.texture->image, texPath);
                     if (imEmissive.data != NULL)
                     {
-                        model.materials[j].maps[MATERIAL_MAP_EMISSION].texture = LoadTextureFromImage(imEmissive);
-                        UnloadImage(imEmissive);
+                        model.materials[j].maps[MATERIAL_MAP_EMISSION].texture = LoadTextureFromImage(&imEmissive);
+                        UnloadImage(&imEmissive);
                     }
 
                     // Load emissive color factor

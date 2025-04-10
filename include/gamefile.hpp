@@ -14,7 +14,7 @@ struct GameFile{
     std::map<std::string, std::string> configMetadata;
     std::map<std::string, std::string> configDifficulty;
     std::map<std::string, std::string> configColours;
-    std::vector<std::vector<int>> comboColours;
+    std::vector<std::vector<short>> comboColours;
     std::vector<HitObjectData> hitObjects;
     std::vector<TimingPoint> timingPoints;
     std::vector<FollowPoint> followPoints;

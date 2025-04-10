@@ -332,6 +332,36 @@ void DrawCircleWithDepth(Vector2 center, float radius, int segments, float depth
     rlEnd();
 }
 
+void DrawCircleWithDepthGrad(Vector2 center, float radius, int segments, float depth, Color color, Color color2)
+{
+    if (radius <= 0.0f) radius = 0.1f;
+
+    int minSegments = 4;
+
+    if (segments < minSegments)
+    {
+        float th = acosf(2*powf(1 - SMOOTH_CIRCLE_ERROR_RATE/radius, 2) - 1);
+        segments = (int)((360)*ceilf(2*PI/th)/360);
+        if (segments <= 0) segments = minSegments;
+    }
+
+    float stepLength = (360)/(float)segments;
+    float angle = 0;
+    rlCheckRenderBatchLimit(3*segments);
+
+    rlBegin(RL_TRIANGLES);
+        for (int i = 0; i < segments; i++)
+        {
+            rlColor4ub(color2.r, color2.g, color2.b, color2.a);
+            rlVertex3f(center.x, center.y, depth);
+            rlColor4ub(color.r, color.g, color.b, color.a);
+            rlVertex3f(center.x + sinf(DEG2RAD*angle)*radius, center.y + cosf(DEG2RAD*angle)*radius, depth);
+            rlVertex3f(center.x + sinf(DEG2RAD*(angle + stepLength))*radius, center.y + cosf(DEG2RAD*(angle + stepLength))*radius, depth);
+            angle += stepLength;
+        }
+    rlEnd();
+}
+
 
 // Draw a piece of a circle outlines
 void DrawCircleSectorLines(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color)

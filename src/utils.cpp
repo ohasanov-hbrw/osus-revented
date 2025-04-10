@@ -8,26 +8,77 @@
 #include <ctype.h>
 #include <parser.hpp>
 
+
+
+
+void InitilizeLocks(){
+    _multithread_mutex_init(&stateLock);
+    _multithread_mutex_init(&accessLock);
+    _multithread_mutex_init(&osuGameLock);
+    _multithread_mutex_init(&wholeRenderLock);
+}
+
+void MutexLock(int i){
+    switch(i){
+        case SWITCHING_STATE:
+            _multithread_mutex_lock(&stateLock);
+            break;
+        case ACCESSING_OBJECTS:
+            _multithread_mutex_lock(&accessLock);
+            break;
+        case OSU_UPDATE:
+            _multithread_mutex_lock(&osuGameLock);
+            break;
+        case RENDER_BLOCK:
+            _multithread_mutex_lock(&wholeRenderLock);
+            break;
+        default:
+            // code block
+            break;
+    }
+}
+
+void MutexUnlock(int i){
+    switch(i){
+        case SWITCHING_STATE:
+            _multithread_mutex_unlock(&stateLock);
+            break;
+        case ACCESSING_OBJECTS:
+            _multithread_mutex_unlock(&accessLock);
+            break;
+        case OSU_UPDATE:
+            _multithread_mutex_unlock(&osuGameLock);
+            break;
+        case RENDER_BLOCK:
+            _multithread_mutex_unlock(&wholeRenderLock);
+            break;
+        default:
+            // code block
+            break;
+    }
+}
+
+
 void updateUpDown(){
     //Get the current state of the mouse wheel
     Global.Wheel = GetMouseWheelMove();
-    if(IsKeyPressed(SDL_SCANCODE_DOWN )){
+    if(IsKeyPressed(Global.DOWN_KEY )){
         //If the down key is pressed, start a timer so that we can simulate a fast mouse wheel movement
         Global.Wheel = -1;
         Global.FrameTimeCounterWheel = -170;
     }
-    if(IsKeyPressed(SDL_SCANCODE_UP )){
+    if(IsKeyPressed(Global.UP_KEY )){
         //The same deal as above but for the up key
         Global.Wheel = 1;
         Global.FrameTimeCounterWheel = -170;
     }
-    Global.FrameTimeCounterWheel += GetFrameTime()*1000.0f;
+    Global.FrameTimeCounterWheel += Global.FrameTime;
     while(Global.FrameTimeCounterWheel > 50.0f){
         //If the keys are still down, trigger a wheel movement every 50 milliseconds
         Global.FrameTimeCounterWheel -= 50.0f;
-        if(IsKeyDown(SDL_SCANCODE_UP ))
+        if(IsKeyDown(Global.UP_KEY ))
             Global.Wheel = 1;
-        if(IsKeyDown(SDL_SCANCODE_DOWN ))
+        if(IsKeyDown(Global.DOWN_KEY ))
             Global.Wheel = -1;
     }
 }
@@ -48,33 +99,33 @@ void GetMouse(){
         if(Global.useAuto)
             Global.MousePosition = Global.AutoMousePosition;
         else
-            Global.MousePosition = {(GetMouseX() - Global.ZeroPoint.x) / Global.Scale, (GetMouseY() - Global.ZeroPoint.y) / Global.Scale};
+            Global.MousePosition = (Vector2){(GetMouseX() - Global.ZeroPoint.x) / Global.Scale, (GetMouseY() - Global.ZeroPoint.y) / Global.Scale};
     }
 }
 
 void GetKeys(){
     //Get all of the keys an store this data into some variables
-    if(IsKeyPressed(SDL_SCANCODE_Z ) or (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_LEFT)))
+    if(IsKeyPressed(Global.P1_KEY ) or (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_LEFT)))
         Global.Key1P = true;
     else
         Global.Key1P = false;
-    if(IsKeyPressed(SDL_SCANCODE_X ) or (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_RIGHT)))
+    if(IsKeyPressed(Global.P2_KEY ) or (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_RIGHT)))
         Global.Key2P = true;
     else
         Global.Key2P = false;
-    if(IsKeyDown(SDL_SCANCODE_Z ) or (Global.enableMouse and IsMouseButtonDown(SDL_BUTTON_LEFT)))
+    if(IsKeyDown(Global.P1_KEY ) or (Global.enableMouse and IsMouseButtonDown(SDL_BUTTON_LEFT)))
         Global.Key1D = true;
     else
         Global.Key1D = false;
-    if(IsKeyDown(SDL_SCANCODE_X ) or (Global.enableMouse and IsMouseButtonDown(SDL_BUTTON_RIGHT)))
+    if(IsKeyDown(Global.P2_KEY ) or (Global.enableMouse and IsMouseButtonDown(SDL_BUTTON_RIGHT)))
         Global.Key2D = true;
     else
         Global.Key2D = false;
-    if(IsKeyReleased(SDL_SCANCODE_Z ) or (Global.enableMouse and IsMouseButtonReleased(SDL_BUTTON_LEFT)))
+    if(IsKeyReleased(Global.P1_KEY ) or (Global.enableMouse and IsMouseButtonReleased(SDL_BUTTON_LEFT)))
         Global.Key1R = true;
     else
         Global.Key1R = false;
-    if(IsKeyReleased(SDL_SCANCODE_X ) or (Global.enableMouse and IsMouseButtonReleased(SDL_BUTTON_RIGHT)))
+    if(IsKeyReleased(Global.P2_KEY ) or (Global.enableMouse and IsMouseButtonReleased(SDL_BUTTON_RIGHT)))
         Global.Key2R = true;
     else
         Global.Key2R = false;
@@ -155,20 +206,17 @@ int Search(std::vector<float> arr, float x,int l,int r) {
         return l;
 }
 
-void DrawTextureCenter(Texture2D tex, float x, float y, float s, Color color){
-    //Make the necessary calculations inside the function
-    DrawTextureEx(tex, ScaleCords(GetRaylibOrigin({x,y,tex.width*s,tex.height*s})), 0, Scale(s), color);
-}
 
-void DrawTextureSlider(Texture2D tex, float x, float y, Color color, float s){
+
+void DrawTextureSlider(Texture2D *tex, float x, float y, Color color, float s){
     //Same thing as the DrawTextureCenter() function above
     DrawTextureEx(tex, ScaleCords({x-s/2.0f-4.0f*Global.sliderTexSize,y-s/2.0f-4.0f*Global.sliderTexSize}),0,Scale(1.0f/Global.sliderTexSize), color);
 }
 
-void DrawTextureRotate(Texture2D tex, float x, float y, float s, float r, Color color){
+/*void DrawTextureRotate(Texture2D tex, float x, float y, float s, float r, Color color){
     //Same thing as the DrawTextureCenter() function above
     DrawTexturePro(tex, Rectangle{0,0,tex.width,tex.height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex.width*s),Scale(tex.height*s)}, Vector2{Scale(tex.width*s/2.0f), Scale(tex.height*s/2.0f)}, r, color);
-}
+}*/
 
 int nthDigit(int v, int n){
     //Find the nth digit of a number... Dumb but this is probably one of the best ways :D
@@ -185,7 +233,7 @@ void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
     int digits = log10(n) + 1;
     int i = (digits - 1) * 18;
     for(int k = 0; k < digits; k++){
-        DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x - (float)i * s + k * 18 * s * 2, y, s, color);
+        DrawTextureCenter(&gm->numbers[nthDigit(n, digits-k-1)], x - (float)i * s + k * 18 * s * 2, y, s, color);
     }
 }
 std::string getSampleSetFromInt(int s){
@@ -195,12 +243,12 @@ std::string getSampleSetFromInt(int s){
     else if (s == 3) return "drum"; 
 }
 
-void DrawSpinnerMeter(Texture2D tex, float per){
+void DrawSpinnerMeter(Texture2D *tex, float per){
     //currently broken, TODO
     per = clip(per, 0.001f, 0.999f);
     float x = 0;
     float y = 0;
-    float ratio = (float)tex.width / (float)tex.height;
+    float ratio = (float)tex->width / (float)tex->height;
     float defaultRatio = 640.0f / 480.0f;
     if(defaultRatio > ratio){
         x = 640.0f - 480.0f * ratio;
@@ -208,16 +256,16 @@ void DrawSpinnerMeter(Texture2D tex, float per){
     else{
         y = 480.0f - 640.0f / ratio;
     }
-    Rectangle source = {0,tex.height*(1.0f-per),tex.width, tex.height*per};
-    DrawTexturePro(tex, Rectangle{0,0,tex.width, tex.height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
+    Rectangle source = {0,tex->height*(1.0f-per),tex->width, tex->height*per};
+    DrawTexturePro(tex, Rectangle{0,0,tex->width, tex->height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,(480.0f-y)*(1.0f-per)+y/2.0f,640-x,(480.0f-y)*per}), Vector2{0,0}, 0, WHITE);
 }
 
-void DrawSpinnerBack(Texture2D tex, Color color){
+void DrawSpinnerBack(Texture2D *tex, Color color){
     //currently broken, TODO
     float x = 0;
     float y = 0;
-    float ratio = (float)tex.width / (float)tex.height;
+    float ratio = (float)tex->width / (float)tex->height;
     float defaultRatio = 640.0f / 480.0f;
     if(defaultRatio > ratio){
         x = 640.0f - 480.0f * ratio;
@@ -225,7 +273,7 @@ void DrawSpinnerBack(Texture2D tex, Color color){
     else{
         y = 480.0f - 640.0f / ratio;
     }
-    Rectangle source = {0,0,tex.width, tex.height};
+    Rectangle source = {0,0,tex->width, tex->height};
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,y/2.0f,640-x,(480.0f-y)}), Vector2{0,0}, 0, color);
 }
 
@@ -237,7 +285,7 @@ Vector2 getPointOnCircle(float x, float y, float radius, float angle){
     return Vector2{x + xdiff, y + ydiff};
 }
 
-void DrawTextureOnCircle(Texture2D tex, float x, float y, float rad, float s, float r, float ang, Color color){
+void DrawTextureOnCircle(Texture2D *tex, float x, float y, float rad, float s, float r, float ang, Color color){
     //draw texture on a circular path
     Vector2 pos = getPointOnCircle(x, y, rad, ang);
     DrawTextureRotate(tex, pos.x, pos.y, s, r, color);
@@ -245,14 +293,14 @@ void DrawTextureOnCircle(Texture2D tex, float x, float y, float rad, float s, fl
 
 void DrawTextCenter(const char *text, float x, float y, float s, Color color){
     //draw centered text
-    Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
-    DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x - size.x / 2.0f, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
+    Vector2 size = MeasureTextEx(&Global.DefaultFont, text, s, 2);
+    DrawTextPro(&Global.DefaultFont, text, ScaleCords(Vector2{x - size.x / 2.0f, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
 }
 
 void DrawTextLeft(const char *text, float x, float y, float s, Color color){
     //draw text LTR
-    Vector2 size = MeasureTextEx(Global.DefaultFont, text, s, 1);
-    DrawTextPro(Global.DefaultFont, text, ScaleCords(Vector2{x, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
+    Vector2 size = MeasureTextEx(&Global.DefaultFont, text, s, 2);
+    DrawTextPro(&Global.DefaultFont, text, ScaleCords(Vector2{x, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
 }
 
 void DrawCNumbersLeft(int n, float x, float y, float s, Color color){
@@ -261,7 +309,7 @@ void DrawCNumbersLeft(int n, float x, float y, float s, Color color){
     int digits = log10(n) + 1;
     int i = (digits - 1) * 18;
     for(int k = 0; k < digits; k++){
-        DrawTextureCenter(gm->numbers[nthDigit(n, digits-k-1)], x + k * 18 * s * 2, y, s, color);
+        DrawTextureCenter(&gm->numbers[nthDigit(n, digits-k-1)], x + k * 18 * s * 2, y, s, color);
     }
 }
 
@@ -387,20 +435,18 @@ void updateTimer(){
     //currently not in use
 }
 
-bool IsTextureReady(Texture2D texture){
+bool IsTextureReady(Texture2D *texture){
     // TODO: Validate maximum texture size supported by GPU?
 
-    return ((texture.id > 0) &&         // Validate OpenGL id
-            (texture.width > 0) &&
-            (texture.height > 0) &&     // Validate texture size
-            (texture.format > 0) &&     // Validate texture pixel format
-            (texture.mipmaps > 0));     // Validate texture mipmaps (at least 1 for basic mipmap level)
+    return ((texture->id > 0) &&         // Validate OpenGL id
+            (texture->width > 0) &&
+            (texture->height > 0) &&     // Validate texture size
+            (texture->format > 0) &&     // Validate texture pixel format
+            (texture->mipmaps > 0));     // Validate texture mipmaps (at least 1 for basic mipmap level)
 }
 
-bool IsRenderTextureReady(RenderTexture2D target){
-    return ((target.id > 0) &&                  // Validate OpenGL id
-            IsTextureReady(target.depth) &&     // Validate FBO depth texture/renderbuffer
-            IsTextureReady(target.texture));    // Validate FBO texture
+bool IsRenderTextureReady(RenderTexture2D *target){
+    return (target->texture.id > 0);
 }
 
 float getAngle(Vector2 p1, Vector2 p2){
@@ -518,3 +564,5 @@ std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
 
     return out;
 }
+
+

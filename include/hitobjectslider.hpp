@@ -8,6 +8,8 @@ class Slider : public HitObject{
         void update() override;
         void dead_update() override;
         void dead_render() override;
+        void deinit() override; 
+        void unloadTextures();
         bool is_hit_at_first = false;
         bool is_hit_at_end = false;
         int demoPuan = 0;
@@ -26,12 +28,10 @@ class Slider : public HitObject{
         int lastblack = 0;
         bool readyToDelete = false;
         bool durationNull = false;
+        float texSizeXoffset = 0.0f;
+        float texSizeYoffset = 0.0f;
         Vector2 lastPosition;
-        std::vector<std::vector<bool>> renderedLocations = {std::vector<std::vector<bool>>(945, std::vector<bool>(785, false))};
-        
-
-        
-        
+           
 
     private:
         double sliderDuration;
@@ -45,13 +45,8 @@ class Slider : public HitObject{
         int ticknumber = 0;
         int reversenumber = 0;
         float timer;
-        
         RenderTexture2D sliderTexture;
-
         Shader shdrOutline;
-
-        
         unsigned int VAO;
-        
         float minX = static_cast<float>(INT_MAX), minY = static_cast<float>(INT_MAX), maxX = INT_MIN, maxY = INT_MIN;
 };

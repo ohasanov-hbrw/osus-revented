@@ -140,12 +140,12 @@ Sound LoadSound(const char *fileName);                          // Load sound fr
 Sound LoadSoundFromWave(Wave wave);                             // Load sound from wave data
 void UpdateSound(Sound sound, const void *data, int samplesCount);// Update sound buffer with new data
 void UnloadWave(Wave wave);                                     // Unload wave data
-void UnloadSound(Sound sound);                                  // Unload sound
+void UnloadSound(Sound *sound);                                  // Unload sound
 bool ExportWave(Wave wave, const char *fileName);               // Export wave data to file, returns true on success
 bool ExportWaveAsCode(Wave wave, const char *fileName);         // Export wave sample data to code (.h), returns true on success
 
 // Wave/Sound management functions
-void PlaySound(Sound sound);                                    // Play a sound
+void PlaySound(Sound *sound);                                    // Play a sound
 void StopSound(Sound sound);                                    // Stop playing a sound
 void PauseSound(Sound sound);                                   // Pause a sound
 void ResumeSound(Sound sound);                                  // Resume a paused sound
@@ -153,32 +153,32 @@ void PlaySoundMulti(Sound sound);                               // Play a sound 
 void StopSoundMulti(void);                                      // Stop any sound playing (using multichannel buffer pool)
 int GetSoundsPlaying(void);                                     // Get number of sounds playing in the multichannel
 bool IsSoundPlaying(Sound sound);                               // Check if a sound is currently playing
-void SetSoundVolume(Sound sound, float volume);                 // Set volume for a sound (1.0 is max level)
+void SetSoundVolume(Sound *sound, float volume);                 // Set volume for a sound (1.0 is max level)
 void SetSoundPitch(Sound sound, float pitch);                   // Set pitch for a sound (1.0 is base level)
-void SetSoundPan(Sound sound, float pan);                       // Set pan for a sound (0.0 to 1.0, 0.5=center)
+void SetSoundPan(Sound *sound, float pan);                       // Set pan for a sound (0.0 to 1.0, 0.5=center)
 void WaveFormat(Wave *wave, int sampleRate, int sampleSize, int channels);  // Convert wave data to desired format
 Wave WaveCopy(Wave wave);                                       // Copy a wave to a new wave
 void WaveCrop(Wave *wave, int initSample, int finalSample);     // Crop a wave to defined samples range
 float *LoadWaveSamples(Wave wave);                              // Load samples data from wave as a floats array
 void UnloadWaveSamples(float *samples);                         // Unload samples data loaded with LoadWaveSamples()
-bool IsSoundReady(Sound sound);
+bool IsSoundReady(Sound *sound);
 
 // Music management functions
 Music LoadMusicStream(const char *fileName);                    // Load music stream from file
 Music LoadMusicStreamFromMemory(const char *fileType, unsigned char* data, int dataSize); // Load music stream from data
-void UnloadMusicStream(Music music);                            // Unload music stream
-void PlayMusicStream(Music music);                              // Start music playing
-bool IsMusicStreamPlaying(Music music);                         // Check if music is playing
-void UpdateMusicStream(Music music);                            // Updates buffers for music streaming
-void StopMusicStream(Music music);                              // Stop music playing
+void UnloadMusicStream(Music *music);                            // Unload music stream
+void PlayMusicStream(Music *music);                              // Start music playing
+bool IsMusicStreamPlaying(Music *music);                         // Check if music is playing
+void UpdateMusicStream(Music *music);                            // Updates buffers for music streaming
+void StopMusicStream(Music *music);                              // Stop music playing
 void PauseMusicStream(Music music);                             // Pause music playing
 void ResumeMusicStream(Music music);                            // Resume playing paused music
-void SeekMusicStream(Music music, float position);              // Seek music to a position (in seconds)
-void SetMusicVolume(Music music, float volume);                 // Set volume for music (1.0 is max level)
+void SeekMusicStream(Music *music, float position);              // Seek music to a position (in seconds)
+void SetMusicVolume(Music *music, float volume);                 // Set volume for music (1.0 is max level)
 void SetMusicPan(Music sound, float pan);                       // Set pan for a music (0.0 to 1.0, 0.5=center)
 void SetMusicPitch(Music music, float pitch);                   // Set pitch for a music (1.0 is base level)
-float GetMusicTimeLength(Music music);                          // Get music time length (in seconds)
-float GetMusicTimePlayed(Music music);                          // Get current music time played (in seconds)
+float GetMusicTimeLength(Music *music);                          // Get music time length (in seconds)
+float GetMusicTimePlayed(Music *music);                          // Get current music time played (in seconds)
 
 // AudioStream management functions
 AudioStream LoadAudioStream(unsigned int sampleRate, unsigned int sampleSize, unsigned int channels); // Load audio stream (to stream raw audio pcm data)

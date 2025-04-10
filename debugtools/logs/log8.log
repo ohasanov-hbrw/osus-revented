@@ -1,0 +1,187 @@
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fastrender.o -c src/fastrender.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/fastrender.hpp:2,
+                 from src/fastrender.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/utils.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/followpoint.o -c src/followpoint.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/followpoint.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/followpoint.hpp:5,
+                 from src/followpoint.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/followpoint.cpp: In member function ‘void FollowPoint::render()’:
+src/followpoint.cpp:77:127: warning: narrowing conversion of ‘opacity’ from ‘int’ to ‘unsigned char’ [-Wnarrowing]
+   77 |                 DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, {255,200,255,opacity});
+      |                                                                                                                               ^~~~~~~
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fs.o -c src/fs.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/fs.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from include/platformspesifics.hpp:7,
+                 from include/globals.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/gamemanager.o -c src/gamemanager.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/gamemanager.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/parser.hpp:4,
+                 from include/gamemanager.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/gamemanager.cpp: In member function ‘void GameManager::update()’:
+src/gamemanager.cpp:310:105: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                         ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:310:124: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:315:108: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  315 |                                 if (CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f)){
+      |                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:397:115: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  397 |                                         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
+      |                                                                                                   ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:98: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                  ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:117: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                                     ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp: In member function ‘void GameManager::render()’:
+src/gamemanager.cpp:739:180: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                                                                                                    ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:739:200: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)400)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                                                                                                                        ^~~~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadDefaultSkin(std::string)’:
+src/gamemanager.cpp:935:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  935 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSkin(std::string)’:
+src/gamemanager.cpp:1045:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1045 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadBeatmapSkin(std::string)’:
+src/gamemanager.cpp:1152:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1152 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGame(std::string)’:
+src/gamemanager.cpp:1321:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1321 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::unloadGame()’:
+src/gamemanager.cpp:1860:53: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1860 |                 delete objectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp:1867:57: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1867 |                 delete deadObjectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::destroyDeadHitObject(Node*)’:
+src/gamemanager.cpp:1918:22: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1918 |         delete node->object;
+      |                ~~~~~~^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameTextures()’:
+src/gamemanager.cpp:1946:9: error: ‘C2D_Prepare’ was not declared in this scope
+ 1946 |         C2D_Prepare();
+      |         ^~~~~~~~~~~
+src/gamemanager.cpp:1947:20: error: ‘C3D_FRAME_SYNCDRAW’ was not declared in this scope
+ 1947 |     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                    ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1947:5: error: ‘C3D_FrameBegin’ was not declared in this scope
+ 1947 |     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |     ^~~~~~~~~~~~~~
+src/gamemanager.cpp:1948:5: error: ‘C2D_SceneBegin’ was not declared in this scope
+ 1948 |     C2D_SceneBegin(Global.window);
+      |     ^~~~~~~~~~~~~~
+src/gamemanager.cpp:1982:9: error: ‘C2D_Flush’ was not declared in this scope
+ 1982 |         C2D_Flush();  //test
+      |         ^~~~~~~~~
+src/gamemanager.cpp:1983:5: error: ‘C3D_FrameEnd’ was not declared in this scope
+ 1983 |     C3D_FrameEnd(0);
+      |     ^~~~~~~~~~~~
+src/gamemanager.cpp:2020:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2020 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:2021:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2021 |         std::vector<std::string> files2 = ls(".jpg");
+      |                                              ^~~~~~
+src/gamemanager.cpp:2022:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2022 |         std::vector<std::string> files3 = ls(".jpeg");
+      |                                              ^~~~~~~
+src/gamemanager.cpp:2086:115: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::xOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2086 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp:2086:143: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::yOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2086 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSounds()’:
+src/gamemanager.cpp:2588:50: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2588 |         std::vector<std::string> ComboBreak = ls(".wav");
+      |                                                  ^~~~~~
+src/gamemanager.cpp:2623:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2623 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2652:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2652 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2682:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2682 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2710:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2710 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2737:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2737 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2766:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2766 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2791:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2791 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2816:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2816 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+make: *** [MakefilePC:31: object/gamemanager.o] Error 1

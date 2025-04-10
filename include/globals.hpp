@@ -1,5 +1,5 @@
 #pragma once
-
+#include "platformspesifics.hpp"
 #include "raylib.h"
 #include <string.h>
 #include <filesystem>
@@ -7,8 +7,11 @@
 #include "gamemanager.hpp"
 #include <thread>
 #include <functional>
-#include "SDL2/SDL.h"
 #include <mutex>
+#include <cstdint>
+
+#define DEPTH_MULT -1
+
 
 #define PLATFORM_DESKTOP
 
@@ -37,14 +40,38 @@ struct InputHandler {
 
 class State;
 struct TextureSizes{
-    int hitCircle = 128;
-    int comboNumber = 140;
-    int hitCircleOverlay = 128;
-    int approachCircle = 128;
+    int hitCircle = 64;
+    int comboNumber = 110;
+    int hitCircleOverlay = 64;
+    int approachCircle = 64;
     bool render300 = false;
 };
 
 struct Globals {
+    #ifdef THREEDS_BUILD
+        int AUDIO_SETUP_KEY = KEY_SELECT;
+        int GO_BACK_KEY = KEY_B;
+        int UP_KEY = KEY_DUP;
+        int DOWN_KEY = KEY_DDOWN;
+        int LEFT_KEY = KEY_DLEFT;
+        int RIGHT_KEY = KEY_DRIGHT;
+        int AUTO_KEY = KEY_X;
+        int P1_KEY = KEY_L;
+        int P2_KEY = KEY_R;
+    #endif
+    #ifndef THREEDS_BUILD
+        int AUDIO_SETUP_KEY = SDL_SCANCODE_LALT;
+        int GO_BACK_KEY = SDL_SCANCODE_BACKSPACE;
+        int UP_KEY = SDL_SCANCODE_UP;
+        int DOWN_KEY = SDL_SCANCODE_DOWN;
+        int LEFT_KEY = SDL_SCANCODE_LEFT;
+        int RIGHT_KEY = SDL_SCANCODE_RIGHT;
+        int AUTO_KEY = SDL_SCANCODE_LEFT;
+        int P1_KEY = SDL_SCANCODE_Z;
+        int P2_KEY = SDL_SCANCODE_X;
+    #endif
+
+
     float Scale = 1.f;
     Vector2 ZeroPoint = {0.f, 0.f};
     Color Background = { 15, 0, 30, 255 };
@@ -57,8 +84,16 @@ struct Globals {
     //Color Background = {42,22,33,255};
     int skinNumberOverlap = 18;
     double FPS = 4.0f * 100.0f;
-    int Width = 640;
-    int Height = 480;
+    
+    #ifdef THREEDS_BUILD
+        int TPS = 240;
+    #endif
+    #ifndef THREEDS_BUILD
+        int TPS = 1000;
+    #endif
+
+    int Width = 400;
+    int Height = 240;
     float offset = 45.0f;
 
     struct timespec ts1 = timespec{0,0}, ts2 = timespec{0,0};
@@ -90,21 +125,33 @@ struct Globals {
     double AutoMouseStartTime;
     bool useAuto = false;
 
+    //float audioSecondsElapsed = 0.0f;
+    //bool audioPlaying = false;
     Font DefaultFont;
 
-    std::string Path = std::filesystem::current_path().string();
-    std::string BeatmapLocation = "C:/Users/renot/AppData/Local/osu!/Songs"; //std::filesystem::current_path().string() + "/beatmaps";
-    std::string GamePath = std::filesystem::current_path().string();
-    std::string selectedPath = "";
-    std::string CurrentLocation = std::filesystem::current_path().string();
+    #ifdef THREEDS_BUILD
+        std::string Path = "sdmc:/3ds";//std::filesystem::current_path().string();
+        std::string BeatmapLocation = "sdmc:/3ds/beatmaps";
+        std::string GamePath = "sdmc:/3ds";//std::filesystem::current_path().string();
+        std::string selectedPath = "sdmc:/3ds";
+        std::string CurrentLocation = "sdmc:/3ds";
+    #endif
+    #ifndef THREEDS_BUILD
+        std::string Path = std::filesystem::current_path().string();
+        std::string BeatmapLocation = std::filesystem::current_path().string() + "/beatmaps";
+        std::string GamePath = std::filesystem::current_path().string();
+        std::string selectedPath = "";
+        std::string CurrentLocation = std::filesystem::current_path().string();
+    #endif
+
     int MouseTrailSize = 150;
 
     float FrameTimeCounterWheel = 0.f;
 
     Texture2D OsusLogo;
 
-    double volume = 0.4f;
-    double hitVolume = 0.7f;
+    double volume = 1.0f;
+    double hitVolume = 1.0f;
     bool volumeChanged = true;
 
     bool Key1P = false;
@@ -127,7 +174,11 @@ struct Globals {
 
     Globals() = default;
 
-    float sliderTexSize = 1.0f;
+    float sliderTexSize = 0.50f;
+    float sliderMinimumX = 0.0f; // -150
+    float sliderMinimumY = 0.0f; // -150
+    float sliderMaximumX = 640.0f; // 790
+    float sliderMaximumY = 480.0f; // 630
     int circleSector = 16;
     bool legacyRender = false;
 
@@ -153,7 +204,6 @@ struct Globals {
 
     int loadingState = 0;
 
-    SDL_Window* win;
     bool quit = false;
 
     TextureSizes textureSize;
@@ -161,8 +211,45 @@ struct Globals {
     InputHandler Input;
     bool renderFrame;
     std::mutex mutex;
+    std::mutex mutex2;
+
+    MULTITHREAD_MUTEX lightlock;
+
 
     GameSettings settings;
+
+    bool useTopScreen = false;
+    bool touchScreenTouchEnabled = true;
+
+    INPUT_TOUCHSCREEN touch;
+    INPUT_TOUCHSCREEN lastTouchPos;
+
+    bool lastTouch = false;
+
+    GPU_RENDER_TARGET * window;
+    GPU_RENDER_TARGET * gpu_currentRenderTarget;
+    
+    u32 ds_kDown = 0;
+    u32 ds_kHeld = 0;
+    u32 ds_kUp = 0;
+
+    u64 totalNumOfSamples = 0;
+    
+    bool sliderTexNeedDeleting = false;
+    u32 linearSpaceFree = 0;
+
+    bool MusicLoaded = false;
+
+    bool channelOccupied[24];
+    std::vector<Sound *> soundAtChannel;
+
+    bool stop = false;
+
+    bool polygonalRendering = true;
+
+    
+
+
 };
 
 extern Globals Global;

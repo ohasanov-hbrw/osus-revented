@@ -223,7 +223,7 @@ extern void LoadFontDefault(void)
         counter++;
     }
 
-    defaultFont.texture = LoadTextureFromImage(imFont);
+    defaultFont.texture = LoadTextureFromImage(&imFont);
 
     // Reconstruct charSet using charsWidth[], charsHeight, charsDivisor, glyphCount
     //------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ extern void LoadFontDefault(void)
         defaultFont.glyphs[i].image = ImageFromImage(imFont, defaultFont.recs[i]);
     }
 
-    UnloadImage(imFont);
+    UnloadImage(&imFont);
 
     defaultFont.baseSize = (int)defaultFont.recs[0].height;
 
@@ -278,8 +278,8 @@ extern void LoadFontDefault(void)
 // Unload raylib default font
 extern void UnloadFontDefault(void)
 {
-    for (int i = 0; i < defaultFont.glyphCount; i++) UnloadImage(defaultFont.glyphs[i].image);
-    UnloadTexture(defaultFont.texture);
+    for (int i = 0; i < defaultFont.glyphCount; i++) UnloadImage(&defaultFont.glyphs[i].image);
+    UnloadTexture(&defaultFont.texture);
     RL_FREE(defaultFont.glyphs);
     RL_FREE(defaultFont.recs);
 }
@@ -326,7 +326,7 @@ Font LoadFont(const char *fileName)
     {
         Image image = LoadImage(fileName);
         if (image.data != NULL) font = LoadFontFromImage(image, MAGENTA, FONT_TTF_DEFAULT_FIRST_CHAR);
-        UnloadImage(image);
+        UnloadImage(&image);
     }
 
     if (font.texture.id == 0)
@@ -336,7 +336,7 @@ Font LoadFont(const char *fileName)
     }
     else 
     {
-        SetTextureFilter(font.texture, TEXTURE_FILTER_POINT);    // By default we set point filter (best performance)
+        SetTextureFilter(&font.texture, TEXTURE_FILTER_POINT);    // By default we set point filter (best performance)
         TRACELOG(LOG_INFO, "FONT: Data loaded successfully (%i pixel size | %i glyphs)", FONT_TTF_DEFAULT_SIZE, FONT_TTF_DEFAULT_NUMCHARS);
     }
 
@@ -459,7 +459,7 @@ Font LoadFontFromImage(Image image, Color key, int firstChar)
     };
 
     // Set font with all data parsed from image
-    font.texture = LoadTextureFromImage(fontClear); // Convert processed image to OpenGL texture
+    font.texture = LoadTextureFromImage(&fontClear); // Convert processed image to OpenGL texture
     font.glyphCount = index;
     font.glyphPadding = 0;
 
@@ -484,7 +484,7 @@ Font LoadFontFromImage(Image image, Color key, int firstChar)
         font.glyphs[i].image = ImageFromImage(fontClear, tempCharRecs[i]);
     }
 
-    UnloadImage(fontClear);     // Unload processed image once converted to texture
+    UnloadImage(&fontClear);     // Unload processed image once converted to texture
 
     font.baseSize = (int)font.recs[0].height;
 
@@ -513,16 +513,16 @@ Font LoadFontFromMemory(const char *fileType, const unsigned char *fileData, int
             font.glyphPadding = FONT_TTF_DEFAULT_CHARS_PADDING;
 
             Image atlas = GenImageFontAtlas(font.glyphs, &font.recs, font.glyphCount, font.baseSize, font.glyphPadding, 0);
-            font.texture = LoadTextureFromImage(atlas);
+            font.texture = LoadTextureFromImage(&atlas);
 
             // Update glyphs[i].image to use alpha, required to be used on ImageDrawText()
             for (int i = 0; i < font.glyphCount; i++)
             {
-                UnloadImage(font.glyphs[i].image);
+                UnloadImage(&font.glyphs[i].image);
                 font.glyphs[i].image = ImageFromImage(atlas, font.recs[i]);
             }
 
-            UnloadImage(atlas);
+            UnloadImage(&atlas);
 
             TRACELOG(LOG_INFO, "FONT: Data loaded successfully (%i pixel size | %i glyphs)", font.baseSize, font.glyphCount);
         }
@@ -818,20 +818,20 @@ Image GenImageFontAtlas(const GlyphInfo *chars, Rectangle **charRecs, int glyphC
 // Unload font glyphs info data (RAM)
 void UnloadFontData(GlyphInfo *glyphs, int glyphCount)
 {
-    for (int i = 0; i < glyphCount; i++) UnloadImage(glyphs[i].image);
+    for (int i = 0; i < glyphCount; i++) UnloadImage(&glyphs[i].image);
 
     RL_FREE(glyphs);
 }
 
 // Unload Font from GPU memory (VRAM)
-void UnloadFont(Font font)
+void UnloadFont(Font * font)
 {
     // NOTE: Make sure font is not default font (fallback)
-    if (font.texture.id != GetFontDefault().texture.id)
+    if (font->texture.id != GetFontDefault().texture.id)
     {
-        UnloadFontData(font.glyphs, font.glyphCount);
-        UnloadTexture(font.texture);
-        RL_FREE(font.recs);
+        UnloadFontData(font->glyphs, font->glyphCount);
+        UnloadTexture(&font->texture);
+        RL_FREE(font->recs);
 
         TRACELOGD("FONT: Unloaded font data from RAM and VRAM");
     }
@@ -978,7 +978,7 @@ bool ExportFontAsCode(Font font, const char *fileName)
     byteCount += sprintf(txtData + byteCount, "    return font;\n");
     byteCount += sprintf(txtData + byteCount, "}\n");
 
-    UnloadImage(image);
+    UnloadImage(&image);
 
     // NOTE: Text data size exported is determined by '\0' (NULL) character
     success = SaveFileText(fileName, txtData);
@@ -1018,23 +1018,24 @@ void DrawText(const char *text, int posX, int posY, int fontSize, Color color)
         int defaultFontSize = 10;   // Default Font chars height in pixel
         if (fontSize < defaultFontSize) fontSize = defaultFontSize;
         int spacing = fontSize/defaultFontSize;
-
-        DrawTextEx(GetFontDefault(), text, position, (float)fontSize, (float)spacing, color);
+        Font temp = GetFontDefault();
+        DrawTextEx(&temp, text, position, (float)fontSize, (float)spacing, color);
     }
 }
 
 // Draw text using Font
 // NOTE: chars spacing is NOT proportional to fontSize
-void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint)
+void DrawTextEx(Font *font, const char *text, Vector2 position, float fontSize, float spacing, Color tint)
 {
-    if (font.texture.id == 0) font = GetFontDefault();  // Security check in case of not valid font
+    Font temp = GetFontDefault();
+    if (font->texture.id == 0) font = &temp;  // Security check in case of not valid font
 
     int size = TextLength(text);    // Total size in bytes of the text, scanned by codepoints in loop
 
     int textOffsetY = 0;            // Offset between lines (on line break '\n')
     float textOffsetX = 0.0f;       // Offset X to next character to draw
 
-    float scaleFactor = fontSize/font.baseSize;         // Character quad scaling factor
+    float scaleFactor = fontSize/font->baseSize;         // Character quad scaling factor
 
     for (int i = 0; i < size;)
     {
@@ -1051,7 +1052,7 @@ void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, f
         {
             // NOTE: Fixed line spacing of 1.5 line-height
             // TODO: Support custom line spacing defined by user
-            textOffsetY += (int)((font.baseSize + font.baseSize/2)*scaleFactor);
+            textOffsetY += (int)((font->baseSize + font->baseSize/2)*scaleFactor);
             textOffsetX = 0.0f;
         }
         else
@@ -1061,8 +1062,8 @@ void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, f
                 DrawTextCodepoint(font, codepoint, (Vector2){ position.x + textOffsetX, position.y + textOffsetY }, fontSize, tint);
             }
 
-            if (font.glyphs[index].advanceX == 0) textOffsetX += ((float)font.recs[index].width*scaleFactor + spacing);
-            else textOffsetX += ((float)font.glyphs[index].advanceX*scaleFactor + spacing);
+            if (font->glyphs[index].advanceX == 0) textOffsetX += ((float)font->recs[index].width*scaleFactor + spacing);
+            else textOffsetX += ((float)font->glyphs[index].advanceX*scaleFactor + spacing);
         }
 
         i += codepointByteCount;   // Move text bytes counter to next codepoint
@@ -1070,7 +1071,7 @@ void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, f
 }
 
 // Draw text using Font and pro parameters (rotation)
-void DrawTextPro(Font font, const char *text, Vector2 position, Vector2 origin, float rotation, float fontSize, float spacing, Color tint)
+void DrawTextPro(Font *font, const char *text, Vector2 position, Vector2 origin, float rotation, float fontSize, float spacing, Color tint)
 {
     rlPushMatrix();
 
@@ -1084,27 +1085,27 @@ void DrawTextPro(Font font, const char *text, Vector2 position, Vector2 origin, 
 }
 
 // Draw one character (codepoint)
-void DrawTextCodepoint(Font font, int codepoint, Vector2 position, float fontSize, Color tint)
+void DrawTextCodepoint(Font *font, int codepoint, Vector2 position, float fontSize, Color tint)
 {
     // Character index position in sprite font
     // NOTE: In case a codepoint is not available in the font, index returned points to '?'
     int index = GetGlyphIndex(font, codepoint);
-    float scaleFactor = fontSize/font.baseSize;     // Character quad scaling factor
+    float scaleFactor = fontSize/font->baseSize;     // Character quad scaling factor
 
     // Character destination rectangle on screen
     // NOTE: We consider glyphPadding on drawing
-    Rectangle dstRec = { (int)position.x + font.glyphs[index].offsetX*scaleFactor - (float)font.glyphPadding*scaleFactor,
-                      (int)position.y + font.glyphs[index].offsetY*scaleFactor - (float)font.glyphPadding*scaleFactor,
-                      (font.recs[index].width + 2.0f*font.glyphPadding)*scaleFactor,
-                      (font.recs[index].height + 2.0f*font.glyphPadding)*scaleFactor };
+    Rectangle dstRec = { (int)position.x + font->glyphs[index].offsetX*scaleFactor - (float)font->glyphPadding*scaleFactor,
+                      (int)position.y + font->glyphs[index].offsetY*scaleFactor - (float)font->glyphPadding*scaleFactor,
+                      (font->recs[index].width + 2.0f*font->glyphPadding)*scaleFactor,
+                      (font->recs[index].height + 2.0f*font->glyphPadding)*scaleFactor };
 
     // Character source rectangle from font texture atlas
     // NOTE: We consider chars padding when drawing, it could be required for outline/glow shader effects
-    Rectangle srcRec = { font.recs[index].x - (float)font.glyphPadding, font.recs[index].y - (float)font.glyphPadding,
-                         font.recs[index].width + 2.0f*font.glyphPadding, font.recs[index].height + 2.0f*font.glyphPadding };
+    Rectangle srcRec = { font->recs[index].x - (float)font->glyphPadding, font->recs[index].y - (float)font->glyphPadding,
+                         font->recs[index].width + 2.0f*font->glyphPadding, font->recs[index].height + 2.0f*font->glyphPadding };
 
     // Draw the character texture on the screen
-    DrawTexturePro(font.texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, tint);
+    DrawTexturePro(&font->texture, srcRec, dstRec, (Vector2){ 0, 0 }, 0.0f, tint);
 }
 
 // Draw multiple character (codepoints)
@@ -1117,7 +1118,7 @@ void DrawTextCodepoints(Font font, const int *codepoints, int count, Vector2 pos
 
     for (int i = 0; i < count; i++)
     {
-        int index = GetGlyphIndex(font, codepoints[i]);
+        int index = GetGlyphIndex(&font, codepoints[i]);
 
         if (codepoints[i] == '\n')
         {
@@ -1130,7 +1131,7 @@ void DrawTextCodepoints(Font font, const int *codepoints, int count, Vector2 pos
         {
             if ((codepoints[i] != ' ') && (codepoints[i] != '\t'))
             {
-                DrawTextCodepoint(font, codepoints[i], (Vector2){ position.x + textOffsetX, position.y + textOffsetY }, fontSize, tint);
+                DrawTextCodepoint(&font, codepoints[i], (Vector2){ position.x + textOffsetX, position.y + textOffsetY }, fontSize, tint);
             }
 
             if (font.glyphs[index].advanceX == 0) textOffsetX += ((float)font.recs[index].width*scaleFactor + spacing);
@@ -1150,15 +1151,15 @@ int MeasureText(const char *text, int fontSize)
         int defaultFontSize = 10;   // Default Font chars height in pixel
         if (fontSize < defaultFontSize) fontSize = defaultFontSize;
         int spacing = fontSize/defaultFontSize;
-
-        vec = MeasureTextEx(GetFontDefault(), text, (float)fontSize, (float)spacing);
+        Font temp = GetFontDefault();
+        vec = MeasureTextEx(&temp, text, (float)fontSize, (float)spacing);
     }
 
     return (int)vec.x;
 }
 
 // Measure string size for Font
-Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing)
+Vector2 MeasureTextEx(Font *font, const char *text, float fontSize, float spacing)
 {
     int size = TextLength(text);    // Get size in bytes of text
     int tempByteCounter = 0;        // Used to count longer text line num chars
@@ -1167,8 +1168,8 @@ Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing
     float textWidth = 0.0f;
     float tempTextWidth = 0.0f;     // Used to count longer text line width
 
-    float textHeight = (float)font.baseSize;
-    float scaleFactor = fontSize/(float)font.baseSize;
+    float textHeight = (float)font->baseSize;
+    float scaleFactor = fontSize/(float)font->baseSize;
 
     int letter = 0;                 // Current character
     int index = 0;                  // Index position in sprite font
@@ -1188,15 +1189,15 @@ Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing
 
         if (letter != '\n')
         {
-            if (font.glyphs[index].advanceX != 0) textWidth += font.glyphs[index].advanceX;
-            else textWidth += (font.recs[index].width + font.glyphs[index].offsetX);
+            if (font->glyphs[index].advanceX != 0) textWidth += font->glyphs[index].advanceX;
+            else textWidth += (font->recs[index].width + font->glyphs[index].offsetX);
         }
         else
         {
             if (tempTextWidth < textWidth) tempTextWidth = textWidth;
             byteCounter = 0;
             textWidth = 0;
-            textHeight += ((float)font.baseSize*1.5f); // NOTE: Fixed line spacing of 1.5 lines
+            textHeight += ((float)font->baseSize*1.5f); // NOTE: Fixed line spacing of 1.5 lines
         }
 
         if (tempByteCounter < byteCounter) tempByteCounter = byteCounter;
@@ -1213,7 +1214,7 @@ Vector2 MeasureTextEx(Font font, const char *text, float fontSize, float spacing
 
 // Get index position for a unicode character on font
 // NOTE: If codepoint is not found in the font it fallbacks to '?'
-int GetGlyphIndex(Font font, int codepoint)
+int GetGlyphIndex(Font *font, int codepoint)
 {
 #ifndef GLYPH_NOTFOUND_CHAR_FALLBACK
     #define GLYPH_NOTFOUND_CHAR_FALLBACK     63      // Character used if requested codepoint is not found: '?'
@@ -1224,9 +1225,9 @@ int GetGlyphIndex(Font font, int codepoint)
 #if defined(SUPPORT_UNORDERED_CHARSET)
     int index = GLYPH_NOTFOUND_CHAR_FALLBACK;
 
-    for (int i = 0; i < font.glyphCount; i++)
+    for (int i = 0; i < font->glyphCount; i++)
     {
-        if (font.glyphs[i].value == codepoint)
+        if (font->glyphs[i].value == codepoint)
         {
             index = i;
             break;
@@ -1245,7 +1246,7 @@ GlyphInfo GetGlyphInfo(Font font, int codepoint)
 {
     GlyphInfo info = { 0 };
 
-    info = font.glyphs[GetGlyphIndex(font, codepoint)];
+    info = font.glyphs[GetGlyphIndex(&font, codepoint)];
 
     return info;
 }
@@ -1256,7 +1257,7 @@ Rectangle GetGlyphAtlasRec(Font font, int codepoint)
 {
     Rectangle rec = { 0 };
 
-    rec = font.recs[GetGlyphIndex(font, codepoint)];
+    rec = font.recs[GetGlyphIndex(&font, codepoint)];
 
     return rec;
 }
@@ -1952,11 +1953,11 @@ static Font LoadBMFont(const char *fileName)
             ((unsigned char *)(imFontAlpha.data))[p + 1] = ((unsigned char *)imFont.data)[i];
         }
 
-        UnloadImage(imFont);
+        UnloadImage(&imFont);
         imFont = imFontAlpha;
     }
 
-    font.texture = LoadTextureFromImage(imFont);
+    font.texture = LoadTextureFromImage(&imFont);
 
     if (lastSlash != NULL) RL_FREE(imPath);
 
@@ -1989,12 +1990,12 @@ static Font LoadBMFont(const char *fileName)
         font.glyphs[i].image = ImageFromImage(imFont, font.recs[i]);
     }
 
-    UnloadImage(imFont);
+    UnloadImage(&imFont);
     UnloadFileText(fileText);
 
     if (font.texture.id == 0)
     {
-        UnloadFont(font);
+        UnloadFont(&font);
         font = GetFontDefault();
         TRACELOG(LOG_WARNING, "FONT: [%s] Failed to load texture, reverted to default font", fileName);
     }

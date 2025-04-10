@@ -1,0 +1,1 @@
+make all -j12 --makefile=Makefile3DS

@@ -371,7 +371,7 @@ Image LoadImageFromMemory(const char *fileType, const unsigned char *fileData, i
             else
             {
                 TRACELOG(LOG_WARNING, "IMAGE: HDR file format not supported");
-                UnloadImage(image);
+                UnloadImage(&image);
             }
         }
 #endif
@@ -458,9 +458,9 @@ Image LoadImageFromScreen(void)
 }
 
 // Unload image from CPU memory (RAM)
-void UnloadImage(Image image)
+void UnloadImage(Image *image)
 {
-    RL_FREE(image.data);
+    RL_FREE(image->data);
 }
 
 // Export image data to file
@@ -1163,7 +1163,7 @@ Image ImageTextEx(Font font, const char *text, float fontSize, float spacing, Co
     int textOffsetY = 0;            // Offset between lines (on line break '\n')
 
     // NOTE: Text image is generated at font base size, later scaled to desired font size
-    Vector2 imSize = MeasureTextEx(font, text, (float)font.baseSize, spacing);  // WARNING: Module required: rtext
+    Vector2 imSize = MeasureTextEx(&font, text, (float)font.baseSize, spacing);  // WARNING: Module required: rtext
 
     // Create image to store text
     imText = GenImageColor((int)imSize.x, (int)imSize.y, BLANK);
@@ -1173,7 +1173,7 @@ Image ImageTextEx(Font font, const char *text, float fontSize, float spacing, Co
         // Get next codepoint from byte string and glyph index in font
         int codepointByteCount = 0;
         int codepoint = GetCodepoint(&text[i], &codepointByteCount);    // WARNING: Module required: rtext
-        int index = GetGlyphIndex(font, codepoint);                     // WARNING: Module required: rtext
+        int index = GetGlyphIndex(&font, codepoint);                     // WARNING: Module required: rtext
 
         // NOTE: Normally we exit the decoding sequence as soon as a bad byte is found (and return 0x3f)
         // but we need to draw all of the bad bytes using the '?' symbol moving one byte
@@ -1370,7 +1370,7 @@ void ImageAlphaMask(Image *image, Image alphaMask)
             }
         }
 
-        UnloadImage(mask);
+        UnloadImage(&mask);
     }
 }
 
@@ -1419,8 +1419,8 @@ void ImageBlurGaussian(Image *image, int blurSize) {
     Color *pixels = LoadImageColors(*image);
 
     // Loop switches between pixelsCopy1 and pixelsCopy2
-    Vector4 *pixelsCopy1 = RL_MALLOC((image->height)*(image->width)*sizeof(Vector4));
-    Vector4 *pixelsCopy2 = RL_MALLOC((image->height)*(image->width)*sizeof(Vector4));
+    Vector4 *pixelsCopy1 = (Vector4 *)malloc((image->height)*(image->width)*sizeof(Vector4));
+    Vector4 *pixelsCopy2 = (Vector4 *)malloc((image->height)*(image->width)*sizeof(Vector4));
 
     for (int i = 0; i < (image->height)*(image->width); i++) {
         pixelsCopy1[i].x = pixels[i].r;
@@ -1430,7 +1430,7 @@ void ImageBlurGaussian(Image *image, int blurSize) {
     }
 
     // Repeated convolution of rectangular window signal by itself converges to a gaussian distribution
-    for (int j = 0; j < GAUSSIAN_BLUR_ITERATIONS; j++) {
+    for (int j = 0; j < 4; j++) {
         // Horizontal motion blur
         for (int row = 0; row < image->height; row++)
         {
@@ -1438,9 +1438,9 @@ void ImageBlurGaussian(Image *image, int blurSize) {
             float avgG = 0.0f;
             float avgB = 0.0f;
             float avgAlpha = 0.0f;
-            int convolutionSize = blurSize+1;
+            int convolutionSize = blurSize;
 
-            for (int i = 0; i < blurSize+1; i++)
+            for (int i = 0; i < blurSize; i++)
             {
                 avgR += pixelsCopy1[row*image->width + i].x;
                 avgG += pixelsCopy1[row*image->width + i].y;
@@ -1448,19 +1448,14 @@ void ImageBlurGaussian(Image *image, int blurSize) {
                 avgAlpha += pixelsCopy1[row*image->width + i].w;
             }
 
-            pixelsCopy2[row*image->width].x = avgR/convolutionSize;
-            pixelsCopy2[row*image->width].y = avgG/convolutionSize;
-            pixelsCopy2[row*image->width].z = avgB/convolutionSize;
-            pixelsCopy2[row*image->width].w = avgAlpha/convolutionSize;
-
-            for (int x = 1; x < image->width; x++)
+            for (int x = 0; x < image->width; x++)
             {
-                if (x-blurSize >= 0)
+                if (x-blurSize-1 >= 0)
                 {
-                    avgR -= pixelsCopy1[row*image->width + x-blurSize].x;
-                    avgG -= pixelsCopy1[row*image->width + x-blurSize].y;
-                    avgB -= pixelsCopy1[row*image->width + x-blurSize].z;
-                    avgAlpha -= pixelsCopy1[row*image->width + x-blurSize].w;
+                    avgR -= pixelsCopy1[row*image->width + x-blurSize-1].x;
+                    avgG -= pixelsCopy1[row*image->width + x-blurSize-1].y;
+                    avgB -= pixelsCopy1[row*image->width + x-blurSize-1].z;
+                    avgAlpha -= pixelsCopy1[row*image->width + x-blurSize-1].w;
                     convolutionSize--;
                 }
 
@@ -1478,7 +1473,7 @@ void ImageBlurGaussian(Image *image, int blurSize) {
                 pixelsCopy2[row*image->width + x].z = avgB/convolutionSize;
                 pixelsCopy2[row*image->width + x].w = avgAlpha/convolutionSize;
             }
-                }
+        }
 
         // Vertical motion blur
         for (int col = 0; col < image->width; col++)
@@ -1487,9 +1482,9 @@ void ImageBlurGaussian(Image *image, int blurSize) {
             float avgG = 0.0f;
             float avgB = 0.0f;
             float avgAlpha = 0.0f;
-            int convolutionSize = blurSize+1;
+            int convolutionSize = blurSize;
 
-            for (int i = 0; i < blurSize+1; i++)
+            for (int i = 0; i < blurSize; i++)
             {
                 avgR += pixelsCopy2[i*image->width + col].x;
                 avgG += pixelsCopy2[i*image->width + col].y;
@@ -1497,19 +1492,14 @@ void ImageBlurGaussian(Image *image, int blurSize) {
                 avgAlpha += pixelsCopy2[i*image->width + col].w;
             }
 
-            pixelsCopy1[col].x = (unsigned char) (avgR/convolutionSize);
-            pixelsCopy1[col].y = (unsigned char) (avgG/convolutionSize);
-            pixelsCopy1[col].z = (unsigned char) (avgB/convolutionSize);
-            pixelsCopy1[col].w = (unsigned char) (avgAlpha/convolutionSize);
-
-            for (int y = 1; y < image->height; y++)
+            for (int y = 0; y < image->height; y++)
             {
-                if (y-blurSize >= 0)
+                if (y-blurSize-1 >= 0)
                 {
-                    avgR -= pixelsCopy2[(y-blurSize)*image->width + col].x;
-                    avgG -= pixelsCopy2[(y-blurSize)*image->width + col].y;
-                    avgB -= pixelsCopy2[(y-blurSize)*image->width + col].z;
-                    avgAlpha -= pixelsCopy2[(y-blurSize)*image->width + col].w;
+                    avgR -= pixelsCopy2[(y-blurSize-1)*image->width + col].x;
+                    avgG -= pixelsCopy2[(y-blurSize-1)*image->width + col].y;
+                    avgB -= pixelsCopy2[(y-blurSize-1)*image->width + col].z;
+                    avgAlpha -= pixelsCopy2[(y-blurSize-1)*image->width + col].w;
                     convolutionSize--;
                 }
                 if (y+blurSize < image->height)
@@ -1528,7 +1518,6 @@ void ImageBlurGaussian(Image *image, int blurSize) {
             }
         }
     }
-
 
     // Reverse premultiply
     for (int i = 0; i < (image->width)*(image->height); i++)
@@ -1551,9 +1540,9 @@ void ImageBlurGaussian(Image *image, int blurSize) {
     }
 
     int format = image->format;
-    RL_FREE(image->data);
-    RL_FREE(pixelsCopy1);
-    RL_FREE(pixelsCopy2);
+    free(image->data);
+    free(pixelsCopy1);
+    free(pixelsCopy2);
 
     image->data = pixels;
     image->format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
@@ -1773,7 +1762,7 @@ void ImageMipmaps(Image *image)
             mipSize = GetPixelDataSize(mipWidth, mipHeight, image->format);
         }
 
-        UnloadImage(imCopy);
+        UnloadImage(&imCopy);
     }
     else TRACELOG(LOG_WARNING, "IMAGE: Mipmaps already available");
 }
@@ -2995,7 +2984,7 @@ void ImageDraw(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec, Color 
             pDstBase += strideDst;
         }
 
-        if (useSrcMod) UnloadImage(srcMod);     // Unload source modified image
+        if (useSrcMod) UnloadImage(&srcMod);     // Unload source modified image
     }
 }
 
@@ -3021,7 +3010,7 @@ void ImageDrawTextEx(Image *dst, Font font, const char *text, Vector2 position, 
 
     ImageDraw(dst, imText, srcRec, dstRec, WHITE);
 
-    UnloadImage(imText);
+    UnloadImage(&imText);
 }
 
 //------------------------------------------------------------------------------------
@@ -3036,8 +3025,8 @@ Texture2D LoadTexture(const char *fileName)
 
     if (image.data != NULL)
     {
-        texture = LoadTextureFromImage(image);
-        UnloadImage(image);
+        texture = LoadTextureFromImage(&image);
+        UnloadImage(&image);
     }
 
     return texture;
@@ -3053,8 +3042,8 @@ Texture2D LoadTexturePOT(const char *fileName)
 
     if (image.data != NULL)
     {
-        texture = LoadTextureFromImage(image);
-        UnloadImage(image);
+        texture = LoadTextureFromImage(&image);
+        UnloadImage(&image);
     }
 
     return texture;
@@ -3062,20 +3051,20 @@ Texture2D LoadTexturePOT(const char *fileName)
 
 // Load a texture from image data
 // NOTE: image is not unloaded, it must be done manually
-Texture2D LoadTextureFromImage(Image image)
+Texture2D LoadTextureFromImage(Image * image)
 {
     Texture2D texture = { 0 };
 
-    if ((image.width != 0) && (image.height != 0))
+    if ((image->width != 0) && (image->height != 0))
     {
-        texture.id = rlLoadTexture(image.data, image.width, image.height, image.format, image.mipmaps);
+        texture.id = rlLoadTexture(image->data, image->width, image->height, image->format, image->mipmaps);
     }
     else TRACELOG(LOG_WARNING, "IMAGE: Data is not valid to load texture");
 
-    texture.width = image.width;
-    texture.height = image.height;
-    texture.mipmaps = image.mipmaps;
-    texture.format = image.format;
+    texture.width = image->width;
+    texture.height = image->height;
+    texture.mipmaps = image->mipmaps;
+    texture.format = image->format;
 
     return texture;
 }
@@ -3157,7 +3146,7 @@ TextureCubemap LoadTextureCubemap(Image image, int layout)
         cubemap.id = rlLoadTextureCubemap(faces.data, size, faces.format);
         if (cubemap.id == 0) TRACELOG(LOG_WARNING, "IMAGE: Failed to load cubemap image");
 
-        UnloadImage(faces);
+        UnloadImage(&faces);
     }
     else TRACELOG(LOG_WARNING, "IMAGE: Failed to detect cubemap image layout");
 
@@ -3205,27 +3194,27 @@ RenderTexture2D LoadRenderTexture(int width, int height)
 }
 
 // Unload texture from GPU memory (VRAM)
-void UnloadTexture(Texture2D texture)
+void UnloadTexture(Texture2D * texture)
 {
-    if (texture.id > 0)
+    if (texture->id > 0)
     {
-        rlUnloadTexture(texture.id);
+        rlUnloadTexture(texture->id);
 
-        TRACELOG(LOG_INFO, "TEXTURE: [ID %i] Unloaded texture data from VRAM (GPU)", texture.id);
+        TRACELOG(LOG_INFO, "TEXTURE: [ID %i] Unloaded texture data from VRAM (GPU)", texture->id);
     }
 }
 
 // Unload render texture from GPU memory (VRAM)
-void UnloadRenderTexture(RenderTexture2D target)
+void UnloadRenderTexture(RenderTexture2D *target)
 {
-    if (target.id > 0)
+    if (target->id > 0)
     {
         // Color texture attached to FBO is deleted
-        rlUnloadTexture(target.texture.id);
+        rlUnloadTexture(target->texture.id);
 
         // NOTE: Depth texture/renderbuffer is automatically
         // queried and deleted before deleting framebuffer
-        rlUnloadFramebuffer(target.id);
+        rlUnloadFramebuffer(target->id);
     }
 }
 
@@ -3261,7 +3250,7 @@ void GenTextureMipmaps(Texture2D *texture)
 }
 
 // Set texture scaling filter mode
-void SetTextureFilter(Texture2D texture, int filter)
+void SetTextureFilter(Texture2D *texture, int filter)
 {
     #if defined(GRAPHICS_API_OPENGL_11)
         if(filter == TEXTURE_FILTER_TRILINEAR)
@@ -3271,61 +3260,61 @@ void SetTextureFilter(Texture2D texture, int filter)
     {
         case TEXTURE_FILTER_POINT:
         {
-            if (texture.mipmaps > 1)
+            if (texture->mipmaps > 1)
             {
                 // RL_TEXTURE_FILTER_MIP_NEAREST - tex filter: POINT, mipmaps filter: POINT (sharp switching between mipmaps)
-                rlTextureParameters(texture.id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_MIP_NEAREST);
+                rlTextureParameters(texture->id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_MIP_NEAREST);
 
                 // RL_TEXTURE_FILTER_NEAREST - tex filter: POINT (no filter), no mipmaps
-                rlTextureParameters(texture.id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_NEAREST);
+                rlTextureParameters(texture->id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_NEAREST);
             }
             else
             {
                 // RL_TEXTURE_FILTER_NEAREST - tex filter: POINT (no filter), no mipmaps
-                rlTextureParameters(texture.id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_NEAREST);
-                rlTextureParameters(texture.id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_NEAREST);
+                rlTextureParameters(texture->id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_NEAREST);
+                rlTextureParameters(texture->id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_NEAREST);
             }
         } break;
         case TEXTURE_FILTER_BILINEAR:
         {
-            if (texture.mipmaps > 1)
+            if (texture->mipmaps > 1)
             {
                 // RL_TEXTURE_FILTER_LINEAR_MIP_NEAREST - tex filter: BILINEAR, mipmaps filter: POINT (sharp switching between mipmaps)
                 // Alternative: RL_TEXTURE_FILTER_NEAREST_MIP_LINEAR - tex filter: POINT, mipmaps filter: BILINEAR (smooth transition between mipmaps)
-                rlTextureParameters(texture.id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR_MIP_NEAREST);
+                rlTextureParameters(texture->id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR_MIP_NEAREST);
 
                 // RL_TEXTURE_FILTER_LINEAR - tex filter: BILINEAR, no mipmaps
-                rlTextureParameters(texture.id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
+                rlTextureParameters(texture->id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
             }
             else
             {
                 // RL_TEXTURE_FILTER_LINEAR - tex filter: BILINEAR, no mipmaps
-                rlTextureParameters(texture.id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR);
-                rlTextureParameters(texture.id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
+                rlTextureParameters(texture->id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR);
+                rlTextureParameters(texture->id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
             }
         } break;
         case TEXTURE_FILTER_TRILINEAR:
         {
-            if (texture.mipmaps > 1)
+            if (texture->mipmaps > 1)
             {
                 // RL_TEXTURE_FILTER_MIP_LINEAR - tex filter: BILINEAR, mipmaps filter: BILINEAR (smooth transition between mipmaps)
-                rlTextureParameters(texture.id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_MIP_LINEAR);
+                rlTextureParameters(texture->id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_MIP_LINEAR);
 
                 // RL_TEXTURE_FILTER_LINEAR - tex filter: BILINEAR, no mipmaps
-                rlTextureParameters(texture.id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
+                rlTextureParameters(texture->id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
             }
             else
             {
-                TRACELOG(LOG_WARNING, "TEXTURE: [ID %i] No mipmaps available for TRILINEAR texture filtering", texture.id);
+                TRACELOG(LOG_WARNING, "TEXTURE: [ID %i] No mipmaps available for TRILINEAR texture filtering", texture->id);
 
                 // RL_TEXTURE_FILTER_LINEAR - tex filter: BILINEAR, no mipmaps
-                rlTextureParameters(texture.id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR);
-                rlTextureParameters(texture.id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
+                rlTextureParameters(texture->id, RL_TEXTURE_MIN_FILTER, RL_TEXTURE_FILTER_LINEAR);
+                rlTextureParameters(texture->id, RL_TEXTURE_MAG_FILTER, RL_TEXTURE_FILTER_LINEAR);
             }
         } break;
-        case TEXTURE_FILTER_ANISOTROPIC_4X: rlTextureParameters(texture.id, RL_TEXTURE_FILTER_ANISOTROPIC, 4); break;
-        case TEXTURE_FILTER_ANISOTROPIC_8X: rlTextureParameters(texture.id, RL_TEXTURE_FILTER_ANISOTROPIC, 8); break;
-        case TEXTURE_FILTER_ANISOTROPIC_16X: rlTextureParameters(texture.id, RL_TEXTURE_FILTER_ANISOTROPIC, 16); break;
+        case TEXTURE_FILTER_ANISOTROPIC_4X: rlTextureParameters(texture->id, RL_TEXTURE_FILTER_ANISOTROPIC, 4); break;
+        case TEXTURE_FILTER_ANISOTROPIC_8X: rlTextureParameters(texture->id, RL_TEXTURE_FILTER_ANISOTROPIC, 8); break;
+        case TEXTURE_FILTER_ANISOTROPIC_16X: rlTextureParameters(texture->id, RL_TEXTURE_FILTER_ANISOTROPIC, 16); break;
         default: break;
     }
 }
@@ -3364,29 +3353,29 @@ void SetTextureWrap(Texture2D texture, int wrap)
 // Texture drawing functions
 //------------------------------------------------------------------------------------
 // Draw a Texture2D
-void DrawTexture(Texture2D texture, int posX, int posY, Color tint)
+void DrawTexture(Texture2D *texture, int posX, int posY, Color tint)
 {
     DrawTextureEx(texture, (Vector2){ (float)posX, (float)posY }, 0.0f, 1.0f, tint);
 }
 
 // Draw a Texture2D with position defined as Vector2
-void DrawTextureV(Texture2D texture, Vector2 position, Color tint)
+void DrawTextureV(Texture2D *texture, Vector2 position, Color tint)
 {
     DrawTextureEx(texture, position, 0, 1.0f, tint);
 }
 
 // Draw a Texture2D with extended parameters
-void DrawTextureEx(Texture2D texture, Vector2 position, float rotation, float scale, Color tint)
+void DrawTextureEx(Texture2D *texture, Vector2 position, float rotation, float scale, Color tint)
 {
-    Rectangle source = { 0.0f, 0.0f, (float)texture.width, (float)texture.height };
-    Rectangle dest = { position.x, position.y, (float)texture.width*scale, (float)texture.height*scale };
+    Rectangle source = { 0.0f, 0.0f, (float)texture->width, (float)texture->height };
+    Rectangle dest = { position.x, position.y, (float)texture->width*scale, (float)texture->height*scale };
     Vector2 origin = { 0.0f, 0.0f };
 
     DrawTexturePro(texture, source, dest, origin, rotation, tint);
 }
 
 // Draw a part of a texture (defined by a rectangle)
-void DrawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint)
+void DrawTextureRec(Texture2D *texture, Rectangle source, Vector2 position, Color tint)
 {
     Rectangle dest = { position.x, position.y, fabsf(source.width), fabsf(source.height) };
     Vector2 origin = { 0.0f, 0.0f };
@@ -3397,11 +3386,11 @@ void DrawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color
 // Draw texture quad with tiling and offset parameters
 // NOTE: Tiling and offset should be provided considering normalized texture values [0..1]
 // i.e tiling = { 1.0f, 1.0f } refers to all texture, offset = { 0.5f, 0.5f } moves texture origin to center
-void DrawTextureQuad(Texture2D texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint)
+void DrawTextureQuad(Texture2D *texture, Vector2 tiling, Vector2 offset, Rectangle quad, Color tint)
 {
     // WARNING: This solution only works if TEXTURE_WRAP_REPEAT is supported,
     // NPOT textures supported is required and OpenGL ES 2.0 could not support it
-    Rectangle source = { offset.x*texture.width, offset.y*texture.height, tiling.x*texture.width, tiling.y*texture.height };
+    Rectangle source = { offset.x*texture->width, offset.y*texture->height, tiling.x*texture->width, tiling.y*texture->height };
     Vector2 origin = { 0.0f, 0.0f };
 
     DrawTexturePro(texture, source, quad, origin, 0.0f, tint);
@@ -3409,9 +3398,9 @@ void DrawTextureQuad(Texture2D texture, Vector2 tiling, Vector2 offset, Rectangl
 
 // Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
 // NOTE: For tilling a whole texture DrawTextureQuad() is better
-void DrawTextureTiled(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, float scale, Color tint)
+void DrawTextureTiled(Texture2D *texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, float scale, Color tint)
 {
-    if ((texture.id <= 0) || (scale <= 0.0f)) return;  // Wanna see a infinite loop?!...just delete this line!
+    if ((texture->id <= 0) || (scale <= 0.0f)) return;  // Wanna see a infinite loop?!...just delete this line!
     if ((source.width == 0) || (source.height == 0)) return;
 
     int tileWidth = (int)(source.width*scale), tileHeight = (int)(source.height*scale);
@@ -3494,13 +3483,13 @@ void DrawTextureTiled(Texture2D texture, Rectangle source, Rectangle dest, Vecto
 
 // Draw a part of a texture (defined by a rectangle) with 'pro' parameters
 // NOTE: origin is relative to destination rectangle size
-void DrawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint)
+void DrawTexturePro(Texture2D *texture, Rectangle source, Rectangle dest, Vector2 origin, float rotation, Color tint)
 {
     // Check if texture is valid
-    if (texture.id > 0)
+    if (texture->id > 0)
     {
-        float width = (float)texture.width;
-        float height = (float)texture.height;
+        float width = (float)texture->width;
+        float height = (float)texture->height;
 
         bool flipX = false;
 
@@ -3546,7 +3535,7 @@ void DrawTexturePro(Texture2D texture, Rectangle source, Rectangle dest, Vector2
 
         rlCheckRenderBatchLimit(4);     // Make sure there is enough free space on the batch buffer
 
-        rlSetTexture(texture.id);
+        rlSetTexture(texture->id);
         rlBegin(RL_QUADS);
 
             rlColor4ub(tint.r, tint.g, tint.b, tint.a);
@@ -3848,6 +3837,16 @@ void DrawTexturePoly(Texture2D texture, Vector2 center, Vector2 *points, Vector2
 
     rlSetTexture(0);
 }
+
+void DrawTextureExDepth(Texture2D *texture, Vector2 position, float depth, float scale, Color tint){
+    printf("WARNING: The function \"DrawTextureExDepth\" is not supported on the PC architecture. This means that the graphics will seem broken since there are some things that are using this function, as it was called. To solve this issue, check the code and see if you can do something about it I guess. \n");
+    printf("TIP: This function is currently mainly used for the slider generation, maybe turn on the polygon based renderer by setting \"polygonalRendering\" to \"true\"\n");
+    return;
+}
+
+
+
+
 
 // Get color with alpha applied, alpha goes from 0.0f to 1.0f
 Color Fade(Color color, float alpha)

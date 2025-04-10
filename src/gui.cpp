@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstring>
 #include "globals.hpp"
+//This file includes functions for updating and rendering the GUI elements
 
 GuiElement::GuiElement(Vector2 position, Vector2 size) : position(position), size(size)
 {  }
@@ -23,27 +24,27 @@ Button::Button(Vector2 position, Vector2 size, Color color, char* text, Color te
     : GuiElement(position, size), color(color), text(text), textcolor(textcolor), textsize(textsize)
 {  }
 
-
+//A button consists of a Textbox, so it is important that we update the textbox as well
 void Button::render() {
-    Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text, textsize, 1);
+    Vector2 TextBoxSize = MeasureTextEx(&Global.DefaultFont, text, textsize, 2);
     Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
-    //melih buradaki variablelar calismio placeholder koydum
     if ((this->clicked or (Global.Key1D and this->focused)) and !this->focusbreak){
         DrawRectangleRec(ScaleRect(this->getRect()), textcolor);
-        DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
+        DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
     }
     else if (this->focused){
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
-        DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+        DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
     }
     else{
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
-        DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+        DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
     }
 }
 
+//This function just checks if the button is "clicked" or not.
 void Button::update() {
     bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
     bool click = Global.MouseInFocus and Global.Key1P;
@@ -76,15 +77,14 @@ TextBox::TextBox(Vector2 position, Vector2 size, Color color, std::string text, 
 }
 
 void TextBox::render() {
-    Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, rendertext.c_str(), textsize, 1);
+    Vector2 TextBoxSize = MeasureTextEx(&Global.DefaultFont, rendertext.c_str(), textsize, 2);
     Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});\
-    DrawRectangleRec(ScaleRect(this->getRect()), BLUE);
     if (focused) {
         DrawRectangleRec(ScaleRect(this->getRect()), textcolor);
         if(renderpos > -1)
-            DrawTextEx(Global.DefaultFont, subtext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
+            DrawTextEx(&Global.DefaultFont, subtext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
         else
-            DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), this->color);
+            DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
     }
     else if(hover){
         Color tempColor = this->color;
@@ -93,11 +93,11 @@ void TextBox::render() {
         tempColor.b = (this->color.b * 2 + textcolor.b) / 3;
         tempColor.a = (this->color.a * 2 + textcolor.a) / 3;
         DrawRectangleRec(ScaleRect(this->getRect()), tempColor);
-        DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+        DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
     }
     else {
         DrawRectangleRec(ScaleRect(this->getRect()), this->color);
-        DrawTextEx(Global.DefaultFont, rendertext.c_str(), ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
+        DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
     }
 }
 void TextBox::init() {
@@ -106,14 +106,14 @@ void TextBox::init() {
     while(true){
         if(maxlength <= 0)
             break;
-        Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, rendertext.substr(1,maxlength).c_str(), textsize, 1);
+        Vector2 TextBoxSize = MeasureTextEx(&Global.DefaultFont, rendertext.substr(1,maxlength).c_str(), textsize, 2);
         //std::cout << TextBoxSize.x << " size?" << std::endl;
         if(TextBoxSize.x > (size.x * 0.95f))
             maxlength--;
         else
             break;
     }
-    std::cout << maxlength << std::endl;
+    //std::cout << maxlength << std::endl;
     if(text.length() > maxlength){
         rendertext = text;
         while(rendertext.length() > 0 and rendertext.length() > maxlength - 3){
@@ -242,9 +242,6 @@ Switch::Switch(Vector2 position, Vector2 size, Color color, Color altcolor, Colo
 
 
 void Switch::render() {
-    //Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text, textsize, 1);
-    //Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
-    //melih buradaki variablelar calismio placeholder koydum
     Rectangle Left = GetRaylibOriginR({position.x - size.x/4.0f, position.y, size.x/2.0f, size.y});
     Rectangle Right = GetRaylibOriginR({position.x + size.x/4.0f, position.y, size.x/2.0f, size.y});
     if(this->state){
@@ -256,13 +253,9 @@ void Switch::render() {
         DrawRectangleRec(ScaleRect(Right), this->color);
     }
     if (this->focused){
-        //DrawRectangleRec(ScaleRect(this->getRect()), this->color);
         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
-        //DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
     }
     else{
-        //DrawRectangleRec(ScaleRect(this->getRect()), this->color);
-        //DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
         DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), this->outcolor);
         
     }
@@ -302,31 +295,6 @@ TestSlider::TestSlider(Vector2 position, Vector2 size, Color color, Color altcol
 
 
 void TestSlider::render() {
-    /*//Vector2 TextBoxSize = MeasureTextEx(Global.DefaultFont, text, textsize, 1);
-    //Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
-    //melih buradaki variablelar calismio placeholder koydum
-    Rectangle Left = GetRaylibOriginR({position.x - size.x/4.0f, position.y, size.x/2.0f, size.y});
-    Rectangle Right = GetRaylibOriginR({position.x + size.x/4.0f, position.y, size.x/2.0f, size.y});
-    if(this->state){
-        DrawRectangleRec(ScaleRect(Left), this->altcolor);
-        DrawRectangleRec(ScaleRect(Right), this->switchcolor);
-    }
-    else{
-        DrawRectangleRec(ScaleRect(Left), this->switchcolor);
-        DrawRectangleRec(ScaleRect(Right), this->color);
-    }
-    if (this->focused){
-        //DrawRectangleRec(ScaleRect(this->getRect()), this->color);
-        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), WHITE);
-        //DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
-    }
-    else{
-        //DrawRectangleRec(ScaleRect(this->getRect()), this->color);
-        //DrawTextEx(Global.DefaultFont, text, ScaleCords(TextBoxLocation), Scale(textsize),  Scale(1), textcolor);
-        DrawRectangleLinesEx(ScaleRect(this->getRect()), Scale(2), this->outcolor);
-        
-    }*/
-
     double percentage = location / 100.0f;
     Rectangle Left = GetRaylibOriginR({position.x - (size.x * (1 - percentage)) / 2, position.y, size.x * percentage, size.y});
     Rectangle Right = GetRaylibOriginR({position.x + (size.x * (percentage)) / 2, position.y, size.x * (1.0f-percentage), size.y});
@@ -390,6 +358,5 @@ void TestSlider::update() {
             location = 100;
         else if(location < 0.0)
             location = 0;
-        //std::cout << (Global.MousePosition.x - (position.x - (size.x / 2.0))) / size.x << std::endl;
     }
 }

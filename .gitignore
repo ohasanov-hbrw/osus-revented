@@ -3,6 +3,12 @@ bin
 build
 object
 beatmaps
+resources
+.vscode
+
+
+# vscode bs?
+*.code-workspace
 
 # Prerequisites
 *.d
@@ -33,6 +39,10 @@ beatmaps
 *.lib
 
 # Executables
+*.3dsx
+*.cia
+*.elf
+*.smdh
 *.exe
 *.out
 *.app

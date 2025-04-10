@@ -1,0 +1,559 @@
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/gamemanager.o -c src/gamemanager.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/gamemanager.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/parser.hpp:4,
+                 from include/gamemanager.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/gamemanager.cpp: In member function ‘void GameManager::update()’:
+src/gamemanager.cpp:310:105: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                         ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:310:124: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:315:108: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  315 |                                 if (CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f)){
+      |                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:397:115: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  397 |                                         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
+      |                                                                                                   ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:98: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                  ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:117: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                                     ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp: In member function ‘void GameManager::render()’:
+src/gamemanager.cpp:739:180: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                                                                                                    ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:739:200: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)400)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                                                                                                                        ^~~~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::run()’:
+src/gamemanager.cpp:803:36: error: ‘Music’ {aka ‘struct Music’} has no member named ‘ended’
+  803 |                 if(backgroundMusic.ended){
+      |                                    ^~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadDefaultSkin(std::string)’:
+src/gamemanager.cpp:935:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  935 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:946:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  946 |                                 UnloadTexture(&hitCircleOverlay);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:950:47: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  950 |                                 UnloadTexture(&selectCircle);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:954:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  954 |                                 UnloadTexture(&hitCircle);
+      |                                               ^~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:958:47: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  958 |                                 UnloadTexture(&approachCircle);
+      |                                               ^~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:964:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  964 |                                 UnloadTexture(&hit300);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:970:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  970 |                                 UnloadTexture(&hit100);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:976:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  976 |                                 UnloadTexture(&hit50);
+      |                                               ^~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:980:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  980 |                                 UnloadTexture(&hit0);
+      |                                               ^~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:984:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  984 |                                 UnloadTexture(&sliderscorepoint);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:988:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderfollow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  988 |                                 UnloadTexture(&sliderfollow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:992:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  992 |                                 UnloadTexture(&sliderb);
+      |                                               ^~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:996:47: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  996 |                                 UnloadTexture(&reverseArrow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1000:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1000 |                                 UnloadTexture(&spinnerCircle);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1005:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerMetre’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1005 |                                 UnloadTexture(&spinnerMetre);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1010:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerBottom’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1010 |                                 UnloadTexture(&spinnerBottom);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1014:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerTop’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1014 |                                 UnloadTexture(&spinnerTop);
+      |                                               ^~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1018:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerApproachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1018 |                                 UnloadTexture(&spinnerApproachCircle);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1024:63: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[j]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1024 |                                                 UnloadTexture(&numbers[j]);
+      |                                                               ^~~~~~~~~~~
+      |                                                               |
+      |                                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSkin(std::string)’:
+src/gamemanager.cpp:1045:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1045 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:1056:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1056 |                                 UnloadTexture(&hitCircleOverlay);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1060:47: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1060 |                                 UnloadTexture(&selectCircle);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1064:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1064 |                                 UnloadTexture(&hitCircle);
+      |                                               ^~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1068:47: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1068 |                                 UnloadTexture(&approachCircle);
+      |                                               ^~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1074:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1074 |                                 UnloadTexture(&hit300);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1080:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1080 |                                 UnloadTexture(&hit100);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1086:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1086 |                                 UnloadTexture(&hit50);
+      |                                               ^~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1090:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1090 |                                 UnloadTexture(&hit0);
+      |                                               ^~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1094:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1094 |                                 UnloadTexture(&sliderscorepoint);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1098:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderfollow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1098 |                                 UnloadTexture(&sliderfollow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1102:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1102 |                                 UnloadTexture(&sliderb);
+      |                                               ^~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1106:47: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1106 |                                 UnloadTexture(&reverseArrow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1110:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1110 |                                 UnloadTexture(&spinnerCircle);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1115:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerMetre’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1115 |                                 UnloadTexture(&spinnerMetre);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1120:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerBottom’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1120 |                                 UnloadTexture(&spinnerBottom);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1124:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerTop’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1124 |                                 UnloadTexture(&spinnerTop);
+      |                                               ^~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1128:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerApproachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1128 |                                 UnloadTexture(&spinnerApproachCircle);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1134:63: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[j]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1134 |                                                 UnloadTexture(&numbers[j]);
+      |                                                               ^~~~~~~~~~~
+      |                                                               |
+      |                                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp: In member function ‘void GameManager::loadBeatmapSkin(std::string)’:
+src/gamemanager.cpp:1152:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1152 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:1165:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1165 |                                 UnloadTexture(&hitCircleOverlay);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1169:47: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1169 |                                 UnloadTexture(&selectCircle);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1173:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1173 |                                 UnloadTexture(&hitCircle);
+      |                                               ^~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1177:47: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1177 |                                 UnloadTexture(&approachCircle);
+      |                                               ^~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1183:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1183 |                                 UnloadTexture(&hit300);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1189:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1189 |                                 UnloadTexture(&hit100);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1195:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1195 |                                 UnloadTexture(&hit50);
+      |                                               ^~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1199:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1199 |                                 UnloadTexture(&hit0);
+      |                                               ^~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1203:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1203 |                                 UnloadTexture(&sliderscorepoint);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1207:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderfollow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1207 |                                 UnloadTexture(&sliderfollow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1211:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1211 |                                 UnloadTexture(&sliderb);
+      |                                               ^~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1215:47: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1215 |                                 UnloadTexture(&reverseArrow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1219:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1219 |                                 UnloadTexture(&spinnerCircle);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1224:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerMetre’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1224 |                                 UnloadTexture(&spinnerMetre);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1229:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerBottom’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1229 |                                 UnloadTexture(&spinnerBottom);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1233:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerTop’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1233 |                                 UnloadTexture(&spinnerTop);
+      |                                               ^~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1237:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerApproachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1237 |                                 UnloadTexture(&spinnerApproachCircle);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1243:63: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[j]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1243 |                                                 UnloadTexture(&numbers[j]);
+      |                                                               ^~~~~~~~~~~
+      |                                                               |
+      |                                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp: In member function ‘void GameManager::loadGame(std::string)’:
+src/gamemanager.cpp:1321:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1321 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:1772:39: error: ‘vramSpaceFree’ was not declared in this scope
+ 1772 |         std::cout << "Free Vram: " << vramSpaceFree() << std::endl;
+      |                                       ^~~~~~~~~~~~~
+src/gamemanager.cpp:1773:59: error: ‘MEMREGION_ALL’ was not declared in this scope
+ 1773 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                                           ^~~~~~~~~~~~~
+src/gamemanager.cpp:1773:40: error: ‘osGetMemRegionFree’ was not declared in this scope
+ 1773 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                        ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1773:84: error: ‘osGetMemRegionSize’ was not declared in this scope
+ 1773 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                                                                    ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1774:59: error: ‘MEMREGION_APPLICATION’ was not declared in this scope
+ 1774 |         std::cout << "Free M_APP: " << osGetMemRegionFree(MEMREGION_APPLICATION) << "/" << osGetMemRegionSize(MEMREGION_APPLICATION) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1775:59: error: ‘MEMREGION_SYSTEM’ was not declared in this scope
+ 1775 |         std::cout << "Free M_SYS: " << osGetMemRegionFree(MEMREGION_SYSTEM) << "/" << osGetMemRegionSize(MEMREGION_SYSTEM) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1776:59: error: ‘MEMREGION_BASE’ was not declared in this scope
+ 1776 |         std::cout << "Free M_BSE: " << osGetMemRegionFree(MEMREGION_BASE) << "/" << osGetMemRegionSize(MEMREGION_BASE) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~
+src/gamemanager.cpp:1777:40: error: ‘linearSpaceFree’ was not declared in this scope
+ 1777 |         std::cout << "Free M_LIN: " << linearSpaceFree() << "/" << Global.linearSpaceFree << std::endl;
+      |                                        ^~~~~~~~~~~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::unloadGame()’:
+src/gamemanager.cpp:1855:53: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1855 |                 delete objectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp:1862:57: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1862 |                 delete deadObjectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::destroyDeadHitObject(Node*)’:
+src/gamemanager.cpp:1913:22: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1913 |         delete node->object;
+      |                ~~~~~~^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameTextures()’:
+src/gamemanager.cpp:1941:9: error: ‘C2D_Prepare’ was not declared in this scope
+ 1941 |         C2D_Prepare();
+      |         ^~~~~~~~~~~
+src/gamemanager.cpp:1942:20: error: ‘C3D_FRAME_SYNCDRAW’ was not declared in this scope
+ 1942 |     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                    ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1942:5: error: ‘C3D_FrameBegin’ was not declared in this scope
+ 1942 |     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |     ^~~~~~~~~~~~~~
+src/gamemanager.cpp:1943:5: error: ‘C2D_SceneBegin’ was not declared in this scope
+ 1943 |     C2D_SceneBegin(Global.window);
+      |     ^~~~~~~~~~~~~~
+src/gamemanager.cpp:1977:9: error: ‘C2D_Flush’ was not declared in this scope
+ 1977 |         C2D_Flush();  //test
+      |         ^~~~~~~~~
+src/gamemanager.cpp:1978:5: error: ‘C3D_FrameEnd’ was not declared in this scope
+ 1978 |     C3D_FrameEnd(0);
+      |     ^~~~~~~~~~~~
+src/gamemanager.cpp:2015:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2015 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:2016:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2016 |         std::vector<std::string> files2 = ls(".jpg");
+      |                                              ^~~~~~
+src/gamemanager.cpp:2017:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2017 |         std::vector<std::string> files3 = ls(".jpeg");
+      |                                              ^~~~~~~
+src/gamemanager.cpp:2078:117: error: could not convert ‘& image’ from ‘Image*’ to ‘Image’
+ 2078 |                                         backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(&image);
+      |                                                                                                                     ^~~~~~
+      |                                                                                                                     |
+      |                                                                                                                     Image*
+src/gamemanager.cpp:2079:53: error: could not convert ‘& image’ from ‘Image*’ to ‘Image’
+ 2079 |                                         UnloadImage(&image);
+      |                                                     ^~~~~~
+      |                                                     |
+      |                                                     Image*
+src/gamemanager.cpp:2081:115: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::xOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2081 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp:2081:143: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::yOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2081 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp: In member function ‘void GameManager::unloadGameTextures()’:
+src/gamemanager.cpp:2105:19: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2105 |     UnloadTexture(&hitCircleOverlay);
+      |                   ^~~~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2106:19: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2106 |     UnloadTexture(&hitCircle);
+      |                   ^~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2107:19: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2107 |     UnloadTexture(&sliderscorepoint);
+      |                   ^~~~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2108:19: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2108 |     UnloadTexture(&approachCircle);
+      |                   ^~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2109:19: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2109 |     UnloadTexture(&hit300);
+      |                   ^~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2110:19: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2110 |     UnloadTexture(&hit100);
+      |                   ^~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2111:19: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2111 |     UnloadTexture(&hit50);
+      |                   ^~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2112:19: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2112 |     UnloadTexture(&hit0);
+      |                   ^~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2113:19: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2113 |     UnloadTexture(&sliderb);
+      |                   ^~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2114:19: error: could not convert ‘&((GameManager*)this)->GameManager::sliderin’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2114 |     UnloadTexture(&sliderin);
+      |                   ^~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2115:23: error: could not convert ‘&((GameManager*)this)->GameManager::sliderblank’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2115 |         UnloadTexture(&sliderblank);
+      |                       ^~~~~~~~~~~~
+      |                       |
+      |                       Texture2D* {aka Texture*}
+src/gamemanager.cpp:2116:19: error: could not convert ‘&((GameManager*)this)->GameManager::sliderout’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2116 |     UnloadTexture(&sliderout);
+      |                   ^~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2117:19: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2117 |     UnloadTexture(&selectCircle);
+      |                   ^~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2118:19: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2118 |     UnloadTexture(&reverseArrow);
+      |                   ^~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2119:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerBottom’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2119 |     UnloadTexture(&spinnerBottom);
+      |                   ^~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2120:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerTop’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2120 |     UnloadTexture(&spinnerTop);
+      |                   ^~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2121:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2121 |     UnloadTexture(&spinnerCircle);
+      |                   ^~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2122:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerApproachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2122 |     UnloadTexture(&spinnerApproachCircle);
+      |                   ^~~~~~~~~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2123:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerMetre’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2123 |     UnloadTexture(&spinnerMetre);
+      |                   ^~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2124:23: error: could not convert ‘&((GameManager*)this)->GameManager::followPoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2124 |         UnloadTexture(&followPoint);
+      |                       ^~~~~~~~~~~~
+      |                       |
+      |                       Texture2D* {aka Texture*}
+src/gamemanager.cpp:2126:29: error: could not convert ‘&((GameManager*)this)->GameManager::sliderInnerBall’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 2126 |         UnloadRenderTexture(&sliderInnerBall);
+      |                             ^~~~~~~~~~~~~~~~
+      |                             |
+      |                             RenderTexture2D* {aka RenderTexture*}
+src/gamemanager.cpp:2127:29: error: could not convert ‘&((GameManager*)this)->GameManager::sliderOuterBall’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 2127 |         UnloadRenderTexture(&sliderOuterBall);
+      |                             ^~~~~~~~~~~~~~~~
+      |                             |
+      |                             RenderTexture2D* {aka RenderTexture*}
+src/gamemanager.cpp:2130:23: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[i]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2130 |         UnloadTexture(&numbers[i]);
+      |                       ^~~~~~~~~~~
+      |                       |
+      |                       Texture2D* {aka Texture*}
+src/gamemanager.cpp:2136:23: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundTextures.Background::data.std::map<std::__cxx11::basic_string<char>, Texture>::operator[](key)’ from ‘std::map<std::__cxx11::basic_string<char>, Texture>::mapped_type*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2136 |         UnloadTexture(&backgroundTextures.data[key]);
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSounds()’:
+src/gamemanager.cpp:2583:50: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2583 |         std::vector<std::string> ComboBreak = ls(".wav");
+      |                                                  ^~~~~~
+src/gamemanager.cpp:2618:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2618 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2647:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2647 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2677:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2677 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2705:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2705 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2732:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2732 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2761:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2761 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2786:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2786 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2811:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2811 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+make: *** [MakefilePC:31: object/gamemanager.o] Error 1

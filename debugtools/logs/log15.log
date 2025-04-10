@@ -1,0 +1,671 @@
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fastrender.o -c src/fastrender.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/fastrender.hpp:2,
+                 from src/fastrender.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/utils.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/followpoint.o -c src/followpoint.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/followpoint.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/followpoint.hpp:5,
+                 from src/followpoint.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/followpoint.cpp: In member function ‘void FollowPoint::render()’:
+src/followpoint.cpp:77:127: warning: narrowing conversion of ‘opacity’ from ‘int’ to ‘unsigned char’ [-Wnarrowing]
+   77 |                 DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, {255,200,255,opacity});
+      |                                                                                                                               ^~~~~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fs.o -c src/fs.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/fs.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from include/platformspesifics.hpp:3,
+                 from include/globals.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/gamemanager.o -c src/gamemanager.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/gamemanager.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/parser.hpp:4,
+                 from include/gamemanager.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/gamemanager.cpp: In member function ‘void GameManager::update()’:
+src/gamemanager.cpp:310:105: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                         ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:310:124: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:315:108: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  315 |                                 if (CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f)){
+      |                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:397:115: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  397 |                                         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
+      |                                                                                                   ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:98: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                  ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:117: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                                     ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp: In member function ‘void GameManager::render()’:
+src/gamemanager.cpp:739:180: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                                                                                                    ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:739:200: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)400)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                                                                                                                        ^~~~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadDefaultSkin(std::string)’:
+src/gamemanager.cpp:935:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  935 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSkin(std::string)’:
+src/gamemanager.cpp:1045:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1045 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadBeatmapSkin(std::string)’:
+src/gamemanager.cpp:1152:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1152 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGame(std::string)’:
+src/gamemanager.cpp:1321:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1321 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::unloadGame()’:
+src/gamemanager.cpp:1860:53: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1860 |                 delete objectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp:1867:57: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1867 |                 delete deadObjectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::destroyDeadHitObject(Node*)’:
+src/gamemanager.cpp:1918:22: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1918 |         delete node->object;
+      |                ~~~~~~^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameTextures()’:
+src/gamemanager.cpp:2026:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2026 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:2027:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2027 |         std::vector<std::string> files2 = ls(".jpg");
+      |                                              ^~~~~~
+src/gamemanager.cpp:2028:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2028 |         std::vector<std::string> files3 = ls(".jpeg");
+      |                                              ^~~~~~~
+src/gamemanager.cpp:2092:115: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::xOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2092 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp:2092:143: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::yOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2092 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSounds()’:
+src/gamemanager.cpp:2594:50: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2594 |         std::vector<std::string> ComboBreak = ls(".wav");
+      |                                                  ^~~~~~
+src/gamemanager.cpp:2629:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2629 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2658:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2658 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2688:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2688 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2716:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2716 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2743:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2743 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2772:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2772 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2797:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2797 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2822:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2822 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/gui.o -c src/gui.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from src/gui.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/gui.hpp:3,
+                 from src/gui.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/gui.cpp: In member function ‘virtual void Button::render()’:
+src/gui.cpp:33:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   33 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:33:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   33 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:39:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   39 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:39:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   39 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:43:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   43 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:43:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   43 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp: In member function ‘virtual void TextBox::render()’:
+src/gui.cpp:85:70: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   85 |             DrawTextEx(&Global.DefaultFont, subtext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:85:106: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   85 |             DrawTextEx(&Global.DefaultFont, subtext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:87:73: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   87 |             DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:87:109: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   87 |             DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:96:69: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   96 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:96:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   96 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:100:69: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  100 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:100:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  100 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp: In member function ‘virtual void TestSlider::render()’:
+src/gui.cpp:299:51: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x) - ((((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * ((double)1 - percentage)) / (double)2))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  299 |     Rectangle Left = GetRaylibOriginR({position.x - (size.x * (1 - percentage)) / 2, position.y, size.x * percentage, size.y});
+      |                                        ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:299:105: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage)’ from ‘double’ to ‘float’ [-Wnarrowing]
+  299 |     Rectangle Left = GetRaylibOriginR({position.x - (size.x * (1 - percentage)) / 2, position.y, size.x * percentage, size.y});
+      |                                                                                                  ~~~~~~~^~~~~~~~~~~~
+src/gui.cpp:300:52: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x) + ((((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage) / (double)2))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  300 |     Rectangle Right = GetRaylibOriginR({position.x + (size.x * (percentage)) / 2, position.y, size.x * (1.0f-percentage), size.y});
+      |                                         ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:300:102: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * (((double)1.0e+0f) - percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  300 |     Rectangle Right = GetRaylibOriginR({position.x + (size.x * (percentage)) / 2, position.y, size.x * (1.0f-percentage), size.y});
+      |                                                                                               ~~~~~~~^~~~~~~~~~~~~~~~~~~
+src/gui.cpp:301:68: warning: narrowing conversion of ‘(((double)(((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x - (((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x / (float)2))) + (((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  301 |     Rectangle Dingus = GetRaylibOriginR({position.x - (size.x / 2) + (size.x * (percentage)), position.y, size.y / 2, size.y});
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp: In member function ‘virtual void TestSlider::update()’:
+src/gui.cpp:345:68: warning: narrowing conversion of ‘(((double)(((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x - (((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x / (float)2))) + (((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  345 |     Rectangle Dingus = GetRaylibOriginR({position.x - (size.x / 2) + (size.x * (percentage)), position.y, size.y / 2, size.y});
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectcircle.o -c src/hitobjectcircle.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectcircle.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectcircle.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectslider.o -c src/hitobjectslider.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectslider.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectslider.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectspinner.o -c src/hitobjectspinner.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectspinner.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectspinner.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/main.o -c src/main.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from src/main.cpp:11:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from src/main.cpp:8:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/main.cpp: In function ‘void RenderLoop(void*)’:
+src/main.cpp:90:45: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   90 |         std::vector<std::string> files = ls(".png");
+      |                                             ^~~~~~
+src/main.cpp:107:16: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  107 |     files = ls(".png");
+      |                ^~~~~~
+src/main.cpp:161:93: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  161 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                             ^~~~~~~~~~~~~~~~~~
+src/main.cpp:161:113: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  161 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                                 ^~~~~~~~~~~~~~~~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/parser.o -c src/parser.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/parser.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/parser.hpp:4,
+                 from src/parser.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/platformspesifics.o -c src/platformspesifics.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+src/platformspesifics.cpp:1:9: warning: #pragma once in main file
+    1 | #pragma once
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/platformspesifics.cpp:3:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from include/platformspesifics.hpp:3,
+                 from src/platformspesifics.cpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/platformspesifics.cpp: In function ‘void DrawTextureRotate(Texture2D*, float, float, float, float, Color)’:
+src/platformspesifics.cpp:310:48: warning: narrowing conversion of ‘tex->Texture::width’ from ‘int’ to ‘float’ [-Wnarrowing]
+  310 |         DrawTexturePro(tex, Rectangle{0,0,tex->width,tex->height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
+      |                                           ~~~~~^~~~~
+src/platformspesifics.cpp:310:59: warning: narrowing conversion of ‘tex->Texture::height’ from ‘int’ to ‘float’ [-Wnarrowing]
+  310 |         DrawTexturePro(tex, Rectangle{0,0,tex->width,tex->height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
+      |                                                      ~~~~~^~~~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/SDLutils.o -c src/SDLutils.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from include/SDLutils.hpp:3,
+                 from src/SDLutils.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from include/platformspesifics.hpp:3,
+                 from include/globals.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/settingsParser.o -c src/settingsParser.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/settingsParser.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/settingsParser.hpp:4,
+                 from src/settingsParser.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/state.o -c src/state.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/state.hpp:4,
+                 from src/state.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/gui.hpp:3,
+                 from include/state.hpp:3:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/state.cpp: In constructor ‘PlayMenu::PlayMenu()’:
+src/state.cpp:22:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   22 |     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 20);
+      |                                                           ^~~~~~
+src/state.cpp:23:61: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   23 |     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 20);
+      |                                                             ^~~~~~~~
+src/state.cpp:24:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   24 |     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 20);
+      |                                                           ^~~
+src/state.cpp: In member function ‘virtual void PlayMenu::init()’:
+src/state.cpp:42:39: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   42 |     std::vector<std::string> dir = ls(".osu");
+      |                                       ^~~~~~
+src/state.cpp: In member function ‘virtual void PlayMenu::update()’:
+src/state.cpp:107:31: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  107 |                 auto dir = ls(".osu");
+      |                               ^~~~~~
+src/state.cpp:129:23: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  129 |         auto dir = ls(".osu");
+      |                       ^~~~~~
+src/state.cpp: In constructor ‘LoadMenu::LoadMenu()’:
+src/state.cpp:148:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  148 |     back = Button({395,360}, {120,40}, {255,135,198,255}, "Back", BLACK, 20);
+      |                                                           ^~~~~~
+src/state.cpp:149:61: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  149 |     select = Button({520,360}, {120,40}, {255,135,198,255}, "Select", BLACK, 20);
+      |                                                             ^~~~~~~~
+src/state.cpp:150:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  150 |     close = Button({70, 110}, {20,20}, {255,135,198,255}, "x", BLACK, 20);
+      |                                                           ^~~
+src/state.cpp:151:19: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  151 |     auto dir = ls(".osz");
+      |                   ^~~~~~
+src/state.cpp: In member function ‘virtual void LoadMenu::update()’:
+src/state.cpp:206:31: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  206 |                 auto dir = ls(".osz");
+      |                               ^~~~~~
+src/state.cpp:231:23: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  231 |         auto dir = ls(".osz");
+      |                       ^~~~~~
+src/state.cpp: In constructor ‘MainMenu::MainMenu()’:
+src/state.cpp:249:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  249 |     play = Button({250,420}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
+      |                                                           ^~~~~~
+src/state.cpp:250:56: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  250 |     wip = Button({320,340}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
+      |                                                        ^~~~~
+src/state.cpp:251:57: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  251 |     wip2 = Button({320,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
+      |                                                         ^~~~~~
+src/state.cpp:252:59: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  252 |     load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
+      |                                                           ^~~~~~
+src/state.cpp: In member function ‘virtual void MainMenu::update()’:
+src/state.cpp:394:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  394 |         files = ls(".db");
+      |                    ^~~~~
+src/state.cpp: In member function ‘virtual void Game::render()’:
+src/state.cpp:573:170: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  573 |             DrawTextEx(&Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                                                          ^~~~~~~~~~~~~~~~~~
+src/state.cpp:573:190: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)25)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  573 |             DrawTextEx(&Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                                                                              ^~~~~~~~~~~~~~~~~~~
+src/state.cpp:579:208: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  579 |             DrawTextEx(&Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(&Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                                                                                                ^~~~~~~~~~~~~~~~~~
+src/state.cpp:579:228: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)25)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  579 |             DrawTextEx(&Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(&Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                                                                                                                    ^~~~~~~~~~~~~~~~~~~
+src/state.cpp:581:123: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  581 |                 DrawTextEx(&Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {(int)ScaleCordX(5), (int)ScaleCordY(40)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                           ^~~~~~~~~~~~~~~~~~
+src/state.cpp:581:143: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)40)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  581 |                 DrawTextEx(&Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {(int)ScaleCordX(5), (int)ScaleCordY(40)}, Scale(20.05) , Scale(2), WHITE);
+      |                                                                                                                                               ^~~~~~~~~~~~~~~~~~~
+src/state.cpp:584:77: warning: narrowing conversion of ‘((double)GetScreenWidth()() * ((Global.Globals::currentOsuTime / 1.0e+3) / ((double)GetMusicTimeLength((& Global.Globals::gameManager->GameManager::backgroundMusic)))))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  584 |             DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(&Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
+      |                                                            ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:605:59: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)320 - (float)message.std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size()() * 7.5e+0f)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  605 |         DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:605:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)220)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  605 |         DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~
+src/state.cpp:638:59: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)320 - (float)message.std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::size()() * 7.5e+0f)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  638 |         DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:638:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)220)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  638 |         DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~
+src/state.cpp: In member function ‘virtual void WIPMenu::init()’:
+src/state.cpp:678:14: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  678 |     dir = ls(".osu");
+      |              ^~~~~~
+src/state.cpp:747:76: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  747 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                            ^~~~~~~~~~~~~~~~~~
+src/state.cpp:747:96: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  747 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                ^~~~~~~~~~~~~~~~~~
+src/state.cpp: In member function ‘virtual void WIPMenu::render()’:
+src/state.cpp:794:69: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  794 |     DrawTextureCenter(&back, 145, 240, 0.45f, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                 ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:796:78: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  796 |         DrawTextLeft((TempMeta[0]).c_str(), 25, 55, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                          ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:797:78: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  797 |         DrawTextLeft((TempMeta[1]).c_str(), 25, 70, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                          ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:798:78: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  798 |         DrawTextLeft((TempMeta[2]).c_str(), 25, 85, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                          ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:799:79: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  799 |         DrawTextLeft((TempMeta[3]).c_str(), 25, 100, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                           ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:800:79: warning: narrowing conversion of ‘((float)255 * easeInOutCubic(((WIPMenu*)this)->WIPMenu::animtime))’ from ‘float’ to ‘unsigned char’ [-Wnarrowing]
+  800 |         DrawTextLeft((TempMeta[4]).c_str(), 25, 115, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+      |                                                                           ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp: In member function ‘virtual void WIPMenu::update()’:
+src/state.cpp:928:88: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  928 |                     DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                        ^~~~~~~~~~~~~~~~~~
+src/state.cpp:928:108: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  928 |                     DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                            ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1001:88: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1001 |                     DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                        ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1001:108: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1001 |                     DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                            ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1130:80: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1130 |             DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                ^~~~~~~~~~~~~~~~~~
+src/state.cpp:1130:100: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1130 |             DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                    ^~~~~~~~~~~~~~~~~~
+src/state.cpp: In constructor ‘ResultsMenu::ResultsMenu()’:
+src/state.cpp:1161:61: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1161 |     close = Button({480, 440}, {160,30}, {255,135,198,255}, "Back to menu", BLACK, 20);
+      |                                                             ^~~~~~~~~~~~~~
+src/state.cpp: In member function ‘virtual void WipMenu2::render()’:
+src/state.cpp:1487:60: warning: narrowing conversion of ‘(int)ScaleCordX(float)(r.Rectangle::x + (float)10)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1487 |             DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+      |                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:1487:87: warning: narrowing conversion of ‘(int)ScaleCordY(float)(r.Rectangle::y + (float)18 - (float)10)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1487 |             DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+      |                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:1496:60: warning: narrowing conversion of ‘(int)ScaleCordX(float)(r.Rectangle::x + (float)10)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1496 |             DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+      |                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/state.cpp:1496:87: warning: narrowing conversion of ‘(int)ScaleCordY(float)(r.Rectangle::y + (float)18 - (float)10)’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 1496 |             DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+      |                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/utils.o -c src/utils.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from src/utils.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/utils.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/utils.cpp: In function ‘void GetMouse()’:
+src/utils.cpp:94:102: warning: narrowing conversion of ‘GetScreenWidth()’ from ‘int’ to ‘float’ [-Wnarrowing]
+   94 |     Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
+      |                                                                                        ~~~~~~~~~~~~~~^~
+src/utils.cpp:94:121: warning: narrowing conversion of ‘GetScreenHeight()’ from ‘int’ to ‘float’ [-Wnarrowing]
+   94 |     Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
+      |                                                                                                          ~~~~~~~~~~~~~~~^~
+src/utils.cpp: In function ‘void DrawSpinnerMeter(Texture2D*, float)’:
+src/utils.cpp:259:55: warning: narrowing conversion of ‘tex->Texture::width’ from ‘int’ to ‘float’ [-Wnarrowing]
+  259 |     Rectangle source = {0,tex->height*(1.0f-per),tex->width, tex->height*per};
+      |                                                  ~~~~~^~~~~
+src/utils.cpp:260:44: warning: narrowing conversion of ‘tex->Texture::width’ from ‘int’ to ‘float’ [-Wnarrowing]
+  260 |     DrawTexturePro(tex, Rectangle{0,0,tex->width, tex->height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
+      |                                       ~~~~~^~~~~
+src/utils.cpp:260:56: warning: narrowing conversion of ‘tex->Texture::height’ from ‘int’ to ‘float’ [-Wnarrowing]
+  260 |     DrawTexturePro(tex, Rectangle{0,0,tex->width, tex->height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
+      |                                                   ~~~~~^~~~~~
+src/utils.cpp: In function ‘void DrawSpinnerBack(Texture2D*, Color)’:
+src/utils.cpp:276:34: warning: narrowing conversion of ‘tex->Texture::width’ from ‘int’ to ‘float’ [-Wnarrowing]
+  276 |     Rectangle source = {0,0,tex->width, tex->height};
+      |                             ~~~~~^~~~~
+src/utils.cpp:276:46: warning: narrowing conversion of ‘tex->Texture::height’ from ‘int’ to ‘float’ [-Wnarrowing]
+  276 |     Rectangle source = {0,0,tex->width, tex->height};
+      |                                         ~~~~~^~~~~~
+src/utils.cpp: In function ‘std::string getSampleSetFromInt(int)’:
+src/utils.cpp:244:1: warning: control reaches end of non-void function [-Wreturn-type]
+  244 | }
+      | ^
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -o bin/osus.exe object/fastrender.o object/followpoint.o object/fs.o object/gamemanager.o object/gui.o object/hitobjectcircle.o object/hitobjectslider.o object/hitobjectspinner.o object/linkedListImpl.o object/main.o object/parser.o object/platformspesifics.o object/SDLutils.o object/settingsParser.o object/state.o object/time_util.o object/utils.o -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -L/usr/x86_64-w64-mingw32/lib -lSDL2main -lSDL2 -lm -lole32 -loleaut32 -limm32 -lwinmm -lpthread -lgdi32 -lopengl32 -lversion -lsetupapi -lhid
+mkdir -p beatmaps
+bin/osus.exe 
+GLAD: version 40006
+GLAD: trying to load
+GLAD: LOADING VERSION 1.0
+GLAD: LOADING VERSION 1.1
+GLAD: LOADING VERSION 1.2
+GLAD: LOADING VERSION 1.3
+GLAD: LOADING VERSION 1.4
+GLAD: LOADING VERSION 1.5
+GLAD: LOADING VERSION 2.0
+GLAD: LOADING VERSION 2.1
+GLAD: LOADING VERSION 3.0
+GLAD: LOADING VERSION 3.1
+GLAD: LOADING VERSION 3.2
+GLAD: LOADING VERSION 3.3
+GLAD: LOADING VERSION 4.0
+GLAD: LOADING VERSION 4.1
+GLAD: LOADING VERSION 4.2
+GLAD: LOADING VERSION 4.3
+Extensions LIST: (null)
+GLAD_GL_EXT_framebuffer_object: 1 
+GLAD: loading finished
+rlgl version:2
+-37
+parsing the settings.ini file...
+Loaded gamepath
+Starting render loop
+Free Vram: -37
+Free M_ALL: -37/-37
+Free M_APP: -37/-37
+Free M_SYS: -37/-37
+Free M_BSE: -37/-37
+Free M_LIN: -37/4294967259
+Render make gl current
+Clear first bg
+WARNING: FILEIO: [sdmc:/3ds/resources/osus.png] Failed to open file
+Loaded logo
+Loaded font
+WARNING: FILEIO: [sdmc:/3ds/resources/shaders/glsl100/outline.fs] Failed to open text file
+WARNING: FILEIO: [sdmc:/3ds/resources/shaders/glsl330/mcosu.vsh] Failed to open text file
+terminate called after throwing an instance of 'WARNING: FILEIO: [sdmc:/3ds/resources/shaders/glsl330/mcosu.fsh] Failed to open text file
+std::filesystem::__cxx11::filesystem_error'
+  what():  filesystem error: directory iterator cannot open directory: No such file or directory [sdmc:/3ds/resources/default_skin/]
+make: *** [MakefilePC:25: run] Error 9

@@ -897,9 +897,9 @@ void UnloadWave(Wave wave)
 }
 
 // Unload sound
-void UnloadSound(Sound sound)
+void UnloadSound(Sound * sound)
 {
-    UnloadAudioBuffer(sound.stream.buffer);
+    UnloadAudioBuffer(sound->stream.buffer);
     //TRACELOG(LOG_INFO, "SOUND: Unloaded sound data from RAM");
 }
 
@@ -1023,9 +1023,9 @@ bool ExportWaveAsCode(Wave wave, const char *fileName)
 }
 
 // Play a sound
-void PlaySound(Sound sound)
+void PlaySound(Sound * sound)
 {
-    PlayAudioBuffer(sound.stream.buffer);
+    PlayAudioBuffer(sound->stream.buffer);
 }
 
 // Play a sound in the multichannel buffer pool
@@ -1135,9 +1135,9 @@ bool IsSoundPlaying(Sound sound)
 }
 
 // Set volume for a sound
-void SetSoundVolume(Sound sound, float volume)
+void SetSoundVolume(Sound * sound, float volume)
 {
-    SetAudioBufferVolume(sound.stream.buffer, volume);
+    SetAudioBufferVolume(sound->stream.buffer, volume);
 }
 
 // Set pitch for a sound
@@ -1147,9 +1147,9 @@ void SetSoundPitch(Sound sound, float pitch)
 }
 
 // Set pan for a sound
-void SetSoundPan(Sound sound, float pan)
+void SetSoundPan(Sound * sound, float pan)
 {
-    SetAudioBufferPan(sound.stream.buffer, pan);
+    SetAudioBufferPan(sound->stream.buffer, pan);
 }
 
 // Convert wave data to desired format
@@ -1611,46 +1611,46 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
 }
 
 // Unload music stream
-void UnloadMusicStream(Music music)
+void UnloadMusicStream(Music * music)
 {
-    UnloadAudioStream(music.stream);
+    UnloadAudioStream(music->stream);
 
-    if (music.ctxData != NULL)
+    if (music->ctxData != NULL)
     {
         if (false) { }
 #if defined(SUPPORT_FILEFORMAT_WAV)
-        else if (music.ctxType == MUSIC_AUDIO_WAV) drwav_uninit((drwav *)music.ctxData);
+        else if (music->ctxType == MUSIC_AUDIO_WAV) drwav_uninit((drwav *)music->ctxData);
 #endif
 #if defined(SUPPORT_FILEFORMAT_OGG)
-        else if (music.ctxType == MUSIC_AUDIO_OGG) stb_vorbis_close((stb_vorbis *)music.ctxData);
+        else if (music->ctxType == MUSIC_AUDIO_OGG) stb_vorbis_close((stb_vorbis *)music->ctxData);
 #endif
 #if defined(SUPPORT_FILEFORMAT_FLAC)
-        else if (music.ctxType == MUSIC_AUDIO_FLAC) drflac_free((drflac *)music.ctxData, NULL);
+        else if (music->ctxType == MUSIC_AUDIO_FLAC) drflac_free((drflac *)music->ctxData, NULL);
 #endif
 #if defined(SUPPORT_FILEFORMAT_MP3)
-    else if (music.ctxType == MUSIC_AUDIO_MP3) { drmp3_uninit((drmp3 *)music.ctxData); RL_FREE(music.ctxData); }
+    else if (music->ctxType == MUSIC_AUDIO_MP3) { drmp3_uninit((drmp3 *)music->ctxData); RL_FREE(music->ctxData); }
 #endif
 #if defined(SUPPORT_FILEFORMAT_XM)
-        else if (music.ctxType == MUSIC_MODULE_XM) jar_xm_free_context((jar_xm_context_t *)music.ctxData);
+        else if (music->ctxType == MUSIC_MODULE_XM) jar_xm_free_context((jar_xm_context_t *)music->ctxData);
 #endif
 #if defined(SUPPORT_FILEFORMAT_MOD)
-        else if (music.ctxType == MUSIC_MODULE_MOD) { jar_mod_unload((jar_mod_context_t *)music.ctxData); RL_FREE(music.ctxData); }
+        else if (music->ctxType == MUSIC_MODULE_MOD) { jar_mod_unload((jar_mod_context_t *)music->ctxData); RL_FREE(music->ctxData); }
 #endif
     }
 }
 
 // Start music playing (open stream)
-void PlayMusicStream(Music music)
+void PlayMusicStream(Music * music)
 {
-    if (music.stream.buffer != NULL)
+    if (music->stream.buffer != NULL)
     {
         // For music streams, we need to make sure we maintain the frame cursor position
         // This is a hack for this section of code in UpdateMusicStream()
         // NOTE: In case window is minimized, music stream is stopped, just make sure to
         // play again on window restore: if (IsMusicStreamPlaying(music)) PlayMusicStream(music);
-        ma_uint32 frameCursorPos = music.stream.buffer->frameCursorPos;
-        PlayAudioStream(music.stream);  // WARNING: This resets the cursor position.
-        music.stream.buffer->frameCursorPos = frameCursorPos;
+        ma_uint32 frameCursorPos = music->stream.buffer->frameCursorPos;
+        PlayAudioStream(music->stream);  // WARNING: This resets the cursor position.
+        music->stream.buffer->frameCursorPos = frameCursorPos;
     }
 }
 
@@ -1667,92 +1667,92 @@ void ResumeMusicStream(Music music)
 }
 
 // Stop music playing (close stream)
-void StopMusicStream(Music music)
+void StopMusicStream(Music * music)
 {
-    StopAudioStream(music.stream);
+    StopAudioStream(music->stream);
 
-    switch (music.ctxType)
+    switch (music->ctxType)
     {
 #if defined(SUPPORT_FILEFORMAT_WAV)
-        case MUSIC_AUDIO_WAV: drwav_seek_to_pcm_frame((drwav *)music.ctxData, 0); break;
+        case MUSIC_AUDIO_WAV: drwav_seek_to_pcm_frame((drwav *)music->ctxData, 0); break;
 #endif
 #if defined(SUPPORT_FILEFORMAT_OGG)
-        case MUSIC_AUDIO_OGG: stb_vorbis_seek_start((stb_vorbis *)music.ctxData); break;
+        case MUSIC_AUDIO_OGG: stb_vorbis_seek_start((stb_vorbis *)music->ctxData); break;
 #endif
 #if defined(SUPPORT_FILEFORMAT_FLAC)
-        case MUSIC_AUDIO_FLAC: drflac_seek_to_pcm_frame((drflac *)music.ctxData, 0); break;
+        case MUSIC_AUDIO_FLAC: drflac_seek_to_pcm_frame((drflac *)music->ctxData, 0); break;
 #endif
 #if defined(SUPPORT_FILEFORMAT_MP3)
-        case MUSIC_AUDIO_MP3: drmp3_seek_to_pcm_frame((drmp3 *)music.ctxData, 0); break;
+        case MUSIC_AUDIO_MP3: drmp3_seek_to_pcm_frame((drmp3 *)music->ctxData, 0); break;
 #endif
 #if defined(SUPPORT_FILEFORMAT_XM)
-        case MUSIC_MODULE_XM: jar_xm_reset((jar_xm_context_t *)music.ctxData); break;
+        case MUSIC_MODULE_XM: jar_xm_reset((jar_xm_context_t *)music->ctxData); break;
 #endif
 #if defined(SUPPORT_FILEFORMAT_MOD)
-        case MUSIC_MODULE_MOD: jar_mod_seek_start((jar_mod_context_t *)music.ctxData); break;
+        case MUSIC_MODULE_MOD: jar_mod_seek_start((jar_mod_context_t *)music->ctxData); break;
 #endif
         default: break;
     }
 }
 
 // Seek music to a certain position (in seconds)
-void SeekMusicStream(Music music, float position)
+void SeekMusicStream(Music * music, float position)
 {
     // Seeking is not supported in module formats
-    if ((music.ctxType == MUSIC_MODULE_XM) || (music.ctxType == MUSIC_MODULE_MOD)) return;
+    if ((music->ctxType == MUSIC_MODULE_XM) || (music->ctxType == MUSIC_MODULE_MOD)) return;
 
-    unsigned int positionInFrames = (unsigned int)(position*music.stream.sampleRate);
+    unsigned int positionInFrames = (unsigned int)(position*music->stream.sampleRate);
 
-    switch (music.ctxType)
+    switch (music->ctxType)
     {
 #if defined(SUPPORT_FILEFORMAT_WAV)
-        case MUSIC_AUDIO_WAV: drwav_seek_to_pcm_frame((drwav *)music.ctxData, positionInFrames); break;
+        case MUSIC_AUDIO_WAV: drwav_seek_to_pcm_frame((drwav *)music->ctxData, positionInFrames); break;
 #endif
 #if defined(SUPPORT_FILEFORMAT_OGG)
-        case MUSIC_AUDIO_OGG: stb_vorbis_seek_frame((stb_vorbis *)music.ctxData, positionInFrames); break;
+        case MUSIC_AUDIO_OGG: stb_vorbis_seek_frame((stb_vorbis *)music->ctxData, positionInFrames); break;
 #endif
 #if defined(SUPPORT_FILEFORMAT_FLAC)
-        case MUSIC_AUDIO_FLAC: drflac_seek_to_pcm_frame((drflac *)music.ctxData, positionInFrames); break;
+        case MUSIC_AUDIO_FLAC: drflac_seek_to_pcm_frame((drflac *)music->ctxData, positionInFrames); break;
 #endif
 #if defined(SUPPORT_FILEFORMAT_MP3)
-        case MUSIC_AUDIO_MP3: drmp3_seek_to_pcm_frame((drmp3 *)music.ctxData, positionInFrames); break;
+        case MUSIC_AUDIO_MP3: drmp3_seek_to_pcm_frame((drmp3 *)music->ctxData, positionInFrames); break;
 #endif
         default: break;
     }
 
-    music.stream.buffer->framesProcessed = positionInFrames;
+    music->stream.buffer->framesProcessed = positionInFrames;
 }
 
 // Update (re-fill) music buffers if data already processed
-void UpdateMusicStream(Music music)
+void UpdateMusicStream(Music * music)
 {
-    if (music.stream.buffer == NULL) return;
+    if (music->stream.buffer == NULL) return;
 
     bool streamEnding = false;
-    unsigned int subBufferSizeInFrames = music.stream.buffer->sizeInFrames/2;
+    unsigned int subBufferSizeInFrames = music->stream.buffer->sizeInFrames/2;
 
     // NOTE: Using dynamic allocation because it could require more than 16KB
-    void *pcm = RL_CALLOC(subBufferSizeInFrames*music.stream.channels*music.stream.sampleSize/8, 1);
+    void *pcm = RL_CALLOC(subBufferSizeInFrames*music->stream.channels*music->stream.sampleSize/8, 1);
 
     int frameCountToStream = 0;    // Total size of data in frames to be streamed
 
     // TODO: Get the framesLeft using framesProcessed... but first, get total frames processed correctly...
     //ma_uint32 frameSizeInBytes = ma_get_bytes_per_sample(music.stream.buffer->dsp.formatConverterIn.config.formatIn)*music.stream.buffer->dsp.formatConverterIn.config.channels;
-    unsigned int framesLeft = music.frameCount - music.stream.buffer->framesProcessed;
+    unsigned int framesLeft = music->frameCount - music->stream.buffer->framesProcessed;
 
-    while (IsAudioStreamProcessed(music.stream))
+    while (IsAudioStreamProcessed(music->stream))
     {
         if (framesLeft >= subBufferSizeInFrames) frameCountToStream = subBufferSizeInFrames;
         else frameCountToStream = framesLeft;
 
-        switch (music.ctxType)
+        switch (music->ctxType)
         {
         #if defined(SUPPORT_FILEFORMAT_WAV)
             case MUSIC_AUDIO_WAV:
             {
                 // NOTE: Returns the number of samples to process (not required)
-                if (music.stream.sampleSize == 16) drwav_read_pcm_frames_s16((drwav *)music.ctxData, frameCountToStream, (short *)pcm);
-                else if (music.stream.sampleSize == 32) drwav_read_pcm_frames_f32((drwav *)music.ctxData, frameCountToStream, (float *)pcm);
+                if (music->stream.sampleSize == 16) drwav_read_pcm_frames_s16((drwav *)music->ctxData, frameCountToStream, (short *)pcm);
+                else if (music->stream.sampleSize == 32) drwav_read_pcm_frames_f32((drwav *)music->ctxData, frameCountToStream, (float *)pcm);
 
             } break;
         #endif
@@ -1760,7 +1760,7 @@ void UpdateMusicStream(Music music)
             case MUSIC_AUDIO_OGG:
             {
                 // NOTE: Returns the number of samples to process (be careful! we ask for number of shorts!)
-                stb_vorbis_get_samples_short_interleaved((stb_vorbis *)music.ctxData, music.stream.channels, (short *)pcm, frameCountToStream*music.stream.channels);
+                stb_vorbis_get_samples_short_interleaved((stb_vorbis *)music->ctxData, music->stream.channels, (short *)pcm, frameCountToStream*music->stream.channels);
 
             } break;
         #endif
@@ -1768,14 +1768,14 @@ void UpdateMusicStream(Music music)
             case MUSIC_AUDIO_FLAC:
             {
                 // NOTE: Returns the number of samples to process (not required)
-                drflac_read_pcm_frames_s16((drflac *)music.ctxData, frameCountToStream*music.stream.channels, (short *)pcm);
+                drflac_read_pcm_frames_s16((drflac *)music->ctxData, frameCountToStream*music->stream.channels, (short *)pcm);
 
             } break;
         #endif
         #if defined(SUPPORT_FILEFORMAT_MP3)
             case MUSIC_AUDIO_MP3:
             {
-                drmp3_read_pcm_frames_f32((drmp3 *)music.ctxData, frameCountToStream, (float *)pcm);
+                drmp3_read_pcm_frames_f32((drmp3 *)music->ctxData, frameCountToStream, (float *)pcm);
 
             } break;
         #endif
@@ -1783,9 +1783,9 @@ void UpdateMusicStream(Music music)
             case MUSIC_MODULE_XM:
             {
                 // NOTE: Internally we consider 2 channels generation, so sampleCount/2
-                if (AUDIO_DEVICE_FORMAT == ma_format_f32) jar_xm_generate_samples((jar_xm_context_t *)music.ctxData, (float *)pcm, frameCountToStream);
-                else if (AUDIO_DEVICE_FORMAT == ma_format_s16) jar_xm_generate_samples_16bit((jar_xm_context_t *)music.ctxData, (short *)pcm, frameCountToStream);
-                else if (AUDIO_DEVICE_FORMAT == ma_format_u8) jar_xm_generate_samples_8bit((jar_xm_context_t *)music.ctxData, (char *)pcm, frameCountToStream);
+                if (AUDIO_DEVICE_FORMAT == ma_format_f32) jar_xm_generate_samples((jar_xm_context_t *)music->ctxData, (float *)pcm, frameCountToStream);
+                else if (AUDIO_DEVICE_FORMAT == ma_format_s16) jar_xm_generate_samples_16bit((jar_xm_context_t *)music->ctxData, (short *)pcm, frameCountToStream);
+                else if (AUDIO_DEVICE_FORMAT == ma_format_u8) jar_xm_generate_samples_8bit((jar_xm_context_t *)music->ctxData, (char *)pcm, frameCountToStream);
 
             } break;
         #endif
@@ -1793,13 +1793,13 @@ void UpdateMusicStream(Music music)
             case MUSIC_MODULE_MOD:
             {
                 // NOTE: 3rd parameter (nbsample) specify the number of stereo 16bits samples you want, so sampleCount/2
-                jar_mod_fillbuffer((jar_mod_context_t *)music.ctxData, (short *)pcm, frameCountToStream, 0);
+                jar_mod_fillbuffer((jar_mod_context_t *)music->ctxData, (short *)pcm, frameCountToStream, 0);
             } break;
         #endif
             default: break;
         }
 
-        UpdateAudioStream(music.stream, pcm, frameCountToStream);
+        UpdateAudioStream(music->stream, pcm, frameCountToStream);
 
         framesLeft -= frameCountToStream;
 
@@ -1817,7 +1817,7 @@ void UpdateMusicStream(Music music)
     if (streamEnding)
     {
         StopMusicStream(music);                     // Stop music (and reset)
-        if (music.looping) PlayMusicStream(music);  // Play again
+        if (music->looping) PlayMusicStream(music);  // Play again
     }
     else
     {
@@ -1828,15 +1828,15 @@ void UpdateMusicStream(Music music)
 }
 
 // Check if any music is playing
-bool IsMusicStreamPlaying(Music music)
+bool IsMusicStreamPlaying(Music * music)
 {
-    return IsAudioStreamPlaying(music.stream);
+    return IsAudioStreamPlaying(music->stream);
 }
 
 // Set volume for music
-void SetMusicVolume(Music music, float volume)
+void SetMusicVolume(Music * music, float volume)
 {
-    SetAudioStreamVolume(music.stream, volume);
+    SetAudioStreamVolume(music->stream, volume);
 }
 
 // Set pitch for music
@@ -1852,35 +1852,35 @@ void SetMusicPan(Music music, float pan)
 }
 
 // Get music time length (in seconds)
-float GetMusicTimeLength(Music music)
+float GetMusicTimeLength(Music * music)
 {
     float totalSeconds = 0.0f;
 
-    totalSeconds = (float)music.frameCount/music.stream.sampleRate;
+    totalSeconds = (float)music->frameCount/music->stream.sampleRate;
 
     return totalSeconds;
 }
 
 // Get current music time played (in seconds)
-float GetMusicTimePlayed(Music music)
+float GetMusicTimePlayed(Music * music)
 {
     float secondsPlayed = 0.0f;
-    if (music.stream.buffer != NULL)
+    if (music->stream.buffer != NULL)
     {
     #if defined(SUPPORT_FILEFORMAT_XM)
-        if (music.ctxType == MUSIC_MODULE_XM)
+        if (music->ctxType == MUSIC_MODULE_XM)
         {
             uint64_t framesPlayed = 0;
 
-            jar_xm_get_position(music.ctxData, NULL, NULL, NULL, &framesPlayed);
-            secondsPlayed = (float)framesPlayed/music.stream.sampleRate;
+            jar_xm_get_position(music->ctxData, NULL, NULL, NULL, &framesPlayed);
+            secondsPlayed = (float)framesPlayed/music->stream.sampleRate;
         }
         else
     #endif
         {
             //ma_uint32 frameSizeInBytes = ma_get_bytes_per_sample(music.stream.buffer->dsp.formatConverterIn.config.formatIn)*music.stream.buffer->dsp.formatConverterIn.config.channels;
-            unsigned int framesPlayed = music.stream.buffer->framesProcessed;
-            secondsPlayed = (float)framesPlayed/music.stream.sampleRate;
+            unsigned int framesPlayed = music->stream.buffer->framesProcessed;
+            secondsPlayed = (float)framesPlayed/music->stream.sampleRate;
         }
     }
 
@@ -2508,11 +2508,11 @@ static bool SaveFileText(const char *fileName, char *text)
 
 #endif      // SUPPORT_MODULE_RAUDIO
 
-bool IsSoundReady(Sound sound)
+bool IsSoundReady(Sound * sound)
 {
-    return ((sound.frameCount > 0) &&           // Validate frame count
-            (sound.stream.buffer != NULL) &&    // Validate stream buffer
-            (sound.stream.sampleRate > 0) &&    // Validate sample rate is supported
-            (sound.stream.sampleSize > 0) &&    // Validate sample size is supported
-            (sound.stream.channels > 0));       // Validate number of channels supported
+    return ((sound->frameCount > 0) &&           // Validate frame count
+            (sound->stream.buffer != NULL) &&    // Validate stream buffer
+            (sound->stream.sampleRate > 0) &&    // Validate sample rate is supported
+            (sound->stream.sampleSize > 0) &&    // Validate sample size is supported
+            (sound->stream.channels > 0));       // Validate number of channels supported
 }

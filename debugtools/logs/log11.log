@@ -1,0 +1,23 @@
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectslider.o -c src/hitobjectslider.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectslider.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectslider.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/hitobjectslider.cpp: In member function ‘virtual void Slider::render()’:
+src/hitobjectslider.cpp:1104:37: error: ‘DrawCircleWithDepthGrad’ was not declared in this scope; did you mean ‘DrawCircleWithDepth’?
+ 1104 |                                     DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.76)  * Global.sliderTexSize, Global.circleSector*2, 0.4f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
+      |                                     ^~~~~~~~~~~~~~~~~~~~~~~
+      |                                     DrawCircleWithDepth
+make: *** [MakefilePC:31: object/hitobjectslider.o] Error 1

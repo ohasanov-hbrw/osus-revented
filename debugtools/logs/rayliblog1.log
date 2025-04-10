@@ -1,0 +1,1812 @@
+rm -rf vendor/raylib/src/*.o vendor/raylib/src/libraylib.a bin/osus   object/fastrender.o  object/followpoint.o  object/fs.o  object/gamemanager.o  object/gui.o  object/hitobjectcircle.o  object/hitobjectslider.o  object/hitobjectspinner.o  object/linkedListImpl.o  object/main.o  object/parser.o  object/platformspesifics.o  object/SDLutils.o  object/settingsParser.o  object/state.o  object/time_util.o  object/utils.o object/*.d vendor/zip/build SDL_mixer/build vendor/raylib/src/external/glfw/build
+cd vendor/raylib/src/ && make
+make[1]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/raylib/src'
+x86_64-w64-mingw32-gcc --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rcore.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rshapes.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rtextures.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rtext.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c utils.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32  -c rglfw.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rmodels.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c raudio.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+In file included from rshapes.c:57:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+In file included from rcore.c:125:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+In file included from rmodels.c:53:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+In file included from rtextures.c:74:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+In file included from rtext.c:62:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+In file included from rtext.c:76:
+external/stb_truetype.h:4962:15: warning: ‘stbtt_CompareUTF8toUTF16_bigendian’ defined but not used [-Wunused-function]
+ 4962 | STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const char *s2, int len2)
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4957:15: warning: ‘stbtt_FindMatchingFont’ defined but not used [-Wunused-function]
+ 4957 | STBTT_DEF int stbtt_FindMatchingFont(const unsigned char *fontdata, const char *name, int flags)
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4947:15: warning: ‘stbtt_GetNumberOfFonts’ defined but not used [-Wunused-function]
+ 4947 | STBTT_DEF int stbtt_GetNumberOfFonts(const unsigned char *data)
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4935:15: warning: ‘stbtt_BakeFontBitmap’ defined but not used [-Wunused-function]
+ 4935 | STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,
+      |               ^~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4822:23: warning: ‘stbtt_GetFontNameString’ defined but not used [-Wunused-function]
+ 4822 | STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int platformID, int encodingID, int languageID, int nameID)
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4765:16: warning: ‘stbtt_FreeSDF’ defined but not used [-Wunused-function]
+ 4765 | STBTT_DEF void stbtt_FreeSDF(unsigned char *bitmap, void *userdata)
+      |                ^~~~~~~~~~~~~
+external/stb_truetype.h:4363:16: warning: ‘stbtt_GetPackedQuad’ defined but not used [-Wunused-function]
+ 4363 | STBTT_DEF void stbtt_GetPackedQuad(const stbtt_packedchar *chardata, int pw, int ph, int char_index, float *xpos, float *ypos, stbtt_aligned_quad *q, int align_to_integer)
+      |                ^~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4350:16: warning: ‘stbtt_GetScaledFontVMetrics’ defined but not used [-Wunused-function]
+ 4350 | STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char *fontdata, int index, float size, float *ascent, float *descent, float *lineGap)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4338:15: warning: ‘stbtt_PackFontRange’ defined but not used [-Wunused-function]
+ 4338 | STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context *spc, const unsigned char *fontdata, int font_index, float font_size,
+      |               ^~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4005:16: warning: ‘stbtt_PackSetSkipMissingCodepoints’ defined but not used [-Wunused-function]
+ 4005 | STBTT_DEF void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc, int skip)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3995:16: warning: ‘stbtt_PackSetOversampling’ defined but not used [-Wunused-function]
+ 3995 | STBTT_DEF void stbtt_PackSetOversampling(stbtt_pack_context *spc, unsigned int h_oversample, unsigned int v_oversample)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3989:16: warning: ‘stbtt_PackEnd’ defined but not used [-Wunused-function]
+ 3989 | STBTT_DEF void stbtt_PackEnd  (stbtt_pack_context *spc)
+      |                ^~~~~~~~~~~~~
+external/stb_truetype.h:3957:15: warning: ‘stbtt_PackBegin’ defined but not used [-Wunused-function]
+ 3957 | STBTT_DEF int stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels, int pw, int ph, int stride_in_bytes, int padding, void *alloc_context)
+      |               ^~~~~~~~~~~~~~~
+external/stb_truetype.h:3859:16: warning: ‘stbtt_GetBakedQuad’ defined but not used [-Wunused-function]
+ 3859 | STBTT_DEF void stbtt_GetBakedQuad(const stbtt_bakedchar *chardata, int pw, int ph, int char_index, float *xpos, float *ypos, stbtt_aligned_quad *q, int opengl_fillrule)
+      |                ^~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3802:16: warning: ‘stbtt_MakeCodepointBitmap’ defined but not used [-Wunused-function]
+ 3802 | STBTT_DEF void stbtt_MakeCodepointBitmap(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int codepoint)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3787:16: warning: ‘stbtt_MakeCodepointBitmapSubpixelPrefilter’ defined but not used [-Wunused-function]
+ 3787 | STBTT_DEF void stbtt_MakeCodepointBitmapSubpixelPrefilter(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int oversample_x, int oversample_y, float *sub_x, float *sub_y, int codepoint)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3753:26: warning: ‘stbtt_GetGlyphBitmap’ defined but not used [-Wunused-function]
+ 3753 | STBTT_DEF unsigned char *stbtt_GetGlyphBitmap(const stbtt_fontinfo *info, float scale_x, float scale_y, int glyph, int *width, int *height, int *xoff, int *yoff)
+      |                          ^~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3708:16: warning: ‘stbtt_FreeBitmap’ defined but not used [-Wunused-function]
+ 3708 | STBTT_DEF void stbtt_FreeBitmap(unsigned char *bitmap, void *userdata)
+      |                ^~~~~~~~~~~~~~~~
+external/stb_truetype.h:2749:16: warning: ‘stbtt_GetCodepointBitmapBox’ defined but not used [-Wunused-function]
+ 2749 | STBTT_DEF void stbtt_GetCodepointBitmapBox(const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2711:15: warning: ‘stbtt_GetCodepointSVG’ defined but not used [-Wunused-function]
+ 2711 | STBTT_DEF int stbtt_GetCodepointSVG(const stbtt_fontinfo *info, int unicode_codepoint, const char **svg)
+      |               ^~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2672:16: warning: ‘stbtt_FreeShape’ defined but not used [-Wunused-function]
+ 2672 | STBTT_DEF void stbtt_FreeShape(const stbtt_fontinfo *info, stbtt_vertex *v)
+      |                ^~~~~~~~~~~~~~~
+external/stb_truetype.h:2652:16: warning: ‘stbtt_GetFontBoundingBox’ defined but not used [-Wunused-function]
+ 2652 | STBTT_DEF void stbtt_GetFontBoundingBox(const stbtt_fontinfo *info, int *x0, int *y0, int *x1, int *y1)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2641:16: warning: ‘stbtt_GetFontVMetricsOS2’ defined but not used [-Wunused-function]
+ 2641 | STBTT_DEF int  stbtt_GetFontVMetricsOS2(const stbtt_fontinfo *info, int *typoAscent, int *typoDescent, int *typoLineGap)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2622:16: warning: ‘stbtt_GetCodepointKernAdvance’ defined but not used [-Wunused-function]
+ 2622 | STBTT_DEF int  stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2332:15: warning: ‘stbtt_GetKerningTable’ defined but not used [-Wunused-function]
+ 2332 | STBTT_DEF int stbtt_GetKerningTable(const stbtt_fontinfo *info, stbtt_kerningentry* table, int table_length)
+      |               ^~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2317:16: warning: ‘stbtt_GetKerningTableLength’ defined but not used [-Wunused-function]
+ 2317 | STBTT_DEF int  stbtt_GetKerningTableLength(const stbtt_fontinfo *info)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:1646:15: warning: ‘stbtt_IsGlyphEmpty’ defined but not used [-Wunused-function]
+ 1646 | STBTT_DEF int stbtt_IsGlyphEmpty(const stbtt_fontinfo *info, int glyph_index)
+      |               ^~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:1641:15: warning: ‘stbtt_GetCodepointBox’ defined but not used [-Wunused-function]
+ 1641 | STBTT_DEF int stbtt_GetCodepointBox(const stbtt_fontinfo *info, int codepoint, int *x0, int *y0, int *x1, int *y1)
+      |               ^~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:1589:15: warning: ‘stbtt_GetCodepointShape’ defined but not used [-Wunused-function]
+ 1589 | STBTT_DEF int stbtt_GetCodepointShape(const stbtt_fontinfo *info, int unicode_codepoint, stbtt_vertex **vertices)
+      |               ^~~~~~~~~~~~~~~~~~~~~~~
+rcore.c:2962:13: warning: ‘SetupFramebuffer’ defined but not used [-Wunused-function]
+ 2962 | static void SetupFramebuffer(int width, int height)
+      |             ^~~~~~~~~~~~~~~~
+rcore.c:479:12: warning: ‘gifFrameCounter’ defined but not used [-Wunused-variable]
+  479 | static int gifFrameCounter = 0;             // GIF frames counter
+      |            ^~~~~~~~~~~~~~~
+rcore.c:475:12: warning: ‘screenshotCounter’ defined but not used [-Wunused-variable]
+  475 | static int screenshotCounter = 0;           // Screenshots counter
+      |            ^~~~~~~~~~~~~~~~~
+In file included from raudio.c:203:
+external/stb_vorbis.h: In function ‘stbv_decode_residue’:
+external/stb_vorbis.h:900:46: warning: statement with no effect [-Wunused-value]
+  900 | #define stbv_temp_free(f,p)                  0
+      |                                              ^
+external/stb_vorbis.h:2275:4: note: in expansion of macro ‘stbv_temp_free’
+ 2275 |    stbv_temp_free(f,part_classdata);
+      |    ^~~~~~~~~~~~~~
+external/stb_vorbis.h: In function ‘stbv_inverse_mdct’:
+external/stb_vorbis.h:900:46: warning: statement with no effect [-Wunused-value]
+  900 | #define stbv_temp_free(f,p)                  0
+      |                                              ^
+external/stb_vorbis.h:2924:4: note: in expansion of macro ‘stbv_temp_free’
+ 2924 |    stbv_temp_free(f,buf2);
+      |    ^~~~~~~~~~~~~~
+In file included from rlgl.h:790:
+rlgl.h: In function ‘rlGenTextureMipmaps’:
+external/glad.h:5129:22: warning: pointer ‘texData’ may be used after ‘realloc’ [-Wuse-after-free]
+ 5129 | #define glTexImage2D glad_glTexImage2D
+rlgl.h:3220:17: note: in expansion of macro ‘glTexImage2D’
+ 3220 |                 glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA8, mipWidth, mipHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char *)texData + offset);
+      |                 ^~~~~~~~~~~~
+In file included from rcore.c:115:
+In function ‘rlGenTextureMipmapsData’,
+    inlined from ‘rlGenTextureMipmaps’ at rlgl.h:3209:31:
+raylib.h:121:33: note: call to ‘realloc’ here
+  121 |     #define RL_REALLOC(ptr,sz)  realloc(ptr,sz)
+      |                                 ^~~~~~~~~~~~~~~
+rlgl.h:4659:27: note: in expansion of macro ‘RL_REALLOC’
+ 4659 |     unsigned char *temp = RL_REALLOC(data, size);
+      |                           ^~~~~~~~~~
+rlgl.h: In function ‘rlGenTextureMipmaps’:
+raylib.h:124:33: warning: pointer ‘texData’ used after ‘realloc’ [-Wuse-after-free]
+  124 |     #define RL_FREE(ptr)        free(ptr)
+      |                                 ^~~~~~~~~
+rlgl.h:3230:13: note: in expansion of macro ‘RL_FREE’
+ 3230 |             RL_FREE(texData); // Once mipmaps have been generated and data has been uploaded to GPU VRAM, we can discard RAM data
+      |             ^~~~~~~
+In function ‘rlGenTextureMipmapsData’,
+    inlined from ‘rlGenTextureMipmaps’ at rlgl.h:3209:31:
+raylib.h:121:33: note: call to ‘realloc’ here
+  121 |     #define RL_REALLOC(ptr,sz)  realloc(ptr,sz)
+      |                                 ^~~~~~~~~~~~~~~
+rlgl.h:4659:27: note: in expansion of macro ‘RL_REALLOC’
+ 4659 |     unsigned char *temp = RL_REALLOC(data, size);
+      |                           ^~~~~~~~~~
+raudio.c: At top level:
+raudio.c:900:6: error: conflicting types for ‘UnloadSound’; have ‘void(Sound *)’
+  900 | void UnloadSound(Sound * sound)
+      |      ^~~~~~~~~~~
+In file included from raudio.c:76:
+raylib.h:1505:12: note: previous declaration of ‘UnloadSound’ with type ‘void(Sound)’
+ 1505 | RLAPI void UnloadSound(Sound sound);                                  // Unload sound
+      |            ^~~~~~~~~~~
+raudio.c:1026:6: error: conflicting types for ‘PlaySound’; have ‘void(Sound *)’
+ 1026 | void PlaySound(Sound * sound)
+      |      ^~~~~~~~~
+raylib.h:1510:12: note: previous declaration of ‘PlaySound’ with type ‘void(Sound)’
+ 1510 | RLAPI void PlaySound(Sound sound);                                    // Play a sound
+      |            ^~~~~~~~~
+raudio.c:1138:6: error: conflicting types for ‘SetSoundVolume’; have ‘void(Sound *, float)’
+ 1138 | void SetSoundVolume(Sound * sound, float volume)
+      |      ^~~~~~~~~~~~~~
+raylib.h:1518:12: note: previous declaration of ‘SetSoundVolume’ with type ‘void(Sound,  float)’
+ 1518 | RLAPI void SetSoundVolume(Sound sound, float volume);                 // Set volume for a sound (1.0 is max level)
+      |            ^~~~~~~~~~~~~~
+raudio.c:1150:6: error: conflicting types for ‘SetSoundPan’; have ‘void(Sound *, float)’
+ 1150 | void SetSoundPan(Sound * sound, float pan)
+      |      ^~~~~~~~~~~
+raylib.h:1520:12: note: previous declaration of ‘SetSoundPan’ with type ‘void(Sound,  float)’
+ 1520 | RLAPI void SetSoundPan(Sound sound, float pan);                       // Set pan for a sound (0.5 is center)
+      |            ^~~~~~~~~~~
+raudio.c:1614:6: error: conflicting types for ‘UnloadMusicStream’; have ‘void(Music *)’
+ 1614 | void UnloadMusicStream(Music * music)
+      |      ^~~~~~~~~~~~~~~~~
+raylib.h:1530:12: note: previous declaration of ‘UnloadMusicStream’ with type ‘void(Music)’
+ 1530 | RLAPI void UnloadMusicStream(Music music);                            // Unload music stream
+      |            ^~~~~~~~~~~~~~~~~
+raudio.c:1643:6: error: conflicting types for ‘PlayMusicStream’; have ‘void(Music *)’
+ 1643 | void PlayMusicStream(Music * music)
+      |      ^~~~~~~~~~~~~~~
+raylib.h:1531:12: note: previous declaration of ‘PlayMusicStream’ with type ‘void(Music)’
+ 1531 | RLAPI void PlayMusicStream(Music music);                              // Start music playing
+      |            ^~~~~~~~~~~~~~~
+raudio.c:1670:6: error: conflicting types for ‘StopMusicStream’; have ‘void(Music *)’
+ 1670 | void StopMusicStream(Music * music)
+      |      ^~~~~~~~~~~~~~~
+raylib.h:1534:12: note: previous declaration of ‘StopMusicStream’ with type ‘void(Music)’
+ 1534 | RLAPI void StopMusicStream(Music music);                              // Stop music playing
+      |            ^~~~~~~~~~~~~~~
+raudio.c:1699:6: error: conflicting types for ‘SeekMusicStream’; have ‘void(Music *, float)’
+ 1699 | void SeekMusicStream(Music * music, float position)
+      |      ^~~~~~~~~~~~~~~
+raylib.h:1537:12: note: previous declaration of ‘SeekMusicStream’ with type ‘void(Music,  float)’
+ 1537 | RLAPI void SeekMusicStream(Music music, float position);              // Seek music to a position (in seconds)
+      |            ^~~~~~~~~~~~~~~
+raudio.c:1727:6: error: conflicting types for ‘UpdateMusicStream’; have ‘void(Music *)’
+ 1727 | void UpdateMusicStream(Music * music)
+      |      ^~~~~~~~~~~~~~~~~
+raylib.h:1533:12: note: previous declaration of ‘UpdateMusicStream’ with type ‘void(Music)’
+ 1533 | RLAPI void UpdateMusicStream(Music music);                            // Updates buffers for music streaming
+      |            ^~~~~~~~~~~~~~~~~
+raudio.c: In function ‘UpdateMusicStream’:
+raudio.c:1820:18: error: ‘music’ is a pointer; did you mean to use ‘->’?
+ 1820 |         if (music.looping) PlayMusicStream(music);  // Play again
+      |                  ^
+      |                  ->
+raudio.c:1826:34: error: incompatible type for argument 1 of ‘IsMusicStreamPlaying’
+ 1826 |         if (IsMusicStreamPlaying(music)) PlayMusicStream(music);
+      |                                  ^~~~~
+      |                                  |
+      |                                  Music *
+raylib.h:1532:39: note: expected ‘Music’ but argument is of type ‘Music *’
+ 1532 | RLAPI bool IsMusicStreamPlaying(Music music);                         // Check if music is playing
+      |                                 ~~~~~~^~~~~
+raudio.c: At top level:
+raudio.c:1831:6: error: conflicting types for ‘IsMusicStreamPlaying’; have ‘_Bool(Music *)’
+ 1831 | bool IsMusicStreamPlaying(Music * music)
+      |      ^~~~~~~~~~~~~~~~~~~~
+raylib.h:1532:12: note: previous declaration of ‘IsMusicStreamPlaying’ with type ‘_Bool(Music)’
+ 1532 | RLAPI bool IsMusicStreamPlaying(Music music);                         // Check if music is playing
+      |            ^~~~~~~~~~~~~~~~~~~~
+raudio.c:1837:6: error: conflicting types for ‘SetMusicVolume’; have ‘void(Music *, float)’
+ 1837 | void SetMusicVolume(Music * music, float volume)
+      |      ^~~~~~~~~~~~~~
+raylib.h:1538:12: note: previous declaration of ‘SetMusicVolume’ with type ‘void(Music,  float)’
+ 1538 | RLAPI void SetMusicVolume(Music music, float volume);                 // Set volume for music (1.0 is max level)
+      |            ^~~~~~~~~~~~~~
+raudio.c:1855:7: error: conflicting types for ‘GetMusicTimeLength’; have ‘float(Music *)’
+ 1855 | float GetMusicTimeLength(Music * music)
+      |       ^~~~~~~~~~~~~~~~~~
+raylib.h:1541:13: note: previous declaration of ‘GetMusicTimeLength’ with type ‘float(Music)’
+ 1541 | RLAPI float GetMusicTimeLength(Music music);                          // Get music time length (in seconds)
+      |             ^~~~~~~~~~~~~~~~~~
+raudio.c:1865:7: error: conflicting types for ‘GetMusicTimePlayed’; have ‘float(Music *)’
+ 1865 | float GetMusicTimePlayed(Music * music)
+      |       ^~~~~~~~~~~~~~~~~~
+raylib.h:1542:13: note: previous declaration of ‘GetMusicTimePlayed’ with type ‘float(Music)’
+ 1542 | RLAPI float GetMusicTimePlayed(Music music);                          // Get current music time played (in seconds)
+      |             ^~~~~~~~~~~~~~~~~~
+raudio.c: In function ‘ReadAudioBufferFramesInMixingFormat’:
+raudio.c:2231:19: warning: unused variable ‘result’ [-Wunused-variable]
+ 2231 |         ma_result result = ma_data_converter_get_required_input_frame_count(&audioBuffer->converter, outputFramesToProcessThisIteration, &inputFramesToProcessThisIteration);
+      |                   ^~~~~~
+raudio.c: At top level:
+raudio.c:2511:6: error: conflicting types for ‘IsSoundReady’; have ‘_Bool(Sound *)’
+ 2511 | bool IsSoundReady(Sound * sound)
+      |      ^~~~~~~~~~~~
+raylib.h:1526:12: note: previous declaration of ‘IsSoundReady’ with type ‘_Bool(Sound)’
+ 1526 | RLAPI bool IsSoundReady(Sound sound);
+      |            ^~~~~~~~~~~~
+make[1]: *** [Makefile:670: raudio.o] Error 1
+make[1]: *** Waiting for unfinished jobs....
+In file included from rmodels.c:43:
+external/par_shapes.h: In function ‘par_shapes_create_disk’:
+raylib.h:115:33: warning: argument 1 range [18446744069414584320, 18446744073709551610] exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]
+  115 |     #define RL_MALLOC(sz)       malloc(sz)
+      |                                 ^~~~~~~~~~
+rmodels.c:90:35: note: in expansion of macro ‘RL_MALLOC’
+   90 |     #define PAR_MALLOC(T, N) ((T*)RL_MALLOC(N*sizeof(T)))
+      |                                   ^~~~~~~~~
+external/par_shapes.h:741:23: note: in expansion of macro ‘PAR_MALLOC’
+  741 |     mesh->triangles = PAR_MALLOC(PAR_SHAPES_T, 3 * mesh->ntriangles);
+      |                       ^~~~~~~~~~
+In file included from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:46,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from raylib.h:80:
+/usr/x86_64-w64-mingw32/include/stdlib.h:538:17: note: in a call to allocation function ‘malloc’ declared here
+  538 |   void *__cdecl malloc(size_t _Size);
+      |                 ^~~~~~
+make[1]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/raylib/src'
+make: *** [MakefilePC:20: deps] Error 2
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fastrender.o -c src/fastrender.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/followpoint.o -c src/followpoint.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fs.o -c src/fs.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/gamemanager.o -c src/gamemanager.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/gui.o -c src/gui.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectcircle.o -c src/hitobjectcircle.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectslider.o -c src/hitobjectslider.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectspinner.o -c src/hitobjectspinner.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/linkedListImpl.o -c src/linkedListImpl.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/main.o -c src/main.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/parser.o -c src/parser.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/platformspesifics.o -c src/platformspesifics.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from include/fastrender.hpp:2,
+                 from src/fastrender.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/utils.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from src/gui.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/gui.hpp:3,
+                 from src/gui.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from src/main.cpp:11:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from src/main.cpp:8:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectslider.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectslider.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/followpoint.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/followpoint.hpp:5,
+                 from src/followpoint.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectcircle.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectcircle.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/gamemanager.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/parser.hpp:4,
+                 from include/gamemanager.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectspinner.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectspinner.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/fs.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from include/platformspesifics.hpp:7,
+                 from include/globals.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/parser.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/parser.hpp:4,
+                 from src/parser.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/SDLutils.o -c src/SDLutils.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/settingsParser.o -c src/settingsParser.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+src/hitobjectcircle.cpp: In member function ‘virtual void Circle::update()’:
+src/hitobjectcircle.cpp:32:28: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+   32 |             SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+src/hitobjectcircle.cpp:33:23: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+   33 |             PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp: In member function ‘void GameManager::update()’:
+src/gamemanager.cpp:310:105: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                         ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:310:124: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:315:108: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  315 |                                 if (CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f)){
+      |                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:319:72: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  319 |                                                         SetSoundVolume(&SoundFilesAll.data["combobreak"], 1.0f);
+src/gamemanager.cpp:320:67: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  320 |                                                         PlaySound(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:370:69: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  370 |                                                         SetSoundPan(&SoundFilesAll.data[sounds[soundIndex]], 1-clip(hitObject->data.x / 640.0, 0, 1));
+src/gamemanager.cpp:371:72: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  371 |                                                         SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f));
+src/gamemanager.cpp:372:67: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  372 |                                                         PlaySound(&SoundFilesAll.data[sounds[soundIndex]]);
+src/gamemanager.cpp:376:69: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  376 |                                                         SetSoundPan(&SoundFilesAll.data[sounds[soundIndex+1]], 1-clip(hitObject->data.x / 640.0, 0, 1));
+src/gamemanager.cpp:377:72: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  377 |                                                         SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex+1]], Global.hitVolume * ((float)volume/100.0f));
+src/gamemanager.cpp:378:67: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  378 |                                                         PlaySound(&SoundFilesAll.data[sounds[soundIndex+1]]);
+src/gamemanager.cpp:397:115: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  397 |                                         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
+      |                                                                                                   ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:403:80: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  403 |                                                                 SetSoundVolume(&SoundFilesAll.data["combobreak"], 1.0f);
+src/gamemanager.cpp:404:75: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  404 |                                                                 PlaySound(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:428:77: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  428 |                                                                 SetSoundPan(&SoundFilesAll.data[sounds[soundIndex]], 1-clip(hitObject->data.x / 640.0, 0, 1));
+src/gamemanager.cpp:429:80: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  429 |                                                                 SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f) );
+src/gamemanager.cpp:430:75: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  430 |                                                                 PlaySound(&SoundFilesAll.data[sounds[soundIndex]]);
+src/gamemanager.cpp:434:77: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  434 |                                                                 SetSoundPan(&SoundFilesAll.data[sounds[soundIndex+1]], 1-clip(hitObject->data.x / 640.0, 0, 1));
+src/gamemanager.cpp:435:80: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  435 |                                                                 SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex+1]], Global.hitVolume * ((float)volume/100.0f));
+src/gamemanager.cpp:436:75: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  436 |                                                                 PlaySound(&SoundFilesAll.data[sounds[soundIndex+1]]);
+src/gamemanager.cpp:480:77: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  480 |                                                                 SetSoundPan(&SoundFilesAll.data[sounds[soundIndex]], 1-clip(hitObject->data.x / 640.0, 0, 1));
+src/gamemanager.cpp:481:80: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  481 |                                                                 SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f));
+src/gamemanager.cpp:482:75: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  482 |                                                                 PlaySound(&SoundFilesAll.data[sounds[soundIndex]]);
+src/gamemanager.cpp:486:77: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  486 |                                                                 SetSoundPan(&SoundFilesAll.data[sounds[soundIndex+1]], 1-clip(hitObject->data.x / 640.0, 0, 1));
+src/gamemanager.cpp:487:80: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  487 |                                                                 SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex+1]], Global.hitVolume * ((float)volume/100.0f));
+src/gamemanager.cpp:488:75: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  488 |                                                                 PlaySound(&SoundFilesAll.data[sounds[soundIndex+1]]);
+src/gamemanager.cpp:496:98: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                  ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:117: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                                     ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:520:77: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  520 |                                                                 SetSoundPan(&SoundFilesAll.data[sounds[soundIndex]], 1-clip(hitObject->data.x / 640.0, 0, 1));
+src/gamemanager.cpp:521:80: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  521 |                                                                 SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f));
+src/gamemanager.cpp:522:75: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)soundIndex)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  522 |                                                                 PlaySound(&SoundFilesAll.data[sounds[soundIndex]]);
+src/hitobjectspinner.cpp: In member function ‘virtual void Spinner::render()’:
+src/hitobjectspinner.cpp:140:5: error: ‘DrawTextureRotate’ was not declared in this scope; did you mean ‘DrawTextureRec’?
+  140 |     DrawTextureRotate(&gm->spinnerBottom, data.x, data.y, (310.0f/gm->spinnerBottom.width), 0, Fade(spinnerColor, clampedFade));
+      |     ^~~~~~~~~~~~~~~~~
+      |     DrawTextureRec
+src/gamemanager.cpp:526:77: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  526 |                                                                 SetSoundPan(&SoundFilesAll.data[sounds[soundIndex+1]], 1-clip(hitObject->data.x / 640.0, 0, 1));
+src/gamemanager.cpp:527:80: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  527 |                                                                 SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex+1]], Global.hitVolume * ((float)volume/100.0f));
+src/gamemanager.cpp:528:75: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(soundIndex + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  528 |                                                                 PlaySound(&SoundFilesAll.data[sounds[soundIndex+1]]);
+src/gamemanager.cpp: In member function ‘void GameManager::render()’:
+src/gamemanager.cpp:739:28: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                            ^~~~~~~~~~~~~~~~~~~
+      |                            |
+      |                            Font*
+src/gamemanager.cpp: In member function ‘void GameManager::run()’:
+src/gamemanager.cpp:762:33: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  762 |                 PlayMusicStream(&backgroundMusic);
+      |                                 ^~~~~~~~~~~~~~~~
+      |                                 |
+      |                                 Music*
+src/gamemanager.cpp:765:24: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  765 |         SetMusicVolume(&backgroundMusic, Global.volume); //Global.volume
+      |                        ^~~~~~~~~~~~~~~~
+      |                        |
+      |                        Music*
+src/gamemanager.cpp:767:35: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  767 |                 UpdateMusicStream(&backgroundMusic);
+      |                                   ^~~~~~~~~~~~~~~~
+      |                                   |
+      |                                   Music*
+src/gamemanager.cpp:779:58: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  779 |                 double Time = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
+      |                                                          ^~~~~~~~~~~~~~~~
+      |                                                          |
+      |                                                          Music*
+src/gamemanager.cpp:791:40: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  791 |                         SetMusicVolume(&backgroundMusic, Global.volume);
+      |                                        ^~~~~~~~~~~~~~~~
+      |                                        |
+      |                                        Music*
+src/gamemanager.cpp:794:35: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  794 |                 UpdateMusicStream(&backgroundMusic);
+      |                                   ^~~~~~~~~~~~~~~~
+      |                                   |
+      |                                   Music*
+src/gamemanager.cpp:798:49: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  798 |                                 SeekMusicStream(&backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
+      |                                                 ^~~~~~~~~~~~~~~~
+      |                                                 |
+      |                                                 Music*
+src/gamemanager.cpp:803:36: error: ‘Music’ {aka ‘struct Music’} has no member named ‘ended’
+  803 |                 if(backgroundMusic.ended){
+      |                                    ^~~~~
+src/gamemanager.cpp:805:41: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  805 |                         StopMusicStream(&backgroundMusic);
+      |                                         ^~~~~~~~~~~~~~~~
+      |                                         |
+      |                                         Music*
+src/gamemanager.cpp:806:64: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  806 |                         TimerLast = (double)GetMusicTimeLength(&backgroundMusic) * 1000.0;
+      |                                                                ^~~~~~~~~~~~~~~~
+      |                                                                |
+      |                                                                Music*
+src/gamemanager.cpp:840:42: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  840 |                 if (IsMusicStreamPlaying(&backgroundMusic)){
+      |                                          ^~~~~~~~~~~~~~~~
+      |                                          |
+      |                                          Music*
+src/gamemanager.cpp:841:59: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  841 |                         Time = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
+      |                                                           ^~~~~~~~~~~~~~~~
+      |                                                           |
+      |                                                           Music*
+src/gamemanager.cpp:844:72: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  844 |                                 TimerLast = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
+      |                                                                        ^~~~~~~~~~~~~~~~
+      |                                                                        |
+      |                                                                        Music*
+src/gamemanager.cpp:861:42: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  861 |                 if (IsMusicStreamPlaying(&backgroundMusic)){
+      |                                          ^~~~~~~~~~~~~~~~
+      |                                          |
+      |                                          Music*
+src/gamemanager.cpp:862:48: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  862 |                         if (GetMusicTimePlayed(&backgroundMusic) * 1000.0 != 0)
+      |                                                ^~~~~~~~~~~~~~~~
+      |                                                |
+      |                                                Music*
+src/gamemanager.cpp:867:77: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  867 |                         if (!IsInterpolating || std::abs(GetMusicTimePlayed(&backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) > 8){
+      |                                                                             ^~~~~~~~~~~~~~~~
+      |                                                                             |
+      |                                                                             Music*
+src/gamemanager.cpp:868:103: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  868 |                                 Global.CurrentInterpolatedTime = ElapsedTime < 0 ? GetMusicTimePlayed(&backgroundMusic) * 1000.0: std::max(LastInterpolatedTime, GetMusicTimePlayed(&backgroundMusic) * 1000.0);
+      |                                                                                                       ^~~~~~~~~~~~~~~~
+      |                                                                                                       |
+      |                                                                                                       Music*
+src/gamemanager.cpp:868:181: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  868 |                                 Global.CurrentInterpolatedTime = ElapsedTime < 0 ? GetMusicTimePlayed(&backgroundMusic) * 1000.0: std::max(LastInterpolatedTime, GetMusicTimePlayed(&backgroundMusic) * 1000.0);
+      |                                                                                                                                                                                     ^~~~~~~~~~~~~~~~
+      |                                                                                                                                                                                     |
+      |                                                                                                                                                                                     Music*
+src/gamemanager.cpp:873:87: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  873 |                                 Global.CurrentInterpolatedTime += (GetMusicTimePlayed(&backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 5;
+      |                                                                                       ^~~~~~~~~~~~~~~~
+      |                                                                                       |
+      |                                                                                       Music*
+src/gamemanager.cpp:878:62: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  878 |                 Global.currentOsuTime = IsMusicStreamPlaying(&backgroundMusic) ? Global.CurrentInterpolatedTime : GetMusicTimePlayed(&backgroundMusic);
+      |                                                              ^~~~~~~~~~~~~~~~
+      |                                                              |
+      |                                                              Music*
+src/gamemanager.cpp:878:134: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  878 |                 Global.currentOsuTime = IsMusicStreamPlaying(&backgroundMusic) ? Global.CurrentInterpolatedTime : GetMusicTimePlayed(&backgroundMusic);
+      |                                                                                                                                      ^~~~~~~~~~~~~~~~
+      |                                                                                                                                      |
+      |                                                                                                                                      Music*
+src/gamemanager.cpp:881:41: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+  881 |                 if(IsMusicStreamPlaying(&backgroundMusic)){
+      |                                         ^~~~~~~~~~~~~~~~
+      |                                         |
+      |                                         Music*
+src/gamemanager.cpp: In member function ‘void GameManager::loadDefaultSkin(std::string)’:
+src/gamemanager.cpp:935:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  935 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:946:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  946 |                                 UnloadTexture(&hitCircleOverlay);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:950:47: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  950 |                                 UnloadTexture(&selectCircle);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:954:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  954 |                                 UnloadTexture(&hitCircle);
+      |                                               ^~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:958:47: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  958 |                                 UnloadTexture(&approachCircle);
+      |                                               ^~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:964:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  964 |                                 UnloadTexture(&hit300);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:970:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  970 |                                 UnloadTexture(&hit100);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:976:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  976 |                                 UnloadTexture(&hit50);
+      |                                               ^~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:980:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  980 |                                 UnloadTexture(&hit0);
+      |                                               ^~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:984:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  984 |                                 UnloadTexture(&sliderscorepoint);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:988:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderfollow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  988 |                                 UnloadTexture(&sliderfollow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:992:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  992 |                                 UnloadTexture(&sliderb);
+      |                                               ^~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:996:47: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  996 |                                 UnloadTexture(&reverseArrow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1000:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1000 |                                 UnloadTexture(&spinnerCircle);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1005:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerMetre’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1005 |                                 UnloadTexture(&spinnerMetre);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1010:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerBottom’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1010 |                                 UnloadTexture(&spinnerBottom);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1014:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerTop’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1014 |                                 UnloadTexture(&spinnerTop);
+      |                                               ^~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1018:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerApproachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1018 |                                 UnloadTexture(&spinnerApproachCircle);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1024:63: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[j]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1024 |                                                 UnloadTexture(&numbers[j]);
+      |                                                               ^~~~~~~~~~~
+      |                                                               |
+      |                                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSkin(std::string)’:
+src/gamemanager.cpp:1045:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1045 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:1056:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1056 |                                 UnloadTexture(&hitCircleOverlay);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1060:47: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1060 |                                 UnloadTexture(&selectCircle);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1064:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1064 |                                 UnloadTexture(&hitCircle);
+      |                                               ^~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1068:47: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1068 |                                 UnloadTexture(&approachCircle);
+      |                                               ^~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1074:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1074 |                                 UnloadTexture(&hit300);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1080:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1080 |                                 UnloadTexture(&hit100);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1086:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1086 |                                 UnloadTexture(&hit50);
+      |                                               ^~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1090:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1090 |                                 UnloadTexture(&hit0);
+      |                                               ^~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1094:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1094 |                                 UnloadTexture(&sliderscorepoint);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1098:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderfollow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1098 |                                 UnloadTexture(&sliderfollow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1102:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1102 |                                 UnloadTexture(&sliderb);
+      |                                               ^~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1106:47: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1106 |                                 UnloadTexture(&reverseArrow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1110:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1110 |                                 UnloadTexture(&spinnerCircle);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1115:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerMetre’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1115 |                                 UnloadTexture(&spinnerMetre);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1120:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerBottom’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1120 |                                 UnloadTexture(&spinnerBottom);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1124:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerTop’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1124 |                                 UnloadTexture(&spinnerTop);
+      |                                               ^~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1128:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerApproachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1128 |                                 UnloadTexture(&spinnerApproachCircle);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1134:63: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[j]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1134 |                                                 UnloadTexture(&numbers[j]);
+      |                                                               ^~~~~~~~~~~
+      |                                                               |
+      |                                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp: In member function ‘void GameManager::loadBeatmapSkin(std::string)’:
+src/gamemanager.cpp:1152:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1152 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:1165:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1165 |                                 UnloadTexture(&hitCircleOverlay);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1169:47: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1169 |                                 UnloadTexture(&selectCircle);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1173:47: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1173 |                                 UnloadTexture(&hitCircle);
+      |                                               ^~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1177:47: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1177 |                                 UnloadTexture(&approachCircle);
+      |                                               ^~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1183:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1183 |                                 UnloadTexture(&hit300);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1189:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1189 |                                 UnloadTexture(&hit100);
+      |                                               ^~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1195:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1195 |                                 UnloadTexture(&hit50);
+      |                                               ^~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1199:47: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1199 |                                 UnloadTexture(&hit0);
+      |                                               ^~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1203:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1203 |                                 UnloadTexture(&sliderscorepoint);
+      |                                               ^~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1207:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderfollow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1207 |                                 UnloadTexture(&sliderfollow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1211:47: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1211 |                                 UnloadTexture(&sliderb);
+      |                                               ^~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1215:47: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1215 |                                 UnloadTexture(&reverseArrow);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1219:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1219 |                                 UnloadTexture(&spinnerCircle);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1224:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerMetre’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1224 |                                 UnloadTexture(&spinnerMetre);
+      |                                               ^~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1229:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerBottom’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1229 |                                 UnloadTexture(&spinnerBottom);
+      |                                               ^~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1233:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerTop’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1233 |                                 UnloadTexture(&spinnerTop);
+      |                                               ^~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1237:47: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerApproachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1237 |                                 UnloadTexture(&spinnerApproachCircle);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~
+      |                                               |
+      |                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp:1243:63: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[j]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1243 |                                                 UnloadTexture(&numbers[j]);
+      |                                                               ^~~~~~~~~~~
+      |                                                               |
+      |                                                               Texture2D* {aka Texture*}
+src/gamemanager.cpp: In member function ‘void GameManager::loadGame(std::string)’:
+src/gamemanager.cpp:1321:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1321 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:1601:221: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+ 1601 |         difficultyMultiplier = ((hpdrainrate + std::stof(gameFile.configDifficulty["CircleSize"]) + std::stof(gameFile.configDifficulty["OverallDifficulty"]) + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(&backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
+      |                                                                                                                                                                                                                             ^~~~~~~~~~~~~~~~
+      |                                                                                                                                                                                                                             |
+      |                                                                                                                                                                                                                             Music*
+make: *** [MakefilePC:31: object/hitobjectcircle.o] Error 1
+make: *** Waiting for unfinished jobs....
+src/gamemanager.cpp:1772:39: error: ‘vramSpaceFree’ was not declared in this scope
+ 1772 |         std::cout << "Free Vram: " << vramSpaceFree() << std::endl;
+      |                                       ^~~~~~~~~~~~~
+src/main.cpp:30:1: error: ‘LightLock’ does not name a type
+   30 | LightLock stateLock;
+      | ^~~~~~~~~
+src/main.cpp:31:1: error: ‘LightLock’ does not name a type
+   31 | LightLock accessLock;
+      | ^~~~~~~~~
+src/main.cpp:32:1: error: ‘LightLock’ does not name a type
+   32 | LightLock osuGameLock;
+      | ^~~~~~~~~
+src/main.cpp:33:1: error: ‘LightLock’ does not name a type
+   33 | LightLock wholeRenderLock;
+      | ^~~~~~~~~
+src/main.cpp: In function ‘void RenderLoop(void*)’:
+src/main.cpp:64:5: error: ‘C3D_Init’ was not declared in this scope
+   64 |     C3D_Init(0x100000);//C3D_DEFAULT_CMDBUF_SIZE);
+      |     ^~~~~~~~
+src/gamemanager.cpp:1773:59: error: ‘MEMREGION_ALL’ was not declared in this scope
+ 1773 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                                           ^~~~~~~~~~~~~
+src/main.cpp:65:18: error: ‘C2D_DEFAULT_MAX_OBJECTS’ was not declared in this scope
+   65 |         C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~
+src/main.cpp:65:9: error: ‘C2D_Init’ was not declared in this scope
+   65 |         C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+      |         ^~~~~~~~
+src/main.cpp:75:48: error: ‘GFX_TOP’ was not declared in this scope
+   75 |         Global.window = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+      |                                                ^~~~~~~
+src/gamemanager.cpp:1773:40: error: ‘osGetMemRegionFree’ was not declared in this scope
+ 1773 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                        ^~~~~~~~~~~~~~~~~~
+make: *** [MakefilePC:31: object/hitobjectspinner.o] Error 1
+src/gui.cpp: In member function ‘virtual void Button::render()’:
+src/gui.cpp:29:41: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+   29 |     Vector2 TextBoxSize = MeasureTextEx(&Global.DefaultFont, text, textsize, 2);
+      |                                         ^~~~~~~~~~~~~~~~~~~
+      |                                         |
+      |                                         Font*
+src/gui.cpp:33:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   33 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:33:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   33 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:33:20: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+   33 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                    ^~~~~~~~~~~~~~~~~~~
+      |                    |
+      |                    Font*
+src/gui.cpp:39:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   39 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:39:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   39 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:39:20: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+   39 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                    ^~~~~~~~~~~~~~~~~~~
+      |                    |
+      |                    Font*
+src/gui.cpp:43:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   43 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:43:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   43 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:43:20: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+   43 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                    ^~~~~~~~~~~~~~~~~~~
+      |                    |
+      |                    Font*
+src/gui.cpp: In member function ‘virtual void TextBox::render()’:
+src/gui.cpp:80:41: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+   80 |     Vector2 TextBoxSize = MeasureTextEx(&Global.DefaultFont, rendertext.c_str(), textsize, 2);
+      |                                         ^~~~~~~~~~~~~~~~~~~
+      |                                         |
+      |                                         Font*
+src/gui.cpp:85:70: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   85 |             DrawTextEx(&Global.DefaultFont, subtext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/main.cpp:75:57: error: ‘GFX_LEFT’ was not declared in this scope
+   75 |         Global.window = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+      |                                                         ^~~~~~~~
+src/gui.cpp:85:106: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   85 |             DrawTextEx(&Global.DefaultFont, subtext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:85:24: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+   85 |             DrawTextEx(&Global.DefaultFont, subtext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                        ^~~~~~~~~~~~~~~~~~~
+      |                        |
+      |                        Font*
+src/gui.cpp:87:73: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   87 |             DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:87:109: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   87 |             DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:87:24: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+   87 |             DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                        ^~~~~~~~~~~~~~~~~~~
+      |                        |
+      |                        Font*
+src/gui.cpp:96:69: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   96 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:96:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   96 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/followpoint.cpp: In member function ‘void FollowPoint::render()’:
+src/followpoint.cpp:77:127: warning: narrowing conversion of ‘opacity’ from ‘int’ to ‘unsigned char’ [-Wnarrowing]
+   77 |                 DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, {255,200,255,opacity});
+      |                                                                                                                               ^~~~~~~
+src/gui.cpp:96:20: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+   96 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                    ^~~~~~~~~~~~~~~~~~~
+      |                    |
+      |                    Font*
+src/gui.cpp:100:69: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  100 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:100:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  100 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:100:20: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+  100 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                    ^~~~~~~~~~~~~~~~~~~
+      |                    |
+      |                    Font*
+src/gui.cpp: In member function ‘void TextBox::init()’:
+src/gui.cpp:109:45: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+  109 |         Vector2 TextBoxSize = MeasureTextEx(&Global.DefaultFont, rendertext.substr(1,maxlength).c_str(), textsize, 2);
+      |                                             ^~~~~~~~~~~~~~~~~~~
+      |                                             |
+      |                                             Font*
+src/gui.cpp: In member function ‘virtual void TestSlider::render()’:
+src/gui.cpp:299:51: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x) - ((((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * ((double)1 - percentage)) / (double)2))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  299 |     Rectangle Left = GetRaylibOriginR({position.x - (size.x * (1 - percentage)) / 2, position.y, size.x * percentage, size.y});
+      |                                        ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:299:105: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage)’ from ‘double’ to ‘float’ [-Wnarrowing]
+  299 |     Rectangle Left = GetRaylibOriginR({position.x - (size.x * (1 - percentage)) / 2, position.y, size.x * percentage, size.y});
+      |                                                                                                  ~~~~~~~^~~~~~~~~~~~
+src/gui.cpp:300:52: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x) + ((((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage) / (double)2))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  300 |     Rectangle Right = GetRaylibOriginR({position.x + (size.x * (percentage)) / 2, position.y, size.x * (1.0f-percentage), size.y});
+      |                                         ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:300:102: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * (((double)1.0e+0f) - percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  300 |     Rectangle Right = GetRaylibOriginR({position.x + (size.x * (percentage)) / 2, position.y, size.x * (1.0f-percentage), size.y});
+      |                                                                                               ~~~~~~~^~~~~~~~~~~~~~~~~~~
+src/gui.cpp:301:68: warning: narrowing conversion of ‘(((double)(((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x - (((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x / (float)2))) + (((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  301 |     Rectangle Dingus = GetRaylibOriginR({position.x - (size.x / 2) + (size.x * (percentage)), position.y, size.y / 2, size.y});
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp: In member function ‘virtual void TestSlider::update()’:
+src/gui.cpp:345:68: warning: narrowing conversion of ‘(((double)(((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x - (((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x / (float)2))) + (((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  345 |     Rectangle Dingus = GetRaylibOriginR({position.x - (size.x / 2) + (size.x * (percentage)), position.y, size.y / 2, size.y});
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+src/main.cpp:75:25: error: ‘C2D_CreateScreenTarget’ was not declared in this scope
+   75 |         Global.window = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~
+src/main.cpp:78:48: error: ‘GFX_BOTTOM’ was not declared in this scope
+   78 |         Global.window = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+      |                                                ^~~~~~~~~~
+src/gamemanager.cpp:1773:84: error: ‘osGetMemRegionSize’ was not declared in this scope
+ 1773 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                                                                    ^~~~~~~~~~~~~~~~~~
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from include/SDLutils.hpp:3,
+                 from src/SDLutils.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from include/platformspesifics.hpp:7,
+                 from include/globals.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/main.cpp:78:60: error: ‘GFX_LEFT’ was not declared in this scope
+   78 |         Global.window = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+      |                                                            ^~~~~~~~
+src/main.cpp:78:25: error: ‘C2D_CreateScreenTarget’ was not declared in this scope
+   78 |         Global.window = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1774:59: error: ‘MEMREGION_APPLICATION’ was not declared in this scope
+ 1774 |         std::cout << "Free M_APP: " << osGetMemRegionFree(MEMREGION_APPLICATION) << "/" << osGetMemRegionSize(MEMREGION_APPLICATION) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~
+src/main.cpp:81:5: error: ‘C2D_Prepare’ was not declared in this scope
+   81 |     C2D_Prepare();
+      |     ^~~~~~~~~~~
+src/main.cpp:82:20: error: ‘C3D_FRAME_SYNCDRAW’ was not declared in this scope
+   82 |     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                    ^~~~~~~~~~~~~~~~~~
+src/hitobjectslider.cpp: In member function ‘virtual void Slider::update()’:
+src/hitobjectslider.cpp:632:28: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  632 |             SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+src/hitobjectslider.cpp:633:23: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  633 |             PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+src/hitobjectslider.cpp:692:72: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  692 |                                                         SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+src/hitobjectslider.cpp:693:67: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  693 |                                                         PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+src/hitobjectslider.cpp:734:21: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](NormalFileName)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  734 |         SetSoundPan(&gm->SoundFilesAll.data[NormalFileName], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+src/hitobjectslider.cpp:735:24: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](NormalFileName)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  735 |         SetSoundVolume(&gm->SoundFilesAll.data[NormalFileName], ((float)volume/100.0f) * Global.hitVolume);
+src/hitobjectslider.cpp:736:19: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](NormalFileName)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  736 |         PlaySound(&gm->SoundFilesAll.data[NormalFileName]);
+src/hitobjectslider.cpp:763:36: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  763 |                     SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+src/hitobjectslider.cpp:764:31: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  764 |                     PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+src/hitobjectslider.cpp:782:36: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  782 |                     SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+src/hitobjectslider.cpp:783:31: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  783 |                     PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:1775:59: error: ‘MEMREGION_SYSTEM’ was not declared in this scope
+ 1775 |         std::cout << "Free M_SYS: " << osGetMemRegionFree(MEMREGION_SYSTEM) << "/" << osGetMemRegionSize(MEMREGION_SYSTEM) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~~~
+src/hitobjectslider.cpp:813:33: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)i)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  813 |                     SetSoundPan(&gm->SoundFilesAll.data[sounds[i]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
+src/hitobjectslider.cpp:814:36: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)i)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  814 |                     SetSoundVolume(&gm->SoundFilesAll.data[sounds[i]], ((float)volume/100.0f) * Global.hitVolume);
+src/hitobjectslider.cpp:815:31: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)i)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  815 |                     PlaySound(&gm->SoundFilesAll.data[sounds[i]]);
+src/hitobjectslider.cpp:819:33: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(i + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  819 |                     SetSoundPan(&gm->SoundFilesAll.data[sounds[i+1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
+src/hitobjectslider.cpp:820:36: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(i + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  820 |                     SetSoundVolume(&gm->SoundFilesAll.data[sounds[i+1]], ((float)volume/100.0f) * Global.hitVolume);
+src/hitobjectslider.cpp:821:31: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(i + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  821 |                     PlaySound(&gm->SoundFilesAll.data[sounds[i+1]]);
+src/hitobjectslider.cpp:843:41: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)i)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  843 |                             SetSoundPan(&gm->SoundFilesAll.data[sounds[i]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
+src/hitobjectslider.cpp:844:44: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)i)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  844 |                             SetSoundVolume(&gm->SoundFilesAll.data[sounds[i]], ((float)volume/100.0f) * Global.hitVolume);
+src/hitobjectslider.cpp:845:39: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)i)))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  845 |                             PlaySound(&gm->SoundFilesAll.data[sounds[i]]);
+src/hitobjectslider.cpp:849:41: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(i + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  849 |                             SetSoundPan(&gm->SoundFilesAll.data[sounds[i+1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
+src/hitobjectslider.cpp:850:44: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(i + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  850 |                             SetSoundVolume(&gm->SoundFilesAll.data[sounds[i+1]], ((float)volume/100.0f) * Global.hitVolume);
+src/hitobjectslider.cpp:851:39: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[]((*(const std::map<std::__cxx11::basic_string<char>, Sound>::key_type*)(& sounds.std::vector<std::__cxx11::basic_string<char> >::operator[](((std::vector<std::__cxx11::basic_string<char> >::size_type)(i + 1))))))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  851 |                             PlaySound(&gm->SoundFilesAll.data[sounds[i+1]]);
+src/main.cpp:82:5: error: ‘C3D_FrameBegin’ was not declared in this scope
+   82 |     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |     ^~~~~~~~~~~~~~
+src/hitobjectslider.cpp:859:40: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  859 |                         SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+src/hitobjectslider.cpp:860:35: error: could not convert ‘& gm->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+  860 |                         PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+src/hitobjectslider.cpp: In member function ‘virtual void Slider::render()’:
+src/hitobjectslider.cpp:893:30: error: could not convert ‘&((Slider*)this)->Slider::sliderTexture’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+  893 |             BeginTextureMode(&sliderTexture);
+      |                              ^~~~~~~~~~~~~~
+      |                              |
+      |                              RenderTexture2D* {aka RenderTexture*}
+src/hitobjectslider.cpp:915:30: error: could not convert ‘&((Slider*)this)->Slider::sliderTexture.RenderTexture::texture’ from ‘Texture*’ to ‘Texture2D’ {aka ‘Texture’}
+  915 |             SetTextureFilter(&sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
+      |                              ^~~~~~~~~~~~~~~~~~~~~~
+      |                              |
+      |                              Texture*
+src/hitobjectslider.cpp:937:38: error: could not convert ‘&((Slider*)this)->Slider::sliderTexture’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+  937 |                     BeginTextureMode(&sliderTexture);
+      |                                      ^~~~~~~~~~~~~~
+      |                                      |
+      |                                      RenderTexture2D* {aka RenderTexture*}
+src/main.cpp:83:5: error: ‘C2D_Flush’ was not declared in this scope
+   83 |     C2D_Flush();
+      |     ^~~~~~~~~
+src/hitobjectslider.cpp:1009:38: error: could not convert ‘&((Slider*)this)->Slider::sliderTexture’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 1009 |                     BeginTextureMode(&sliderTexture);
+      |                                      ^~~~~~~~~~~~~~
+      |                                      |
+      |                                      RenderTexture2D* {aka RenderTexture*}
+src/main.cpp:84:5: error: ‘C2D_SceneBegin’ was not declared in this scope
+   84 |     C2D_SceneBegin(Global.window);
+      |     ^~~~~~~~~~~~~~
+src/gamemanager.cpp:1776:59: error: ‘MEMREGION_BASE’ was not declared in this scope
+ 1776 |         std::cout << "Free M_BSE: " << osGetMemRegionFree(MEMREGION_BASE) << "/" << osGetMemRegionSize(MEMREGION_BASE) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~
+src/main.cpp:85:21: error: ‘C2D_TintMult’ was not declared in this scope
+   85 |     C2D_SetTintMode(C2D_TintMult);
+      |                     ^~~~~~~~~~~~
+src/hitobjectslider.cpp:1037:37: error: ‘DrawTextureExDepth’ was not declared in this scope; did you mean ‘DrawTextureEx’?
+ 1037 |                                     DrawTextureExDepth(&gm->sliderOuterBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize}, 0.0f, gm->circlesize / 64.0f * Global.sliderTexSize, WHITE);
+      |                                     ^~~~~~~~~~~~~~~~~~
+      |                                     DrawTextureEx
+src/main.cpp:85:5: error: ‘C2D_SetTintMode’ was not declared in this scope
+   85 |     C2D_SetTintMode(C2D_TintMult);
+      |     ^~~~~~~~~~~~~~~
+src/gamemanager.cpp:1777:40: error: ‘linearSpaceFree’ was not declared in this scope
+ 1777 |         std::cout << "Free M_LIN: " << linearSpaceFree() << "/" << Global.linearSpaceFree << std::endl;
+      |                                        ^~~~~~~~~~~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::unloadGame()’:
+src/gamemanager.cpp:1798:21: error: could not convert ‘& pair.std::pair<const std::__cxx11::basic_string<char>, Sound>::second’ from ‘Sound*’ to ‘Sound’
+ 1798 |         UnloadSound(&pair.second);
+      |                     ^~~~~~~~~~~~
+      |                     |
+      |                     Sound*
+src/gamemanager.cpp:1802:21: error: could not convert ‘& pair.std::pair<const std::__cxx11::basic_string<char>, Sound>::second’ from ‘Sound*’ to ‘Sound’
+ 1802 |         UnloadSound(&pair.second);
+      |                     ^~~~~~~~~~~~
+      |                     |
+      |                     Sound*
+src/gamemanager.cpp:1808:27: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundMusic’ from ‘Music*’ to ‘Music’
+ 1808 |         UnloadMusicStream(&backgroundMusic);
+      |                           ^~~~~~~~~~~~~~~~
+      |                           |
+      |                           Music*
+src/gamemanager.cpp:1855:53: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1855 |                 delete objectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp:1862:57: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1862 |                 delete deadObjectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+make: *** [MakefilePC:31: object/gui.o] Error 1
+src/gamemanager.cpp: In member function ‘void GameManager::destroyDeadHitObject(Node*)’:
+src/gamemanager.cpp:1913:22: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1913 |         delete node->object;
+      |                ~~~~~~^~~~~~
+src/main.cpp:89:5: error: ‘C3D_FrameEnd’ was not declared in this scope
+   89 |     C3D_FrameEnd(0);
+      |     ^~~~~~~~~~~~
+src/hitobjectslider.cpp:1104:37: error: ‘DrawCircleWithDepthGrad’ was not declared in this scope; did you mean ‘DrawCircleWithDepth’?
+ 1104 |                                     DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.76)  * Global.sliderTexSize, Global.circleSector*2, 0.4f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
+      |                                     ^~~~~~~~~~~~~~~~~~~~~~~
+      |                                     DrawCircleWithDepth
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameTextures()’:
+src/gamemanager.cpp:1941:9: error: ‘C2D_Prepare’ was not declared in this scope
+ 1941 |         C2D_Prepare();
+      |         ^~~~~~~~~~~
+src/hitobjectslider.cpp:1149:34: error: could not convert ‘&((Slider*)this)->Slider::sliderTexture’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 1149 |                 BeginTextureMode(&sliderTexture);
+      |                                  ^~~~~~~~~~~~~~
+      |                                  |
+      |                                  RenderTexture2D* {aka RenderTexture*}
+src/hitobjectslider.cpp:1158:43: error: could not convert ‘& gm->GameManager::sliderout’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1158 |                             DrawTextureEx(&gm->sliderout, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
+      |                                           ^~~~~~~~~~~~~~
+      |                                           |
+      |                                           Texture2D* {aka Texture*}
+src/main.cpp:95:5: error: ‘LoadFontDefault’ was not declared in this scope; did you mean ‘GetFontDefault’?
+   95 |     LoadFontDefault();
+      |     ^~~~~~~~~~~~~~~
+      |     GetFontDefault
+src/main.cpp:110:45: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  110 |         std::vector<std::string> files = ls(".png");
+      |                                             ^~~~~~
+src/main.cpp:127:16: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  127 |     files = ls(".png");
+      |                ^~~~~~
+src/main.cpp:146:22: error: could not convert ‘& Global.Globals::DefaultFont.Font::texture’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  146 |     SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_POINT);
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/main.cpp:147:22: error: could not convert ‘& Global.Globals::cursor’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  147 |     SetTextureFilter(&Global.cursor, TEXTURE_FILTER_BILINEAR);
+      |                      ^~~~~~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/main.cpp:148:22: error: could not convert ‘& Global.Globals::OsusLogo’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  148 |     SetTextureFilter(&Global.OsusLogo, TEXTURE_FILTER_BILINEAR);
+      |                      ^~~~~~~~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/main.cpp:183:20: error: could not convert ‘& Global.Globals::DefaultFont’ from ‘Font*’ to ‘Font’
+  183 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                    ^~~~~~~~~~~~~~~~~~~
+      |                    |
+      |                    Font*
+src/main.cpp:184:12: error: ‘C3D_GetCmdBufUsage’ was not declared in this scope
+  184 |         if(C3D_GetCmdBufUsage() > 0.8f){
+      |            ^~~~~~~~~~~~~~~~~~
+src/main.cpp:209:19: error: could not convert ‘& Global.Globals::OsusLogo’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  209 |     UnloadTexture(&Global.OsusLogo);
+      |                   ^~~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/main.cpp:210:19: error: could not convert ‘& Global.Globals::cursor’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+  210 |     UnloadTexture(&Global.cursor);
+      |                   ^~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:1942:20: error: ‘C3D_FRAME_SYNCDRAW’ was not declared in this scope
+ 1942 |     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |                    ^~~~~~~~~~~~~~~~~~
+src/hitobjectslider.cpp:1199:9: error: ‘DrawTextureRotate’ was not declared in this scope; did you mean ‘DrawTextureRec’?
+ 1199 |         DrawTextureRotate(&gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/gm->reverseArrow.width)/2.0f, angle, Fade(WHITE, clampedFade));
+      |         ^~~~~~~~~~~~~~~~~
+      |         DrawTextureRec
+src/main.cpp:212:5: error: ‘UnloadFontDefault’ was not declared in this scope; did you mean ‘UnloadFontData’?
+  212 |     UnloadFontDefault();
+      |     ^~~~~~~~~~~~~~~~~
+      |     UnloadFontData
+src/main.cpp:214:5: error: ‘C2D_Fini’ was not declared in this scope
+  214 |     C2D_Fini();
+      |     ^~~~~~~~
+src/gamemanager.cpp:1942:5: error: ‘C3D_FrameBegin’ was not declared in this scope
+ 1942 |     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+      |     ^~~~~~~~~~~~~~
+src/main.cpp:215:9: error: ‘C3D_Fini’ was not declared in this scope
+  215 |         C3D_Fini();
+      |         ^~~~~~~~
+src/hitobjectslider.cpp:1217:9: error: ‘DrawTextureRotate’ was not declared in this scope; did you mean ‘DrawTextureRec’?
+ 1217 |         DrawTextureRotate(&gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/gm->reverseArrow.width)/2.0f, angle, Fade(WHITE, clampedFade));
+      |         ^~~~~~~~~~~~~~~~~
+      |         DrawTextureRec
+src/main.cpp: In function ‘int main()’:
+src/main.cpp:224:5: error: ‘osSetSpeedupEnable’ was not declared in this scope
+  224 |     osSetSpeedupEnable(true);
+      |     ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1943:5: error: ‘C2D_SceneBegin’ was not declared in this scope
+ 1943 |     C2D_SceneBegin(Global.window);
+      |     ^~~~~~~~~~~~~~
+src/gamemanager.cpp:1948:26: error: could not convert ‘&((GameManager*)this)->GameManager::sliderOuterBall’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 1948 |         BeginTextureMode(&sliderOuterBall);
+      |                          ^~~~~~~~~~~~~~~~
+      |                          |
+      |                          RenderTexture2D* {aka RenderTexture*}
+src/gamemanager.cpp:1964:22: error: could not convert ‘&((GameManager*)this)->GameManager::sliderOuterBall.RenderTexture::texture’ from ‘Texture*’ to ‘Texture2D’ {aka ‘Texture’}
+ 1964 |     SetTextureFilter(&sliderOuterBall.texture, TEXTURE_FILTER_BILINEAR);
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                      |
+      |                      Texture*
+src/gamemanager.cpp:1966:26: error: could not convert ‘&((GameManager*)this)->GameManager::sliderInnerBall’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 1966 |         BeginTextureMode(&sliderInnerBall);
+      |                          ^~~~~~~~~~~~~~~~
+      |                          |
+      |                          RenderTexture2D* {aka RenderTexture*}
+src/gamemanager.cpp:1974:22: error: could not convert ‘&((GameManager*)this)->GameManager::sliderInnerBall.RenderTexture::texture’ from ‘Texture*’ to ‘Texture2D’ {aka ‘Texture’}
+ 1974 |     SetTextureFilter(&sliderInnerBall.texture, TEXTURE_FILTER_BILINEAR);
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                      |
+      |                      Texture*
+src/main.cpp:230:5: error: ‘gfxInitDefault’ was not declared in this scope
+  230 |     gfxInitDefault();
+      |     ^~~~~~~~~~~~~~
+src/gamemanager.cpp:1977:9: error: ‘C2D_Flush’ was not declared in this scope
+ 1977 |         C2D_Flush();  //test
+      |         ^~~~~~~~~
+src/hitobjectslider.cpp:1270:9: error: ‘DrawTextureRotate’ was not declared in this scope; did you mean ‘DrawTextureRec’?
+ 1270 |         DrawTextureRotate(&gm->sliderb, texturePositionSmooth.x, texturePositionSmooth.y, (gm->circlesize/gm->sliderb.width) * 1.3f, angle, Fade(renderColor,clampedFade));
+      |         ^~~~~~~~~~~~~~~~~
+      |         DrawTextureRec
+src/main.cpp:231:5: error: ‘aptSetSleepAllowed’ was not declared in this scope
+  231 |     aptSetSleepAllowed(true);
+      |     ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:1978:5: error: ‘C3D_FrameEnd’ was not declared in this scope
+ 1978 |     C3D_FrameEnd(0);
+      |     ^~~~~~~~~~~~
+src/gamemanager.cpp:1986:22: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1986 |     SetTextureFilter(&hit0, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1987:22: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1987 |     SetTextureFilter(&hit50, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1988:22: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1988 |     SetTextureFilter(&hit100, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1989:22: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1989 |     SetTextureFilter(&hit300, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1990:22: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1990 |     SetTextureFilter(&approachCircle, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1991:22: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1991 |     SetTextureFilter(&selectCircle, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1992:22: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1992 |     SetTextureFilter(&hitCircleOverlay, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~~~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1993:22: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1993 |     SetTextureFilter(&hitCircle, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1994:22: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1994 |     SetTextureFilter(&sliderb, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1997:22: error: could not convert ‘&((GameManager*)this)->GameManager::sliderin’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1997 |     SetTextureFilter(&sliderin, TEXTURE_FILTER_POINT);
+      |                      ^~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:1998:26: error: could not convert ‘&((GameManager*)this)->GameManager::sliderblank’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1998 |         SetTextureFilter(&sliderblank, TEXTURE_FILTER_POINT);
+      |                          ^~~~~~~~~~~~
+      |                          |
+      |                          Texture2D* {aka Texture*}
+src/gamemanager.cpp:1999:22: error: could not convert ‘&((GameManager*)this)->GameManager::sliderout’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 1999 |     SetTextureFilter(&sliderout, TEXTURE_FILTER_POINT);
+      |                      ^~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:2000:22: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2000 |     SetTextureFilter(&sliderscorepoint, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~~~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:2002:22: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2002 |     SetTextureFilter(&reverseArrow, TEXTURE_FILTER_BILINEAR );
+      |                      ^~~~~~~~~~~~~
+      |                      |
+      |                      Texture2D* {aka Texture*}
+src/gamemanager.cpp:2004:26: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[i]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2004 |         SetTextureFilter(&numbers[i], TEXTURE_FILTER_BILINEAR );  //OPENGL1.1 DOESNT SUPPORT THIS
+      |                          ^~~~~~~~~~~
+      |                          |
+      |                          Texture2D* {aka Texture*}
+src/gamemanager.cpp:2015:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2015 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:2016:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2016 |         std::vector<std::string> files2 = ls(".jpg");
+      |                                              ^~~~~~
+src/gamemanager.cpp:2017:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2017 |         std::vector<std::string> files3 = ls(".jpeg");
+      |                                              ^~~~~~~
+src/main.cpp:232:5: error: ‘consoleGetDefault’ was not declared in this scope
+  232 |     consoleGetDefault()->fg = 23;
+      |     ^~~~~~~~~~~~~~~~~
+src/hitobjectslider.cpp: In member function ‘virtual void Slider::dead_render()’:
+src/hitobjectslider.cpp:1393:17: error: ‘DrawTextureRotate’ was not declared in this scope; did you mean ‘DrawTextureRec’?
+ 1393 |                 DrawTextureRotate(&gm->sliderfollow, renderPoints[position].x, renderPoints[position].y, (clip(clampedFade,0.7,2))*(gm->circlesize/gm->sliderfollow.width)*2.0f , 0, Fade(WHITE,clampedFade2));
+      |                 ^~~~~~~~~~~~~~~~~
+      |                 DrawTextureRec
+src/hitobjectslider.cpp: In member function ‘void Slider::unloadTextures()’:
+src/hitobjectslider.cpp:1413:33: error: could not convert ‘&((Slider*)this)->Slider::sliderTexture’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 1413 |             UnloadRenderTexture(&sliderTexture);
+      |                                 ^~~~~~~~~~~~~~
+      |                                 |
+      |                                 RenderTexture2D* {aka RenderTexture*}
+src/gamemanager.cpp:2078:117: error: could not convert ‘& image’ from ‘Image*’ to ‘Image’
+ 2078 |                                         backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(&image);
+      |                                                                                                                     ^~~~~~
+      |                                                                                                                     |
+      |                                                                                                                     Image*
+src/gamemanager.cpp:2079:53: error: could not convert ‘& image’ from ‘Image*’ to ‘Image’
+ 2079 |                                         UnloadImage(&image);
+      |                                                     ^~~~~~
+      |                                                     |
+      |                                                     Image*
+src/gamemanager.cpp:2081:115: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::xOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2081 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp:2081:143: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::yOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2081 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp:2085:66: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundTextures.Background::data.std::map<std::__cxx11::basic_string<char>, Texture>::operator[](((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::filename)’ from ‘std::map<std::__cxx11::basic_string<char>, Texture>::mapped_type*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2085 |                                                 SetTextureFilter(&backgroundTextures.data[gameFile.events[j].filename], TEXTURE_FILTER_BILINEAR) ;
+src/gamemanager.cpp: In member function ‘void GameManager::unloadGameTextures()’:
+src/gamemanager.cpp:2105:19: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircleOverlay’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2105 |     UnloadTexture(&hitCircleOverlay);
+      |                   ^~~~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2106:19: error: could not convert ‘&((GameManager*)this)->GameManager::hitCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2106 |     UnloadTexture(&hitCircle);
+      |                   ^~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2107:19: error: could not convert ‘&((GameManager*)this)->GameManager::sliderscorepoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2107 |     UnloadTexture(&sliderscorepoint);
+      |                   ^~~~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2108:19: error: could not convert ‘&((GameManager*)this)->GameManager::approachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2108 |     UnloadTexture(&approachCircle);
+      |                   ^~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2109:19: error: could not convert ‘&((GameManager*)this)->GameManager::hit300’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2109 |     UnloadTexture(&hit300);
+      |                   ^~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2110:19: error: could not convert ‘&((GameManager*)this)->GameManager::hit100’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2110 |     UnloadTexture(&hit100);
+      |                   ^~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2111:19: error: could not convert ‘&((GameManager*)this)->GameManager::hit50’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2111 |     UnloadTexture(&hit50);
+      |                   ^~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2112:19: error: could not convert ‘&((GameManager*)this)->GameManager::hit0’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2112 |     UnloadTexture(&hit0);
+      |                   ^~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2113:19: error: could not convert ‘&((GameManager*)this)->GameManager::sliderb’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2113 |     UnloadTexture(&sliderb);
+      |                   ^~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2114:19: error: could not convert ‘&((GameManager*)this)->GameManager::sliderin’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2114 |     UnloadTexture(&sliderin);
+      |                   ^~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2115:23: error: could not convert ‘&((GameManager*)this)->GameManager::sliderblank’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2115 |         UnloadTexture(&sliderblank);
+      |                       ^~~~~~~~~~~~
+      |                       |
+      |                       Texture2D* {aka Texture*}
+src/gamemanager.cpp:2116:19: error: could not convert ‘&((GameManager*)this)->GameManager::sliderout’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2116 |     UnloadTexture(&sliderout);
+      |                   ^~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2117:19: error: could not convert ‘&((GameManager*)this)->GameManager::selectCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2117 |     UnloadTexture(&selectCircle);
+      |                   ^~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2118:19: error: could not convert ‘&((GameManager*)this)->GameManager::reverseArrow’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2118 |     UnloadTexture(&reverseArrow);
+      |                   ^~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2119:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerBottom’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2119 |     UnloadTexture(&spinnerBottom);
+      |                   ^~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2120:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerTop’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2120 |     UnloadTexture(&spinnerTop);
+      |                   ^~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2121:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2121 |     UnloadTexture(&spinnerCircle);
+      |                   ^~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2122:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerApproachCircle’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2122 |     UnloadTexture(&spinnerApproachCircle);
+      |                   ^~~~~~~~~~~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2123:19: error: could not convert ‘&((GameManager*)this)->GameManager::spinnerMetre’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2123 |     UnloadTexture(&spinnerMetre);
+      |                   ^~~~~~~~~~~~~
+      |                   |
+      |                   Texture2D* {aka Texture*}
+src/gamemanager.cpp:2124:23: error: could not convert ‘&((GameManager*)this)->GameManager::followPoint’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2124 |         UnloadTexture(&followPoint);
+      |                       ^~~~~~~~~~~~
+      |                       |
+      |                       Texture2D* {aka Texture*}
+src/gamemanager.cpp:2126:29: error: could not convert ‘&((GameManager*)this)->GameManager::sliderInnerBall’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 2126 |         UnloadRenderTexture(&sliderInnerBall);
+      |                             ^~~~~~~~~~~~~~~~
+      |                             |
+      |                             RenderTexture2D* {aka RenderTexture*}
+src/gamemanager.cpp:2127:29: error: could not convert ‘&((GameManager*)this)->GameManager::sliderOuterBall’ from ‘RenderTexture2D*’ {aka ‘RenderTexture*’} to ‘RenderTexture2D’ {aka ‘RenderTexture’}
+ 2127 |         UnloadRenderTexture(&sliderOuterBall);
+      |                             ^~~~~~~~~~~~~~~~
+      |                             |
+      |                             RenderTexture2D* {aka RenderTexture*}
+src/gamemanager.cpp:2130:23: error: could not convert ‘&((GameManager*)this)->GameManager::numbers[i]’ from ‘Texture2D*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2130 |         UnloadTexture(&numbers[i]);
+      |                       ^~~~~~~~~~~
+      |                       |
+      |                       Texture2D* {aka Texture*}
+src/gamemanager.cpp:2136:23: error: could not convert ‘&((GameManager*)this)->GameManager::backgroundTextures.Background::data.std::map<std::__cxx11::basic_string<char>, Texture>::operator[](key)’ from ‘std::map<std::__cxx11::basic_string<char>, Texture>::mapped_type*’ {aka ‘Texture*’} to ‘Texture2D’ {aka ‘Texture’}
+ 2136 |         UnloadTexture(&backgroundTextures.data[key]);
+src/main.cpp:235:21: error: ‘GFX_BOTTOM’ was not declared in this scope
+  235 |         consoleInit(GFX_BOTTOM, NULL);
+      |                     ^~~~~~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSounds()’:
+src/gamemanager.cpp:2583:50: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2583 |         std::vector<std::string> ComboBreak = ls(".wav");
+      |                                                  ^~~~~~
+src/gamemanager.cpp:2595:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2595 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:2609:73: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2609 |                         SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/gamemanager.cpp:2618:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2618 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2625:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2625 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/main.cpp:235:9: error: ‘consoleInit’ was not declared in this scope
+  235 |         consoleInit(GFX_BOTTOM, NULL);
+      |         ^~~~~~~~~~~
+src/gamemanager.cpp:2639:73: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2639 |                         SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/gamemanager.cpp:2647:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2647 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2654:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2654 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:2668:73: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2668 |                         SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/gamemanager.cpp:2677:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2677 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2683:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2683 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:2694:81: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2694 |                                 SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/gamemanager.cpp:2705:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2705 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2711:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2711 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:2722:81: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2722 |                                 SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/gamemanager.cpp:2732:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2732 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/main.cpp:238:21: error: ‘GFX_TOP’ was not declared in this scope
+  238 |         consoleInit(GFX_TOP, NULL);
+      |                     ^~~~~~~
+src/gamemanager.cpp:2738:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2738 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:2749:81: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2749 |                                 SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/gamemanager.cpp:2761:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2761 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2767:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2767 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:2778:81: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2778 |                                 SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/gamemanager.cpp:2786:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2786 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2792:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2792 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:2803:81: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2803 |                                 SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/gamemanager.cpp:2811:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2811 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2817:89: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](std::__cxx11::basic_string<char>(((const char*)"combobreak"), std::allocator<char>()))’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2817 |                                 SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
+src/gamemanager.cpp:2828:81: error: could not convert ‘&((GameManager*)this)->GameManager::SoundFilesAll.HitSound::data.std::map<std::__cxx11::basic_string<char>, Sound>::operator[](name)’ from ‘std::map<std::__cxx11::basic_string<char>, Sound>::mapped_type*’ {aka ‘Sound*’} to ‘Sound’
+ 2828 |                                 SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
+src/main.cpp:238:9: error: ‘consoleInit’ was not declared in this scope
+  238 |         consoleInit(GFX_TOP, NULL);
+      |         ^~~~~~~~~~~
+src/main.cpp:258:18: error: ‘linearSpaceFree’ was not declared in this scope
+  258 |     std::cout << linearSpaceFree() << std::endl;
+      |                  ^~~~~~~~~~~~~~~
+src/main.cpp:280:35: error: ‘vramSpaceFree’ was not declared in this scope
+  280 |     std::cout << "Free Vram: " << vramSpaceFree() << std::endl;
+      |                                   ^~~~~~~~~~~~~
+src/main.cpp:281:59: error: ‘MEMREGION_ALL’ was not declared in this scope
+  281 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                                           ^~~~~~~~~~~~~
+src/main.cpp:281:40: error: ‘osGetMemRegionFree’ was not declared in this scope
+  281 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                        ^~~~~~~~~~~~~~~~~~
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/settingsParser.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/settingsParser.hpp:4,
+                 from src/settingsParser.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/main.cpp:281:84: error: ‘osGetMemRegionSize’ was not declared in this scope
+  281 |         std::cout << "Free M_ALL: " << osGetMemRegionFree(MEMREGION_ALL) << "/" << osGetMemRegionSize(MEMREGION_ALL) << std::endl;
+      |                                                                                    ^~~~~~~~~~~~~~~~~~
+src/main.cpp:282:59: error: ‘MEMREGION_APPLICATION’ was not declared in this scope
+  282 |         std::cout << "Free M_APP: " << osGetMemRegionFree(MEMREGION_APPLICATION) << "/" << osGetMemRegionSize(MEMREGION_APPLICATION) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~
+src/main.cpp:283:59: error: ‘MEMREGION_SYSTEM’ was not declared in this scope
+  283 |         std::cout << "Free M_SYS: " << osGetMemRegionFree(MEMREGION_SYSTEM) << "/" << osGetMemRegionSize(MEMREGION_SYSTEM) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~~~
+src/main.cpp:284:59: error: ‘MEMREGION_BASE’ was not declared in this scope
+  284 |         std::cout << "Free M_BSE: " << osGetMemRegionFree(MEMREGION_BASE) << "/" << osGetMemRegionSize(MEMREGION_BASE) << std::endl;
+      |                                                           ^~~~~~~~~~~~~~
+src/main.cpp:287:5: error: ‘Thread’ was not declared in this scope; did you mean ‘fread’?
+  287 |     Thread renderThread;
+      |     ^~~~~~
+      |     fread
+src/main.cpp:288:5: error: ‘renderThread’ was not declared in this scope; did you mean ‘_endthread’?
+  288 |     renderThread = threadCreate(RenderLoop, NULL, 1*1024*1024, 0x29, -1, false);
+      |     ^~~~~~~~~~~~
+      |     _endthread
+src/main.cpp:288:20: error: ‘threadCreate’ was not declared in this scope; did you mean ‘pthread_create’?
+  288 |     renderThread = threadCreate(RenderLoop, NULL, 1*1024*1024, 0x29, -1, false);
+      |                    ^~~~~~~~~~~~
+      |                    pthread_create
+src/main.cpp:292:36: error: ‘aptMainLoop’ was not declared in this scope
+  292 |     while(!WindowShouldClose() and aptMainLoop()){
+      |                                    ^~~~~~~~~~~
+src/main.cpp:302:22: error: ‘KEY_START’ was not declared in this scope; did you mean ‘KEY_TAB’?
+  302 |         if(IsKeyDown(KEY_START)){
+      |                      ^~~~~~~~~
+      |                      KEY_TAB
+src/main.cpp:341:30: error: ‘U64_MAX’ was not declared in this scope
+  341 |     threadJoin(renderThread, U64_MAX);
+      |                              ^~~~~~~
+src/main.cpp:341:5: error: ‘threadJoin’ was not declared in this scope; did you mean ‘pthread_join’?
+  341 |     threadJoin(renderThread, U64_MAX);
+      |     ^~~~~~~~~~
+      |     pthread_join
+make: *** [MakefilePC:31: object/hitobjectslider.o] Error 1
+src/main.cpp:342:5: error: ‘threadFree’ was not declared in this scope
+  342 |     threadFree(renderThread);
+      |     ^~~~~~~~~~
+src/main.cpp:349:5: error: ‘gfxExit’ was not declared in this scope
+  349 |     gfxExit();
+      |     ^~~~~~~
+make: *** [MakefilePC:31: object/main.o] Error 1
+make: *** [MakefilePC:31: object/gamemanager.o] Error 1

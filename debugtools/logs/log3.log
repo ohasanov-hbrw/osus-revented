@@ -1,0 +1,31 @@
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fastrender.o -c src/fastrender.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT
+In file included from include/fastrender.hpp:6,
+                 from src/fastrender.cpp:1:
+include/globals.hpp:185:5: error: ‘touchPosition’ does not name a type
+  185 |     touchPosition touch;
+      |     ^~~~~~~~~~~~~
+include/globals.hpp:186:5: error: ‘touchPosition’ does not name a type
+  186 |     touchPosition lastTouchPos;
+      |     ^~~~~~~~~~~~~
+include/globals.hpp:190:5: error: ‘C3D_RenderTarget’ does not name a type
+  190 |     C3D_RenderTarget* window;
+      |     ^~~~~~~~~~~~~~~~
+include/globals.hpp:191:5: error: ‘C3D_RenderTarget’ does not name a type
+  191 |     C3D_RenderTarget* gpu_currentRenderTarget;
+      |     ^~~~~~~~~~~~~~~~
+include/globals.hpp:193:5: error: ‘u32’ does not name a type
+  193 |     u32 ds_kDown = 0;
+      |     ^~~
+include/globals.hpp:194:5: error: ‘u32’ does not name a type
+  194 |     u32 ds_kHeld = 0;
+      |     ^~~
+include/globals.hpp:195:5: error: ‘u32’ does not name a type
+  195 |     u32 ds_kUp = 0;
+      |     ^~~
+include/globals.hpp:197:5: error: ‘u64’ does not name a type
+  197 |     u64 totalNumOfSamples = 0;
+      |     ^~~
+include/globals.hpp:200:5: error: ‘u32’ does not name a type
+  200 |     u32 linearSpaceFree = 0;
+      |     ^~~
+make: *** [MakefilePC:31: object/fastrender.o] Error 1

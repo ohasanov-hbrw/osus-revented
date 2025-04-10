@@ -1,3 +1,3 @@
-make clean
-make deps CC="x86_64-w64-mingw32-gcc --static  -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32" -j12
-make run CC="x86_64-w64-mingw32-g++ --static  -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32" name="osus.exe" ldflags="-lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -L/usr/x86_64-w64-mingw32/lib -lSDL2main -lSDL2 -lm -lole32 -loleaut32 -limm32 -lwinmm -lpthread -lgdi32 -lopengl32 -lversion -lsetupapi -lhid -mwindows" -j12
+make clean --makefile=MakefilePC
+make deps CC="x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32" -j12 --makefile=MakefilePC
+make run CC="x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32" name="osus.exe" ldflags="-lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -L/usr/x86_64-w64-mingw32/lib -lSDL2main -lSDL2 -lm -lole32 -loleaut32 -limm32 -lwinmm -lpthread -lgdi32 -lopengl32 -lversion -lsetupapi -lhid -mwindows" -j12 --makefile=MakefilePC

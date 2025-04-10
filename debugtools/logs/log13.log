@@ -1,0 +1,46 @@
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/main.o -c src/main.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from src/main.cpp:11:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from src/main.cpp:8:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/main.cpp: In function ‘void RenderLoop(void*)’:
+src/main.cpp:89:45: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   89 |         std::vector<std::string> files = ls(".png");
+      |                                             ^~~~~~
+src/main.cpp:106:16: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  106 |     files = ls(".png");
+      |                ^~~~~~
+src/main.cpp:160:93: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  160 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                             ^~~~~~~~~~~~~~~~~~
+src/main.cpp:160:113: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  160 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                                 ^~~~~~~~~~~~~~~~~~
+src/main.cpp: In function ‘int main()’:
+src/main.cpp:250:36: error: ‘aptMainLoop’ was not declared in this scope
+  250 |     while(!WindowShouldClose() and aptMainLoop()){
+      |                                    ^~~~~~~~~~~
+src/main.cpp:260:22: error: ‘KEY_START’ was not declared in this scope; did you mean ‘KEY_TAB’?
+  260 |         if(IsKeyDown(KEY_START)){
+      |                      ^~~~~~~~~
+      |                      KEY_TAB
+src/main.cpp:300:30: error: ‘U64_MAX’ was not declared in this scope
+  300 |     threadJoin(renderThread, U64_MAX);
+      |                              ^~~~~~~
+src/main.cpp:300:5: error: ‘threadJoin’ was not declared in this scope; did you mean ‘pthread_join’?
+  300 |     threadJoin(renderThread, U64_MAX);
+      |     ^~~~~~~~~~
+      |     pthread_join
+src/main.cpp:301:5: error: ‘threadFree’ was not declared in this scope
+  301 |     threadFree(renderThread);
+      |     ^~~~~~~~~~
+src/main.cpp:308:5: error: ‘gfxExit’ was not declared in this scope
+  308 |     gfxExit();
+      |     ^~~~~~~
+make: *** [MakefilePC:31: object/main.o] Error 1

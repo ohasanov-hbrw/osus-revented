@@ -1276,23 +1276,23 @@ void EndMode3D(void)
 }
 
 // Initializes render texture for drawing
-void BeginTextureMode(RenderTexture2D target)
+void BeginTextureMode(RenderTexture2D * target)
 {
     rlDrawRenderBatchActive();      // Update and draw internal render batch
 
-    rlEnableFramebuffer(target.id); // Enable render target
+    rlEnableFramebuffer(target->id); // Enable render target
 
     // Set viewport and RLGL internal framebuffer size
-    rlViewport(0, 0, target.texture.width, target.texture.height);
-    rlSetFramebufferWidth(target.texture.width);
-    rlSetFramebufferHeight(target.texture.height);
+    rlViewport(0, 0, target->texture.width, target->texture.height);
+    rlSetFramebufferWidth(target->texture.width);
+    rlSetFramebufferHeight(target->texture.height);
 
     rlMatrixMode(RL_PROJECTION);    // Switch to projection matrix
     rlLoadIdentity();               // Reset current matrix (projection)
 
     // Set orthographic projection to current framebuffer size
     // NOTE: Configured top-left corner as (0, 0)
-    rlOrtho(0, target.texture.width, target.texture.height, 0, 0.0f, 1.0f);
+    rlOrtho(0, target->texture.width, target->texture.height, 0, 0.0f, 1.0f);
 
     rlMatrixMode(RL_MODELVIEW);     // Switch back to modelview matrix
     rlLoadIdentity();               // Reset current matrix (modelview)
@@ -1301,8 +1301,8 @@ void BeginTextureMode(RenderTexture2D target)
 
     // Setup current width/height for proper aspect ratio
     // calculation when using BeginMode3D()
-    CORE.Window.currentFbo.width = target.texture.width;
-    CORE.Window.currentFbo.height = target.texture.height;
+    CORE.Window.currentFbo.width = target->texture.width;
+    CORE.Window.currentFbo.height = target->texture.height;
 }
 
 // Ends drawing to render texture

@@ -6,12 +6,29 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
+#include "platformspesifics.hpp"
 
 #define RAYMATH_IMPLEMENTATION
 # define M_PI 3.14159265358979323846f
 //extern "C" {
     #include "raymath.h"
 //}
+
+
+extern MULTITHREAD_MUTEX stateLock;
+extern MULTITHREAD_MUTEX accessLock;
+extern MULTITHREAD_MUTEX osuGameLock;
+extern MULTITHREAD_MUTEX wholeRenderLock;
+
+
+#define SWITCHING_STATE 0
+#define ACCESSING_OBJECTS 1
+#define OSU_UPDATE 2
+#define RENDER_BLOCK 3
+
+void InitilizeLocks();
+void MutexLock(int i);
+void MutexUnlock(int i);
 
 //Update the variables needed for the scrolling
 void updateUpDown();
@@ -44,7 +61,7 @@ Vector2 GetRaylibOrigin(Rectangle);
 Rectangle GetRaylibOriginR(Rectangle);
 
 //Draw a centered and scaled Texture
-void DrawTextureCenter(Texture2D, float, float, float, Color);
+//void DrawTextureCenter(Texture2D*, float, float, float, Color);
 //Draw centered and scaled combo numbers
 void DrawCNumbersCenter(int, float, float, float, Color);
 //lmao
@@ -53,15 +70,15 @@ void DrawTextLeft(const char *, float, float, float, Color);
 //Draw scaled combo numbers from left to right
 void DrawCNumbersLeft(int, float, float, float, Color);
 //Draw a centered, scaled and rotated Texture
-void DrawTextureRotate(Texture2D, float, float, float, float, Color);
+//void DrawTextureRotate(Texture2D, float, float, float, float, Color);
 //max trigo
-void DrawTextureOnCircle(Texture2D, float, float, float, float, float, float, Color);
+void DrawTextureOnCircle(Texture2D*, float, float, float, float, float, float, Color);
 //Draw a slider texture (exclusively for a slider object)
-void DrawTextureSlider(Texture2D, float, float, Color, float);
+void DrawTextureSlider(Texture2D*, float, float, Color, float);
 
-void DrawSpinnerMeter(Texture2D, float);
+void DrawSpinnerMeter(Texture2D*, float);
 
-void DrawSpinnerBack(Texture2D, Color);
+void DrawSpinnerBack(Texture2D*, Color);
 
 //Clip a number between two other numbers
 float clip( float, float, float);
@@ -109,9 +126,10 @@ double getTimer();
 void addOffsetTimer(unsigned long long int);
 void updateTimer();
 
-bool IsTextureReady(Texture2D);
-bool IsRenderTextureReady(RenderTexture2D);
+bool IsTextureReady(Texture2D*);
+bool IsRenderTextureReady(RenderTexture2D*);
 
 float getAngle(Vector2, Vector2);
 
 std::vector<std::string> getAudioFilenames(int , int , int , int , int , int , int , std::string);
+

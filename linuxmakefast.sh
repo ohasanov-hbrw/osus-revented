@@ -1,1 +1,1 @@
-make run -j12
+make run -j12 --makefile=MakefilePC

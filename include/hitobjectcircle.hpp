@@ -8,6 +8,7 @@ class Circle : public HitObject{
         void update() override;
         void dead_update() override;
         void dead_render() override;
+        void deinit() override; 
     private:
 
 };

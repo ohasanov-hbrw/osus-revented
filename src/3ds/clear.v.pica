@@ -1,0 +1,15 @@
+; Uniforms
+.fvec clear_color
+
+; Outputs
+.out outpos position
+.out outclr color
+
+; Input aliases
+.alias inpos v0
+
+.proc main
+	mov outpos, inpos
+	mov outclr, clear_color
+	end
+.end

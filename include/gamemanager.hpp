@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "utils.hpp"
 #include <limits>
-
+#include "linkedListImpl.hpp"
 
 struct dbool
 {
@@ -39,9 +39,11 @@ class GameManager{
 		void loadGameTextures();
 		void loadGameSounds();
 		void unloadGameTextures();
-		void destroyHitObject(int index);
-		void destroyDeadHitObject(int index);
-		std::vector<int> sliderPreInit(HitObjectData data);
+		void destroyHitObject(Node *node);
+		void destroyDeadHitObject(Node *node);
+		void unloadSliderTextures();
+		//std::vector<int> sliderPreInit(HitObjectData data);
+		int * sliderPreInit(HitObjectData data);
 		void render();
 
 		HitSound SoundFilesAll;
@@ -49,7 +51,14 @@ class GameManager{
 
 		float windowScale = 2.0f;
         HitSound hitCircleHS;
-		int skip = 3;
+		
+		#ifdef THREEDS_BUILD
+			int skip = 10;
+		#endif
+		#ifndef THREEDS_BUILD
+			int skip = 3;
+		#endif
+
 		bool renderSpinnerCircle = false;
 		bool renderSpinnerMetre = false;
 		bool renderSpinnerBack = false;
@@ -77,13 +86,16 @@ class GameManager{
 		Texture2D spinnerMetre;
 		Texture2D spinnerBack;
 		Texture2D followPoint;
+		RenderTexture2D sliderInnerBall;
+		RenderTexture2D sliderOuterBall;
 		Music backgroundMusic;
 		double currentTime;
 		double currentTimeTemp = -1;
 		int combo = 1;
 		int clickCombo = 0;
+		int maxCombo;
 		Color comboColour;
-		int score = 0;
+		long int score = 0;
 		float difficultyMultiplier = 0;
 		int currentComboIndex = 0;
 		int time;
@@ -104,10 +116,12 @@ class GameManager{
 		Vector2 MousePosition;
 		GameFile gameFile;
 		Parser parser;
+
+		Linkedlist objectsLinkedList;
+		Linkedlist deadObjectsLinkedList;
+
 		std::vector<HitObject*> objects;
-
 		std::vector<FollowPoint> followLines;
-
 		std::vector<HitObject*> dead_objects;
 		float clip(float value, float min, float max);
 		std::vector<timingSettings> timingSettingsForHitObject;
@@ -135,7 +149,10 @@ class GameManager{
 		bool temprenderSpinnerMetre = false;
 		bool temprenderSpinnerBack = false;
 
-
+		int hit300s = 0;
+		int hit100s = 0;
+		int hit50s = 0;
+		int hit0s = 0;
 
 		std::string lastPath;
 		std::string GamePathWithSlash;

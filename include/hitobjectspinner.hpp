@@ -8,6 +8,7 @@ class Spinner : public HitObject{
         void update() override;
         void dead_update() override;
         void dead_render() override;
+        void deinit() override; 
         float renderAngle = 0;
         float totalAngle = 0;
         float neededAngle = 0;

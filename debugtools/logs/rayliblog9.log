@@ -1,0 +1,760 @@
+rm -rf vendor/raylib/src/*.o vendor/raylib/src/libraylib.a bin/osus   object/fastrender.o  object/followpoint.o  object/fs.o  object/gamemanager.o  object/gui.o  object/hitobjectcircle.o  object/hitobjectslider.o  object/hitobjectspinner.o  object/linkedListImpl.o  object/main.o  object/parser.o  object/platformspesifics.o  object/SDLutils.o  object/settingsParser.o  object/state.o  object/time_util.o  object/utils.o object/*.d vendor/zip/build SDL_mixer/build vendor/raylib/src/external/glfw/build
+cd vendor/raylib/src/ && make
+make[1]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/raylib/src'
+x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rcore.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rshapes.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rtextures.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rtext.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c utils.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32  -c rglfw.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c rmodels.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+x86_64-w64-mingw32-gcc --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -c raudio.c -Wall -D_DEFAULT_SOURCE -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing  -std=c99 -fPIC -O1 -Werror=implicit-function-declaration -I. -Iexternal/glfw/include -Iexternal/glfw/deps/mingw -I/usr/x86_64-w64-mingw32/include/SDL2 
+In file included from rcore.c:125:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+In file included from rmodels.c:53:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+In file included from rshapes.c:57:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+In file included from rtextures.c:74:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+In file included from rtext.c:62:
+rlgl.h:182:13: warning: "GRAPHICS_API_OPENGL_33" redefined
+  182 |     #define GRAPHICS_API_OPENGL_33
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+<command-line>: note: this is the location of the previous definition
+<command-line>: note: this is the location of the previous definition
+<command-line>: note: this is the location of the previous definition
+<command-line>: note: this is the location of the previous definition
+In file included from rtext.c:76:
+external/stb_truetype.h:4962:15: warning: ‘stbtt_CompareUTF8toUTF16_bigendian’ defined but not used [-Wunused-function]
+ 4962 | STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const char *s2, int len2)
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4957:15: warning: ‘stbtt_FindMatchingFont’ defined but not used [-Wunused-function]
+ 4957 | STBTT_DEF int stbtt_FindMatchingFont(const unsigned char *fontdata, const char *name, int flags)
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4947:15: warning: ‘stbtt_GetNumberOfFonts’ defined but not used [-Wunused-function]
+ 4947 | STBTT_DEF int stbtt_GetNumberOfFonts(const unsigned char *data)
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4935:15: warning: ‘stbtt_BakeFontBitmap’ defined but not used [-Wunused-function]
+ 4935 | STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char *data, int offset,
+      |               ^~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4822:23: warning: ‘stbtt_GetFontNameString’ defined but not used [-Wunused-function]
+ 4822 | STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font, int *length, int platformID, int encodingID, int languageID, int nameID)
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4765:16: warning: ‘stbtt_FreeSDF’ defined but not used [-Wunused-function]
+ 4765 | STBTT_DEF void stbtt_FreeSDF(unsigned char *bitmap, void *userdata)
+      |                ^~~~~~~~~~~~~
+external/stb_truetype.h:4363:16: warning: ‘stbtt_GetPackedQuad’ defined but not used [-Wunused-function]
+ 4363 | STBTT_DEF void stbtt_GetPackedQuad(const stbtt_packedchar *chardata, int pw, int ph, int char_index, float *xpos, float *ypos, stbtt_aligned_quad *q, int align_to_integer)
+      |                ^~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4350:16: warning: ‘stbtt_GetScaledFontVMetrics’ defined but not used [-Wunused-function]
+ 4350 | STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char *fontdata, int index, float size, float *ascent, float *descent, float *lineGap)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4338:15: warning: ‘stbtt_PackFontRange’ defined but not used [-Wunused-function]
+ 4338 | STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context *spc, const unsigned char *fontdata, int font_index, float font_size,
+      |               ^~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:4005:16: warning: ‘stbtt_PackSetSkipMissingCodepoints’ defined but not used [-Wunused-function]
+ 4005 | STBTT_DEF void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc, int skip)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3995:16: warning: ‘stbtt_PackSetOversampling’ defined but not used [-Wunused-function]
+ 3995 | STBTT_DEF void stbtt_PackSetOversampling(stbtt_pack_context *spc, unsigned int h_oversample, unsigned int v_oversample)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3989:16: warning: ‘stbtt_PackEnd’ defined but not used [-Wunused-function]
+ 3989 | STBTT_DEF void stbtt_PackEnd  (stbtt_pack_context *spc)
+      |                ^~~~~~~~~~~~~
+external/stb_truetype.h:3957:15: warning: ‘stbtt_PackBegin’ defined but not used [-Wunused-function]
+ 3957 | STBTT_DEF int stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels, int pw, int ph, int stride_in_bytes, int padding, void *alloc_context)
+      |               ^~~~~~~~~~~~~~~
+external/stb_truetype.h:3859:16: warning: ‘stbtt_GetBakedQuad’ defined but not used [-Wunused-function]
+ 3859 | STBTT_DEF void stbtt_GetBakedQuad(const stbtt_bakedchar *chardata, int pw, int ph, int char_index, float *xpos, float *ypos, stbtt_aligned_quad *q, int opengl_fillrule)
+      |                ^~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3802:16: warning: ‘stbtt_MakeCodepointBitmap’ defined but not used [-Wunused-function]
+ 3802 | STBTT_DEF void stbtt_MakeCodepointBitmap(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, int codepoint)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3787:16: warning: ‘stbtt_MakeCodepointBitmapSubpixelPrefilter’ defined but not used [-Wunused-function]
+ 3787 | STBTT_DEF void stbtt_MakeCodepointBitmapSubpixelPrefilter(const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y, int oversample_x, int oversample_y, float *sub_x, float *sub_y, int codepoint)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3753:26: warning: ‘stbtt_GetGlyphBitmap’ defined but not used [-Wunused-function]
+ 3753 | STBTT_DEF unsigned char *stbtt_GetGlyphBitmap(const stbtt_fontinfo *info, float scale_x, float scale_y, int glyph, int *width, int *height, int *xoff, int *yoff)
+      |                          ^~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:3708:16: warning: ‘stbtt_FreeBitmap’ defined but not used [-Wunused-function]
+ 3708 | STBTT_DEF void stbtt_FreeBitmap(unsigned char *bitmap, void *userdata)
+      |                ^~~~~~~~~~~~~~~~
+external/stb_truetype.h:2749:16: warning: ‘stbtt_GetCodepointBitmapBox’ defined but not used [-Wunused-function]
+ 2749 | STBTT_DEF void stbtt_GetCodepointBitmapBox(const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2711:15: warning: ‘stbtt_GetCodepointSVG’ defined but not used [-Wunused-function]
+ 2711 | STBTT_DEF int stbtt_GetCodepointSVG(const stbtt_fontinfo *info, int unicode_codepoint, const char **svg)
+      |               ^~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2672:16: warning: ‘stbtt_FreeShape’ defined but not used [-Wunused-function]
+ 2672 | STBTT_DEF void stbtt_FreeShape(const stbtt_fontinfo *info, stbtt_vertex *v)
+      |                ^~~~~~~~~~~~~~~
+external/stb_truetype.h:2652:16: warning: ‘stbtt_GetFontBoundingBox’ defined but not used [-Wunused-function]
+ 2652 | STBTT_DEF void stbtt_GetFontBoundingBox(const stbtt_fontinfo *info, int *x0, int *y0, int *x1, int *y1)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2641:16: warning: ‘stbtt_GetFontVMetricsOS2’ defined but not used [-Wunused-function]
+ 2641 | STBTT_DEF int  stbtt_GetFontVMetricsOS2(const stbtt_fontinfo *info, int *typoAscent, int *typoDescent, int *typoLineGap)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2622:16: warning: ‘stbtt_GetCodepointKernAdvance’ defined but not used [-Wunused-function]
+ 2622 | STBTT_DEF int  stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2332:15: warning: ‘stbtt_GetKerningTable’ defined but not used [-Wunused-function]
+ 2332 | STBTT_DEF int stbtt_GetKerningTable(const stbtt_fontinfo *info, stbtt_kerningentry* table, int table_length)
+      |               ^~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:2317:16: warning: ‘stbtt_GetKerningTableLength’ defined but not used [-Wunused-function]
+ 2317 | STBTT_DEF int  stbtt_GetKerningTableLength(const stbtt_fontinfo *info)
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:1646:15: warning: ‘stbtt_IsGlyphEmpty’ defined but not used [-Wunused-function]
+ 1646 | STBTT_DEF int stbtt_IsGlyphEmpty(const stbtt_fontinfo *info, int glyph_index)
+      |               ^~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:1641:15: warning: ‘stbtt_GetCodepointBox’ defined but not used [-Wunused-function]
+ 1641 | STBTT_DEF int stbtt_GetCodepointBox(const stbtt_fontinfo *info, int codepoint, int *x0, int *y0, int *x1, int *y1)
+      |               ^~~~~~~~~~~~~~~~~~~~~
+external/stb_truetype.h:1589:15: warning: ‘stbtt_GetCodepointShape’ defined but not used [-Wunused-function]
+ 1589 | STBTT_DEF int stbtt_GetCodepointShape(const stbtt_fontinfo *info, int unicode_codepoint, stbtt_vertex **vertices)
+      |               ^~~~~~~~~~~~~~~~~~~~~~~
+rcore.c:2962:13: warning: ‘SetupFramebuffer’ defined but not used [-Wunused-function]
+ 2962 | static void SetupFramebuffer(int width, int height)
+      |             ^~~~~~~~~~~~~~~~
+rcore.c:479:12: warning: ‘gifFrameCounter’ defined but not used [-Wunused-variable]
+  479 | static int gifFrameCounter = 0;             // GIF frames counter
+      |            ^~~~~~~~~~~~~~~
+rcore.c:475:12: warning: ‘screenshotCounter’ defined but not used [-Wunused-variable]
+  475 | static int screenshotCounter = 0;           // Screenshots counter
+      |            ^~~~~~~~~~~~~~~~~
+In file included from raudio.c:203:
+external/stb_vorbis.h: In function ‘stbv_decode_residue’:
+external/stb_vorbis.h:900:46: warning: statement with no effect [-Wunused-value]
+  900 | #define stbv_temp_free(f,p)                  0
+      |                                              ^
+external/stb_vorbis.h:2275:4: note: in expansion of macro ‘stbv_temp_free’
+ 2275 |    stbv_temp_free(f,part_classdata);
+      |    ^~~~~~~~~~~~~~
+external/stb_vorbis.h: In function ‘stbv_inverse_mdct’:
+external/stb_vorbis.h:900:46: warning: statement with no effect [-Wunused-value]
+  900 | #define stbv_temp_free(f,p)                  0
+      |                                              ^
+external/stb_vorbis.h:2924:4: note: in expansion of macro ‘stbv_temp_free’
+ 2924 |    stbv_temp_free(f,buf2);
+      |    ^~~~~~~~~~~~~~
+In file included from rlgl.h:790:
+rlgl.h: In function ‘rlGenTextureMipmaps’:
+external/glad.h:5129:22: warning: pointer ‘texData’ may be used after ‘realloc’ [-Wuse-after-free]
+ 5129 | #define glTexImage2D glad_glTexImage2D
+rlgl.h:3220:17: note: in expansion of macro ‘glTexImage2D’
+ 3220 |                 glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA8, mipWidth, mipHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char *)texData + offset);
+      |                 ^~~~~~~~~~~~
+In file included from rcore.c:115:
+In function ‘rlGenTextureMipmapsData’,
+    inlined from ‘rlGenTextureMipmaps’ at rlgl.h:3209:31:
+raylib.h:121:33: note: call to ‘realloc’ here
+  121 |     #define RL_REALLOC(ptr,sz)  realloc(ptr,sz)
+      |                                 ^~~~~~~~~~~~~~~
+rlgl.h:4659:27: note: in expansion of macro ‘RL_REALLOC’
+ 4659 |     unsigned char *temp = RL_REALLOC(data, size);
+      |                           ^~~~~~~~~~
+rlgl.h: In function ‘rlGenTextureMipmaps’:
+raylib.h:124:33: warning: pointer ‘texData’ used after ‘realloc’ [-Wuse-after-free]
+  124 |     #define RL_FREE(ptr)        free(ptr)
+      |                                 ^~~~~~~~~
+rlgl.h:3230:13: note: in expansion of macro ‘RL_FREE’
+ 3230 |             RL_FREE(texData); // Once mipmaps have been generated and data has been uploaded to GPU VRAM, we can discard RAM data
+      |             ^~~~~~~
+In function ‘rlGenTextureMipmapsData’,
+    inlined from ‘rlGenTextureMipmaps’ at rlgl.h:3209:31:
+raylib.h:121:33: note: call to ‘realloc’ here
+  121 |     #define RL_REALLOC(ptr,sz)  realloc(ptr,sz)
+      |                                 ^~~~~~~~~~~~~~~
+rlgl.h:4659:27: note: in expansion of macro ‘RL_REALLOC’
+ 4659 |     unsigned char *temp = RL_REALLOC(data, size);
+      |                           ^~~~~~~~~~
+raudio.c: In function ‘ReadAudioBufferFramesInMixingFormat’:
+raudio.c:2231:19: warning: unused variable ‘result’ [-Wunused-variable]
+ 2231 |         ma_result result = ma_data_converter_get_required_input_frame_count(&audioBuffer->converter, outputFramesToProcessThisIteration, &inputFramesToProcessThisIteration);
+      |                   ^~~~~~
+In file included from rmodels.c:43:
+external/par_shapes.h: In function ‘par_shapes_create_disk’:
+raylib.h:115:33: warning: argument 1 range [18446744069414584320, 18446744073709551610] exceeds maximum object size 9223372036854775807 [-Walloc-size-larger-than=]
+  115 |     #define RL_MALLOC(sz)       malloc(sz)
+      |                                 ^~~~~~~~~~
+rmodels.c:90:35: note: in expansion of macro ‘RL_MALLOC’
+   90 |     #define PAR_MALLOC(T, N) ((T*)RL_MALLOC(N*sizeof(T)))
+      |                                   ^~~~~~~~~
+external/par_shapes.h:741:23: note: in expansion of macro ‘PAR_MALLOC’
+  741 |     mesh->triangles = PAR_MALLOC(PAR_SHAPES_T, 3 * mesh->ntriangles);
+      |                       ^~~~~~~~~~
+In file included from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:46,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from raylib.h:80:
+/usr/x86_64-w64-mingw32/include/stdlib.h:538:17: note: in a call to allocation function ‘malloc’ declared here
+  538 |   void *__cdecl malloc(size_t _Size);
+      |                 ^~~~~~
+In file included from raudio.c:172:
+external/miniaudio.h: In function ‘ma_resource_manager_data_stream_fill_page’:
+external/miniaudio.h:66476:9: warning: ‘rangeBeg’ may be used uninitialized [-Wmaybe-uninitialized]
+66476 |         ma_data_source_set_range_in_pcm_frames(&pDataStream->decoder, rangeBeg, rangeEnd);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/miniaudio.h:66468:19: note: ‘rangeBeg’ was declared here
+66468 |         ma_uint64 rangeBeg;
+      |                   ^~~~~~~~
+external/miniaudio.h:66476:9: warning: ‘rangeEnd’ may be used uninitialized [-Wmaybe-uninitialized]
+66476 |         ma_data_source_set_range_in_pcm_frames(&pDataStream->decoder, rangeBeg, rangeEnd);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/miniaudio.h:66469:19: note: ‘rangeEnd’ was declared here
+66469 |         ma_uint64 rangeEnd;
+      |                   ^~~~~~~~
+external/miniaudio.h:66479:9: warning: ‘loopPointBeg’ may be used uninitialized [-Wmaybe-uninitialized]
+66479 |         ma_data_source_set_loop_point_in_pcm_frames(&pDataStream->decoder, loopPointBeg, loopPointEnd);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/miniaudio.h:66470:19: note: ‘loopPointBeg’ was declared here
+66470 |         ma_uint64 loopPointBeg;
+      |                   ^~~~~~~~~~~~
+external/miniaudio.h:66479:9: warning: ‘loopPointEnd’ may be used uninitialized [-Wmaybe-uninitialized]
+66479 |         ma_data_source_set_loop_point_in_pcm_frames(&pDataStream->decoder, loopPointBeg, loopPointEnd);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+external/miniaudio.h:66471:19: note: ‘loopPointEnd’ was declared here
+66471 |         ma_uint64 loopPointEnd;
+      |                   ^~~~~~~~~~~~
+external/stb_vorbis.h: In function ‘stbv_start_decoder’:
+external/stb_vorbis.h:3939:37: warning: ‘hi’ may be used uninitialized [-Wmaybe-uninitialized]
+ 3939 |             g->stbv_neighbors[j][1] = hi;
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~
+external/stb_vorbis.h:3936:21: note: ‘hi’ was declared here
+ 3936 |             int low,hi;
+      |                     ^~
+external/stb_vorbis.h:3938:37: warning: ‘low’ may be used uninitialized [-Wmaybe-uninitialized]
+ 3938 |             g->stbv_neighbors[j][0] = low;
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+external/stb_vorbis.h:3936:17: note: ‘low’ was declared here
+ 3936 |             int low,hi;
+      |                 ^~~
+ar rcs ../src/libraylib.a rcore.o rshapes.o rtextures.o rtext.o utils.o rglfw.o rmodels.o raudio.o
+raylib static library generated (libraylib.a) in ../src!
+make[1]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/raylib/src'
+cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make -j12
+-- The C compiler identification is GNU 14.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - failed
+-- Check for working C compiler: /usr/sbin/x86_64-w64-mingw32-gcc
+-- Check for working C compiler: /usr/sbin/x86_64-w64-mingw32-gcc - works
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (4.1s)
+-- Generating done (0.2s)
+-- Build files have been written to: /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build
+make[1]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+make[1]: warning: -j12 forced in submake: resetting jobserver mode.
+/usr/sbin/cmake -S/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip -B/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build --check-build-system CMakeFiles/Makefile.cmake 0
+/usr/sbin/cmake -E cmake_progress_start /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build/CMakeFiles /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[2]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+make  -f CMakeFiles/zip.dir/build.make CMakeFiles/zip.dir/depend
+make[3]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+cd /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build && /usr/sbin/cmake -E cmake_depends "Unix Makefiles" /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build/CMakeFiles/zip.dir/DependInfo.cmake "--color="
+make[3]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+make  -f CMakeFiles/zip.dir/build.make CMakeFiles/zip.dir/build
+make[3]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+[ 50%] Building C object CMakeFiles/zip.dir/src/zip.c.o
+/usr/sbin/x86_64-w64-mingw32-gcc  --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32  -I/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/src -Wall -Wextra -Werror -pedantic -fPIC -fvisibility=hidden -MD -MT CMakeFiles/zip.dir/src/zip.c.o -MF CMakeFiles/zip.dir/src/zip.c.o.d -o CMakeFiles/zip.dir/src/zip.c.o -c /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/src/zip.c
+[100%] Linking C static library libzip.a
+/usr/sbin/cmake -P CMakeFiles/zip.dir/cmake_clean_target.cmake
+/usr/sbin/cmake -E cmake_link_script CMakeFiles/zip.dir/link.txt --verbose=1
+/usr/sbin/x86_64-w64-mingw32-ar qc libzip.a CMakeFiles/zip.dir/src/zip.c.o
+/usr/sbin/x86_64-w64-mingw32-ranlib libzip.a
+make[3]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+[100%] Built target zip
+make[2]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+/usr/sbin/cmake -E cmake_progress_start /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build/CMakeFiles 0
+make[1]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make -j12
+-- Configuring done (0.1s)
+-- Generating done (0.2s)
+-- Build files have been written to: /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build
+make[1]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+make[1]: warning: -j12 forced in submake: resetting jobserver mode.
+/usr/sbin/cmake -S/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip -B/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build --check-build-system CMakeFiles/Makefile.cmake 0
+/usr/sbin/cmake -E cmake_progress_start /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build/CMakeFiles /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build//CMakeFiles/progress.marks
+make  -f CMakeFiles/Makefile2 all
+make[2]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+make  -f CMakeFiles/zip.dir/build.make CMakeFiles/zip.dir/depend
+make[3]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+cd /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build && /usr/sbin/cmake -E cmake_depends "Unix Makefiles" /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build/CMakeFiles/zip.dir/DependInfo.cmake "--color="
+make[3]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+make  -f CMakeFiles/zip.dir/build.make CMakeFiles/zip.dir/build
+make[3]: Entering directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+make[3]: Nothing to be done for 'CMakeFiles/zip.dir/build'.
+make[3]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+[100%] Built target zip
+make[2]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+/usr/sbin/cmake -E cmake_progress_start /mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build/CMakeFiles 0
+make[1]: Leaving directory '/mnt/z/3DS-Projeler/osus-revented-3ds-git/osus-revented-3ds/vendor/zip/build'
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fastrender.o -c src/fastrender.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/followpoint.o -c src/followpoint.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/fs.o -c src/fs.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/gamemanager.o -c src/gamemanager.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/gui.o -c src/gui.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectcircle.o -c src/hitobjectcircle.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectslider.o -c src/hitobjectslider.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/hitobjectspinner.o -c src/hitobjectspinner.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/linkedListImpl.o -c src/linkedListImpl.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/main.o -c src/main.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/parser.o -c src/parser.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+x86_64-w64-mingw32-g++ --static  -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -D_FILE_OFFSET_BITS=64 -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -D_WIN32 -MMD -o object/platformspesifics.o -c src/platformspesifics.cpp -std=c++17 -O2 -Ivendor/raylib/src -Iinclude -Ivendor/zip/src -Iinclude/sound -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64
+In file included from src/gui.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/gui.hpp:3,
+                 from src/gui.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/fastrender.hpp:2,
+                 from src/fastrender.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/utils.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from src/main.cpp:11:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from src/main.cpp:8:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/gamemanager.cpp:1:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/parser.hpp:4,
+                 from include/gamemanager.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectslider.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectslider.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectspinner.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectspinner.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/followpoint.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/followpoint.hpp:5,
+                 from src/followpoint.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from src/hitobjectcircle.cpp:4:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from src/hitobjectcircle.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/fs.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from include/platformspesifics.hpp:3,
+                 from include/globals.hpp:2:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+In file included from include/gamemanager.hpp:6,
+                 from include/globals.hpp:7,
+                 from src/parser.cpp:2:
+include/utils.hpp:12:10: warning: "M_PI" redefined
+   12 | # define M_PI 3.14159265358979323846f
+      |          ^~~~
+In file included from /usr/x86_64-w64-mingw32/include/c++/14.2.0/cmath:47,
+                 from /usr/x86_64-w64-mingw32/include/c++/14.2.0/math.h:36,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_stdinc.h:90,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL_main.h:25,
+                 from /usr/x86_64-w64-mingw32/include/SDL2/SDL.h:32,
+                 from vendor/raylib/src/raylib.h:80,
+                 from include/hitobject.hpp:5,
+                 from include/gamefile.hpp:4,
+                 from include/parser.hpp:4,
+                 from src/parser.cpp:1:
+/usr/x86_64-w64-mingw32/include/math.h:45:9: note: this is the location of the previous definition
+   45 | #define M_PI            3.14159265358979323846
+      |         ^~~~
+src/platformspesifics.cpp:88:6: error: default argument given for parameter 1 of ‘void _gpu_end_drawing(bool)’ [-fpermissive]
+   88 | void _gpu_end_drawing(bool batch = true){
+      |      ^~~~~~~~~~~~~~~~
+In file included from src/platformspesifics.cpp:1:
+include/platformspesifics.hpp:57:6: note: previous specification in ‘void _gpu_end_drawing(bool)’ here
+   57 | void _gpu_end_drawing(bool batch = true);
+      |      ^~~~~~~~~~~~~~~~
+src/platformspesifics.cpp: In function ‘void _gpu_init_render_thread()’:
+src/platformspesifics.cpp:135:14: error: ‘cout’ is not a member of ‘std’
+  135 |         std::cout << "Render make gl current\n";
+      |              ^~~~
+src/platformspesifics.cpp:3:1: note: ‘std::cout’ is defined in header ‘<iostream>’; this is probably fixable by adding ‘#include <iostream>’
+    2 | #include "rlgl.h"
+  +++ |+#include <iostream>
+    3 | 
+src/platformspesifics.cpp:137:25: error: ‘Global’ was not declared in this scope
+  137 |         ClearBackground(Global.Background);
+      |                         ^~~~~~
+src/platformspesifics.cpp:141:14: error: ‘cout’ is not a member of ‘std’
+  141 |         std::cout << "Clear first bg\n";
+      |              ^~~~
+src/platformspesifics.cpp:141:14: note: ‘std::cout’ is defined in header ‘<iostream>’; this is probably fixable by adding ‘#include <iostream>’
+src/platformspesifics.cpp: In function ‘void DrawTextureRotate(Texture2D*, float, float, float, float, Color)’:
+src/platformspesifics.cpp:166:48: warning: narrowing conversion of ‘tex->Texture::width’ from ‘int’ to ‘float’ [-Wnarrowing]
+  166 |         DrawTexturePro(tex, Rectangle{0,0,tex->width,tex->height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
+      |                                           ~~~~~^~~~~
+src/platformspesifics.cpp:166:59: warning: narrowing conversion of ‘tex->Texture::height’ from ‘int’ to ‘float’ [-Wnarrowing]
+  166 |         DrawTexturePro(tex, Rectangle{0,0,tex->width,tex->height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
+      |                                                      ~~~~~^~~~~~
+src/platformspesifics.cpp:166:78: error: ‘ScaleCordX’ was not declared in this scope
+  166 |         DrawTexturePro(tex, Rectangle{0,0,tex->width,tex->height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
+      |                                                                              ^~~~~~~~~~
+src/platformspesifics.cpp:166:92: error: ‘ScaleCordY’ was not declared in this scope
+  166 |         DrawTexturePro(tex, Rectangle{0,0,tex->width,tex->height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
+      |                                                                                            ^~~~~~~~~~
+src/platformspesifics.cpp:166:106: error: ‘Scale’ was not declared in this scope
+  166 |         DrawTexturePro(tex, Rectangle{0,0,tex->width,tex->height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
+      |                                                                                                          ^~~~~
+make: *** [MakefilePC:31: object/platformspesifics.o] Error 1
+make: *** Waiting for unfinished jobs....
+src/gui.cpp: In member function ‘virtual void Button::render()’:
+src/gui.cpp:33:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   33 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:33:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   33 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:39:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   39 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:39:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   39 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:43:55: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   43 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:43:91: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   43 |         DrawTextEx(&Global.DefaultFont, text, Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp: In member function ‘virtual void TextBox::render()’:
+src/gui.cpp:85:70: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   85 |             DrawTextEx(&Global.DefaultFont, subtext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:85:106: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   85 |             DrawTextEx(&Global.DefaultFont, subtext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:87:73: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   87 |             DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:87:109: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   87 |             DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), this->color);
+      |                                                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:96:69: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   96 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:96:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+   96 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:100:69: warning: narrowing conversion of ‘(int)ScaleCordX(float)(TextBoxLocation.Vector2::x)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  100 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:100:105: warning: narrowing conversion of ‘(int)ScaleCordY(float)(TextBoxLocation.Vector2::y)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  100 |         DrawTextEx(&Global.DefaultFont, rendertext.c_str(), Vector2{(int)ScaleCordX(TextBoxLocation.x), (int)ScaleCordY(TextBoxLocation.y)}, Scale(textsize),  Scale(2), textcolor);
+      |                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp: In member function ‘virtual void TestSlider::render()’:
+src/gui.cpp:299:51: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x) - ((((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * ((double)1 - percentage)) / (double)2))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  299 |     Rectangle Left = GetRaylibOriginR({position.x - (size.x * (1 - percentage)) / 2, position.y, size.x * percentage, size.y});
+      |                                        ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:299:105: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage)’ from ‘double’ to ‘float’ [-Wnarrowing]
+  299 |     Rectangle Left = GetRaylibOriginR({position.x - (size.x * (1 - percentage)) / 2, position.y, size.x * percentage, size.y});
+      |                                                                                                  ~~~~~~~^~~~~~~~~~~~
+src/gui.cpp:300:52: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x) + ((((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage) / (double)2))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  300 |     Rectangle Right = GetRaylibOriginR({position.x + (size.x * (percentage)) / 2, position.y, size.x * (1.0f-percentage), size.y});
+      |                                         ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp:300:102: warning: narrowing conversion of ‘(((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * (((double)1.0e+0f) - percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  300 |     Rectangle Right = GetRaylibOriginR({position.x + (size.x * (percentage)) / 2, position.y, size.x * (1.0f-percentage), size.y});
+      |                                                                                               ~~~~~~~^~~~~~~~~~~~~~~~~~~
+src/gui.cpp:301:68: warning: narrowing conversion of ‘(((double)(((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x - (((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x / (float)2))) + (((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  301 |     Rectangle Dingus = GetRaylibOriginR({position.x - (size.x / 2) + (size.x * (percentage)), position.y, size.y / 2, size.y});
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+src/gui.cpp: In member function ‘virtual void TestSlider::update()’:
+src/gui.cpp:345:68: warning: narrowing conversion of ‘(((double)(((TestSlider*)this)->TestSlider::GuiElement.GuiElement::position.Vector2::x - (((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x / (float)2))) + (((double)((TestSlider*)this)->TestSlider::GuiElement.GuiElement::size.Vector2::x) * percentage))’ from ‘double’ to ‘float’ [-Wnarrowing]
+  345 |     Rectangle Dingus = GetRaylibOriginR({position.x - (size.x / 2) + (size.x * (percentage)), position.y, size.y / 2, size.y});
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+src/followpoint.cpp: In member function ‘void FollowPoint::render()’:
+src/followpoint.cpp:77:127: warning: narrowing conversion of ‘opacity’ from ‘int’ to ‘unsigned char’ [-Wnarrowing]
+   77 |                 DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, {255,200,255,opacity});
+      |                                                                                                                               ^~~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::update()’:
+src/gamemanager.cpp:310:105: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                         ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:310:124: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  310 |                         Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+      |                                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:315:108: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  315 |                                 if (CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f)){
+      |                                                                                            ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:397:115: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  397 |                                         if(CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
+      |                                                                                                   ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:98: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::x’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                  ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp:496:117: warning: narrowing conversion of ‘hitObject->HitObject::data.HitObjectData::y’ from ‘short int’ to ‘float’ [-Wnarrowing]
+  496 |                                                 Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+      |                                                                                                     ~~~~~~~~~~~~~~~~^
+src/gamemanager.cpp: In member function ‘void GameManager::render()’:
+src/gamemanager.cpp:739:180: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                                                                                                    ^~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp:739:200: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)400)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  739 |                 DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+      |                                                                                                                                                                                                        ^~~~~~~~~~~~~~~~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadDefaultSkin(std::string)’:
+src/gamemanager.cpp:935:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  935 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSkin(std::string)’:
+src/gamemanager.cpp:1045:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1045 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadBeatmapSkin(std::string)’:
+src/gamemanager.cpp:1152:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1152 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGame(std::string)’:
+src/gamemanager.cpp:1321:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 1321 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::unloadGame()’:
+src/gamemanager.cpp:1860:53: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1860 |                 delete objectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp:1867:57: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1867 |                 delete deadObjectsLinkedList.getHead()->object;
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::destroyDeadHitObject(Node*)’:
+src/gamemanager.cpp:1918:22: warning: deleting ‘void*’ is undefined [-Wdelete-incomplete]
+ 1918 |         delete node->object;
+      |                ~~~~~~^~~~~~
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameTextures()’:
+src/gamemanager.cpp:2026:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2026 |         files = ls(".png");
+      |                    ^~~~~~
+src/gamemanager.cpp:2027:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2027 |         std::vector<std::string> files2 = ls(".jpg");
+      |                                              ^~~~~~
+src/gamemanager.cpp:2028:46: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2028 |         std::vector<std::string> files3 = ls(".jpeg");
+      |                                              ^~~~~~~
+src/gamemanager.cpp:2092:115: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::xOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2092 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp:2092:143: warning: narrowing conversion of ‘((GameManager*)this)->GameManager::gameFile.GameFile::events.std::vector<Event>::operator[](((std::vector<Event>::size_type)j)).Event::yOffset’ from ‘int’ to ‘float’ [-Wnarrowing]
+ 2092 |                                         backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+src/gamemanager.cpp: In member function ‘void GameManager::loadGameSounds()’:
+src/gamemanager.cpp:2594:50: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2594 |         std::vector<std::string> ComboBreak = ls(".wav");
+      |                                                  ^~~~~~
+src/gamemanager.cpp:2629:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2629 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2658:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2658 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2688:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2688 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2716:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2716 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2743:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2743 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/gamemanager.cpp:2772:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2772 |         ComboBreak = ls(".wav");
+      |                         ^~~~~~
+src/gamemanager.cpp:2797:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2797 |         ComboBreak = ls(".ogg");
+      |                         ^~~~~~
+src/gamemanager.cpp:2822:25: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+ 2822 |         ComboBreak = ls(".mp3");
+      |                         ^~~~~~
+src/main.cpp: In function ‘void RenderLoop(void*)’:
+src/main.cpp:72:5: error: ‘LoadFontDefault’ was not declared in this scope; did you mean ‘GetFontDefault’?
+   72 |     LoadFontDefault();
+      |     ^~~~~~~~~~~~~~~
+      |     GetFontDefault
+src/main.cpp:87:45: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+   87 |         std::vector<std::string> files = ls(".png");
+      |                                             ^~~~~~
+src/main.cpp:104:16: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+  104 |     files = ls(".png");
+      |                ^~~~~~
+src/main.cpp:158:93: warning: narrowing conversion of ‘(int)ScaleCordX(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  158 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                             ^~~~~~~~~~~~~~~~~~
+src/main.cpp:158:113: warning: narrowing conversion of ‘(int)ScaleCordY(float)((float)5)’ from ‘int’ to ‘float’ [-Wnarrowing]
+  158 |         DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+      |                                                                                                                 ^~~~~~~~~~~~~~~~~~
+src/main.cpp:186:5: error: ‘UnloadFontDefault’ was not declared in this scope; did you mean ‘UnloadFontData’?
+  186 |     UnloadFontDefault();
+      |     ^~~~~~~~~~~~~~~~~
+      |     UnloadFontData
+src/main.cpp:188:5: error: ‘C2D_Fini’ was not declared in this scope
+  188 |     C2D_Fini();
+      |     ^~~~~~~~
+src/main.cpp:189:9: error: ‘C3D_Fini’ was not declared in this scope
+  189 |         C3D_Fini();
+      |         ^~~~~~~~
+src/main.cpp: In function ‘int main()’:
+src/main.cpp:204:5: error: ‘osSetSpeedupEnable’ was not declared in this scope
+  204 |     osSetSpeedupEnable(true);
+      |     ^~~~~~~~~~~~~~~~~~
+src/main.cpp:205:5: error: ‘gfxInitDefault’ was not declared in this scope
+  205 |     gfxInitDefault();
+      |     ^~~~~~~~~~~~~~
+src/main.cpp:206:5: error: ‘aptSetSleepAllowed’ was not declared in this scope
+  206 |     aptSetSleepAllowed(true);
+      |     ^~~~~~~~~~~~~~~~~~
+src/main.cpp:207:5: error: ‘consoleGetDefault’ was not declared in this scope
+  207 |     consoleGetDefault()->fg = 23;
+      |     ^~~~~~~~~~~~~~~~~
+src/main.cpp:210:21: error: ‘GFX_BOTTOM’ was not declared in this scope
+  210 |         consoleInit(GFX_BOTTOM, NULL);
+      |                     ^~~~~~~~~~
+src/main.cpp:210:9: error: ‘consoleInit’ was not declared in this scope
+  210 |         consoleInit(GFX_BOTTOM, NULL);
+      |         ^~~~~~~~~~~
+src/main.cpp:213:21: error: ‘GFX_TOP’ was not declared in this scope
+  213 |         consoleInit(GFX_TOP, NULL);
+      |                     ^~~~~~~
+src/main.cpp:213:9: error: ‘consoleInit’ was not declared in this scope
+  213 |         consoleInit(GFX_TOP, NULL);
+      |         ^~~~~~~~~~~
+src/main.cpp:233:18: error: ‘linearSpaceFree’ was not declared in this scope
+  233 |     std::cout << linearSpaceFree() << std::endl;
+      |                  ^~~~~~~~~~~~~~~
+src/main.cpp:262:5: error: ‘Thread’ was not declared in this scope; did you mean ‘fread’?
+  262 |     Thread renderThread;
+      |     ^~~~~~
+      |     fread
+src/main.cpp:263:5: error: ‘renderThread’ was not declared in this scope; did you mean ‘_endthread’?
+  263 |     renderThread = threadCreate(RenderLoop, NULL, 1*1024*1024, 0x29, -1, false);
+      |     ^~~~~~~~~~~~
+      |     _endthread
+src/main.cpp:263:20: error: ‘threadCreate’ was not declared in this scope; did you mean ‘pthread_create’?
+  263 |     renderThread = threadCreate(RenderLoop, NULL, 1*1024*1024, 0x29, -1, false);
+      |                    ^~~~~~~~~~~~
+      |                    pthread_create
+src/main.cpp:267:36: error: ‘aptMainLoop’ was not declared in this scope
+  267 |     while(!WindowShouldClose() and aptMainLoop()){
+      |                                    ^~~~~~~~~~~
+src/main.cpp:277:22: error: ‘KEY_START’ was not declared in this scope; did you mean ‘KEY_TAB’?
+  277 |         if(IsKeyDown(KEY_START)){
+      |                      ^~~~~~~~~
+      |                      KEY_TAB
+src/main.cpp:316:30: error: ‘U64_MAX’ was not declared in this scope
+  316 |     threadJoin(renderThread, U64_MAX);
+      |                              ^~~~~~~
+src/main.cpp:316:5: error: ‘threadJoin’ was not declared in this scope; did you mean ‘pthread_join’?
+  316 |     threadJoin(renderThread, U64_MAX);
+      |     ^~~~~~~~~~
+      |     pthread_join
+src/main.cpp:317:5: error: ‘threadFree’ was not declared in this scope
+  317 |     threadFree(renderThread);
+      |     ^~~~~~~~~~
+src/main.cpp:324:5: error: ‘gfxExit’ was not declared in this scope
+  324 |     gfxExit();
+      |     ^~~~~~~
+make: *** [MakefilePC:31: object/main.o] Error 1

@@ -15,60 +15,55 @@ struct catmullRomSegment
 
 struct timingSettings{
     int time;
-    double beatLength;
+    float beatLength;
     float meter;
     float sampleSet;
     float sampleIndex;
     float volume;
     bool uninherited;
     int effects;
-    double sliderSpeedOverride = 1;
+    float sliderSpeedOverride = 1;
     bool renderTicks = true;
 };
 
 struct HitObjectData{
-    int x;
-    int y;
+    short x;
+    short y;
     int ex;
     int ey;
-    double time;
-    double lastTime;
-    int type;
-    int hitSound;
-    int point = 0;
+    float time;
+    short type;
+    short hitSound;
+    short point = 0;
     char curveType;
-    std::vector<std::pair<int,int> > curvePoints;
-    int slides;
-    double length;
+    std::vector<std::pair<short,short> > curvePoints;
+    short slides;
+    float length;
     std::vector<int> edgeSounds;
-    std::vector<std::pair<int, int> > edgeSets;
+    std::vector<std::pair<short, short> > edgeSets;
     int endTime;
-    int normalSet;
-    int additionSet;
+    short normalSet;
+    short additionSet;
     int hindex;
     int index;
-    int volume;
+    short volume;
     std::string filename = "";
     bool startingACombo;
     int skipComboColours = 0;
     int comboNumber;
     bool useDefaultHitSound;
-    std::vector<int> colour;
+    std::vector<short> colour;
     timingSettings timing;
     bool touch = false;
     bool PlayAddition = false;
     bool PlayCustom = false;
-    std::string CustomSound = "";
-    std::string AdditionSound = "";
-    std::string NormalSound = "";
-    std::vector<std::string> EdgeNormalSound ;
-    std::vector<std::string> EdgeAdditionSound;
     std::vector<float> lengths;
     bool textureReady = false;
     bool textureLoaded = false;
-    double totalLength;
+    float totalLength;
     Vector2 extraPos;
     bool expired = false;
+    bool destruct = false;
 };
 
 class HitObject{
@@ -81,9 +76,10 @@ class HitObject{
         virtual void update(){}
         virtual void dead_update(){}
         virtual void dead_render(){}
+        virtual void deinit(){}
         HitObjectData data;
-        float x,y;
-    Music id;
+        //float x,y;
+        //Music id;
     private:
         
 };
