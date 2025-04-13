@@ -20,7 +20,7 @@ Funnily enough, the 3DS also has the best latency possible, close to actually no
 
 Here is a ScreenShot of both versions:
 
-![alt text](https://github.com/ohasanov-hbrw/osus-revented/blob/master/resources/gameplay.png?raw=true)
+![alt text](https://github.com/ohasanov-hbrw/osus-revented/blob/3ds-pc-merge/resources/gameplay.png?raw=true)
 
 ## Features?
 Basically speaking, most of the game is implemented and most (normal) maps should be completely playable. Of course, there are some maps that don't work, especially the ones that stretch the limits of even the original osu! engine. I also haven't really figured out how spinners work, which I plan to fix in the near future. Scoring is also something that always changes with the osu! client, but since this project does not exist for any kind of competitive purpose, the scoring system I implemented is enough for now. 
@@ -85,4 +85,4 @@ When you encounter a bug, or see something missing, just report it using the "Is
 -> the WIP buttons obviously are... _work in progress_... If they dont work, don't be suprised...
 
 
-![alt text](https://github.com/ohasanov-hbrw/osus-revented/blob/master/resources/osus.png?raw=true)
+![alt text](https://github.com/ohasanov-hbrw/osus-revented/blob/3ds-pc-merge/resources/osus.png?raw=true)
