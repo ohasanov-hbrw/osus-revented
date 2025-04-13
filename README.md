@@ -19,6 +19,7 @@ Currently the game is running at a pretty constant speed, but it really is depen
 Funnily enough, the 3DS also has the best latency possible, close to actually none. This is probably because of the simpler OS, but the 40ish ms offset I add on desktop builds is not needed for the silly Nintendo Console :D
 
 Here is a ScreenShot of both versions:
+
 ![alt text](https://github.com/ohasanov-hbrw/osus-revented/blob/master/resources/gameplay.png?raw=true)
 
 ## Features?
