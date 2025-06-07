@@ -932,7 +932,7 @@ void Slider::render(){
     if(data.textureLoaded and data.textureReady){
         legacyRender = Global.legacyRender;
         if(legacyRender){   
-            bool polygonalRender = Global.polygonalRendering;
+            bool polygonalRender = Global.polygonalRendering; 
             if(polygonalRender){
                 if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last != renderPoints.size() - 1){
                     BeginTextureMode(&sliderTexture);

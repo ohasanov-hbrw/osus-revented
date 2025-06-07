@@ -64,6 +64,19 @@ public:
     void textureOps() override;
 };
 
+
+class SettingsMenu : public State {
+private:
+    
+public:
+    SettingsMenu();
+    void init() override;
+    void render() override;
+    void update() override;
+    void unload() override;
+    void textureOps() override;
+};
+
 class LoadMenu : public State {
 private:
     SelectableList dir_list;
