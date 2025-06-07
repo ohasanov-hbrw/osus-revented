@@ -895,13 +895,13 @@ void Slider::render(){
             
             //rlClearScreenBuffers();
             //BeginBlendMode(BLEND_ALPHA_PREMUL);
-            if(legacyRender){
-                rlEnableDepthTest(); 
-                rlCustomDepthFunc(false);
-                rlEnableDepthMask();
-                rlClearDepth(0.0f);
-                rlDisableDepthTest();
-            }
+            //if(legacyRender){
+            //    rlEnableDepthTest(); 
+            //    rlCustomDepthFunc(false);
+            //    rlEnableDepthMask();
+            //    rlClearDepth(0.0f);
+            //    rlDisableDepthTest();
+            //}
             rlEnableDepthTest(); 
             ClearBackground({0,0,0,0});
             if(legacyRender){
@@ -936,7 +936,7 @@ void Slider::render(){
             if(polygonalRender){
                 if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last != renderPoints.size() - 1){
                     BeginTextureMode(&sliderTexture);
-                    rlEnableDepthTest(); 
+                    //rlEnableDepthTest(); 
                     //BeginBlendMode(BLEND_ALPHA_PREMUL);
                     bool draw = true;
                     if(renderPoints.size() > 0){

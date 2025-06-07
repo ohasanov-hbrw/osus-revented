@@ -174,12 +174,12 @@ struct Globals {
 
     Globals() = default;
 
-    float sliderTexSize = 0.50f;
+    float sliderTexSize = 1.0f;
     float sliderMinimumX = 0.0f; // -150
     float sliderMinimumY = 0.0f; // -150
     float sliderMaximumX = 640.0f; // 790
     float sliderMaximumY = 480.0f; // 630
-    int circleSector = 16;
+    int circleSector = 32;
     bool legacyRender = true;
 
     long long errorSum = 0;
@@ -245,7 +245,7 @@ struct Globals {
 
     bool stop = false;
 
-    bool polygonalRendering = false;
+    bool polygonalRendering = true;
 
     
 

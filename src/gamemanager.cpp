@@ -1960,7 +1960,7 @@ void GameManager::loadGameTextures(){
 	sliderOuterBall = LoadRenderTexture(64, 64);	
 	
 	BeginTextureMode(&sliderOuterBall);
-    ClearBackground({255,0,255,255});
+    ClearBackground({0,0,0,0});
 	EndBlendMode();
 	//rlEnableDepthTest2();
 	//rlDisableDepthTest();
