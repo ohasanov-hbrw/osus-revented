@@ -895,13 +895,13 @@ void Slider::render(){
             
             //rlClearScreenBuffers();
             //BeginBlendMode(BLEND_ALPHA_PREMUL);
-            /*if(legacyRender){
+            if(legacyRender){
                 rlEnableDepthTest(); 
                 rlCustomDepthFunc(false);
                 rlEnableDepthMask();
                 rlClearDepth(0.0f);
                 rlDisableDepthTest();
-            }*/
+            }
             rlEnableDepthTest(); 
             ClearBackground({0,0,0,0});
             if(legacyRender){

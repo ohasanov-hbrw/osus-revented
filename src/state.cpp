@@ -95,6 +95,7 @@ void PlayMenu::update() {
         Global.CurrentState.reset(new MainMenu());
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        return;
     }
 
     if(select.action or dir_list.action){
@@ -196,7 +197,9 @@ void LoadMenu::update() {
         Global.CurrentState.reset(new MainMenu());
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        return;
     }
+
     MutexLock(ACCESSING_OBJECTS);
     if(select.action or dir_list.action){
         if(dir_list.objects.size() > 0 and dir_list.objects[dir_list.selectedindex].text.size() > 0){
@@ -1213,6 +1216,7 @@ void ResultsMenu::update() {
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        return;
     }
 }
 void ResultsMenu::unload() {
