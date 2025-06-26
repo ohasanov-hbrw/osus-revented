@@ -186,7 +186,18 @@ struct Globals {
     float sliderMaximumX = 640.0f; // 790
     float sliderMaximumY = 480.0f; // 630
     int circleSector = 24;
-    bool legacyRender = true;
+
+
+    
+
+    #ifdef THREEDS_BUILD
+        bool legacyRender = true;
+        bool polygonalRendering = false;
+    #endif
+    #ifndef THREEDS_BUILD
+        bool legacyRender = true;
+        bool polygonalRendering = true;
+    #endif
 
     long long errorSum = 0;
     long long errorLast = 0;
@@ -251,7 +262,7 @@ struct Globals {
 
     bool stop = false;
 
-    bool polygonalRendering = true;
+    
 
     
 
