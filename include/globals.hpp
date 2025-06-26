@@ -178,14 +178,14 @@ struct Globals {
         float sliderTexSize = 0.5f;
     #endif
     #ifndef THREEDS_BUILD
-        float sliderTexSize = 3.0f;
+        float sliderTexSize = 2.5f;
     #endif
     
     float sliderMinimumX = 0.0f; // -150
     float sliderMinimumY = 0.0f; // -150
     float sliderMaximumX = 640.0f; // 790
     float sliderMaximumY = 480.0f; // 630
-    int circleSector = 32;
+    int circleSector = 24;
     bool legacyRender = true;
 
     long long errorSum = 0;

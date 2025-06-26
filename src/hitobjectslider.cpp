@@ -146,7 +146,7 @@ std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
 void Slider::init(){
     //std::cout << "Starting slider init at time " << data.time << "\n";
     GameManager* gm = GameManager::getInstance();
-
+    //Global.sliderTexSize = 2; //TESTING
     data.textureReady = false;
     data.textureLoaded = false;
     bool durationNull = false;
@@ -870,6 +870,8 @@ void Slider::update(){
 void Slider::render(){
     bool legacyRender = Global.legacyRender;
 
+    
+
     if(!legacyRender){
         Global.sliderTexSize = 1.0;
     }
@@ -881,8 +883,11 @@ void Slider::render(){
         if(legacyRender){
             texSizeXoffset = std::max(0.0f, (((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+8)*Global.sliderTexSize) - 511.5f);
             texSizeYoffset = std::max(0.0f, (((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+8)*Global.sliderTexSize) - 255.5f);
-            sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+8)*Global.sliderTexSize - texSizeXoffset),
-                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+8)*Global.sliderTexSize - texSizeYoffset));
+            texSizeXoffset = 0;
+            texSizeYoffset = 0;
+
+            sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
+                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset));
             std::cout << "loadeed legacy texture" << std::endl;
         }
         else
