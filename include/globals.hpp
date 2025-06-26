@@ -174,7 +174,13 @@ struct Globals {
 
     Globals() = default;
 
-    float sliderTexSize = 1.0f;
+    #ifdef THREEDS_BUILD
+        float sliderTexSize = 0.5f;
+    #endif
+    #ifndef THREEDS_BUILD
+        float sliderTexSize = 3.0f;
+    #endif
+    
     float sliderMinimumX = 0.0f; // -150
     float sliderMinimumY = 0.0f; // -150
     float sliderMaximumX = 640.0f; // 790

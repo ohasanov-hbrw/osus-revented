@@ -440,7 +440,7 @@ void InitAudioDevice(void)
     config.dataCallback = OnSendAudioDataToDevice;
     config.pUserData = NULL;
     config.periodSizeInFrames = 0;
-    config.periodSizeInMilliseconds = 5;
+    config.periodSizeInMilliseconds = 20;
     config.performanceProfile = ma_performance_profile_low_latency;
     config.wasapi.noAutoConvertSRC = true;
 
@@ -480,7 +480,7 @@ void InitAudioDevice(void)
         AUDIO.MultiChannel.pool[i] = LoadAudioBuffer(AUDIO_DEVICE_FORMAT, AUDIO_DEVICE_CHANNELS, AUDIO.System.device.sampleRate, 0, AUDIO_BUFFER_USAGE_STATIC);
     }
 
-    AUDIO.System.device.playback.internalPeriodSizeInFrames = 480;
+    AUDIO.System.device.playback.internalPeriodSizeInFrames = 960;
 
     TRACELOG(LOG_INFO, "AUDIO: Device initialized successfully");
     TRACELOG(LOG_INFO, "    > Backend:       miniaudio / %s", ma_get_backend_name(AUDIO.System.context.backend));
