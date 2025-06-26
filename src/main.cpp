@@ -342,7 +342,7 @@ int main(){
     //Global.CurrentState->unload();
 
     std::cout << "bye bye :3 ~!\n";
-    SleepInMs(1000);
+    SleepInMs(50);
 
     _os_exit_program();
 
