@@ -332,7 +332,9 @@ void DrawCircleWithDepth(Vector2 center, float radius, int segments, float depth
     rlEnd();
 }
 
-void DrawCircleWithDepthGrad(Vector2 center, float radius, int segments, float depth, Color color, Color color2)
+
+//color2 and color2 were swapped by me, my bad...
+void DrawCircleWithDepthGrad(Vector2 center, float radius, int segments, float depth, Color color2, Color color)
 {
     if (radius <= 0.0f) radius = 0.1f;
 

@@ -124,7 +124,13 @@ void RenderLoop(void *){
     Global.Path = lastPath;
     std::cout << "Loaded skin";
 
-    SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_POINT);
+    #ifdef THREEDS_BUILD
+        SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_POINT);
+    #endif
+    #ifndef THREEDS_BUILD
+        SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_ANISOTROPIC_8X);
+    #endif
+
     SetTextureFilter(&Global.cursor, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(&Global.OsusLogo, TEXTURE_FILTER_BILINEAR);
 
@@ -236,7 +242,7 @@ int main(){
     InitAudioDevice();
     
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    //SetConfigFlags(FLAG_MSAA_4X_HINT);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetAudioStreamBufferSizeDefault(240);
     //InitWindow(640, 480, "osus - amogus");
     
