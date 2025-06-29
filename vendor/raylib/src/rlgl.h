@@ -2979,6 +2979,9 @@ unsigned int rlLoadTexture(const void *data, int width, int height, int format, 
     return id;
 }
 
+
+
+
 // Load depth texture/renderbuffer (to be attached to fbo)
 // WARNING: OpenGL ES 2.0 requires GL_OES_depth_texture/WEBGL_depth_texture extensions
 unsigned int rlLoadTextureDepth(int width, int height, bool useRenderBuffer)

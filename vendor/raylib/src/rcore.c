@@ -2886,6 +2886,8 @@ static bool InitGraphicsDevice(int width, int height)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     
+    //SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, “2”);
+
     SDL_Init(SDL_INIT_EVERYTHING);
 
 
@@ -2897,7 +2899,7 @@ static bool InitGraphicsDevice(int width, int height)
     
 
     TRACELOG(LOG_INFO, "SDL: Creating Window");
-    CORE.Window.handle = SDL_CreateWindow((CORE.Window.title != 0)? CORE.Window.title : " ", 40, 40, CORE.Window.screen.width, CORE.Window.screen.height, flags);
+    CORE.Window.handle = SDL_CreateWindow((CORE.Window.title != 0)? CORE.Window.title : " ", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, CORE.Window.screen.width, CORE.Window.screen.height, flags);
     TRACELOG(LOG_INFO, "SDL: Created Window");
     if (!CORE.Window.handle)
     {
