@@ -247,6 +247,11 @@ void GameManager::update(){
 			}
 			if(gameFile.comboColours.size())
 				hitObject->data.colour = gameFile.comboColours[currentComboIndex];
+			else{
+				hitObject->data.colour.push_back(255);
+				hitObject->data.colour.push_back(255);
+				hitObject->data.colour.push_back(255);
+			}
 			hitObject->data.comboNumber = combo;
 			combo++;
 
