@@ -109,7 +109,7 @@ struct Globals {
     
     double extraJudgementTime = 16.0;
 
-    double offsetTime = -50;
+    double offsetTime = -70;
 
     unsigned long long int startsTime = 0;
     unsigned long long int pausedFor = 0;

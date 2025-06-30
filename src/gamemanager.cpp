@@ -836,8 +836,9 @@ void GameManager::run(){
 			MutexUnlock(ACCESSING_OBJECTS);
             Global.CurrentState.reset(new ResultsMenu());
             Global.CurrentState->init();
-			MutexLock(ACCESSING_OBJECTS);
+			//MutexLock(ACCESSING_OBJECTS);
 			MutexUnlock(SWITCHING_STATE);
+
 			return;
 		}
 		
@@ -1839,6 +1840,7 @@ void GameManager::unloadGame(){
 	//MutexLock(SWITCHING_STATE);
 	MutexLock(ACCESSING_OBJECTS);
 
+	MutexLock(RENDER_BLOCK);
 	//Global.mutex.lock();
 	//LightLock_Lock(&Global.lightlock);
 
@@ -1874,7 +1876,7 @@ void GameManager::unloadGame(){
 		delete deadObjectsLinkedList.getHead()->object;
 		deadObjectsLinkedList.deleteHead();
 	}
-	
+	MutexUnlock(RENDER_BLOCK);
 	//Global.mutex2.unlock();
 }
 
