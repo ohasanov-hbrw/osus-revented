@@ -1233,6 +1233,7 @@ WipMenu2::WipMenu2() {
 }
 
 void WipMenu2::init() {
+    //is unstable
     locations.clear();
     locations = std::list<MenuItem>();
 
