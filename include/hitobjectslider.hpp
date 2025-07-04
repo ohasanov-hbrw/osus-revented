@@ -34,6 +34,7 @@ class Slider : public HitObject{
            
 
     private:
+        int sliderTextureReadyForMipmaps = 0;
         double sliderDuration;
         double currentDuration;
         double time;

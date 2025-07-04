@@ -886,7 +886,13 @@ void Slider::render(){
             texSizeXoffset = 0;
             texSizeYoffset = 0;
 
-            sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
+            if(Global.mipmaps > 1){
+                sliderTexture = LoadRenderTextureMipmapped((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
+                                              (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset), Global.mipmaps);
+                sliderTextureReadyForMipmaps = 1;
+            }
+            else
+                sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
                                           (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset));
             std::cout << "loaded legacy texture" << std::endl;
             std::cout << renderPoints.size() << std::endl;
@@ -1024,12 +1030,18 @@ void Slider::render(){
                             }
                         }
                         //std::cout << "third pass done" << std::endl;
+                        if(draw && sliderTextureReadyForMipmaps == 1){
+                            sliderTextureReadyForMipmaps = 2;
+                        }
                         EndBlendMode();
                         
                     }
                     rlDisableDepthTest();
                     EndTextureMode();
-                    
+                    if(sliderTextureReadyForMipmaps == 2){
+                        //GenTextureMipmaps(&sliderTexture.texture);
+                        sliderTextureReadyForMipmaps = 3;
+                    }
                 }
                 //rlDisableDepthTest();
                 EndBlendMode();

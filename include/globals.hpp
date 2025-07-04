@@ -175,9 +175,11 @@ struct Globals {
     Globals() = default;
 
     #ifdef THREEDS_BUILD
+        int mipmaps = 1;
         float sliderTexSize = 0.5f;
     #endif
     #ifndef THREEDS_BUILD
+        int mipmaps = 4;
         float sliderTexSize = 2.5f;
     #endif
     
