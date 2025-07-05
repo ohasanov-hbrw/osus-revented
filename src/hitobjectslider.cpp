@@ -887,8 +887,10 @@ void Slider::render(){
             texSizeYoffset = 0;
 
             if(Global.mipmaps > 1){
-                sliderTexture = LoadRenderTextureMipmapped((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
-                                              (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset), Global.mipmaps);
+                //sliderTexture = LoadRenderTextureMipmapped((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
+                //                              (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset), Global.mipmaps);
+                sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
+                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset));
                 sliderTextureReadyForMipmaps = 1;
             }
             else

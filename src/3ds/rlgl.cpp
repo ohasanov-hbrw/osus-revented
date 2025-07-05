@@ -1188,7 +1188,7 @@ Color Fade(Color color, float alpha){
     return (Color){ color.r, color.g, color.b, (unsigned char)(255.0f*alpha) };
 }
 
-RenderTexture2D LoadRenderTexture(int width, int height, bool vram, bool mipmaps){
+RenderTexture2D LoadRenderTexture(int width, int height, bool vram){
     RenderTexture2D target = { 0 };
     target.id = 1; // Load an empty framebuffer
     //std::cout << "shit.\n";
@@ -1493,3 +1493,5 @@ void EndShaderMode(){}
 
 void SetConfigFlags(unsigned int flags){}
 void HideCursor(){}
+
+void BeginBlendMode(int type){}

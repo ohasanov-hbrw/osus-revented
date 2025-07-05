@@ -107,7 +107,7 @@ void DrawRectangleLinesEx(Rectangle rec, float lineThick, Color color);
 
 Color Fade(Color color, float alpha);
 
-RenderTexture2D LoadRenderTexture(int width, int height, bool vram = true, int mipmaps = 1);
+RenderTexture2D LoadRenderTexture(int width, int height, bool vram = true);
 
 void BeginTextureMode(RenderTexture2D *renderTexture);
 
@@ -151,3 +151,5 @@ void HideCursor();
 int GetFPS();
 
 void ImageResize(Image *image, int newWidth, int newHeight);
+
+void BeginBlendMode(int type);
