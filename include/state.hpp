@@ -159,7 +159,7 @@ private:
     std::vector<std::string> itemNames;
     float accel = 0.0f;
     std::list<MenuItem> locations;
-    std::mutex scaryMulti;
+    //std::mutex scaryMulti;
     
 public:
     WipMenu2();

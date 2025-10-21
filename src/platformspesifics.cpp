@@ -4,8 +4,9 @@
 #include "utils.hpp"
 #include "rlgl.h"
 #include <iostream>
-
-
+#ifdef THREEDS_BUILD
+    #include "time_util.hpp"
+#endif
 
 
 

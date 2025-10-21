@@ -1506,25 +1506,19 @@ void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
     // Security check to avoid program crash
     if ((image->data == NULL) || (image->width == 0) || (image->height == 0)) return;
 
-    if (image->format >= PIXELFORMAT_COMPRESSED_DXT1_RGB)
-    {
-        TRACELOG(LOG_WARNING, "IMAGE: Compressed data formats can not be dithered");
-        return;
-    }
-
     if ((rBpp + gBpp + bBpp + aBpp) > 16)
     {
-        TRACELOG(LOG_WARNING, "IMAGE: Unsupported dithering bpps (%ibpp), only 16bpp or lower modes supported", (rBpp+gBpp+bBpp+aBpp));
+        //TRACELOG(LOG_WARNING, "IMAGE: Unsupported dithering bpps (%ibpp), only 16bpp or lower modes supported", (rBpp+gBpp+bBpp+aBpp));
     }
     else
     {
-        Color *pixels = LoadImageColors(*image);
+        Color *pixels = LoadImageColors(image);
 
         RL_FREE(image->data);      // free old image data
 
         if ((image->format != PIXELFORMAT_UNCOMPRESSED_R8G8B8) && (image->format != PIXELFORMAT_UNCOMPRESSED_R8G8B8A8))
         {
-            TRACELOG(LOG_WARNING, "IMAGE: Format is already 16bpp or lower, dithering could have no effect");
+            //TRACELOG(LOG_WARNING, "IMAGE: Format is already 16bpp or lower, dithering could have no effect");
         }
 
         // Define new image format, check if desired bpp match internal known format
@@ -1534,7 +1528,7 @@ void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
         else
         {
             image->format = 0;
-            TRACELOG(LOG_WARNING, "IMAGE: Unsupported dithered OpenGL internal format: %ibpp (R%iG%iB%iA%i)", (rBpp+gBpp+bBpp+aBpp), rBpp, gBpp, bBpp, aBpp);
+            //TRACELOG(LOG_WARNING, "IMAGE: Unsupported dithered OpenGL internal format: %ibpp (R%iG%iB%iA%i)", (rBpp+gBpp+bBpp+aBpp), rBpp, gBpp, bBpp, aBpp);
         }
 
         // NOTE: We will store the dithered data as unsigned short (16bpp)
@@ -1606,6 +1600,6 @@ void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
             }
         }
 
-        UnloadImageColors(pixels);
+        free(pixels);
     }
 }

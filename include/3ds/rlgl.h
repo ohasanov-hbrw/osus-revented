@@ -12,7 +12,7 @@
 #include <tex3ds.h>
 #include <png.h>
 #include "stb_image.h"
-
+#include "utils.hpp"
 
 #include "hashtable.h"
 

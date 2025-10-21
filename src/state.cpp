@@ -1437,7 +1437,7 @@ void WipMenu2::init() {
     itemNames.clear();
     itemNames = std::vector<std::string>();
     position = minimumPosition;
-    const std::lock_guard<std::mutex> lock(scaryMulti);
+    //const std::lock_guard<std::mutex> lock(scaryMulti);
     for(int i = 0; i < 16; i++){
         MenuItem tempItem;
         tempItem.location = i * 40;
