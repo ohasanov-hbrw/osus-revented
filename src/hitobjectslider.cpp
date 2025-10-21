@@ -5,8 +5,9 @@
 #include "globals.hpp"
 #include "utils.hpp"
 #include <limits>
+#include <iostream>
 
-
+// I... uhhh... MATH
 float interpolate(float *p, float *time, float t) {
     float L01 = p[0] * (time[1] - t) / (time[1] - time[0]) + p[1] * (t - time[0]) / (time[1] - time[0]);
     float L12 = p[1] * (time[2] - t) / (time[2] - time[1]) + p[2] * (t - time[1]) / (time[2] - time[1]);
@@ -17,6 +18,7 @@ float interpolate(float *p, float *time, float t) {
     return C12;
 }   
 
+// I... uhhh... MATH
 std::vector<Vector2> interpolate(std::vector<Vector2> &points, int index, int pointsPerSegment) {
     std::vector<Vector2> result;
     float x[4];
@@ -49,6 +51,7 @@ std::vector<Vector2> interpolate(std::vector<Vector2> &points, int index, int po
     return result;
 }
 
+// I... uhhh... MATH
 std::vector<Vector2> interpolate(std::vector<Vector2> &coordinates, float length){
     std::vector<Vector2> vertices;
     std::vector<int> pointsPerSegment;
@@ -84,6 +87,7 @@ std::vector<Vector2> interpolate(std::vector<Vector2> &coordinates, float length
     return result;
 }
 
+// Based on 4 points, get a catmull rom interpolation
 Vector2 getCatmullPoint(Vector2 &p0, Vector2 &p1, Vector2 &p2, Vector2 &p3, float alpha = 0.5f, float t = 0){
     float t01 = std::pow(distance(p0, p1), alpha);
     float t12 = std::pow(distance(p1, p2), alpha);
@@ -102,13 +106,13 @@ Vector2 getCatmullPoint(Vector2 &p0, Vector2 &p1, Vector2 &p2, Vector2 &p3, floa
     return segment.a * vectorize(t) * vectorize(t) * vectorize(t) + segment.b * vectorize(t) * vectorize(t) + segment.c * vectorize(t) + segment.d;
 }
 
-//checks the perfect circle slider's orientation
+// Check if circle is going clockwise or counterclockwise
 int orientation(Vector2 &p1, Vector2 &p2, Vector2 &p3){
     int val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
     return (val > 0)? false: true;
 }
 
-//gets the points needed for a bezier curve, we can also define a resolution for it
+// Calculate bezier points at a position
 Vector2 getBezierPoint(std::vector<Vector2> &points, int numPoints, float t){
     Vector2* tmp = new Vector2[numPoints];
     for(size_t i = 0; i < points.size(); i++){
@@ -125,7 +129,7 @@ Vector2 getBezierPoint(std::vector<Vector2> &points, int numPoints, float t){
     return answer;
 }
 
-//gets the center point and the size for the perfect circle sliders
+// Gets the center point and the size for the perfect circle sliders
 std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
     int x1 = p1.x;
     int y1 = p1.y;
@@ -138,39 +142,49 @@ std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
     int c = (x1 * x1 + y1 * y1) * (x2 - x3) + (x2 * x2 + y2 * y2) * (x3 - x1) + (x3 * x3 + y3 * y3) * (x1 - x2);
     float x = (float)-b / (2.0f * (float)a);
     float y = (float)-c / (2.0f * (float)a);
-    //std::cout << "x1: " << x1 << " y1: " << y1 << " x2: " << x2 << " y2: " << y2 << " x3: " << x3 << " y3: " << y3 << " a: " << a << " b: " << b << " c: " << c << " x: " << x << " y: " << y << std::endl; 
     return std::make_pair(Vector2{x,y}, sqrt((x - x1) * (x - x1) + (y - y1) *(y - y1)));
 }
 
-//initilizes a Slider, all the curve stuff and the texture creation happens here
+// Initilizes a Slider, all the curve stuff and the texture creation happens here
 void Slider::init(){
-    //std::cout << "Starting slider init at time " << data.time << "\n";
     GameManager* gm = GameManager::getInstance();
-    //Global.sliderTexSize = 2; //TESTING
+    
+    // Get time needed for a slider init
+    double startTime = getTimer();
+
+    // Set variables to initial position as nothing is initialized yet
     data.textureReady = false;
     data.textureLoaded = false;
     bool durationNull = false;
+
+    // Get the number of points on a slider
     double templength = data.length;
+
+    // If length is smaller than one, we basically have only one point?
     if(data.length < 1){
         data.length = 1;
         durationNull = true;
     }
-    //these is the points that we get from the beatmap file
-    double startTime = getTimer();
+
+    // The first defining coordinates are the initial position of the object
     edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
-    //the resolution is the number of total points
+
+    // How many points should there be? Maybe there is a way to halve this into two...
     float resolution = data.length;
     float currentResolution = 0;
     float lengthScale, totalLength = 0;
-    //std::cout << "init: " << data.time << std::endl;
-    //add every point from the beatmap 
-    //renderPoints.push_back(edgePoints[0]);
+
+    // Add every point to a reserve buffer
     for(size_t i = 0; i < data.curvePoints.size(); i++)
         edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
-    //if the "curve" is linear calculate the points needed to render the slider
+    
+    // This is the buffer for the end reserved answer
     renderPoints.clear();
     renderPoints.reserve(data.length + 3);
+
+    // Check if we even have other points to base our slider on
     if(edgePoints.size() == 1){
+        // Just spam the result with one singlular point
         for(int k = 0; k < data.length; k++){
             renderPoints.push_back(edgePoints[0]);
         }
@@ -198,9 +212,6 @@ void Slider::init(){
             bool old = false;
             if(old){
                 //for the bezier curves we do the calculations in another function
-                Vector2 edges[edgePoints.size()];
-                for(size_t i = 0; i < edgePoints.size(); i++)
-                    edges[i] = edgePoints[i];
                 std::vector<Vector2> tempEdges;
                 std::vector<Vector2> tempRender;
                 std::vector<float> curveLengths;
@@ -249,13 +260,13 @@ void Slider::init(){
                             for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
                                 float s = (float)k / tempResolution * 2.0f;
                                 s = clip(s, 0.0f, 1.0f);
-                                int j = Search(lengths,s,0,lengths.size()-1);
+                                int j = Search(&lengths,s,0,lengths.size()-1);
                                 indices.push_back(j);
                                 //std::cout << "s " << s << std::endl;
                             }
 
                             float s = 1.0f;
-                            int j = Search(lengths,s,0,lengths.size()-1);
+                            int j = Search(&lengths,s,0,lengths.size()-1);
                             if(indices[indices.size() - 1] != j)
                                 indices.push_back(j);
 
@@ -330,9 +341,6 @@ void Slider::init(){
                 //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
             }
             else{
-                Vector2 edges[edgePoints.size()];
-                for(size_t i = 0; i < edgePoints.size(); i++)
-                    edges[i] = edgePoints[i];
                 std::vector<Vector2> tempEdges;
                 std::vector<Vector2> tempRender;
                 std::vector<float> curveLengths;

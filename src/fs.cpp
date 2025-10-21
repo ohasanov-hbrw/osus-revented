@@ -1,8 +1,13 @@
 #include "fs.hpp"
 #include "globals.hpp"
+#include <iostream>
 #include <stdio.h> 
 #include <dirent.h> 
 #include <time_util.hpp>
+#include <string>
+#ifndef _DIRENT_HAVE_D_TYPE
+    #include <algorithm>
+#endif
 //This file includes the functions for basic file operations
 namespace fs = std::filesystem;
 
@@ -57,7 +62,7 @@ std::vector<std::string> ls(char* extension) {
                 
             }
         }
-        sort(text.begin(), text.end());
+        std::sort(text.begin(), text.end());
     #endif
     return text;
 }
@@ -67,6 +72,20 @@ void create_dir(const std::string& path) {
     fs::create_directory(path);
 }
 
+int check_dir(const std::string &path){
+    fs::path path_p(path);
+    return fs::exists(path_p);
+}
+std::string correct_path_notation(const std::string &path){
+    fs::path path_p(path);
+    return path_p.string();
+}
+
+void print_dir(const std::string &path){
+    fs::path path_p(path);
+    std::cout << path_p << " or " << fs::absolute(path_p) << std::endl;
+    return;
+}
 //Getting a file's name without the extension
 std::string get_without_ext(const std::string& path) {
     fs::path path_p(Global.selectedPath);

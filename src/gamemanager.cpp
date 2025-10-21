@@ -1,9 +1,7 @@
 #include "gamemanager.hpp"
 #include <algorithm>
-#include <cstdint>
 #include <cassert>
 #include <iostream>
-#include <iomanip>
 #include <string>
 #include <vector>
 #include <math.h>
@@ -15,6 +13,7 @@
 #include "followpoint.hpp"
 #include "time_util.hpp"
 #include "state.hpp"
+#include "platformspesifics.hpp"
 
 #include "linkedListImpl.hpp"
 
@@ -278,7 +277,7 @@ void GameManager::update(){
 			hitObject->init();
 			lastHitTime = hitObject->data.time;
 			if(hitObject->data.type == 2){
-				hitObject->data.time + (hitObject->data.length/100) * (hitObject->data.timing.beatLength) / (sliderSpeed * hitObject->data.timing.sliderSpeedOverride) * hitObject->data.slides;
+				//hitObject->data.time + (hitObject->data.length/100) * (hitObject->data.timing.beatLength) / (sliderSpeed * hitObject->data.timing.sliderSpeedOverride) * hitObject->data.slides;
 			}
 			gameFile.hitObjects.pop_back();
 			spawnedHitObjects++;
@@ -312,12 +311,12 @@ void GameManager::update(){
 
 		if(hitObjectNode->prev == NULL){
 			hitObject->data.touch = true;
-			Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {hitObject->data.x, hitObject->data.y}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
+			Global.AutoMousePosition = lerp(Global.AutoMousePositionStart, {static_cast<float>(hitObject->data.x), static_cast<float>(hitObject->data.y)}, clip((currentTime*1000.0f-Global.AutoMouseStartTime) / (hitObject->data.time-Global.AutoMouseStartTime), 0, 1));
 		}
 
 		if (stop && hitObjectNode->prev == NULL && (Global.Key1P or Global.Key2P)){
 			if (hitObject->data.type != 2){
-				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f)){
+				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{static_cast<float>(hitObject->data.x),(float)hitObject->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - hitObject->data.time) > gameFile.p50Final + Global.extraJudgementTime/2.0f){
 						hitObject->data.point = 0;
 						if(clickCombo > 30){
@@ -399,7 +398,7 @@ void GameManager::update(){
 			}
 			else if (hitObject->data.type == 2){
 				if(Slider* tempslider = dynamic_cast<Slider*>(hitObject)){
-					if(CheckCollisionPointCircle(Global.MousePosition,Vector2{hitObject->data.x,(float)hitObject->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
+					if(CheckCollisionPointCircle(Global.MousePosition,Vector2{static_cast<float>(hitObject->data.x),(float)hitObject->data.y}, circlesize/2.0f) && currentTime*1000.0f < tempslider->data.time + gameFile.p50Final){
 						if(std::abs(currentTime*1000.0f - tempslider->data.time) > gameFile.p50Final + Global.extraJudgementTime/2.0f){
 							tempslider->is_hit_at_first = true;
 							stop = false;
@@ -498,7 +497,7 @@ void GameManager::update(){
 						//std::cout << 3.5*easeInOutCubic((1-(currentTime*1000.0f - objects[i]->data.time + gameFile.preempt)/gameFile.preempt))+1 << std::endl;
 						hitObject->data.time = currentTime*1000.0f;
 
-						Global.AutoMousePositionStart = {hitObject->data.x, hitObject->data.y};
+						Global.AutoMousePositionStart = {static_cast<float>(hitObject->data.x), static_cast<float>(hitObject->data.y)};
 						Global.AutoMouseStartTime = currentTime*1000.0f;
 
 						destroyHitObject(hitObjectNode);
@@ -736,12 +735,18 @@ void GameManager::render(){
 	}
 	//Global.mutex2.unlock();
 	DrawCNumbersCenter(score, 320, 10, 0.4f, WHITE);
-	DrawCNumbersLeft(clickCombo, 15, 460, 0.6f, WHITE);
+
+
+
+	DrawCNumbersLeft(clickCombo, 15 - ((GetScreenWidth() - Scale(640))) / Scale(2), 460 + ((GetScreenHeight() - Scale(480))) / Scale(2), 0.6f, WHITE);
+
+
+
 
 	
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 		////Global.mutex.lock();
-		DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {(int)ScaleCordX(5), (int)ScaleCordY(400)}, Scale(20.05), Scale(2), WHITE);
+		DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {static_cast<float>((int)Scale(5)), static_cast<float>(GetScreenHeight() - (int)Scale(80))}, Scale(20.05), Scale(2), WHITE);
 		////Global.mutex.unlock();
 	}
 	//render the points and the combo
@@ -771,7 +776,7 @@ void GameManager::run(){
 		//SeekMusicStream(&backgroundMusic, 0.0f);
 		UpdateMusicStream(&backgroundMusic);
 		initTimer();
-		//std::cout << "started music" << std::endl;
+		//std::cout << "started music"  << std::endl;
 		//std::cout << "first update" << std::endl;
 		//std::cout << sizeof(HitObjectData) << std::endl;
 		//std::cout << sizeof(HitObjectData) * gameFile.hitObjects.size() << std::endl;
@@ -780,18 +785,16 @@ void GameManager::run(){
 		Global.LastOsuTime = 0;
 		TimeLast = ms;
 		startMusic = false;
-		Global.startTime2 = ms;
 		double Time = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
 		double amog = getTimer();
 		std::cout << "Extra Judgement Time in ms " << Global.extraJudgementTime << std::endl;
-		//std::cout << "Time:" << Time << std::endl;
-		Global.avgSum = 0;
-    	Global.avgNum = 0;
-    	Global.avgTime = 0;
 
 		Global.LastFrameTime = getTimer();
 	}
-	if(true){
+	if(Global.startTime >= 0){
+
+
+
 		if(Global.volumeChanged){
 			SetMusicVolume(&backgroundMusic, Global.volume);
 			Global.volumeChanged = false;
@@ -799,8 +802,8 @@ void GameManager::run(){
 		UpdateMusicStream(&backgroundMusic);
 		if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 			//DrawTextEx(Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {ScaleCordX(5), ScaleCordY(420)}, Scale(15), Scale(1), WHITE);
-			if(IsKeyPressed(SDLK_y ) && false){
-				SeekMusicStream(&backgroundMusic, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f);
+			if(IsKeyPressed(Global.SKIP_KEY)){
+				SeekMusicStream(&backgroundMusic, std::max(0.0f, (gameFile.hitObjects[gameFile.hitObjects.size() - 1].time - 3000.0f) / 1000.0f));
 			}
 		}
 		//if(GetMusicTimeLength(&backgroundMusic) - GetMusicTimePlayed(&backgroundMusic) < 0.1f)
@@ -841,65 +844,60 @@ void GameManager::run(){
 
 			return;
 		}
-		
-		
-		if (IsMusicStreamPlaying(&backgroundMusic)){
-			Time = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
-			if(!AreSame(TimerLast, Time)){
-				//Global.extraJudgementTime = std::abs((Time - TimerLast) / 1.5f);
-				TimerLast = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
-				TimeLast = ms;
-			}
-			else{
-				Time += ms - TimeLast;
-			}
-		}
-		else{
+	}
+	if (IsMusicStreamPlaying(&backgroundMusic)){
+		Time = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
+		if(!AreSame(TimerLast, Time)){
+			//Global.extraJudgementTime = std::abs((Time - TimerLast) / 1.5f);
+			TimerLast = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
 			TimeLast = ms;
 		}
-
-
-		Global.curTime = Time;
-		double LastInterpolatedTime = Global.currentOsuTime;
-
-		bool IsInterpolating;
-
-		if (IsMusicStreamPlaying(&backgroundMusic)){
-			if (GetMusicTimePlayed(&backgroundMusic) * 1000.0 != 0)
-				IsInterpolating = true;
-			double ElapsedTime = getTimer() - Global.LastOsuTime;
-			Global.LastOsuTime = getTimer();
-			Global.CurrentInterpolatedTime += ElapsedTime;
-			if (!IsInterpolating || std::abs(GetMusicTimePlayed(&backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) > 8){
-				Global.CurrentInterpolatedTime = ElapsedTime < 0 ? GetMusicTimePlayed(&backgroundMusic) * 1000.0: std::max(LastInterpolatedTime, GetMusicTimePlayed(&backgroundMusic) * 1000.0);
-				IsInterpolating = false;
-				//std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
-			}
-			else{
-				Global.CurrentInterpolatedTime += (GetMusicTimePlayed(&backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 5;
-				Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
-			}
+		else{
+			Time += ms - TimeLast;
 		}
-
-		Global.currentOsuTime = IsMusicStreamPlaying(&backgroundMusic) ? Global.CurrentInterpolatedTime : GetMusicTimePlayed(&backgroundMusic);
-
-		currentTime = (double)Time / 1000.0;
-		#ifndef THREEDS_BUILD
-			if(IsMusicStreamPlaying(&backgroundMusic)){
-				currentTime = (Global.currentOsuTime + Global.offsetTime) / 1000.0;
-				//currentTime = GetMusicTimePlayed(&backgroundMusic);
-				//std::cout << "music playin\n";
-			}
-		#endif
-		//currentTime -= 8/1000.0f;
-		//currentTime *= 2;
-		//std::cout << "update\n";
-		GameManager::update();
-		//std::cout << "update done\n";
-		//std::cout << "called update at time " << currentTime << "\n";
-		//currentTime += 8/1000.0f;
 	}
-	
+	else{
+		TimeLast = ms;
+	}
+
+	double LastInterpolatedTime = Global.currentOsuTime;
+
+	bool IsInterpolating = true;
+
+	if (IsMusicStreamPlaying(&backgroundMusic)){
+		if (GetMusicTimePlayed(&backgroundMusic) * 1000.0 != 0)
+			IsInterpolating = true;
+		double ElapsedTime = getTimer() - Global.LastOsuTime;
+		Global.LastOsuTime = getTimer();
+		Global.CurrentInterpolatedTime += ElapsedTime;
+		if (!IsInterpolating || std::abs(GetMusicTimePlayed(&backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) > 8){
+			Global.CurrentInterpolatedTime = ElapsedTime < 0 ? GetMusicTimePlayed(&backgroundMusic) * 1000.0: std::max(LastInterpolatedTime, GetMusicTimePlayed(&backgroundMusic) * 1000.0);
+			IsInterpolating = false;
+			//std::cout << "failed interpolation at time " << Global.CurrentInterpolatedTime << "\n";
+		}
+		else{
+			Global.CurrentInterpolatedTime += (GetMusicTimePlayed(&backgroundMusic) * 1000.0 - Global.CurrentInterpolatedTime) / 5;
+			Global.CurrentInterpolatedTime = std::max(LastInterpolatedTime, Global.CurrentInterpolatedTime);
+		}
+	}
+
+	Global.currentOsuTime = IsMusicStreamPlaying(&backgroundMusic) ? Global.CurrentInterpolatedTime : GetMusicTimePlayed(&backgroundMusic);
+
+	currentTime = (double)Time / 1000.0;
+	#ifndef THREEDS_BUILD
+		if(IsMusicStreamPlaying(&backgroundMusic)){
+			currentTime = (Global.currentOsuTime + Global.offsetTime) / 1000.0;
+			//currentTime = GetMusicTimePlayed(&backgroundMusic);
+			//std::cout << "music playin\n";
+		}
+	#endif
+	//currentTime -= 8/1000.0f;
+	//currentTime *= 2;
+	//std::cout << "update\n";
+	GameManager::update();
+	//std::cout << "update done\n";
+	//std::cout << "called update at time " << currentTime << "\n";
+	//currentTime += 8/1000.0f;
 }
 
 std::pair<Vector2, int> get2PerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
@@ -1346,7 +1344,7 @@ void GameManager::loadGame(std::string filename){
         		edgePoints.push_back(Vector2{(float)gameFile.hitObjects[i].curvePoints[j].first, (float)gameFile.hitObjects[i].curvePoints[j].second});
 			
 			if(edgePoints.size() == 2 and gameFile.hitObjects[i].curveType == 'B'){
-				gameFile.hitObjects[i].curveType == 'L';
+				gameFile.hitObjects[i].curveType = 'L';
 			}
 
 
@@ -1534,7 +1532,6 @@ void GameManager::loadGame(std::string filename){
 		amountOfSliders++;
 	}
 	std::cout << amountOfSliders << " Sliders precalculated in " << getTimer() - start << "ms" << std::endl;
-	Global.loadingState = 2;
 	
 	
 
@@ -1769,12 +1766,19 @@ void GameManager::loadGame(std::string filename){
 		defaultSampleSet = 2;
 	}
 
+	Global.loadingState = 4;
 	SoundFiles.data.clear();
 	SoundFiles.loaded.clear();
 	loadGameSounds();
 
+
+
+	Global.loadingState = 2;
 	Global.Path.pop_back();
 	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
+
+
+
 
 
 
@@ -1790,7 +1794,7 @@ void GameManager::loadGame(std::string filename){
 
 	//SleepInMs(5000);
 
-	Global.loadingState = 3;
+	
 
 	Global.loadingState = 7;
 
@@ -1866,14 +1870,14 @@ void GameManager::unloadGame(){
 		if(objectsLinkedList.getHead() == NULL)
 			break;
 		((HitObject*)objectsLinkedList.getHead()->object)->deinit();
-		delete objectsLinkedList.getHead()->object;
+		delete (HitObject*)objectsLinkedList.getHead()->object;
 		objectsLinkedList.deleteHead();
 	}
 	while(true){
 		if(deadObjectsLinkedList.getHead() == NULL)
 			break;
 		((HitObject*)deadObjectsLinkedList.getHead()->object)->deinit();
-		delete deadObjectsLinkedList.getHead()->object;
+		delete (HitObject*)deadObjectsLinkedList.getHead()->object;
 		deadObjectsLinkedList.deleteHead();
 	}
 	MutexUnlock(RENDER_BLOCK);
@@ -1924,7 +1928,7 @@ void GameManager::destroyDeadHitObject(Node *node){
 	}*/
 	//else{
 	((HitObject*)node->object)->deinit();
-	delete node->object;
+	delete (HitObject*)node->object;
 	deadObjectsLinkedList.deleteNodeUnsafe(node);
 	//delete dead_objects[index];
 	//dead_objects.erase(dead_objects.begin()+index);
@@ -2077,9 +2081,9 @@ void GameManager::loadGameTextures(){
 					Image image = LoadImage((Global.Path + files[i]).c_str());
 					//ImageColorBrightness(&image, -128);
 					
-					int divider = 4;
+					int divider = OSUS_DEFAULT_DIVIDER;
 					while(true){
-						if(image.width / divider > 256 or image.height / divider > 128){
+						if(image.width / divider > OSUS_MAX_TEXTURE_WIDTH or image.height / divider > OSUS_MAX_TEXTURE_HEIGHT){
 							divider += 1;
 							std::cout << "TOO BIG OF AN IMAGE!" << std::endl;
 							
@@ -2097,12 +2101,14 @@ void GameManager::loadGameTextures(){
 					//std::cout << "T " << image.width << " " << image.height << std::endl;
 
 					ImageColorTint(&image, Color{30,30,30,255});
-					ImageBlurGaussian(&image, 0.3f);
+					ImageBlurGaussian(&image, 2.0f / divider);
+
+					ImageDither(&image, 4, 4, 4, 4);
 
 					backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(&image);
 					UnloadImage(&image); 
 					
-					backgroundTextures.pos[gameFile.events[j].filename] = {gameFile.events[j].xOffset, gameFile.events[j].yOffset};
+					backgroundTextures.pos[gameFile.events[j].filename] = {static_cast<float>(gameFile.events[j].xOffset), static_cast<float>(gameFile.events[j].yOffset)};
 					if(backgroundTextures.data[gameFile.events[j].filename].width != 0){
 						backgroundTextures.loaded[gameFile.events[j].filename].value = true;
 						std::cout << "Loaded: Background with filename: " << gameFile.events[j].filename << std::endl;
@@ -2360,9 +2366,6 @@ int * GameManager::sliderPreInit(HitObjectData data){
             
         }
         else if(data.curveType == 'B'){
-			Vector2 edges[edgePoints.size()];
-			for(size_t i = 0; i < edgePoints.size(); i++)
-				edges[i] = edgePoints[i];
 			std::vector<Vector2> tempEdges;
 			std::vector<Vector2> tempRender;
 			std::vector<float> curveLengths;
@@ -2599,7 +2602,6 @@ void GameManager::loadGameSounds(){
 	long long int loadedBytes = 0;
 	SoundFilesAll.data.clear();
 	SoundFilesAll.loaded.clear();
-
 	std::string last = Global.Path;
 	std::string dontTouch = gameFile.configGeneral["AudioFilename"];
 	Global.Path = GamePathWithSlash;

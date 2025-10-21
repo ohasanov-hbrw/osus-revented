@@ -1,12 +1,10 @@
 #pragma once
 #include <vector>
 #include <map>
-#include "hitobject.hpp"
-#include "gamefile.hpp"
+#include "hitobjectdefinition.hpp"
 #include "timingpoint.hpp"
 #include "followpoint.hpp"
 #include "event.hpp"
-#include <string.h>
 
 struct GameFile{
     std::map<std::string, std::string> configGeneral;

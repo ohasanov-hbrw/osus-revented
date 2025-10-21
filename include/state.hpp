@@ -1,7 +1,6 @@
 #pragma once
 
 #include "gui.hpp"
-#include "utils.hpp"
 #include "parser.hpp"
 #include <globals.hpp>
 #include <list>
@@ -103,9 +102,33 @@ private:
     Button wip2;
     Button load;
     TestSlider volume;
-    
+    Popup popup;
+    int animationStart;
+    bool animationDone;
 public:
     MainMenu();
+
+    void init() override;
+    void render() override;
+    void update() override;
+    void unload() override;
+    void textureOps() override;
+
+    int animation;
+};
+
+class StartMenu : public State {
+private:
+    Popup popup;
+    TextBox description;
+
+    bool focused;
+    bool focusbreak;
+    bool clicked;
+    bool action;
+    
+public:
+    StartMenu();
 
     void init() override;
     void render() override;

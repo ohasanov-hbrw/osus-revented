@@ -1,10 +1,6 @@
 #pragma once
 #include "parser.hpp"
 #include <raylib.h>
-#include <cmath>
-#include <algorithm>
-#include "utils.hpp"
-#include <limits>
 #include "linkedListImpl.hpp"
 
 struct dbool

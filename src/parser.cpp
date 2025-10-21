@@ -1,6 +1,8 @@
 #include "parser.hpp"
 #include "globals.hpp"
 #include <algorithm>
+#include <iostream>
+#include <fstream>
 
 Parser::Parser(){}
 

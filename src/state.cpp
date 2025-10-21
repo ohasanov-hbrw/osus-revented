@@ -1,5 +1,6 @@
 #include "state.hpp"
 #include "fs.hpp"
+#include <algorithm>
 #include <iostream>
 #include "utils.hpp"
 #include "gamemanager.hpp"
@@ -13,7 +14,6 @@
 #include <cstring>
 #include <clocale>
 #include "utils.hpp"
-#include "time_util.hpp"
 #include "settingsParser.hpp"
 
 PlayMenu::PlayMenu() {
@@ -42,9 +42,12 @@ void PlayMenu::init() {
 
     std::vector<std::string> dir = ls(".osu");
     dir_list = SelectableList({320, 250}, {520, 160}, {255,135,198,255}, dir, BLACK, 20, 20, 65);
+    initDone = 1;
     //MutexUnlock(SWITCHING_STATE);
 }
 void PlayMenu::render() {
+    if(!initDone)
+        return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
@@ -161,9 +164,12 @@ void LoadMenu::init() {
     Global.useAuto = false;
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
+    initDone = 1;
     //MutexUnlock(SWITCHING_STATE);
 }
 void LoadMenu::render() {
+    if(!initDone)
+        return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
@@ -215,11 +221,20 @@ void LoadMenu::update() {
             else{
                 Global.selectedPath = Global.Path + '/' + dir_list.objects[dir_list.selectedindex].text;
                 std::string base_file = get_without_ext(Global.selectedPath);
-                std::string final_path = Global.GamePath + "/beatmaps/" + base_file;
-                create_dir(final_path);
-                int arg = 2;
-                //std::cout << Global.selectedPath.c_str() << std::endl;
-                zip_extract(Global.selectedPath.c_str(), final_path.c_str(), on_extract_entry, &arg);
+                std::string final_path = Global.GamePath + "/beatmaps/" + base_file; //  may be a bit cringe when it comes to unzipping stuff...
+                final_path = correct_path_notation(final_path);
+                if(check_dir(final_path)){
+                    std::cout << "the path already exists?" << std::endl;
+                }
+                else{
+                    std::cout << "trying to unzip new beatmap" << std::endl;
+                    create_dir(final_path);
+                    int arg = 2;
+                    //std::cout << Global.selectedPath.c_str() << std::endl;
+                    print_dir(final_path);
+                    int res = zip_extract(Global.selectedPath.c_str(), final_path.c_str(), NULL, NULL);
+                    std::cout << res << std::endl;
+                }
             }
         }
     }
@@ -255,6 +270,10 @@ MainMenu::MainMenu() {
     wip2 = Button({320,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
     load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
     volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
+    popup = Popup({320, 240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+    animation = 0;
+    animationStart = 0;
+    animationDone = false;
 }
 
 void MainMenu::init() {
@@ -265,6 +284,33 @@ void MainMenu::init() {
     Global.useAuto = false;
     volume.location = Global.volume * 100.0f;
     setlocale(LC_ALL, "en_US.utf8");
+    
+    ErrorMessage tempMsg;
+    tempMsg.id = Global.errorid;
+    Global.errorid++;
+    tempMsg.message = "sugomatest\nsagop";
+    tempMsg.type = ERR_FILEIO;
+    Global.errors.push(tempMsg);
+
+    popup.block = !Global.errors.empty();
+
+    if(animation == 0){
+        play = Button({250,420}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
+        wip = Button({320,340}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
+        wip2 = Button({320,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
+        load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
+        volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
+        popup = Popup({320, 240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+    }
+    else if(animation == 1){
+        play = Button({320,240}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
+        wip = Button({320,240}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
+        wip2 = Button({320,240}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
+        load = Button({320,240}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
+        volume = TestSlider({320,240}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
+        popup = Popup({320,240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+    }
+    initDone = 1;
     //MutexUnlock(SWITCHING_STATE);
 }
 
@@ -281,13 +327,46 @@ void MainMenu::update() {
 
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
+
+    if(animation == 0){
+        animationDone = true;
+    }
+
+
+    if(!animationDone){
+        return;
+    }
+
     MutexLock(ACCESSING_OBJECTS);
     Global.enableMouse = true;
-    play.update();
-    wip.update();
-    wip2.update();
-    load.update();
+
+    popup.update();
+
+    if(popup.action){
+        if(popup.ans == 2){
+            Global.errors.pop();
+        }
+    }
+
+    
+    if(!popup.block){
+        play.update();
+        wip.update();
+        wip2.update();
+        load.update();
+    }
+
+    if(Global.errors.empty()){
+        popup.block = false;
+    }
+
     MutexUnlock(ACCESSING_OBJECTS);
+
+
+
+
+
+
     //test.update();
     if(wip.action){
         //Global.CurrentState->unload();
@@ -378,14 +457,14 @@ void MainMenu::update() {
                     if(pFile != NULL){
                         if(firstLine){
                             fprintf(pFile, "---[METADATA]---\n");
-                            fprintf(pFile, (GameTitle + "\n").c_str());
-                            fprintf(pFile, (GameAuthor + "\n").c_str());
-                            fprintf(pFile, (GameSetId + "\n").c_str());
-                            fprintf(pFile, (p.path().parent_path().string() + "/" + "\n").c_str());
-                            fprintf(pFile, (parser.parseBackground(p.path().string()) + "\n").c_str());
+                            fprintf(pFile, "%s", (GameTitle + "\n").c_str());
+                            fprintf(pFile, "%s", (GameAuthor + "\n").c_str());
+                            fprintf(pFile, "%s", (GameSetId + "\n").c_str());
+                            fprintf(pFile, "%s", (p.path().parent_path().string() + "/" + "\n").c_str());
+                            fprintf(pFile, "%s", (parser.parseBackground(p.path().string()) + "\n").c_str());
                             fprintf(pFile, "---[FILES]---\n");
                         }
-                        fprintf(pFile, (p.path().string() + "\n").c_str());
+                        fprintf(pFile, "%s", (p.path().string() + "\n").c_str());
                         fclose(pFile);
                     }
                 }
@@ -402,7 +481,7 @@ void MainMenu::update() {
         pFile = fopen((filename).c_str()  ,"a");
         if(pFile != NULL){
             for(int i = 0; i < files.size(); i++){
-                fprintf(pFile, (files[i] + "\n").c_str());
+                fprintf(pFile, "%s", (files[i] + "\n").c_str());
             }
             fclose(pFile);
         }
@@ -454,6 +533,8 @@ void MainMenu::update() {
     //MutexUnlock(ACCESSING_OBJECTS);
 }
 void MainMenu::render() {
+    if(!initDone)
+        return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
@@ -462,10 +543,14 @@ void MainMenu::render() {
     play.render();
     wip.render();
     wip2.render();
+    
     load.render();
-    MutexUnlock(ACCESSING_OBJECTS);
+    
     if(IsKeyDown(Global.AUDIO_SETUP_KEY ))
         volume.render();
+
+    popup.render();
+    MutexUnlock(ACCESSING_OBJECTS);
     //MutexUnlock(SWITCHING_STATE);
     //MutexUnlock(ACCESSING_OBJECTS);
     //test.render();
@@ -478,6 +563,114 @@ void MainMenu::unload() {
 void MainMenu::textureOps() {
     //NEED FIXING>>> UNLOADING DOESNT STOP RENDEWRING
 }
+
+
+
+StartMenu::StartMenu() {
+    description = TextBox({320,440}, {520,40}, {240,98,161,0}, "Click the circles!", WHITE, 50, 50);
+    popup = Popup({320, 240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+}
+
+void StartMenu::init() {
+    //MutexLock(SWITCHING_STATE);
+    Global.NeedForBackgroundClear = true;
+    Global.LastFrameTime = getTimer();
+    Global.FrameTime = 0.5;
+    Global.useAuto = false;
+    action = false;
+
+    setlocale(LC_ALL, "en_US.utf8");
+    popup.block = !Global.errors.empty();
+    //MutexUnlock(SWITCHING_STATE);
+    initDone = 1;
+}
+
+
+void StartMenu::update() {
+
+    //MutexLock(SWITCHING_STATE);
+    //MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS);
+    Global.enableMouse = true;
+
+    popup.update();
+
+    if(popup.action){
+        if(popup.ans == 2){
+            Global.errors.pop();
+        }
+    }
+
+    
+    if(!popup.block){
+        bool hover = CheckCollisionPointCircle(Global.MousePosition, {320, 200}, 175);
+        bool click = Global.MouseInFocus and Global.Key1P;
+
+        if (hover and click) {
+            focused = true;
+            clicked = true;
+            focusbreak = false;
+        }
+        else if (hover) {
+            focused = true;
+            clicked = false;
+        }
+        else {
+            focused = false;
+            clicked = false;
+            focusbreak = true;
+        }
+
+        if(hover and !focusbreak and Global.Key1R)
+            action = true;
+        else
+            action = false;
+    }
+
+    if(Global.errors.empty()){
+        popup.block = false;
+    }
+
+    MutexUnlock(ACCESSING_OBJECTS);
+
+    if(action){
+        MutexLock(SWITCHING_STATE);
+        Global.CurrentState->unload();
+        Global.CurrentState.reset(new MainMenu());
+        Global.CurrentState->init();
+        MutexUnlock(SWITCHING_STATE);
+        return;
+    }
+}
+void StartMenu::render() {
+    if(!initDone)
+        return;
+    //Global.mutex.lock();
+    //MutexLock(SWITCHING_STATE);
+    //MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS);
+    DrawTextureCenter(&Global.OsusLogo, 320, 200, 400.0 / (float)Global.OsusLogo.width, WHITE);
+    description.render();
+    popup.render();
+    MutexUnlock(ACCESSING_OBJECTS);
+    //MutexUnlock(SWITCHING_STATE);
+    //MutexUnlock(ACCESSING_OBJECTS);
+    //test.render();
+    //Global.mutex.unlock();
+}
+void StartMenu::unload() {
+    //MutexLock(SWITCHING_STATE);
+    //MutexUnlock(SWITCHING_STATE);
+}
+void StartMenu::textureOps() {
+    //NEED FIXING>>> UNLOADING DOESNT STOP RENDEWRING
+}
+
+
+
+
+
+
 
 Game::Game() {
     volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
@@ -574,18 +767,17 @@ void Game::render() {
         Global.gameManager->render();
         //Global.mutex.lock();
         if(IsMusicStreamPlaying(&Global.gameManager->backgroundMusic)){
-            DrawTextEx(&Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+            DrawTextEx(&Global.DefaultFont, TextFormat("Playing: %.3f/%.3f", (Global.currentOsuTime/1000.0), GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05) , Scale(2), WHITE);
             //DrawTextEx(Global.DefaultFont, TextFormat("Timer: %.3f ms", getTimer()), {ScaleCordX(5), ScaleCordY(55)}, Scale(10) , Scale(1), WHITE);
             //DrawTextEx(Global.DefaultFont, TextFormat("Last Error: %.3f ms", Global.errorLast/1000.0f), {ScaleCordX(5), ScaleCordY(65)}, Scale(10) , Scale(1), WHITE);
-            //DrawTextEx(Global.DefaultFont, TextFormat("Avg Time Difference in the First Second: %.3f ms", Global.avgTime), {ScaleCordX(5), ScaleCordY(75)}, Scale(10) , Scale(1), WHITE);
         }
         else{
-            DrawTextEx(&Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(&Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {(int)ScaleCordX(5), (int)ScaleCordY(25)}, Scale(20.05) , Scale(2), WHITE);
+            DrawTextEx(&Global.DefaultFont, TextFormat("Paused: %.3f/%.3f", GetMusicTimePlayed(&Global.gameManager->backgroundMusic) * 1000000.0f, GetMusicTimeLength(&Global.gameManager->backgroundMusic)), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05) , Scale(2), WHITE);
             if(Global.errorDiv != 0)
-                DrawTextEx(&Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {(int)ScaleCordX(5), (int)ScaleCordY(40)}, Scale(20.05) , Scale(2), WHITE);
+                DrawTextEx(&Global.DefaultFont, TextFormat("Error Avg: %ld ms", (Global.errorSum/Global.errorDiv)/1000), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(40))}, Scale(20.05) , Scale(2), WHITE);
         }
         if(GetMusicTimeLength(&Global.gameManager->backgroundMusic) != 0){
-            DrawLineEx({0, GetScreenHeight() - Scale(2)}, {GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(&Global.gameManager->backgroundMusic)), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
+            DrawLineEx({0, GetScreenHeight() - Scale(2)}, {static_cast<float>(GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(&Global.gameManager->backgroundMusic))), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
         }
         MutexUnlock(ACCESSING_OBJECTS);
 
@@ -606,7 +798,7 @@ void Game::render() {
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
         //Global.mutex.lock();
-        DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+        DrawTextEx(&Global.DefaultFont, message.c_str(), {static_cast<float>((int)ScaleCordX(320 - message.size() * 7.5f)), static_cast<float>((int)ScaleCordY(220))}, Scale(20.05), Scale(2), WHITE);
         //Global.mutex.unlock();
     }
     else if(initDone == -2){
@@ -628,7 +820,7 @@ void Game::render() {
         }
         else if(Global.loadingState == 4){
             //std::cout << "Loading Hit Sounds" << std::endl;
-            message = "Loading Hitsound " + std::to_string(Global.parsedLines) + " of " + std::to_string(Global.numberLines);
+            message = "Loading Hitsounds";
         }
         else if(Global.loadingState == 5){
             message = "Parsing line " + std::to_string(Global.parsedLines) + " of " + std::to_string(Global.numberLines);
@@ -639,7 +831,7 @@ void Game::render() {
         else if(Global.loadingState == 7){
             message = "Loading Textures";
         }
-        DrawTextEx(&Global.DefaultFont, message.c_str(), {(int)ScaleCordX(320 - message.size() * 7.5f), (int)ScaleCordY(220)}, Scale(20.05), Scale(2), WHITE);
+        DrawTextEx(&Global.DefaultFont, message.c_str(), {static_cast<float>((int)ScaleCordX(320 - message.size() * 7.5f)), static_cast<float>((int)ScaleCordY(220))}, Scale(20.05), Scale(2), WHITE);
         //Global.mutex.unlock();
     }
     if(IsKeyDown(Global.AUDIO_SETUP_KEY ))
@@ -748,11 +940,12 @@ void WIPMenu::init(){
         DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
         DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
         renderMouse();
-        DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+        DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
         _gpu_end_drawing();
     }
     applyMouse = true;
 	//SetTextureFilter(menu, TEXTURE_FILTER_BILINEAR );
+    initDone = 1;
 
 }
 void WIPMenu::render(){
@@ -795,13 +988,13 @@ void WIPMenu::render(){
         DrawTextLeft((std::to_string((tempindex + index + dir.size() + offset) % dir.size() + 1) + " out of " + std::to_string(dir.size())).c_str(), textpos.x, textpos.y + 15, 7, WHITE);
     }
     
-    DrawTextureCenter(&back, 145, 240, 0.45f, Color{255,255,255,255 * easeInOutCubic(animtime)});
+    DrawTextureCenter(&back, 145, 240, 0.45f, Color{255,255,255,static_cast<unsigned char>(255 * easeInOutCubic(animtime))});
     if(TempMeta.size() == 5){
-        DrawTextLeft((TempMeta[0]).c_str(), 25, 55, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
-        DrawTextLeft((TempMeta[1]).c_str(), 25, 70, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
-        DrawTextLeft((TempMeta[2]).c_str(), 25, 85, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
-        DrawTextLeft((TempMeta[3]).c_str(), 25, 100, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
-        DrawTextLeft((TempMeta[4]).c_str(), 25, 115, 9, Color{255,255,255,255 * easeInOutCubic(animtime)});
+        DrawTextLeft((TempMeta[0]).c_str(), 25, 55, 9, Color{255,255,255,static_cast<unsigned char>(255 * easeInOutCubic(animtime))});
+        DrawTextLeft((TempMeta[1]).c_str(), 25, 70, 9, Color{255,255,255,static_cast<unsigned char>(255 * easeInOutCubic(animtime))});
+        DrawTextLeft((TempMeta[2]).c_str(), 25, 85, 9, Color{255,255,255,static_cast<unsigned char>(255 * easeInOutCubic(animtime))});
+        DrawTextLeft((TempMeta[3]).c_str(), 25, 100, 9, Color{255,255,255,static_cast<unsigned char>(255 * easeInOutCubic(animtime))});
+        DrawTextLeft((TempMeta[4]).c_str(), 25, 115, 9, Color{255,255,255,static_cast<unsigned char>(255 * easeInOutCubic(animtime))});
     }
 
     DrawTextureRotate(&logo, 800, 240, 0.5f, angle, WHITE);
@@ -929,7 +1122,7 @@ void WIPMenu::update(){
                     DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
                     DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
                     renderMouse();
-                    DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+                    DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
                     _gpu_end_drawing();
                 }
                 applyMouse = true;
@@ -1002,7 +1195,7 @@ void WIPMenu::update(){
                     DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
                     DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
                     renderMouse();
-                    DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+                    DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
                     _gpu_end_drawing();
                 }
                 applyMouse = true;
@@ -1131,7 +1324,7 @@ void WIPMenu::update(){
             DrawRectangle(ScaleCordX(580), ScaleCordY(450), Scale(20), Scale(20),(Color) {0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
             DrawRectangle(ScaleCordX(610), ScaleCordY(450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
             renderMouse();
-            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {(int)ScaleCordX(5), (int)ScaleCordY(5)}, Scale(20.05), Scale(2), GREEN);
+            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %d",  GetFPS()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
             _gpu_end_drawing();
         }
         applyMouse = true;
@@ -1192,6 +1385,7 @@ void ResultsMenu::init() {
     Global.NeedForBackgroundClear = true;
     Global.useAuto = false;
     Global.LastFrameTime = getTimer();
+    initDone = 1;
     
 }
 void ResultsMenu::render() {
@@ -1262,6 +1456,7 @@ void WipMenu2::init() {
     lastStuffAt = -1;
     canAddStuff = true;
     canRemoveStuff = false;
+    initDone = 1;
 }
 void WipMenu2::update() {
     MutexLock(ACCESSING_OBJECTS);
@@ -1506,7 +1701,7 @@ void WipMenu2::render(){
                 name = folderNames[n.folderID];
             }
             //DrawTextLeft(name.c_str(), r.x + 10, r.y + 18, 20.05, BLACK);
-            DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+            DrawTextEx(&Global.DefaultFont, name.c_str(), {static_cast<float>((int)ScaleCordX(r.x + 10)), static_cast<float>((int)ScaleCordY(r.y + 18 - 10))}, Scale(20.05), Scale(2), BLACK);
         }
         else{
             DrawRectangleRec(ScaleRect(r), {200, 150, 200, 255});
@@ -1515,7 +1710,7 @@ void WipMenu2::render(){
                 name = itemNames[n.itemID];
             }
             //DrawTextLeft(name.c_str(), r.x + 10, r.y + 18, 20.05, BLACK);
-            DrawTextEx(&Global.DefaultFont, name.c_str(), {(int)ScaleCordX(r.x + 10), (int)ScaleCordY(r.y + 18 - 10)}, Scale(20.05), Scale(2), BLACK);
+            DrawTextEx(&Global.DefaultFont, name.c_str(), {(float)((int)ScaleCordX(r.x + 10)), (float)((int)ScaleCordY(r.y + 18 - 10))}, Scale(20.05), Scale(2), BLACK);
         }
     }
     MutexUnlock(ACCESSING_OBJECTS);

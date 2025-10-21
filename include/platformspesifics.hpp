@@ -1,10 +1,23 @@
 #pragma once
+
+
+
+#ifdef THREEDS_BUILD
+    #define OSUS_MAX_TEXTURE_WIDTH 256
+    #define OSUS_MAX_TEXTURE_HEIGHT 128
+    #define OSUS_DEFAULT_DIVIDER 4
+#endif
 #ifndef THREEDS_BUILD
-    #include "SDL2/SDL.h" 
+    #define OSUS_MAX_TEXTURE_WIDTH 2048
+    #define OSUS_MAX_TEXTURE_HEIGHT 2048
+    #define OSUS_DEFAULT_DIVIDER 1
+#endif
+
+
+#ifndef THREEDS_BUILD
     #include <thread>
     #include "raylib.h"
     #include <mutex>
-    #include <iostream>
     typedef std::mutex MULTITHREAD_MUTEX;
     typedef Vector2 INPUT_TOUCHSCREEN;
     typedef void GPU_RENDER_TARGET;

@@ -1,9 +1,6 @@
 #pragma once
 #include <vector>
-#include <string>
-#include <iostream>
 #include <raylib.h>
-#include <climits>
 
 
 class FollowPoint{

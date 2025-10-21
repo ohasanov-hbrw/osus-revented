@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+
 class GuiElement {
 public:
     Vector2 position;
@@ -83,6 +84,34 @@ public:
     int renderindex2 = 0;
     bool mouseSelect = false;
     int mouseSelectIndex = 0;
+};
+
+class Popup : public GuiElement {
+private:
+    
+public:
+    Popup(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize, int type, int id);
+    Popup() = default;
+    
+    void init();
+    void render() override;
+    void update() override;
+    Color color;
+    Color textcolor;
+    std::string text;
+    int textsize;
+    int type;
+    TextBox bg;
+    TextBox msg;
+    TextBox top;
+    Button b1;
+    Button b2;
+    Button b3;
+    Button c;
+    bool block = true;
+    int ans = 0;
+    bool action = false;
+    int id;
 };
 
 class Switch : public GuiElement {

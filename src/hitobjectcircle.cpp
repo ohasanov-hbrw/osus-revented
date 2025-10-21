@@ -1,63 +1,73 @@
 #include <hitobject.hpp>
-#include <cmath>
 #include <algorithm>
 #include "gamemanager.hpp"
 #include "globals.hpp"
 #include "utils.hpp"
-#include <limits>
 
-//creates a circle
+// Creates the circle object
 Circle::Circle(HitObjectData data){
     this->data = data;
     init();
 }
 
-//initilizes a circle
+// Initializes the circle object
 void Circle::init(){
-    //std::cout << data.hitSound << std::endl;
     data.ex = data.x;
     data.ey = data.y;
 }
 
-//the main code that runs for every circle on screen, the collision and point manager is in the GamerManager
+// Update the logic of a singular cicrcle object
 void Circle::update(){
     GameManager* gm = GameManager::getInstance();
-    //the circle is not clickable after some time so we check that
+
+    // The circle is not clickable after some time so we check that
     if(gm->currentTime*1000.0f > data.time + gm->gameFile.p50Final){
-        //this is needed for dead_update to work, maybe there is a smarter way to do that
+        // This is needed for dead_update to work properly
         data.time = gm->currentTime*1000.0f;
         data.point = 0;
-        //resets the combo
+
+        // Resets the combo if the circle was completely missed
         if(gm->clickCombo > 30){
+            // If you already had a combo higher than 30, play a combo break sound
             SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
             PlaySound(&gm->SoundFilesAll.data["combobreak"]);
         }
+
+        // Check and update the maximum achieved combo
         gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
         gm->clickCombo = 0;
-        //gm->destroyHitObject(data.index);
+        
+        // Flag object for unaliving
         data.destruct = true;
     }
 }
 
-//renders the Circle
+// Render the circle object
 void Circle::render(){
+    // Get the current Game Manager instance
     GameManager* gm = GameManager::getInstance();
+
+    // Calculate the scale of the approach circle using osu! tactics
     float approachScale = 3.5f*easeInOutCubic((1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt))+1.0f;
     if (approachScale <= 1.0f)
         approachScale = 1.0f;
-    float clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
+    
+    // This is probably here because my skin currently has crappy scaling
+    approachScale *= 1.2f;
 
+    // Fade in the circle 
+    float clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
     clampedFade = easeInOutCubic(clampedFade);
 
+    // If a color is defined, use it, otherwise just pinkish white
     Color renderColor;
     if(data.colour.size() > 2)
         renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
     else
-        renderColor =  Fade(Color{255,255,255}, clampedFade);
+        renderColor =  Fade(Color{255,200,235}, clampedFade);
     
-    //td::cout << "renderingCircle\n";
-    approachScale *= 1.2f;
+    // Render all of the textures and the circle number
     DrawTextureCenter(&gm->hitCircle, data.x, data.y, gm->circlesize/(float)gm->hitCircle.width, renderColor);
     DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/(float)Global.textureSize.comboNumber, Fade(WHITE,clampedFade));
     DrawTextureCenter(&gm->hitCircleOverlay, data.x, data.y, gm->circlesize/(float)gm->hitCircleOverlay.width , Fade(WHITE,clampedFade));
@@ -65,9 +75,12 @@ void Circle::render(){
 
 }
 
-//renders the "dead" Circle
+// Render the circle after its life cycle of being clicked or missed
 void Circle::dead_render(){
+    // Get current Game Manager instance
     GameManager* gm = GameManager::getInstance();
+
+    // Respectively the opacity fade of the points and the circle itself
     float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
     float clampedFade2 = (gm->gameFile.fade_in/4.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/4.0f);
 
@@ -77,6 +90,7 @@ void Circle::dead_render(){
     clampedFade2 = clip(clampedFade2, 0.0f, 1.0f);
     clampedFade2 = easeInOutCubic(clampedFade2);
 
+    // Scaling up for a cooler animation
     float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
     scale = clip(scale,1,2);
     scale -= 1.0;
@@ -84,16 +98,19 @@ void Circle::dead_render(){
     scale = scale * 0.4f;
     scale += 1.0f;
     
+    // Pinkish white if no data, normally the same color as it was alive
     Color renderColor;
     if(data.colour.size() > 2)
         renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
     else
-        renderColor =  Fade(Color{255,255,255}, clampedFade2);
+        renderColor =  Fade(Color{255,200,235}, clampedFade2);
+
+    // Render the circle
     DrawTextureCenter(&gm->hitCircle, data.x, data.y, clip(scale,1,2)*gm->circlesize/(float)gm->hitCircle.width , renderColor);
     DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/(float)Global.textureSize.comboNumber, Fade(WHITE,clampedFade2));
     DrawTextureCenter(&gm->hitCircleOverlay, data.x, data.y, clip(scale,1,2)*gm->circlesize/(float)gm->hitCircleOverlay.width , Fade(WHITE,clampedFade2));
-    /*if(data.point != 0)
-        DrawTextureCenter(gm->selectCircle, data.x, data.y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);*/
+    
+    // Render the points icons
     if(data.point == 0)
         DrawTextureCenter(&gm->hit0, data.x, data.y, (gm->circlesize/gm->hit0.width)*0.7f , Fade(WHITE,clampedFade));
     else if(data.point == 1)
@@ -104,17 +121,19 @@ void Circle::dead_render(){
         DrawTextureCenter(&gm->hit300, data.x, data.y, (gm->circlesize/gm->hit300.width)*0.7f , Fade(WHITE,clampedFade));
 }
 
-//just gives more time to render the "dead" Circle 
+// Gives us just enough time to play the outro animation
 void Circle::dead_update(){
     GameManager* gm = GameManager::getInstance();
-    //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE
+    // We need just enough time, this setting is enough most of the times
     if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        //gm->destroyDeadHitObject(data.index);
+        // Flag object for definitive deletion
         data.expired = true;
     }
 }
 
+// Free up memory
 void Circle::deinit(){
+    // Create empty vectors
     std::vector<std::pair<short,short> > curvePoints;
     std::vector<int> edgeSounds;
     std::vector<std::pair<short, short> > edgeSets;
@@ -122,6 +141,7 @@ void Circle::deinit(){
     std::vector<short> colour;
     std::vector<float> lengths;
 
+    // Clear all vectors
     data.curvePoints.clear();
     data.edgeSounds.clear();
     data.edgeSets.clear();
@@ -129,6 +149,7 @@ void Circle::deinit(){
     data.colour.clear();
     data.lengths.clear();
 
+    // Set all vectors to empty vectors, hopefully freeing memory
     data.curvePoints = curvePoints;
     data.edgeSounds = edgeSounds;
     data.edgeSets = edgeSets;

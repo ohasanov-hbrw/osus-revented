@@ -1,0 +1,4 @@
+CompileFlags:                     # Tweak the parse settings
+  Add: [-ferror-limit=0] 
+Diagnostics:
+  Suppress: ["-Wsign-compare", "-Wmissing-field-initializers", "-Wunused-variable", "-Wunused-but-set-variable", "-Wwritable-strings", "readability-misleading-indentation"]

@@ -153,3 +153,5 @@ int GetFPS();
 void ImageResize(Image *image, int newWidth, int newHeight);
 
 void BeginBlendMode(int type);
+
+void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp);

@@ -3,7 +3,12 @@
 #include "globals.hpp"
 #include "utils.hpp"
 #include "rlgl.h"
-#include "time_util.hpp"
+#include <iostream>
+
+
+
+
+
 
 void _multithread_mutex_init(MULTITHREAD_MUTEX * mutex){
     #ifdef THREEDS_BUILD
@@ -323,7 +328,7 @@ void _os_exit_program(){
     //}
 //
     void DrawTextureRotate(Texture2D *tex, float x, float y, float s, float r, Color color){
-        DrawTexturePro(tex, Rectangle{0,0,tex->width,tex->height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
+        DrawTexturePro(tex, Rectangle{0,0,static_cast<float>(tex->width),static_cast<float>(tex->height)}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex->width*s),Scale(tex->height*s)}, Vector2{Scale(tex->width*s/2.0f), Scale(tex->height*s/2.0f)}, r, color);
     }
 
     void DrawTextureCenter(Texture2D *tex, float x, float y, float s, Color color){

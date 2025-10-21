@@ -1,10 +1,6 @@
 #include "followpoint.hpp"
-#include <cmath>
-#include <algorithm>
 #include "gamemanager.hpp"
-#include "globals.hpp"
 #include "utils.hpp"
-#include <limits>
 //This file includes functions for updating and drawing the followpoints
 
 FollowPoint::FollowPoint(){
@@ -74,7 +70,7 @@ void FollowPoint::render(){
                 int opacity = (int)(128.0f * (opacity1));
                 
                 //Drawing a "circle" with 4 segments. Basically a diamond. The 3ds can't really handle more lol
-                DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, {255,200,255,opacity});
+                DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, {255,200,255,static_cast<unsigned char>(opacity)});
 
             }
         }

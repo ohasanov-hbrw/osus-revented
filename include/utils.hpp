@@ -2,14 +2,11 @@
 #include "raylib.h"
 #include <string>
 #include <vector>
-#include <cstdio>
-#include <iostream>
-#include <ctime>
-#include <chrono>
 #include "platformspesifics.hpp"
+#include <math.h>
 
 #define RAYMATH_IMPLEMENTATION
-# define M_PI 3.14159265358979323846f
+//#define M_PI 3.14159265358979323846f
 //extern "C" {
     #include "raymath.h"
 //}
@@ -89,7 +86,7 @@ Vector2 vectorize(float);
 //Calculate the distance between two points
 float distance(Vector2 &, Vector2 &);
 //Binary search algorithm
-int Search(std::vector<float>, float,int,int);
+int Search(std::vector<float>*, float,int,int);
 
 Vector2 getPointOnCircle(float, float, float, float);
 

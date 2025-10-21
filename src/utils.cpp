@@ -4,13 +4,10 @@
 #include <algorithm>
 #include <globals.hpp>
 #include <gamemanager.hpp>
-#include <iostream>
 #include <ctype.h>
 #include <parser.hpp>
 
-
-
-
+// Multithreading mutex initializations
 void InitilizeLocks(){
     _multithread_mutex_init(&stateLock);
     _multithread_mutex_init(&accessLock);
@@ -18,6 +15,7 @@ void InitilizeLocks(){
     _multithread_mutex_init(&wholeRenderLock);
 }
 
+// Lock spesific mutexes
 void MutexLock(int i){
     switch(i){
         case SWITCHING_STATE:
@@ -38,6 +36,7 @@ void MutexLock(int i){
     }
 }
 
+// Unlock Spesific mutexes
 void MutexUnlock(int i){
     switch(i){
         case SWITCHING_STATE:
@@ -58,7 +57,7 @@ void MutexUnlock(int i){
     }
 }
 
-
+// Get input up down movement
 void updateUpDown(){
     //Get the current state of the mouse wheel
     Global.Wheel = GetMouseWheelMove();
@@ -83,15 +82,17 @@ void updateUpDown(){
     }
 }
 
+// Calculate global scaling
 void GetScale(){
     //Get the scale and also get the current offset for the zero point of the game area
     Global.Scale = std::min(GetScreenWidth()/640.0f, GetScreenHeight()/480.0f);
     Global.ZeroPoint = {GetScreenWidth() / 2.0f - (Global.Scale * 320.0f), GetScreenHeight() / 2.0f - (Global.Scale * 240.0f)};
 }
 
+// Mouse position on the main 640*480 grid
 void GetMouse(){
     //Get the mouse position and also check if it is in the game area
-    Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()});
+    Global.MouseInFocus = CheckCollisionPointRec(GetMousePosition(), (Rectangle){0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())});
     if(!Global.MouseInFocus){
         Global.MousePosition = {0,0};
     }
@@ -103,6 +104,7 @@ void GetMouse(){
     }
 }
 
+// Scan inputs
 void GetKeys(){
     //Get all of the keys an store this data into some variables
     if(IsKeyPressed(Global.P1_KEY ) or (Global.enableMouse and IsMouseButtonPressed(SDL_BUTTON_LEFT)))
@@ -131,73 +133,86 @@ void GetKeys(){
         Global.Key2R = false;
 }
 
+// Scale based on global scale
 float Scale(float a){
     //Basic scaling function
     return a * Global.Scale;
 }
 
+// Scale and move the rectangle mainly for rendering
 Rectangle ScaleRect(Rectangle a){
     //Scale the size and also move the rectangle depending on the offset
     return {a.x * Global.Scale + Global.ZeroPoint.x, a.y * Global.Scale + Global.ZeroPoint.y, a.width * Global.Scale, a.height * Global.Scale};
 }
 
+// Scale and move coordinates mainly for rendering
 Vector2 ScaleCords(Vector2 a){
     //Scale so that the coordinates are correct for our window size and also move them based on the offset
     return {a.x * Global.Scale + Global.ZeroPoint.x, a.y * Global.Scale + Global.ZeroPoint.y};
 }
 
+// Seperate functions for ScaleCords
 float ScaleCordX(float a){
     //Do the same thing as the ScaleCords function but only for the x axis
     return a * Global.Scale + Global.ZeroPoint.x;
 }
 
+// Seperate functions for ScaleCords
 float ScaleCordY(float a){
     //Do the same thing as the ScaleCords function but only for the y axis
     return a * Global.Scale + Global.ZeroPoint.y;
 }
 
+// Rendering help to get center of rectangle
 Vector2 GetCenter(Rectangle a){
     //Get the center of a rectangle
     return {a.x + a.width / 2, a.y + a.height / 2};
 }
+
+// Convert center of rectangle to top left as expected by raylib
 Vector2 GetRaylibOrigin(Rectangle a){
     //Move the coordinates so that the center of the rectangle is where we want it to be for the rendering process
     return {a.x - a.width / 2, a.y - a.height / 2};
 }
 
+// Convert center of rectangle to top left as expected by raylib, give a full rectangle
 Rectangle GetRaylibOriginR(Rectangle a){
     //Do the same thing as the RaylibOrigin function but this time just take the whole rectangle
     return {a.x - a.width / 2, a.y - a.height / 2, a.width, a.height};
 }
 
+// Clamp numbers within limits
 float clip( float n, float lower, float upper ){
-    //I have no idea what this does but it works
     n = ( n > lower ) * n + !( n > lower ) * lower;
     return ( n < upper ) * n + !( n < upper ) * upper;
 }
 
+// Get a zwischenpunkt between two points
 Vector2 lerp(Vector2 a, Vector2 b, float t){
     //Thank you geeksforgeeks
     return { .x = (1 - t) * a.x + t * b.x, .y = (1 - t) * a.y + t * b.y};
 }
 
+// Number to Vector2
 Vector2 vectorize(float i) {
     //Really dumb but raylib needs it
     return Vector2{i, i};
 }
 
+// Calculate distance between two points
 float distance(Vector2 &p0, Vector2 &p1){
     //Its a bit heavy of a process but we dont do this frequently anyway
     return std::sqrt(std::pow(std::abs(p0.x - p1.x),2) + std::pow(std::abs(p0.y - p1.y),2));
 }
 
-int Search(std::vector<float> arr, float x,int l,int r) {
+// Search for an object in a float vector
+int Search(std::vector<float> *arr, float x,int l,int r) {
     //Basic binary search implementation
     if (r >= l) {
         int mid = (l + r) / 2;
-        if (arr[mid] == x || l==r)
+        if ((*arr)[mid] == x || l==r)
             return mid;
-        if (arr[mid] > x)
+        if ((*arr)[mid] > x)
             return Search(arr, x,l, mid - 1);
         else 
             return Search(arr, x,mid + 1, r);
@@ -206,27 +221,23 @@ int Search(std::vector<float> arr, float x,int l,int r) {
         return l;
 }
 
-
-
+// Automatically scale and offset a Slider texture based on its size
 void DrawTextureSlider(Texture2D *tex, float x, float y, Color color, float s){
     //Same thing as the DrawTextureCenter() function above
     DrawTextureEx(tex, ScaleCords({x-s/2.0f-4.0f*Global.sliderTexSize,y-s/2.0f-4.0f*Global.sliderTexSize}),0,Scale(1.0f/Global.sliderTexSize), color);
 }
 
-/*void DrawTextureRotate(Texture2D tex, float x, float y, float s, float r, Color color){
-    //Same thing as the DrawTextureCenter() function above
-    DrawTexturePro(tex, Rectangle{0,0,tex.width,tex.height}, Rectangle{ScaleCordX(x),ScaleCordY(y),Scale(tex.width*s),Scale(tex.height*s)}, Vector2{Scale(tex.width*s/2.0f), Scale(tex.height*s/2.0f)}, r, color);
-}*/
-
+// Get a single digit from a number
 int nthDigit(int v, int n){
     //Find the nth digit of a number... Dumb but this is probably one of the best ways :D
     while(n > 0){
         v /= 10;
         n--;
     }
-    return "0123456789"[v % 10] - '0';
+    return "0123456789"[v % 10] - '0'; // hehe.
 }
 
+// Draw a number with the font of the osu skin
 void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
     //I will need to fix this function but currently it works good enough
     GameManager* gm = GameManager::getInstance();
@@ -236,13 +247,17 @@ void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
         DrawTextureCenter(&gm->numbers[nthDigit(n, digits-k-1)], x - (float)i * s + k * 18 * s * 2, y, s, color);
     }
 }
+
+// Get name of sample from the id, used for debug
 std::string getSampleSetFromInt(int s){
     //simple map for sound loading
     if (s == 1) return "normal"; 
     else if (s == 2) return "soft"; 
     else if (s == 3) return "drum"; 
+    return "normal";
 }
 
+// Spinner Object background gauge
 void DrawSpinnerMeter(Texture2D *tex, float per){
     //currently broken, TODO
     per = clip(per, 0.001f, 0.999f);
@@ -256,11 +271,12 @@ void DrawSpinnerMeter(Texture2D *tex, float per){
     else{
         y = 480.0f - 640.0f / ratio;
     }
-    Rectangle source = {0,tex->height*(1.0f-per),tex->width, tex->height*per};
-    DrawTexturePro(tex, Rectangle{0,0,tex->width, tex->height}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
+    Rectangle source = {0,tex->height*(1.0f-per),static_cast<float>(tex->width), tex->height*per};
+    DrawTexturePro(tex, Rectangle{0,0,static_cast<float>(tex->width), static_cast<float>(tex->height)}, ScaleRect(Rectangle{0+x/2.0f,0+y/2.0f,640-x,480-y}), Vector2{0,0}, 0, BLACK);
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,(480.0f-y)*(1.0f-per)+y/2.0f,640-x,(480.0f-y)*per}), Vector2{0,0}, 0, WHITE);
 }
 
+// Spinner Object static background
 void DrawSpinnerBack(Texture2D *tex, Color color){
     //currently broken, TODO
     float x = 0;
@@ -273,10 +289,11 @@ void DrawSpinnerBack(Texture2D *tex, Color color){
     else{
         y = 480.0f - 640.0f / ratio;
     }
-    Rectangle source = {0,0,tex->width, tex->height};
+    Rectangle source = {0,0,static_cast<float>(tex->width), static_cast<float>(tex->height)};
     DrawTexturePro(tex, source, ScaleRect(Rectangle{0+x/2.0f,y/2.0f,640-x,(480.0f-y)}), Vector2{0,0}, 0, color);
 }
 
+// Get the point of a circle depending on an angle (degrees)
 Vector2 getPointOnCircle(float x, float y, float radius, float angle){
     //gets a point on a circle with a defined radius
     angle= (angle * M_PI) / 180;
@@ -285,24 +302,29 @@ Vector2 getPointOnCircle(float x, float y, float radius, float angle){
     return Vector2{x + xdiff, y + ydiff};
 }
 
+// Drawing a texture on a predefined point of a circle (degrees)
 void DrawTextureOnCircle(Texture2D *tex, float x, float y, float rad, float s, float r, float ang, Color color){
     //draw texture on a circular path
     Vector2 pos = getPointOnCircle(x, y, rad, ang);
     DrawTextureRotate(tex, pos.x, pos.y, s, r, color);
 }
 
+// Centered text based on the measurement of the text
+// TODO: switch the text options, especially spacing, to be configurable
 void DrawTextCenter(const char *text, float x, float y, float s, Color color){
     //draw centered text
     Vector2 size = MeasureTextEx(&Global.DefaultFont, text, s, 2);
     DrawTextPro(&Global.DefaultFont, text, ScaleCords(Vector2{x - size.x / 2.0f, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
 }
 
+// Lay text from the left
 void DrawTextLeft(const char *text, float x, float y, float s, Color color){
     //draw text LTR
     Vector2 size = MeasureTextEx(&Global.DefaultFont, text, s, 2);
     DrawTextPro(&Global.DefaultFont, text, ScaleCords(Vector2{x, y - size.y / 2.0f}), Vector2{0,0}, 0, Scale(s), Scale(1), color);
 }
 
+// Draw a number from the left using the osu skin assets
 void DrawCNumbersLeft(int n, float x, float y, float s, Color color){
     //I will need to fix this function but currently it works good enough
     GameManager* gm = GameManager::getInstance();
@@ -313,6 +335,7 @@ void DrawCNumbersLeft(int n, float x, float y, float s, Color color){
     }
 }
 
+// Just return the number, was a test ground for animation effects
 float easeInOutCubic(float x){
     //ease function
     //return x < 0.5f ? 4.0f * x * x * x : 1.0f - std::pow(-2.0f * x + 2.0f, 3) / 2.0f;
@@ -324,6 +347,7 @@ float easeInOutCubic(float x){
     //return std::sin((x * M_PI) / 2.0);
 }
 
+// Basic ease function
 float easeOutQuad(float x){
     //ease function
     //return x < 0.5f ? 4.0f * x * x * x : 1.0f - std::pow(-2.0f * x + 2.0f, 3) / 2.0f;
@@ -335,11 +359,13 @@ float easeOutQuad(float x){
     //return std::sin((x * M_PI) / 2.0);
 }
 
+// double / float comparison
 bool AreSame(double a, double b){
     //float errors
     return std::fabs(a - b) < 0.0001f;
 }
 
+// Try to parse the name of the osu beatmap folder
 std::vector<std::string> ParseNameFolder(std::string folder){
     //parse the normal osu folder names, they give a lot of info WIP
     std::vector<std::string> output;
@@ -393,6 +419,7 @@ std::vector<std::string> ParseNameFolder(std::string folder){
     return output;
 }
 
+// Try to get some metadata id from the beatmap file
 std::vector<std::string> ParseNameFile(std::string file){
     //get get metadata from file WIP
     std::vector<std::string> output;
@@ -406,35 +433,41 @@ std::vector<std::string> ParseNameFile(std::string file){
     return output;
 }
 
+// Initialize the system timer
 void initTimer(){
     //init the timer
     Global.start = std::chrono::steady_clock::now();
 }
 
+// za warudo?
 void pauseTimer(){
     //currently not in use
 }
 
+// anti za warudo.
 void resumeTimer(){
     //currently not in use
 }
 
-
+// Get time time elapsed since initializing the timer
 double getTimer(){
     //get the current time elapsed
     Global.end = std::chrono::steady_clock::now();
     return (Global.end - Global.start).count() / 1000000.0;
 }
 
+// Add an offset to the game timer, so that the time the game has been paused isnt an issue
+// TODO: make this actually work, and try to incorperate this into the music playback... (audio buffer is cringe)
 void addOffsetTimer(unsigned long long int time){
     //currently not in use
-    Global.pausedFor += time;
 }
 
+// It is already up to date
 void updateTimer(){
     //currently not in use
 }
 
+// Check if texture is ready to be rendered
 bool IsTextureReady(Texture2D *texture){
     // TODO: Validate maximum texture size supported by GPU?
 
@@ -445,15 +478,18 @@ bool IsTextureReady(Texture2D *texture){
             (texture->mipmaps > 0));     // Validate texture mipmaps (at least 1 for basic mipmap level)
 }
 
+// Check if an offscreen buffer is ready to be used
 bool IsRenderTextureReady(RenderTexture2D *target){
     return (target->texture.id > 0);
 }
 
+// Get radian angle of a line defined by two points
 float getAngle(Vector2 p1, Vector2 p2){
     //get angle from two points
     return atan2(p1.y - p2.y, p1.x - p2.x);
 }
 
+// Create filenames from sound ids based on the information present on the osu wiki
 std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex, int defaultSampleSet, int normalSet, int additionSet, int hitSound, int index, std::string filename){
     //simple function to get filenames from basic integers
     int defaultSampleSetForObject = 0;

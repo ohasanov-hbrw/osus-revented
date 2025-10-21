@@ -1,4 +1,5 @@
 #include "linkedListImpl.hpp"
+#include <iostream>
 
 Node::Node(){ 
     object = NULL; 

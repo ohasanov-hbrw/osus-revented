@@ -1,5 +1,7 @@
 #include "settingsParser.hpp"
 #include "globals.hpp"
+#include <iostream>
+#include <fstream>
 
 std::pair<std::string, std::string> parseLine(std::string line, bool hasSpaceBefore, bool hasSpaceAfter){
 	size_t spliceLocation;
@@ -64,7 +66,7 @@ void parseSettings(){
                             std::cout << "settings TPS to: " << std::stoi(keyValue.second) << std::endl;                      
                         }
                         else if(keyValue.first == "offset"){
-                            Global.offset = std::stof(keyValue.second);
+                            Global.offsetTime = (int)std::stof(keyValue.second);
                             std::cout << "settings offset to: " << std::stof(keyValue.second) << std::endl;                      
                         }
                         else if(keyValue.first == "maxSliderSize"){
