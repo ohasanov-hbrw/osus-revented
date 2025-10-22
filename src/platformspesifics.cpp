@@ -3,6 +3,8 @@
 #include "globals.hpp"
 #include "utils.hpp"
 #include "rlgl.h"
+#include <SDL2/SDL_pixels.h>
+#include <cstdint>
 #include <iostream>
 #ifdef THREEDS_BUILD
     #include "time_util.hpp"
@@ -279,7 +281,14 @@ void _os_init_program(bool VSYNC){
         
         InitWindow(640, 480, "osus - amogus");
         
-        SDL_Surface* pIcon = SDL_CreateRGBSurface(0,64,64,32,0,0,0,0);;
+        SDL_Surface* pIcon = SDL_CreateRGBSurface(0,64,64,32,0,0,0,0);
+        SDL_PixelFormat* PixelFormat{pIcon->format};
+
+        for(int x = 0; x < 64; x++){
+            for(int y = 0; y < 64; y++){
+                ((uint32_t*)pIcon->pixels)[y * 64 + x] = SDL_MapRGB(PixelFormat, 255 - x * 4, abs(x - y) * 4, y * 4);
+            }
+        }
         SDL_SetWindowIcon((SDL_Window*)GetWindowSDL(), pIcon);
         SDL_FreeSurface(pIcon);
 

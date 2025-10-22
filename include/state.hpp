@@ -11,6 +11,13 @@ public:
     virtual ~State() = default;
     int initDone = 0;
     double initStartTime = 0;
+
+    int animationStart;
+    bool animationDone;
+    double animationStartTime = 0;
+    double animationMs = 10;
+
+    
     virtual void init() = 0;
     virtual void render() = 0;
     virtual void update() = 0;
@@ -103,8 +110,7 @@ private:
     Button load;
     TestSlider volume;
     Popup popup;
-    int animationStart;
-    bool animationDone;
+    ImageObject logo;
 public:
     MainMenu();
 
@@ -120,13 +126,13 @@ public:
 class StartMenu : public State {
 private:
     Popup popup;
+    ImageObject logo;
     TextBox description;
 
     bool focused;
     bool focusbreak;
     bool clicked;
     bool action;
-    
 public:
     StartMenu();
 
@@ -135,6 +141,8 @@ public:
     void update() override;
     void unload() override;
     void textureOps() override;
+
+    int animation;
 };
 
 class WipMenu2 : public State {

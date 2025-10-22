@@ -201,7 +201,7 @@ void RenderLoop(void *){
             renderMouse(); 
 
             // Show fps and game ticks per second
-            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.3f TPS: %.3f",  avgFPS, avgHZ), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
+            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.0f TPS: %.0f",  avgFPS, avgHZ), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
             
             // Mainly for 3DS Debugging purposes
             _gpu_check_command_buffer();
@@ -266,6 +266,11 @@ void RenderLoop(void *){
 
 
 int main(){
+
+    // Set flags before initializing Window
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
+
     // Initialize with VSYNC or not
     _os_init_program(VSYNC);
     // Mutexes need initializing 
@@ -283,10 +288,6 @@ int main(){
     InitAudioDevice();
     SetAudioStreamBufferSizeDefault(240);
 
-    // Set flags before initializing Window
-	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    
     // Convert windows paths to linux path?
     for(int i = 0; i < Global.GamePath.size(); i++) {
         if (Global.GamePath[i] == '\\')
@@ -392,7 +393,9 @@ int main(){
     std::cout << "[INFO] locked the switching state\n";
 
     // Unload current state, which may involve texture operations...
+    std::cout << "[INFO] calling unload\n";
     Global.CurrentState->unload();
+    std::cout << "[INFO] done unloading\n";
     MutexUnlock(ACCESSING_OBJECTS);
 
     // Reset to start? Maybe?
@@ -408,6 +411,8 @@ int main(){
 
     _multithread_join_thread(&renderThread);
     _multithread_free_thread(&renderThread);
+
+    deleteGlobalVariables();
 
     std::cout << "[INFO] bye bye :3 ~!\n";
     SleepInMs(50);

@@ -7,6 +7,7 @@
 #include <math.h>
 #include <hitobject.hpp>
 #include "globals.hpp"
+#include "raylib.h"
 #include "utils.hpp"
 #include "fs.hpp"
 #include <sys/time.h>
@@ -17,7 +18,7 @@
 
 #include "linkedListImpl.hpp"
 
-//for some reason the clamp function didnt work so here is a manual one
+// For some reason the clamp function didnt work so here is a manual one
 float GameManager::clip(float value, float min, float max){
   	return std::min(std::max(value,min), max);
 }
@@ -25,28 +26,28 @@ float GameManager::clip(float value, float min, float max){
 
 GameManager* GameManager::inst_ = NULL;
 
-//get a new gamemanager
+// If we don't current have an instance, create one, if we do just give it back!
 GameManager* GameManager::getInstance() {
    	if (inst_ == NULL)
    		inst_ = new GameManager();
    	return(inst_);
 }
 
-//call the initilization
+// Initialize on creation
 GameManager::GameManager(){
 	init();
 }
 
-//initilize the game manager
+// Initilize the game manager?
 void GameManager::init(){
 
 }
 
-//main game loop
+// Osu! Game loop
 void GameManager::update(){
-	//for now the left key on the keyboard plays the map automatically
-	//this is pretty useful when you need to quickly test the timings
-	//since the bot is always pressing in the correct time window
+	// For now the left key on the keyboard plays the map automatically
+	// this is pretty useful when you need to quickly test the timings
+	// since the bot is always pressing in the correct time window
 	if(IsKeyDown(Global.AUTO_KEY)){
 		Global.useAuto = true;
 	}
@@ -55,7 +56,7 @@ void GameManager::update(){
 	}
 
 	
-	//current implementation of the backgrounds
+	// Current implementation of the backgrounds
 	int eventSize = gameFile.events.size();
 	for(int i = eventSize-1; i >= 0; i--){
 		if(gameFile.events[i].startTime <= currentTime*1000.0f){
@@ -734,19 +735,24 @@ void GameManager::render(){
 		deadHitObjectNode = deadHitObjectNodeNext;
 	}
 	//Global.mutex2.unlock();
-	DrawCNumbersCenter(score, 320, 10, 0.4f, WHITE);
 
-
+	//std::cout << score << " " << difficultyMultiplier << std::endl;
+	int change = (int)std::max(std::max(0.f, (float)Global.FrameTime), std::max(0.f, (float)((float)(score - animatedScore) / 30) * (float)Global.FrameTime));
+	int change2 = (int)std::max(std::max(0.f, 0.0f), std::max(0.f, (float)((float)(score - animatedScore) / 30) * (float)Global.FrameTime));
+	animatedScore += change;
+	if(animatedScore > score){
+		animatedScore = score;
+		change2 = 0;
+	}
+	change2 = clip(change2, 0.01, 25);
+	float scale = clip((float)sqrt((float)change2), 0.0f, 5.0f) / 100;
+	DrawCNumbersRight(animatedScore, 640 - 15 + (ScaleCordX(0) / Scale(1)), (15 + scale * (numbers[0].height / 4.0)) - (ScaleCordY(0) / Scale(1)), 0.5f + scale, Fade(WHITE, 0.8-scale));
 
 	DrawCNumbersLeft(clickCombo, 15 - ((GetScreenWidth() - Scale(640))) / Scale(2), 460 + ((GetScreenHeight() - Scale(480))) / Scale(2), 0.6f, WHITE);
 
-
-
-
-	
 	if(spawnedHitObjects == 0 && gameFile.hitObjects[gameFile.hitObjects.size() - 1].time > 6000 + currentTime*1000.0f){
 		////Global.mutex.lock();
-		DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS \"S\"\n(Keep in mind that this can affect the offset\nbecause of how the raylib sounds system works)"), {static_cast<float>((int)Scale(5)), static_cast<float>(GetScreenHeight() - (int)Scale(80))}, Scale(20.05), Scale(2), WHITE);
+		DrawTextEx(&Global.DefaultFont, TextFormat("TO SKIP PRESS ENTER or A\n(Keep in mind that this can affect the offset\nbecause of how the sounds system currently works)"), {static_cast<float>((int)Scale(5)), static_cast<float>(GetScreenHeight() - (int)Scale(80))}, Scale(20.05), Scale(2), WHITE);
 		////Global.mutex.unlock();
 	}
 	//render the points and the combo
@@ -762,7 +768,7 @@ void GameManager::run(){
 	//ms = getTimer() / 1000.0;
 
 	if(Global.startTime < 0){
-		if(Global.FrameTime < 10.0f)
+		if(Global.FrameTime < 50.0f)
 			Global.startTime += Global.FrameTime;
 		Time = Global.startTime;
 		//std::cout << Time << std::endl;
@@ -1584,6 +1590,7 @@ void GameManager::loadGame(std::string filename){
 
 	//reset the score and the combo
 	score = 0;
+	animatedScore = 0;
 	clickCombo = 0;
 	maxCombo = 0;
 	hit300s = 0;
@@ -1602,7 +1609,8 @@ void GameManager::loadGame(std::string filename){
 	
 	//more difficulty stuff, may also be wrong
 	float overalldifficulty = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
-	difficultyMultiplier = ((hpdrainrate + std::stof(gameFile.configDifficulty["CircleSize"]) + std::stof(gameFile.configDifficulty["OverallDifficulty"]) + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(&backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
+	
+
 	if (gameFile.configDifficulty.find("SliderMultiplier") != gameFile.configDifficulty.end())
 		sliderSpeed = std::stof(gameFile.configDifficulty["SliderMultiplier"]);
 
@@ -1778,7 +1786,9 @@ void GameManager::loadGame(std::string filename){
 	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
 
 
-
+	difficultyMultiplier = (((hpdrainrate + std::stof(gameFile.configDifficulty["CircleSize"]) + overalldifficulty) + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(&backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
+	
+	std::cout << hpdrainrate << " " << std::stof(gameFile.configDifficulty["CircleSize"]) << " " << overalldifficulty << " " << (float)gameFile.hitObjects.size() / GetMusicTimeLength(&backgroundMusic) * 8.f << std::endl;
 
 
 
@@ -1958,11 +1968,7 @@ void GameManager::loadGameTextures(){
 	sliderout = LoadTextureFromImage(&tempImage2);
 	UnloadImage(&tempImage2);
     //sliderout = LoadTexture((Global.GamePath + "/resources/sliderout.png").c_str());
-	
-	//C2D_Prepare();
-    //C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-    //C2D_SceneBegin(Global.window);
-	
+
 	_gpu_start_drawing(Global.window);
 
 
@@ -2170,7 +2176,7 @@ void GameManager::unloadGameTextures(){
 
 
 	Global.GameTextures = 10;
-	std::cout << "Unloading SUTUFF" << std::endl;
+	std::cout << "Unloading STUFF" << std::endl;
 	backgroundTextures.data.clear();
     backgroundTextures.pos.clear();
     backgroundTextures.loaded.clear();
@@ -2595,9 +2601,7 @@ int * GameManager::sliderPreInit(HitObjectData data){
     return out;
 }
 
-
-
-
+// Load all the sounds the game actually needs. Call this after actually parsing the game
 void GameManager::loadGameSounds(){
 	long long int loadedBytes = 0;
 	SoundFilesAll.data.clear();
@@ -2608,11 +2612,8 @@ void GameManager::loadGameSounds(){
 	std::cout << GamePathWithSlash << std::endl;
 	std::vector<std::string> ComboBreak = ls(".wav");
 	std::cout << ComboBreak.size() << std::endl;
-	std::cout << "first comcobreak ls done, press select to continue" << std::endl;
 	if(Global.settings.useDefaultSounds) ComboBreak.clear();
 	for(int i = 0; i < ComboBreak.size(); i++){
-		//std::cout << "loaded " << loadedBytes << " bytes" << std::endl;
-		//std::cout << ComboBreak[i] << std::endl;
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		SleepInUs(1*200*1000);
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
@@ -2620,7 +2621,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from game" << std::endl;
+					std::cout << "[INFO] Loaded " << ComboBreak[i] << " from beatmap files" << std::endl;
 				}
 			}
 		}
@@ -2634,7 +2635,7 @@ void GameManager::loadGameSounds(){
 			SoundFilesAll.data[name] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
 			SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 			if(SoundFilesAll.loaded[name].value){
-				std::cout << "loaded " << name << " from game" << std::endl;
+				std::cout << "[INFO] Loaded " << name << " from beatmap files" << std::endl;
 			}
 		}
 		
@@ -2719,8 +2720,8 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
-					std::filesystem::path p{Global.Path + ComboBreak[i]};
-					loadedBytes += std::filesystem::file_size(p);
+					//std::filesystem::path p{Global.Path + ComboBreak[i]};
+					//loadedBytes += std::filesystem::file_size(p);
 					std::cout << "loaded " << name << " from skin" << std::endl;
 				}
 			}

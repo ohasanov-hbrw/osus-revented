@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <cstring>
 #include <clocale>
+#include <memory>
 #include "utils.hpp"
 #include "settingsParser.hpp"
 
@@ -46,7 +47,7 @@ void PlayMenu::init() {
     //MutexUnlock(SWITCHING_STATE);
 }
 void PlayMenu::render() {
-    if(!initDone)
+    if(initDone != 1)
         return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
@@ -96,6 +97,7 @@ void PlayMenu::update() {
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
+        ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
         return;
@@ -140,6 +142,7 @@ void PlayMenu::update() {
     //MutexUnlock(SWITCHING_STATE);
 }
 void PlayMenu::unload() {
+    initDone = 0;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -168,7 +171,7 @@ void LoadMenu::init() {
     //MutexUnlock(SWITCHING_STATE);
 }
 void LoadMenu::render() {
-    if(!initDone)
+    if(initDone != 1)
         return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
@@ -201,6 +204,7 @@ void LoadMenu::update() {
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
+        ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
         return;
@@ -232,7 +236,7 @@ void LoadMenu::update() {
                     int arg = 2;
                     //std::cout << Global.selectedPath.c_str() << std::endl;
                     print_dir(final_path);
-                    int res = zip_extract(Global.selectedPath.c_str(), final_path.c_str(), NULL, NULL);
+                    int res = zip_extract(Global.selectedPath.c_str(), final_path.c_str(), on_extract_entry, NULL);
                     std::cout << res << std::endl;
                 }
             }
@@ -257,6 +261,7 @@ void LoadMenu::update() {
     //MutexUnlock(ACCESSING_OBJECTS);
 }
 void LoadMenu::unload() {
+    initDone = 0;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -266,12 +271,13 @@ void LoadMenu::textureOps() {
 
 MainMenu::MainMenu() {
     play = Button({250,420}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
-    wip = Button({320,340}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
-    wip2 = Button({320,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
+    wip = Button({500,340}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
+    wip2 = Button({500,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
     load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
     volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
     popup = Popup({320, 240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
-    animation = 0;
+    logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
+    animation = 2;
     animationStart = 0;
     animationDone = false;
 }
@@ -296,20 +302,47 @@ void MainMenu::init() {
 
     if(animation == 0){
         play = Button({250,420}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
-        wip = Button({320,340}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
-        wip2 = Button({320,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
+        wip = Button({500,340}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
+        wip2 = Button({500,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
         load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
         volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
-        popup = Popup({320, 240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+        popup = Popup({320, 240}, {300, 120}, GRAY, tempMsg.message.c_str(), WHITE, 20, 1 << 0, -1);
     }
     else if(animation == 1){
         play = Button({320,240}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
-        wip = Button({320,240}, {120,40}, {255,135,198,0}, "WIP", BLACK, 20);
-        wip2 = Button({320,240}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
-        load = Button({320,240}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
+        wip = Button({320,290}, {120,40}, {150,80,120,255}, "WIP", BLACK, 20);
+        wip2 = Button({440,290}, {120,40}, {100,60,80,255}, "WIP2", BLACK, 20);
+        load = Button({320,240}, {120,60}, {200,100,160,255}, "Load", BLACK, 20);
         volume = TestSlider({320,240}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
-        popup = Popup({320,240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+        popup = Popup({320,240}, {300, 120}, GRAY, tempMsg.message.c_str(), WHITE, 20, 1 << 0, -1);
+        logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
+        popup.block = false;
+        animationDone = false;
+        animationMs = 200;
     }
+    else if(animation == 2){
+        play = Button({0,240}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
+        wip = Button({0,290}, {120,40}, {150,80,120,255}, "WIP", BLACK, 20);
+        wip2 = Button({0,290}, {120,40}, {100,60,80,255}, "WIP2", BLACK, 20);
+        load = Button({0,240}, {120,60}, {200,100,160,255}, "Load", BLACK, 20);
+        volume = TestSlider({320,240}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
+        popup = Popup({320,240}, {300, 120}, GRAY, tempMsg.message.c_str(), WHITE, 20, 1 << 0, -1);
+        logo = ImageObject({0, 240}, {400, 400}, WHITE, 0, 0, &Global.OsusLogo);
+        animationDone = false;
+        animationMs = 200;
+    }
+    else if(animation == -1 || animation == -2){
+        play = Button({380,240}, {120,60}, {255,135,198,255}, "Play", BLACK, 20);
+        wip = Button({320,290}, {120,40}, {150,80,120,255}, "WIP", BLACK, 20);
+        wip2 = Button({440,290}, {160,40}, {100,60,80,255}, "WIP2", BLACK, 20);
+        load = Button({540,240}, {160,60}, {200,100,160,255}, "Load", BLACK, 20);
+        volume = TestSlider({320,240}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
+        popup = Popup({320,240}, {300, 120}, GRAY, tempMsg.message.c_str(), WHITE, 20, 1 << 0, -1);
+        logo = ImageObject({160, 240}, {300, 300}, WHITE, 0, 0, &Global.OsusLogo);
+        animationDone = false;
+        animationMs = 200;
+    }
+    animationStartTime = getTimer();
     initDone = 1;
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -331,7 +364,184 @@ void MainMenu::update() {
     if(animation == 0){
         animationDone = true;
     }
+    else if(animation == 1){
+        double position = (getTimer() - animationStartTime) / animationMs;
+        play.position = lerp({320, 240}, {380,240}, position);
+        play.textsize = 20 + 20 * position;
+        load.position = lerp({320, 240}, {540,240}, position);
+        load.textsize = 20 + 20 * position;
 
+        wip2.position = lerp({320, 290}, {440,290}, position);
+
+        logo.rotation = -360 * position;
+        logo.position = lerp({320, 200}, {160,240}, position);
+
+        logo.size = lerp({400, 400}, {300,300}, position);
+
+        play.size = lerp({120, 60}, {160,60}, position);
+        load.size = lerp({120, 60}, {160,60}, position);
+
+        if(getTimer() - animationStartTime > animationMs){
+            animation = 0;
+            animationDone = true;
+
+            play.position = {380,240};
+            play.textsize = 40;
+            load.position = {540, 240};
+            load.textsize = 40;
+            play.size = {160, 60};
+            load.size = {160, 60};
+            logo.rotation = 0;
+            logo.size = {300, 300};
+            logo.position = {160, 240};
+
+            wip2.position = {440,290};
+        }
+    }
+    else  if(animation == 2){
+        double position = (getTimer() - animationStartTime) / animationMs;
+        play.position = lerp({0, 240}, {380,240}, position);
+        play.textsize = 20 + 20 * position;
+        load.position = lerp({0, 240}, {540,240}, position);
+        load.textsize = 20 + 20 * position;
+
+        wip.position = lerp({0, 290}, {320,290}, position);
+        wip2.position = lerp({0, 290}, {440,290}, position);
+
+        logo.position = lerp({0, 240}, {160,240}, position);
+
+        logo.size = lerp({400, 400}, {300,300}, position);
+
+        play.size = lerp({120, 60}, {160,60}, position);
+        load.size = lerp({120, 60}, {160,60}, position);
+
+
+        play.textcolor.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        load.textcolor.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        wip.textcolor.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        wip2.textcolor.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+
+        logo.opacity = position;
+
+        play.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        load.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        wip.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        wip2.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+
+
+        if(getTimer() - animationStartTime > animationMs){
+            animation = 0;
+            animationDone = true;
+
+            play.position = {380,240};
+            play.textsize = 40;
+            load.position = {540, 240};
+            load.textsize = 40;
+            play.size = {160, 60};
+            load.size = {160, 60};
+            logo.rotation = 0;
+            logo.size = {300, 300};
+            logo.position = {160, 240};
+
+            wip2.position = {440,290};
+            wip.position = {320, 290};
+
+            play.textcolor.a = 255;
+            load.textcolor.a = 255;
+            wip.textcolor.a = 255;
+            wip2.textcolor.a = 255;
+
+            logo.opacity = 1;
+
+            play.color.a = 255;
+            load.color.a = 255;
+            wip.color.a = 255;
+            wip2.color.a = 255;
+
+        }
+    }
+    else if(animation == -1 || animation == -2){
+        play.focused = false;
+        load.focused = false;
+        wip.focused = false;
+        wip2.focused = false;
+        double position = 1 - ((getTimer() - animationStartTime) / animationMs);
+        play.position = lerp({0, 240}, {380,240}, position);
+        play.textsize = 20 + 20 * position;
+        load.position = lerp({0, 240}, {540,240}, position);
+        load.textsize = 20 + 20 * position;
+
+        wip.position = lerp({0, 290}, {320,290}, position);
+        wip2.position = lerp({0, 290}, {440,290}, position);
+
+        logo.position = lerp({0, 240}, {160,240}, position);
+
+        logo.size = lerp({400, 400}, {300,300}, position);
+
+        play.size = lerp({120, 60}, {160,60}, position);
+        load.size = lerp({120, 60}, {160,60}, position);
+
+
+        play.textcolor.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        load.textcolor.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        wip.textcolor.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        wip2.textcolor.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+
+        logo.opacity = position;
+
+        play.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        load.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        wip.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+        wip2.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
+
+
+        if(getTimer() - animationStartTime > animationMs){
+            play.position = {0,240};
+            play.textsize = 20;
+            load.position = {0, 240};
+            load.textsize = 20;
+            play.size = {120, 60};
+            load.size = {120, 60};
+            logo.rotation = 0;
+            logo.size = {400, 400};
+            logo.position = {0, 240};
+
+            wip2.position = {0,290};
+            wip.position = {0, 290};
+
+            play.textcolor.a = 0;
+            load.textcolor.a = 0;
+            wip.textcolor.a = 0;
+            wip2.textcolor.a = 0;
+
+            logo.opacity = 0;
+
+            play.color.a = 0;
+            load.color.a = 0;
+            wip.color.a = 0;
+            wip2.color.a = 0;
+
+            if(animation == -1){
+                MutexLock(SWITCHING_STATE);
+                Global.CurrentState->unload();
+                Global.CurrentState.reset(new PlayMenu());
+                Global.CurrentState->init();
+                MutexUnlock(SWITCHING_STATE);
+                return;
+            }
+            else if(animation == -2){
+                MutexLock(SWITCHING_STATE);
+                Global.CurrentState->unload();
+                Global.CurrentState.reset(new LoadMenu());
+                Global.CurrentState->init();
+                MutexUnlock(SWITCHING_STATE);
+                return;
+            }
+            animation = 0;
+            animationDone = true;
+
+        }
+    }
 
     if(!animationDone){
         return;
@@ -368,7 +578,7 @@ void MainMenu::update() {
 
 
     //test.update();
-    if(wip.action){
+    if(false && wip.action){
         //Global.CurrentState->unload();
         //Global.CurrentState.reset(new WIPMenu());
         //Global.CurrentState->init();
@@ -490,25 +700,17 @@ void MainMenu::update() {
         return;
     }
     else if(play.action){
-        
-        MutexLock(SWITCHING_STATE);
-        //std::cout << "play.action unload" << std::endl;
-        Global.CurrentState->unload();
-        //std::cout << "play.action reset" << std::endl;
-        Global.CurrentState.reset(new PlayMenu());
-        //std::cout << "play.action init" << std::endl;
-        Global.CurrentState->init();
-        //std::cout << "play.action done" << std::endl;
-        MutexUnlock(SWITCHING_STATE);
+        animationMs = 200;
+        animationStartTime = getTimer();
+        animation = -1;
+        animationDone = false;
         return;
     }
     else if(load.action){
-        
-        MutexLock(SWITCHING_STATE);
-        Global.CurrentState->unload();
-        Global.CurrentState.reset(new LoadMenu());
-        Global.CurrentState->init();
-        MutexUnlock(SWITCHING_STATE);
+        animationMs = 200;
+        animationStartTime = getTimer();
+        animation = -2;
+        animationDone = false;
         return;
     }
     else if(wip2.action){
@@ -533,13 +735,13 @@ void MainMenu::update() {
     //MutexUnlock(ACCESSING_OBJECTS);
 }
 void MainMenu::render() {
-    if(!initDone)
+    if(initDone != 1)
         return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
     MutexLock(ACCESSING_OBJECTS);
-    DrawTextureCenter(&Global.OsusLogo, 320, 200, 400.0 / (float)Global.OsusLogo.width, WHITE);
+    
     play.render();
     wip.render();
     wip2.render();
@@ -549,6 +751,8 @@ void MainMenu::render() {
     if(IsKeyDown(Global.AUDIO_SETUP_KEY ))
         volume.render();
 
+   // DrawTextureCenter(&Global.OsusLogo, 320, 200, 400.0 / (float)Global.OsusLogo.width, WHITE);
+    logo.render();
     popup.render();
     MutexUnlock(ACCESSING_OBJECTS);
     //MutexUnlock(SWITCHING_STATE);
@@ -557,6 +761,7 @@ void MainMenu::render() {
     //Global.mutex.unlock();
 }
 void MainMenu::unload() {
+    initDone = 0;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -569,6 +774,7 @@ void MainMenu::textureOps() {
 StartMenu::StartMenu() {
     description = TextBox({320,440}, {520,40}, {240,98,161,0}, "Click the circles!", WHITE, 50, 50);
     popup = Popup({320, 240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+    logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
 }
 
 void StartMenu::init() {
@@ -581,12 +787,34 @@ void StartMenu::init() {
 
     setlocale(LC_ALL, "en_US.utf8");
     popup.block = !Global.errors.empty();
+    animation = 0;
     //MutexUnlock(SWITCHING_STATE);
     initDone = 1;
 }
 
 
 void StartMenu::update() {
+
+    if(animation == 1){
+        double position = (getTimer() - animationStartTime) / animationMs;
+        description.textcolor.a = (unsigned char)((int)clip(255 - (position * 255.0), 0, 255));
+        if(getTimer() - animationStartTime > animationMs){
+            animation = -1;
+            animationDone = true;
+        }
+        if(!animationDone)
+            return;
+        else{
+            MutexLock(SWITCHING_STATE);
+            Global.CurrentState->unload();
+            Global.CurrentState.reset(new MainMenu());
+            ((MainMenu*)(Global.CurrentState.get()))->animation = 1;
+            Global.CurrentState->init();
+            MutexUnlock(SWITCHING_STATE);
+            return;
+        }
+
+    }
 
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
@@ -634,22 +862,22 @@ void StartMenu::update() {
     MutexUnlock(ACCESSING_OBJECTS);
 
     if(action){
-        MutexLock(SWITCHING_STATE);
-        Global.CurrentState->unload();
-        Global.CurrentState.reset(new MainMenu());
-        Global.CurrentState->init();
-        MutexUnlock(SWITCHING_STATE);
+        animationStartTime = getTimer();
+        animation = 1;
+        animationDone = false;
+        animationMs = 100;
         return;
     }
 }
 void StartMenu::render() {
-    if(!initDone)
+    if(initDone != 1)
         return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
     MutexLock(ACCESSING_OBJECTS);
-    DrawTextureCenter(&Global.OsusLogo, 320, 200, 400.0 / (float)Global.OsusLogo.width, WHITE);
+    //DrawTextureCenter(&Global.OsusLogo, 320, 200, 400.0 / (float)Global.OsusLogo.width, WHITE);
+    logo.render();
     description.render();
     popup.render();
     MutexUnlock(ACCESSING_OBJECTS);
@@ -659,6 +887,7 @@ void StartMenu::render() {
     //Global.mutex.unlock();
 }
 void StartMenu::unload() {
+    initDone = 0;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -837,7 +1066,7 @@ void Game::render() {
     if(IsKeyDown(Global.AUDIO_SETUP_KEY ))
         volume.render();
 }
-void Game::unload(){
+void Game::unload() {
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
     Global.gameManager->unloadGame();
@@ -1334,6 +1563,7 @@ void WIPMenu::update(){
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
+        ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
     }
@@ -1414,6 +1644,7 @@ void ResultsMenu::update() {
     }
 }
 void ResultsMenu::unload() {
+    initDone = 0;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -1459,6 +1690,8 @@ void WipMenu2::init() {
     initDone = 1;
 }
 void WipMenu2::update() {
+    if(initDone != 1)
+        return;
     MutexLock(ACCESSING_OBJECTS);
     if(Global.Key2P && addStuffAt == -1 && removeStuffAt == -1){
         removeStuffAt = lastStuffAt;
@@ -1654,16 +1887,20 @@ void WipMenu2::update() {
     }
     
     MutexUnlock(ACCESSING_OBJECTS);
+
     if(IsKeyPressed(Global.GO_BACK_KEY)){
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
+        ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
         return;
     }
 }
 void WipMenu2::render(){
+    if(initDone != 1)
+        return;
     MutexLock(ACCESSING_OBJECTS);
     Rectangle rect;
     rect.x = 322;
@@ -1716,11 +1953,11 @@ void WipMenu2::render(){
     MutexUnlock(ACCESSING_OBJECTS);
 }
 void WipMenu2::unload() {
+    initDone = 0;
     //MutexLock(SWITCHING_STATE);
-    MutexLock(RENDER_BLOCK);
-    std::cout << "locking render\n";
     MutexUnlock(ACCESSING_OBJECTS);
     MutexLock(ACCESSING_OBJECTS);
+    std::cout << "locking render\n";
     std::cout << "starting menu unload\n";
     locations.clear();
     locations = std::list<MenuItem>();
@@ -1731,7 +1968,6 @@ void WipMenu2::unload() {
     itemNames.clear();
     itemNames = std::vector<std::string>();
     MutexUnlock(ACCESSING_OBJECTS);
-    MutexUnlock(RENDER_BLOCK);
     //MutexUnlock(SWITCHING_STATE);
 }
 void WipMenu2::textureOps() {

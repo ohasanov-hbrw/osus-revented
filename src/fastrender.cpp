@@ -2,12 +2,15 @@
 //This file includes functions for rendering the mouse
 
 //Mouse Trails are disabled right now, I don't really see people using them anyway...
+
+// Just add some empty points to the mouse trail array
 void initMouseTrail(){
     while(MouseTrail.size() < 150){
         MouseTrail.push_back({-10,-10});
     }
 }
 
+// "Queue" stuff while using a vector? Why not?
 void updateMouseTrail(){
     FrameTimeCounterTrail += Global.FrameTime * 1.5;
     while(FrameTimeCounterTrail > 1.0f){
@@ -18,7 +21,7 @@ void updateMouseTrail(){
     }
 }
 
-
+// Render the custom cursor
 void renderMouse(){
     if(Global.MousePosition.x == 0.0f && Global.MousePosition.y == 0.0f)
         return;

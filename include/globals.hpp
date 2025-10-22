@@ -334,3 +334,6 @@ struct Globals {
 };
 
 extern Globals Global;
+
+
+void deleteGlobalVariables();

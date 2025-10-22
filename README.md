@@ -101,6 +101,7 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [ ] Try to get beatmaps from a mirror (https://catboy.best/about)
 - [ ] Use the second screen on the 3DS
 - [ ] Dynamic slider resolution with more interpolation to cut down on calculation time
+- [ ] Seperate thread for background loading. Mainly for the new menu implementations
 
 
 

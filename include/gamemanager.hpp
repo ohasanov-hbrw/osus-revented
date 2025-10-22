@@ -91,7 +91,8 @@ class GameManager{
 		int clickCombo = 0;
 		int maxCombo;
 		Color comboColour;
-		long int score = 0;
+		long long int score = 0;
+		long long int animatedScore = 0;
 		float difficultyMultiplier = 0;
 		int currentComboIndex = 0;
 		int time;

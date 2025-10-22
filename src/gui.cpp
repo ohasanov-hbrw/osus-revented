@@ -69,6 +69,22 @@ void Button::update() {
         action = false;
 }
 
+
+ImageObject::ImageObject(Vector2 position, Vector2 size, Color color, float opacity, float rotation, Texture2D * tex)
+    : GuiElement(position, size), color(color), opacity(opacity), rotation(rotation), tex(tex)
+{  }
+
+//A button consists of a Textbox, so it is important that we update the textbox as well
+void ImageObject::render() {
+    DrawTextureRotate(tex, position.x, position.y, std::min(size.x / tex->width, size.y / tex->height), rotation, Fade(color, opacity));
+}
+
+//This function just checks if the button is "clicked" or not.
+void ImageObject::update() {
+    
+}
+
+
 TextBox::TextBox(Vector2 position, Vector2 size, Color color, std::string text, Color textcolor, int textsize, int maxlength)
     : GuiElement(position, size), color(color), textcolor(textcolor), text(text), textsize(textsize), maxlength(maxlength)
 {

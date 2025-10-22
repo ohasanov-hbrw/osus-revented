@@ -11,7 +11,7 @@
 //This file includes the functions for basic file operations
 namespace fs = std::filesystem;
 
-//Basic "ls" or "dir" function for listing files in a directory into a string vector.
+// Basic "ls" or "dir" function for listing files in a directory into a string vector.
 std::vector<std::string> ls(char* extension) {
     for (int i = 0; i < Global.Path.size(); i++) {
         if (Global.Path[i] == '\\') {
@@ -67,41 +67,43 @@ std::vector<std::string> ls(char* extension) {
     return text;
 }
 
-//Basically the "mkdir" command
+// Basically the "mkdir" command
 void create_dir(const std::string& path) {
     fs::create_directory(path);
 }
 
+// Check if a path exists
 int check_dir(const std::string &path){
     fs::path path_p(path);
     return fs::exists(path_p);
 }
+
+// Convert path to a correct notation
 std::string correct_path_notation(const std::string &path){
     fs::path path_p(path);
     return path_p.string();
 }
 
+// Debug, print string as a directory, both local and absolute
 void print_dir(const std::string &path){
     fs::path path_p(path);
     std::cout << path_p << " or " << fs::absolute(path_p) << std::endl;
     return;
 }
-//Getting a file's name without the extension
+
+// Getting a file's name without the extension
 std::string get_without_ext(const std::string& path) {
     fs::path path_p(Global.selectedPath);
     return path_p.stem().string();
 }
 
-//Something about the zip library I am using needed this...
+// Something about the zip library I am using needed this...
 int on_extract_entry(const char *filename, void *arg) {
-    int i = 0;
-    int n = *(int *)arg;
-    printf("Extracted: %s (%d of %d)\n", filename, ++i, n);
+    std::cout << "[INFO] Extracted file " << filename << std::endl;
     return 0;
 }
 
-
-
+// Check if a file exists or not
 bool checkIfExists(const char *name){
     if (FILE *file = fopen(name, "r")) {
         fclose(file);

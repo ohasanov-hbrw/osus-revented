@@ -24,13 +24,34 @@ public:
     inline Rectangle getRect();
 };
 
+class ImageObject : public GuiElement {
+private:
+    
+
+public:
+    Color color;
+    float opacity;
+    float rotation;
+
+    Texture2D * tex;
+
+    ImageObject(Vector2 position, Vector2 size, Color color, float opacity, float rotation, Texture2D * tex);
+    ImageObject() = default;
+    
+
+    void render() override;
+    void update() override;
+};
+
 class Button : public GuiElement {
 private:
+    
+public:
     Color color;
     char* text;
     Color textcolor;
     int textsize;
-public:
+
     Button(Vector2 position, Vector2 size, Color color, char* text, Color textcolor, int textsize);
     Button() = default;
 

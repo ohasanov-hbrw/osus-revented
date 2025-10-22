@@ -242,9 +242,13 @@ void DrawCNumbersCenter(int n, float x, float y, float s, Color color){
     //I will need to fix this function but currently it works good enough
     GameManager* gm = GameManager::getInstance();
     int digits = log10(n) + 1;
-    int i = (digits - 1) * 18;
+    if(n <= 0){
+        n = 0;
+        digits = 1;
+    }
+    int i = (digits - 1) * Global.skinNumberOverlap;
     for(int k = 0; k < digits; k++){
-        DrawTextureCenter(&gm->numbers[nthDigit(n, digits-k-1)], x - (float)i * s + k * 18 * s * 2, y, s, color);
+        DrawTextureCenter(&gm->numbers[nthDigit(n, digits-k-1)], x - (float)i * s + k * Global.skinNumberOverlap * s * 2, y, s, color);
     }
 }
 
@@ -329,9 +333,27 @@ void DrawCNumbersLeft(int n, float x, float y, float s, Color color){
     //I will need to fix this function but currently it works good enough
     GameManager* gm = GameManager::getInstance();
     int digits = log10(n) + 1;
-    int i = (digits - 1) * 18;
+    if(n <= 0){
+        n = 0;
+        digits = 1;
+    }
+    int i = (digits - 1) * Global.skinNumberOverlap;
     for(int k = 0; k < digits; k++){
-        DrawTextureCenter(&gm->numbers[nthDigit(n, digits-k-1)], x + k * 18 * s * 2, y, s, color);
+        DrawTextureCenter(&gm->numbers[nthDigit(n, digits-k-1)], x + k * Global.skinNumberOverlap * s * 2, y, s, color);
+    }
+}
+
+void DrawCNumbersRight(int n, float x, float y, float s, Color color){
+    //I will need to fix this function but currently it works good enough
+    GameManager* gm = GameManager::getInstance();
+    int digits = log10(n) + 1;
+    if(n <= 0){
+        n = 0;
+        digits = 1;
+    }
+    int i = (digits - 1) * Global.skinNumberOverlap;
+    for(int k = 0; k < digits; k++){
+        DrawTextureCenter(&gm->numbers[nthDigit(n, digits-k-1)], x - (digits - k - 1) * Global.skinNumberOverlap * s * 2, y, s, color);
     }
 }
 

@@ -66,6 +66,7 @@ void DrawTextCenter(const char *, float, float, float, Color);
 void DrawTextLeft(const char *, float, float, float, Color);
 //Draw scaled combo numbers from left to right
 void DrawCNumbersLeft(int, float, float, float, Color);
+void DrawCNumbersRight(int n, float x, float y, float s, Color color);
 //Draw a centered, scaled and rotated Texture
 //void DrawTextureRotate(Texture2D, float, float, float, float, Color);
 //max trigo
