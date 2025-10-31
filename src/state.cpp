@@ -958,20 +958,40 @@ void Game::update() {
         //Global.enableMouse = false;
         MutexLock(ACCESSING_OBJECTS);
         if(IsKeyPressed(Global.GO_BACK_KEY) || !(!WindowShouldClose() and _os_should_program_run())){
+           //Global.CurrentState->initDone = 3;
+           //MutexUnlock(ACCESSING_OBJECTS);
+
+			//MutexLock(RENDER_BLOCK);
+           //MutexLock(ACCESSING_OBJECTS);
+           //MutexUnlock(RENDER_BLOCK);
+
+			//MutexLock(SWITCHING_STATE);
+           //std::cout << "locked the switching state\n";
+           //Global.CurrentState->unload();
+           //MutexUnlock(ACCESSING_OBJECTS);
+           //Global.CurrentState.reset(new PlayMenu());
+           //Global.CurrentState->init();
+           //MutexUnlock(SWITCHING_STATE);
+
+
             Global.CurrentState->initDone = 3;
             MutexUnlock(ACCESSING_OBJECTS);
 
 			MutexLock(RENDER_BLOCK);
             MutexLock(ACCESSING_OBJECTS);
-            MutexUnlock(RENDER_BLOCK);
+            
 
 			MutexLock(SWITCHING_STATE);
-            std::cout << "locked the switching state\n";
-            Global.CurrentState->unload();
-            MutexUnlock(ACCESSING_OBJECTS);
+			Global.CurrentState->unload();
+            std::cout << "unload finished \n";
+			MutexUnlock(ACCESSING_OBJECTS);
+			MutexUnlock(RENDER_BLOCK);
+
             Global.CurrentState.reset(new PlayMenu());
             Global.CurrentState->init();
-            MutexUnlock(SWITCHING_STATE);
+			//MutexLock(ACCESSING_OBJECTS);
+			MutexUnlock(SWITCHING_STATE);
+            
             return;
         }
         Global.gameManager->run();
@@ -1076,17 +1096,25 @@ void Game::unload() {
 }
 void Game::textureOps(){
     //std::cout << "Trying to acquire Lock for accessing objects\n";
-    MutexLock(ACCESSING_OBJECTS);
+    
     //std::cout << "Got Permission!\n";
     if(Global.GameTextures == -1){
+        MutexLock(ACCESSING_OBJECTS);
         Global.gameManager->unloadGameTextures();
+        MutexUnlock(ACCESSING_OBJECTS);
     }
-    else if(Global.GameTextures == 1)
+    else if(Global.GameTextures == 1){
+        MutexLock(ACCESSING_OBJECTS);
         Global.gameManager->loadGameTextures();
+        MutexUnlock(ACCESSING_OBJECTS);
+    }
 
-    if(Global.sliderTexNeedDeleting)
+    if(Global.sliderTexNeedDeleting){
+        MutexLock(ACCESSING_OBJECTS);
         Global.gameManager->unloadSliderTextures();
-    MutexUnlock(ACCESSING_OBJECTS);
+        MutexUnlock(ACCESSING_OBJECTS);
+    }
+    
 }
 
 WIPMenu::WIPMenu() {

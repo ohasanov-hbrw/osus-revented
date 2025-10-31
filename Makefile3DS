@@ -55,7 +55,7 @@ APP_AUTHOR      := ohasanov
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-O2 -w -Wall -mword-relocations -Wno-psabi \
+CFLAGS	:=	-Og -g -ggdb -w -Wall -mword-relocations -Wno-psabi \
 			-ffunction-sections \
 			$(ARCH)
 
@@ -212,6 +212,10 @@ endif
 all:$(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile3DS
 	@echo amogs ...
+	@$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) "$(BANNER_IMAGE)" $(BANNER_AUDIO_ARG) "$(BANNER_AUDIO)" -o "$(BUILD)/banner.bnr"
+	@$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f nosavebackups,visible -o "$(BUILD)/icon.icn"
+	@$(MAKEROM) -f cia -o "$(OUTPUT).cia" -target t -exefslogo $(MAKEROM_ARGS)
+	@echo built ... cia file
 $(BUILD):
 	@mkdir -p $@
 

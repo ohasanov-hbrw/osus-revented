@@ -211,6 +211,12 @@ void RenderLoop(void *){
         }
         else{
             // We still need to be able to exit even if we are loading something
+            // First ever frame is a loading screen
+            _gpu_start_drawing(Global.window);
+            ClearBackground(Global.Background);
+            DrawTextEx(&Global.DefaultFont, TextFormat("Loading game..."), {static_cast<float>((int)Scale(10)), static_cast<float>((int)Scale(10))}, Scale(40.15), Scale(2), WHITE);
+            _gpu_check_command_buffer();
+            _gpu_end_drawing();
             if(Global.stop){
                 break;
             }
@@ -315,8 +321,9 @@ int main(){
 
     // Wait for rendering thread to be ready
     while(!Global.readyForGameLoop){
+        // waiting for the render loop to be initialized
         SleepInMs(100);
-        if(WindowShouldClose() or !_os_should_program_run()){
+        if(WindowShouldClose() or !_os_should_program_run() or Global.readyForGameLoop){
             break;
         }
     }

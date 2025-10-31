@@ -109,6 +109,43 @@ uint32_t _readRGB8(const void* data){
 	return (r | (g << 8) | (b << 16) | (a << 24));
 }
 
+
+
+
+/*
+
+ case PIXELFORMAT_UNCOMPRESSED_R4G4B4A4:
+{
+    unsigned char thresholdValue = (unsigned char)(threshold*15.0f);
+
+    unsigned char r = (unsigned char)(round((float)color.r*15.0f));
+    unsigned char g = (unsigned char)(round((float)color.g*15.0f));
+    unsigned char b = (unsigned char)(round((float)color.b*15.0f));
+    unsigned char a = (unsigned char)(round((float)color.a*15.0f));
+
+    for (int i = 0; i < image->width*image->height; i++)
+    {
+        if ((((unsigned short *)image->data)[i] & 0x000f) <= thresholdValue)
+        {
+            ((unsigned short *)image->data)[i] = (unsigned short)r << 12 | (unsigned short)g << 8 | (unsigned short)b << 4 | (unsigned short)a;
+        }
+    }
+} break;
+             
+            */
+
+uint32_t _readRGBA4(const void* data){
+	uint32_t  *clr = (uint32_t*)data;
+
+    //image->data[i] = (unsigned short)r << 12 | (unsigned short)g << 8 | (unsigned short)b << 4 | (unsigned short)a;
+	uint8_t r = (round((float)((clr[0] >> 12) & 0b00001111)*15.0f));
+	uint8_t g = (round((float)((clr[0] >> 8) & 0b00001111)*15.0f));
+	uint8_t b = (round((float)((clr[0] >> 4) & 0b00001111)*15.0f));
+	uint8_t a = (round((float)((clr[0] >> 0) & 0b00001111)*15.0f));
+
+	return (r | (g << 8) | (b << 16) | (a << 24));
+}
+
 uint32_t _readLA8(const void* data){
 
 	uint8_t  *clr = (uint8_t*)data;
@@ -216,12 +253,14 @@ static GPU_TEXCOLOR _determineHardwareFormat(int format){
 	}
 }
 
+
 static inline readFunc _determineReadFunction(int format, uint8_t *bpp){
 	switch (format) {
 		case PIXELFORMAT_UNCOMPRESSED_GRAYSCALE: *bpp = 1; return _readA8;
 		case PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA: *bpp = 2; return _readLA8;
 		case PIXELFORMAT_UNCOMPRESSED_R8G8B8: *bpp = 3; return _readRGB8;
 		case PIXELFORMAT_UNCOMPRESSED_R8G8B8A8: *bpp = 4; return _readRGBA8;
+        case PIXELFORMAT_UNCOMPRESSED_R4G4B4A4: *bpp = 2; return _readRGBA4;
 		default:return NULL;
 	}
 }

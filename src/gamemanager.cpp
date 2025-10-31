@@ -838,11 +838,13 @@ void GameManager::run(){
 
 			MutexLock(RENDER_BLOCK);
             MutexLock(ACCESSING_OBJECTS);
-            MutexUnlock(RENDER_BLOCK);
+            
 
 			MutexLock(SWITCHING_STATE);
 			Global.CurrentState->unload();
 			MutexUnlock(ACCESSING_OBJECTS);
+			MutexUnlock(RENDER_BLOCK);
+
             Global.CurrentState.reset(new ResultsMenu());
             Global.CurrentState->init();
 			//MutexLock(ACCESSING_OBJECTS);
@@ -1852,9 +1854,10 @@ void GameManager::unloadGame(){
 		
 	}
 	//MutexLock(SWITCHING_STATE);
+	//MutexLock(RENDER_BLOCK);
 	MutexLock(ACCESSING_OBJECTS);
 
-	MutexLock(RENDER_BLOCK);
+	
 	//Global.mutex.lock();
 	//LightLock_Lock(&Global.lightlock);
 
@@ -1890,7 +1893,8 @@ void GameManager::unloadGame(){
 		delete (HitObject*)deadObjectsLinkedList.getHead()->object;
 		deadObjectsLinkedList.deleteHead();
 	}
-	MutexUnlock(RENDER_BLOCK);
+	MutexUnlock(ACCESSING_OBJECTS);
+	//MutexUnlock(RENDER_BLOCK);
 	//Global.mutex2.unlock();
 }
 
@@ -2108,9 +2112,9 @@ void GameManager::loadGameTextures(){
 
 					ImageColorTint(&image, Color{30,30,30,255});
 					ImageBlurGaussian(&image, 2.0f / divider);
-
-					ImageDither(&image, 4, 4, 4, 4);
-
+					#ifdef DITHER_ENABLED
+						ImageDither(&image, 4, 4, 4, 4);
+					#endif
 					backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(&image);
 					UnloadImage(&image); 
 					

@@ -1,1 +1,1 @@
-$DEVKITARM/bin/arm-none-eabi-gdb osus-revented-3ds.elf
+$DEVKITARM/bin/arm-none-eabi-gdb osus-revented.elf

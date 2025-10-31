@@ -3,13 +3,15 @@
 #include "globals.hpp"
 #include "utils.hpp"
 #include "rlgl.h"
-#include <SDL2/SDL_pixels.h>
 #include <cstdint>
 #include <iostream>
+
 #ifdef THREEDS_BUILD
     #include "time_util.hpp"
 #endif
-
+#ifndef THREEDS_BUILD
+    #include <SDL2/SDL_pixels.h>
+#endif
 
 
 
