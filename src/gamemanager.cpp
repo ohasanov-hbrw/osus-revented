@@ -766,6 +766,48 @@ void GameManager::run(){
 	gettimeofday(&tp, NULL);
 	long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 	//ms = getTimer() / 1000.0;
+	if(Global.CurrentState->initDone == 3){
+		maxCombo = std::max(maxCombo, clickCombo);
+		StopMusicStream(&backgroundMusic);
+		TimerLast = (double)GetMusicTimeLength(&backgroundMusic) * 1000.0;
+		TimeLast = getTimer();
+		std::cout << "waiting for 0.25 secs for the song to end\n";
+		while(true){
+			currentTime = (double)(TimerLast + (getTimer() - TimeLast)) / 1000.0;
+			GameManager::update();
+			SleepInMs(5);
+			if((getTimer() - TimeLast) > 250.0)
+				break;
+		}
+		//std::cout << "waiting done\n";
+		/*MutexUnlock(ACCESSING_OBJECTS);
+		MutexLock(SWITCHING_STATE);
+		MutexLock(ACCESSING_OBJECTS);
+		MutexUnlock(SWITCHING_STATE);
+		MutexLock(SWITCHING_STATE);*/
+		Global.CurrentState->initDone = 3;
+		//MutexUnlock(ACCESSING_OBJECTS);
+		MutexUnlock(ACCESSING_OBJECTS);
+		std::cout << "trying to lock render block for game unload" << std::endl;
+		MutexLock(RENDER_BLOCK);
+
+		//MutexLock(ACCESSING_OBJECTS);
+		
+		std::cout << "trying to lock switch block for game unload" << std::endl;
+		MutexLock(SWITCHING_STATE);
+		
+		Global.CurrentState->unload();
+		//MutexUnlock(ACCESSING_OBJECTS);
+		
+
+		Global.CurrentState.reset(new ResultsMenu());
+		Global.CurrentState->init();
+		MutexLock(ACCESSING_OBJECTS);
+		MutexUnlock(SWITCHING_STATE);
+		MutexUnlock(RENDER_BLOCK);
+
+		return;
+	}
 
 	if(Global.startTime < 0){
 		if(Global.FrameTime < 50.0f)
@@ -834,21 +876,25 @@ void GameManager::run(){
 			MutexUnlock(SWITCHING_STATE);
 			MutexLock(SWITCHING_STATE);*/
 			Global.CurrentState->initDone = 3;
-            MutexUnlock(ACCESSING_OBJECTS);
-
-			MutexLock(RENDER_BLOCK);
-            MutexLock(ACCESSING_OBJECTS);
-            
-
-			MutexLock(SWITCHING_STATE);
-			Global.CurrentState->unload();
+            //MutexUnlock(ACCESSING_OBJECTS);
 			MutexUnlock(ACCESSING_OBJECTS);
-			MutexUnlock(RENDER_BLOCK);
+			std::cout << "trying to lock render block for game unload" << std::endl;
+			MutexLock(RENDER_BLOCK);
+
+            //MutexLock(ACCESSING_OBJECTS);
+            
+			std::cout << "trying to lock switch block for game unload" << std::endl;
+			MutexLock(SWITCHING_STATE);
+			
+			Global.CurrentState->unload();
+			//MutexUnlock(ACCESSING_OBJECTS);
+			
 
             Global.CurrentState.reset(new ResultsMenu());
             Global.CurrentState->init();
-			//MutexLock(ACCESSING_OBJECTS);
+			MutexLock(ACCESSING_OBJECTS);
 			MutexUnlock(SWITCHING_STATE);
+			MutexUnlock(RENDER_BLOCK);
 
 			return;
 		}
@@ -1843,7 +1889,9 @@ void GameManager::unloadGame(){
 	//LightLock_Unlock(&Global.lightlock);
 
 	MutexUnlock(ACCESSING_OBJECTS);
+	MutexUnlock(SWITCHING_STATE);
 	MutexUnlock(RENDER_BLOCK);
+	
 	std::cout << "unlocking the hold access lock\n";
 	//MutexUnlock(SWITCHING_STATE);
 	while(true){
@@ -1855,7 +1903,13 @@ void GameManager::unloadGame(){
 	}
 	//MutexLock(SWITCHING_STATE);
 	//MutexLock(RENDER_BLOCK);
+
+	
+
+	MutexLock(RENDER_BLOCK);
+	MutexLock(SWITCHING_STATE);
 	MutexLock(ACCESSING_OBJECTS);
+
 
 	
 	//Global.mutex.lock();

@@ -25,7 +25,7 @@ void _multithread_mutex_init(MULTITHREAD_MUTEX * mutex){
 }
 void _multithread_mutex_lock(MULTITHREAD_MUTEX * mutex){
     #ifdef THREEDS_BUILD
-        LightLock_Lock(mutex);
+        while(!LightLock_TryLock(mutex));
     #endif
     #ifndef THREEDS_BUILD
         mutex->lock();

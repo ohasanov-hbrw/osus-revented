@@ -94,12 +94,14 @@ void PlayMenu::update() {
 
     if(close.action){
         Global.Path = temp;
+        MutexLock(RENDER_BLOCK);
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
         ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        MutexUnlock(RENDER_BLOCK);
         return;
     }
 
@@ -118,15 +120,17 @@ void PlayMenu::update() {
                 MutexUnlock(ACCESSING_OBJECTS);
             }
             else{
+                MutexLock(RENDER_BLOCK);
+                MutexLock(SWITCHING_STATE);
                 MutexLock(ACCESSING_OBJECTS);
                 Global.selectedPath = Global.Path + '/' + dir_list.objects[dir_list.selectedindex].text;
                 Global.CurrentLocation = "beatmaps/" + lastPos + "/";
-                MutexUnlock(ACCESSING_OBJECTS);
-                MutexLock(SWITCHING_STATE);
                 Global.CurrentState->unload();
                 Global.CurrentState.reset(new Game());
                 Global.CurrentState->init();
+                MutexUnlock(ACCESSING_OBJECTS);
                 MutexUnlock(SWITCHING_STATE);
+                MutexUnlock(RENDER_BLOCK);
             }
         }
     }
@@ -201,12 +205,14 @@ void LoadMenu::update() {
     MutexUnlock(ACCESSING_OBJECTS);
     
     if(close.action){
+        MutexLock(RENDER_BLOCK);
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
         ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        MutexUnlock(RENDER_BLOCK);
         return;
     }
 
@@ -522,19 +528,23 @@ void MainMenu::update() {
             wip2.color.a = 0;
 
             if(animation == -1){
+                MutexLock(RENDER_BLOCK);
                 MutexLock(SWITCHING_STATE);
                 Global.CurrentState->unload();
                 Global.CurrentState.reset(new PlayMenu());
                 Global.CurrentState->init();
                 MutexUnlock(SWITCHING_STATE);
+                MutexUnlock(RENDER_BLOCK);
                 return;
             }
             else if(animation == -2){
+                MutexLock(RENDER_BLOCK);
                 MutexLock(SWITCHING_STATE);
                 Global.CurrentState->unload();
                 Global.CurrentState.reset(new LoadMenu());
                 Global.CurrentState->init();
                 MutexUnlock(SWITCHING_STATE);
+                MutexUnlock(RENDER_BLOCK);
                 return;
             }
             animation = 0;
@@ -714,12 +724,13 @@ void MainMenu::update() {
         return;
     }
     else if(wip2.action){
-        
+        MutexLock(RENDER_BLOCK);
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new WipMenu2());
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        MutexUnlock(RENDER_BLOCK);
         return;
     }
 
@@ -805,12 +816,14 @@ void StartMenu::update() {
         if(!animationDone)
             return;
         else{
+            MutexLock(RENDER_BLOCK);
             MutexLock(SWITCHING_STATE);
             Global.CurrentState->unload();
             Global.CurrentState.reset(new MainMenu());
             ((MainMenu*)(Global.CurrentState.get()))->animation = 1;
             Global.CurrentState->init();
             MutexUnlock(SWITCHING_STATE);
+            MutexUnlock(RENDER_BLOCK);
             return;
         }
 
@@ -924,12 +937,14 @@ void Game::init() {
     //MutexUnlock(SWITCHING_STATE); 
     //While loading the game chaos can happen, no problem
     
+    //MutexUnlock(SWITCHING_STATE);
     MutexUnlock(SWITCHING_STATE);
+    MutexUnlock(RENDER_BLOCK);
     parseSettings();
     Global.gameManager->loadGame(Global.selectedPath);
-    MutexLock(ACCESSING_OBJECTS);
-    MutexUnlock(ACCESSING_OBJECTS);
-    MutexLock(SWITCHING_STATE);
+    //MutexLock(ACCESSING_OBJECTS);
+    //MutexUnlock(ACCESSING_OBJECTS);
+    //MutexLock(SWITCHING_STATE);
     //MutexLock(SWITCHING_STATE);
     Global.gameManager->timingSettingsForHitObject.clear();
     //Global.mutex.lock();
@@ -940,6 +955,8 @@ void Game::init() {
     Global.errorDiv = 0;
     
     volume.location = Global.volume * 100.0f;
+    MutexLock(RENDER_BLOCK);
+	MutexLock(SWITCHING_STATE);
     //MutexLock(SWITCHING_STATE);
     
 }
@@ -956,44 +973,13 @@ void Game::update() {
 
     if(initDone == 1){
         //Global.enableMouse = false;
-        MutexLock(ACCESSING_OBJECTS);
+        
+        //MutexLock(SWITCHING_STATE);
+        
         if(IsKeyPressed(Global.GO_BACK_KEY) || !(!WindowShouldClose() and _os_should_program_run())){
-           //Global.CurrentState->initDone = 3;
-           //MutexUnlock(ACCESSING_OBJECTS);
-
-			//MutexLock(RENDER_BLOCK);
-           //MutexLock(ACCESSING_OBJECTS);
-           //MutexUnlock(RENDER_BLOCK);
-
-			//MutexLock(SWITCHING_STATE);
-           //std::cout << "locked the switching state\n";
-           //Global.CurrentState->unload();
-           //MutexUnlock(ACCESSING_OBJECTS);
-           //Global.CurrentState.reset(new PlayMenu());
-           //Global.CurrentState->init();
-           //MutexUnlock(SWITCHING_STATE);
-
-
-            Global.CurrentState->initDone = 3;
-            MutexUnlock(ACCESSING_OBJECTS);
-
-			MutexLock(RENDER_BLOCK);
-            MutexLock(ACCESSING_OBJECTS);
-            
-
-			MutexLock(SWITCHING_STATE);
-			Global.CurrentState->unload();
-            std::cout << "unload finished \n";
-			MutexUnlock(ACCESSING_OBJECTS);
-			MutexUnlock(RENDER_BLOCK);
-
-            Global.CurrentState.reset(new PlayMenu());
-            Global.CurrentState->init();
-			//MutexLock(ACCESSING_OBJECTS);
-			MutexUnlock(SWITCHING_STATE);
-            
-            return;
+            Global.CurrentState->initDone = 3;        
         }
+        MutexLock(ACCESSING_OBJECTS);
         Global.gameManager->run();
         MutexUnlock(ACCESSING_OBJECTS);
     }
@@ -1003,7 +989,7 @@ void Game::update() {
         }
         if(initDone == -1 and getTimer() - initStartTime > 0.0f){
             std::cout << "init done in " << getTimer() - initStartTime << " secs\n";
-            initDone = true;
+            initDone = 1;
         }
     }
 
@@ -1098,22 +1084,33 @@ void Game::textureOps(){
     //std::cout << "Trying to acquire Lock for accessing objects\n";
     
     //std::cout << "Got Permission!\n";
-    if(Global.GameTextures == -1){
-        MutexLock(ACCESSING_OBJECTS);
-        Global.gameManager->unloadGameTextures();
-        MutexUnlock(ACCESSING_OBJECTS);
-    }
-    else if(Global.GameTextures == 1){
-        MutexLock(ACCESSING_OBJECTS);
-        Global.gameManager->loadGameTextures();
-        MutexUnlock(ACCESSING_OBJECTS);
-    }
 
     if(Global.sliderTexNeedDeleting){
         MutexLock(ACCESSING_OBJECTS);
         Global.gameManager->unloadSliderTextures();
         MutexUnlock(ACCESSING_OBJECTS);
     }
+
+    if(Global.GameTextures == 1){
+        std::cout << "trying to get lock for object access for game texture load" << std::endl;
+        MutexLock(ACCESSING_OBJECTS);
+        std::cout << "got lock for object access for game texture load" << std::endl;
+        Global.gameManager->loadGameTextures();
+        MutexUnlock(ACCESSING_OBJECTS);
+        std::cout << "loaded textures and unlocked access lock" << std::endl;
+    }
+
+    if(Global.GameTextures == -1){
+        std::cout << "trying to get lock for object access for game texture unload" << std::endl;
+        MutexLock(ACCESSING_OBJECTS);
+        std::cout << "got lock for object access for game texture unload" << std::endl;
+        Global.gameManager->unloadGameTextures();
+        MutexUnlock(ACCESSING_OBJECTS);
+        std::cout << "unloaded textures and unlocked access lock" << std::endl;
+    }
+    
+
+    
     
 }
 
@@ -1588,12 +1585,14 @@ void WIPMenu::update(){
         init();
     }
     if(IsKeyPressed(Global.GO_BACK_KEY ) and !CanGoBack){
+        MutexLock(RENDER_BLOCK);
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
         ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        MutexUnlock(RENDER_BLOCK);
     }
 
 }
@@ -1663,11 +1662,13 @@ void ResultsMenu::update() {
     close.update();
     MutexUnlock(ACCESSING_OBJECTS);
     if(close.action){
+        MutexLock(RENDER_BLOCK);
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        MutexUnlock(RENDER_BLOCK);
         return;
     }
 }
@@ -1917,12 +1918,14 @@ void WipMenu2::update() {
     MutexUnlock(ACCESSING_OBJECTS);
 
     if(IsKeyPressed(Global.GO_BACK_KEY)){
+        MutexLock(RENDER_BLOCK);
         MutexLock(SWITCHING_STATE);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
         ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
         MutexUnlock(SWITCHING_STATE);
+        MutexUnlock(RENDER_BLOCK);
         return;
     }
 }
@@ -1983,8 +1986,8 @@ void WipMenu2::render(){
 void WipMenu2::unload() {
     initDone = 0;
     //MutexLock(SWITCHING_STATE);
-    MutexUnlock(ACCESSING_OBJECTS);
-    MutexLock(ACCESSING_OBJECTS);
+    //MutexUnlock(ACCESSING_OBJECTS);
+    //MutexLock(ACCESSING_OBJECTS);
     std::cout << "locking render\n";
     std::cout << "starting menu unload\n";
     locations.clear();
@@ -1995,7 +1998,7 @@ void WipMenu2::unload() {
 
     itemNames.clear();
     itemNames = std::vector<std::string>();
-    MutexUnlock(ACCESSING_OBJECTS);
+    //MutexUnlock(ACCESSING_OBJECTS);
     //MutexUnlock(SWITCHING_STATE);
 }
 void WipMenu2::textureOps() {

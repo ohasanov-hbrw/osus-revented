@@ -387,29 +387,30 @@ int main(){
     SleepInMs(500); 
 
     // Get control of the situation
-    MutexLock(ACCESSING_OBJECTS);
-    std::cout << "[INFO] unloading current situation\n";
-    Global.CurrentState->initDone = 3;
-    MutexUnlock(ACCESSING_OBJECTS);
+    
 
     // Get control from the render thread
     MutexLock(RENDER_BLOCK);
-    MutexLock(ACCESSING_OBJECTS);
-    MutexUnlock(RENDER_BLOCK);
     MutexLock(SWITCHING_STATE);
+    MutexLock(ACCESSING_OBJECTS);
+    std::cout << "[INFO] unloading current situation\n";
+    Global.CurrentState->initDone = 3;
+    
+    
     std::cout << "[INFO] locked the switching state\n";
 
     // Unload current state, which may involve texture operations...
     std::cout << "[INFO] calling unload\n";
     Global.CurrentState->unload();
     std::cout << "[INFO] done unloading\n";
-    MutexUnlock(ACCESSING_OBJECTS);
+    
 
     // Reset to start? Maybe?
     //Global.CurrentState.reset(new StartMenu());
     //Global.CurrentState->init();
-    MutexUnlock(SWITCHING_STATE);
     MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(SWITCHING_STATE);
+    MutexUnlock(RENDER_BLOCK);
 
     // Signal to kill rendering thread
     SleepInMs(5);
