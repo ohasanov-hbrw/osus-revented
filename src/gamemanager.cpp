@@ -2167,8 +2167,8 @@ void GameManager::loadGameTextures(){
 
 					ImageColorTint(&image, Color{30,30,30,255});
 					ImageBlurGaussian(&image, 2.0f / divider);
-					#ifdef DITHER_ENABLED
-						ImageDither(&image, 4, 4, 4, 4);
+					#ifdef THREEDS_BUILD
+						ImageDither(&image, 5, 6, 5, 0);
 					#endif
 					backgroundTextures.data[gameFile.events[j].filename] = LoadTextureFromImage(&image);
 					UnloadImage(&image); 
