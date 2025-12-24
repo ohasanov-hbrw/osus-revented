@@ -6,6 +6,7 @@
 #include "gamemanager.hpp"
 #include <queue>
 #include "errorManagement.hpp"
+#include <atomic>
 
 
 // This is a weird quirk with how different GPUs handle depth differently
@@ -95,7 +96,7 @@ struct Globals {
     // 2 -> Starting to unload textures
     // 10 -> Some basic textures are unlaoded
     // 15 -> Hopefully all textures are unloaded
-    int GameTextures = -1;
+    std::atomic_int32_t GameTextures = -1;
 
     // Offset between the number textures of a skin
     int skinNumberOverlap = 18;

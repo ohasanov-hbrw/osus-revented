@@ -1896,6 +1896,7 @@ void GameManager::unloadGame(){
 	//MutexUnlock(SWITCHING_STATE);
 	while(true){
 		SleepInMs(500);
+		
 		std::cout << "waiting for textures to unload\n";
 		if(Global.GameTextures == 15)
 			break;

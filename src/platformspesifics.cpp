@@ -15,6 +15,27 @@
 
 
 
+#ifdef THREEDS_BUILD
+    void LightLock_UnlockSafe(LightLock* lock)
+    {
+        __dmb();
+        s32 val;
+        do{
+            val = __ldrex(lock);
+            if (val >= 0) {
+                __clrex();
+                return;
+            }
+            val = -val;
+        }while (__strex(lock, val));
+
+        if (val > 1)
+            // Wake up exactly one thread
+            syncArbitrateAddress(lock, ARBITRATION_SIGNAL, 1);
+    }
+#endif
+
+
 void _multithread_mutex_init(MULTITHREAD_MUTEX * mutex){
     #ifdef THREEDS_BUILD
         LightLock_Init(mutex);
@@ -25,7 +46,8 @@ void _multithread_mutex_init(MULTITHREAD_MUTEX * mutex){
 }
 void _multithread_mutex_lock(MULTITHREAD_MUTEX * mutex){
     #ifdef THREEDS_BUILD
-        while(!LightLock_TryLock(mutex));
+        //while(!LightLock_TryLock(mutex));
+        LightLock_Lock(mutex);
     #endif
     #ifndef THREEDS_BUILD
         mutex->lock();
@@ -33,7 +55,11 @@ void _multithread_mutex_lock(MULTITHREAD_MUTEX * mutex){
 }
 void _multithread_mutex_unlock(MULTITHREAD_MUTEX * mutex){
     #ifdef THREEDS_BUILD
-        LightLock_Unlock(mutex);
+        //if(*(int32_t*)mutex >= 0)
+        //    std::cout << "[WARN] Mutex is already unlocked." << std::endl;
+        //else 
+        //    LightLock_Unlock(mutex);
+        LightLock_UnlockSafe(mutex);
     #endif
     #ifndef THREEDS_BUILD
         mutex->unlock();
