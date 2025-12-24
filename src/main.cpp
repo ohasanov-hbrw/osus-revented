@@ -50,6 +50,7 @@ MULTITHREAD_MUTEX accessLock;
 MULTITHREAD_MUTEX osuGameLock;
 MULTITHREAD_MUTEX wholeRenderLock;
 MULTITHREAD_THREAD renderThread;
+std::atomic<bool> __mutex_threads_locks[32][32];
 
 // This is mainly for the 3DS, shouldn't affect PC builds
 u32 __stacksize__= 512 * 1024;
@@ -93,13 +94,13 @@ void RenderLoop(void *){
     std::cout << "[INFO] Loaded font\n";
 
     // First ever frame is a loading screen
-    MutexLock(RENDER_BLOCK);
+    MutexLock(RENDER_BLOCK, RENDERTHREAD_ID);
     _gpu_start_drawing(Global.window);
     ClearBackground(Global.Background);
     DrawTextEx(&Global.DefaultFont, TextFormat("Loading game..."), {static_cast<float>((int)Scale(10)), static_cast<float>((int)Scale(10))}, Scale(40.15), Scale(2), WHITE);
     _gpu_check_command_buffer();
     _gpu_end_drawing();
-    MutexUnlock(RENDER_BLOCK);
+    MutexUnlock(RENDER_BLOCK, RENDERTHREAD_ID);
     
     // Playing around with shaders sometimes... Sliders are a PITA
     Global.shdrOutline = LoadShader(0, TextFormat((Global.GamePath + "/resources/shaders/glsl%i/outline.fs").c_str(), 100));
@@ -171,12 +172,12 @@ void RenderLoop(void *){
         // While loading/initializing nothing should be rendered...
         if(Global.readyForRenderLoop){
             // Lock Mutexes to drive away multithreading-goblins
-            MutexLock(RENDER_BLOCK);
+            MutexLock(RENDER_BLOCK, RENDERTHREAD_ID);
             // Texture Unloading has a high priority
             Global.CurrentState->textureOps();
             // Stop signal from main thread triggers exit
             if(Global.stop){
-                MutexUnlock(RENDER_BLOCK);
+                MutexUnlock(RENDER_BLOCK, RENDERTHREAD_ID);
                 break;
             }
 
@@ -184,14 +185,14 @@ void RenderLoop(void *){
             _gpu_start_drawing(Global.window);
 
             // Dont want to be rendering stuff while loading stuff
-            MutexLock(SWITCHING_STATE);
+            MutexLock(SWITCHING_STATE, RENDERTHREAD_ID);
             // Dont flash while loading, just keep the last image
             if(Global.NeedForBackgroundClear && Global.CurrentState->initDone != 0)
                 ClearBackground(Global.Background);
             // The state should know not to render while its loading
             Global.CurrentState->render();
-            MutexUnlock(SWITCHING_STATE);
-            MutexUnlock(RENDER_BLOCK);
+            MutexUnlock(SWITCHING_STATE, RENDERTHREAD_ID);
+            MutexUnlock(RENDER_BLOCK, RENDERTHREAD_ID);
             
             // Draw input indicator
             DrawRectangle(GetScreenWidth() - Scale(640 - 580), GetScreenHeight() - Scale(480 - 450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
@@ -390,9 +391,9 @@ int main(){
     
 
     // Get control from the render thread
-    MutexLock(RENDER_BLOCK);
-    MutexLock(SWITCHING_STATE);
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+    MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     std::cout << "[INFO] unloading current situation\n";
     Global.CurrentState->initDone = 3;
     
@@ -408,9 +409,9 @@ int main(){
     // Reset to start? Maybe?
     //Global.CurrentState.reset(new StartMenu());
     //Global.CurrentState->init();
-    MutexUnlock(ACCESSING_OBJECTS);
-    MutexUnlock(SWITCHING_STATE);
-    MutexUnlock(RENDER_BLOCK);
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+    MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+    MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
 
     // Signal to kill rendering thread
     SleepInMs(5);

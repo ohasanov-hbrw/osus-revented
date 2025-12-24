@@ -23,9 +23,18 @@ extern MULTITHREAD_MUTEX wholeRenderLock;
 #define OSU_UPDATE 2
 #define RENDER_BLOCK 3
 
+
+extern std::atomic<bool> __mutex_threads_locks[32][32];
+
+#define UPDATETHREAD_ID 0
+#define RENDERTHREAD_ID 1
+#define MUSICTHREAD_ID 2
+
+
+
 void InitilizeLocks();
-void MutexLock(int i);
-void MutexUnlock(int i);
+void MutexLock(int i, int j);
+void MutexUnlock(int i, int j);
 
 //Update the variables needed for the scrolling
 void updateUpDown();
@@ -130,4 +139,8 @@ bool IsRenderTextureReady(RenderTexture2D*);
 float getAngle(Vector2, Vector2);
 
 std::vector<std::string> getAudioFilenames(int , int , int , int , int , int , int , std::string);
+
+
+
+
 

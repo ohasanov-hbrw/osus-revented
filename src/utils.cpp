@@ -7,8 +7,13 @@
 #include <ctype.h>
 #include <parser.hpp>
 
+
+
 // Multithreading mutex initializations
 void InitilizeLocks(){
+    for(int i = 0; i < 32; i++)
+        for(int j = 0; j < 32; j++)
+            __mutex_threads_locks[i][j] = false;
     _multithread_mutex_init(&stateLock);
     _multithread_mutex_init(&accessLock);
     _multithread_mutex_init(&osuGameLock);
@@ -16,7 +21,14 @@ void InitilizeLocks(){
 }
 
 // Lock spesific mutexes
-void MutexLock(int i){
+void MutexLock(int i, int j){
+    if(i > 31) i = 31;
+    if(i < 0) i = 0;
+    if(__mutex_threads_locks[i][j]){
+        std::cout << "[CRIT] Thread " << j << " tried to relock " << i << std::endl;
+        return;
+    }
+    __mutex_threads_locks[i][j] = true;
     switch(i){
         case SWITCHING_STATE:
             _multithread_mutex_lock(&stateLock);
@@ -37,7 +49,14 @@ void MutexLock(int i){
 }
 
 // Unlock Spesific mutexes
-void MutexUnlock(int i){
+void MutexUnlock(int i, int j){
+    if(i > 31) i = 31;
+    if(i < 0) i = 0;
+    if(!__mutex_threads_locks[i][j]){
+        std::cout << "[CRIT] Thread " << j << " tried to relock " << i << std::endl;
+        return;
+    }
+    __mutex_threads_locks[i][j] = false;
     switch(i){
         case SWITCHING_STATE:
             _multithread_mutex_unlock(&stateLock);

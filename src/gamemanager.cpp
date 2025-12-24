@@ -787,14 +787,14 @@ void GameManager::run(){
 		MutexLock(SWITCHING_STATE);*/
 		Global.CurrentState->initDone = 3;
 		//MutexUnlock(ACCESSING_OBJECTS);
-		MutexUnlock(ACCESSING_OBJECTS);
+		MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 		std::cout << "trying to lock render block for game unload" << std::endl;
-		MutexLock(RENDER_BLOCK);
+		MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
 
 		//MutexLock(ACCESSING_OBJECTS);
 		
 		std::cout << "trying to lock switch block for game unload" << std::endl;
-		MutexLock(SWITCHING_STATE);
+		MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
 		
 		Global.CurrentState->unload();
 		//MutexUnlock(ACCESSING_OBJECTS);
@@ -802,9 +802,9 @@ void GameManager::run(){
 
 		Global.CurrentState.reset(new ResultsMenu());
 		Global.CurrentState->init();
-		MutexLock(ACCESSING_OBJECTS);
-		MutexUnlock(SWITCHING_STATE);
-		MutexUnlock(RENDER_BLOCK);
+		MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+		MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+		MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
 
 		return;
 	}
@@ -877,14 +877,14 @@ void GameManager::run(){
 			MutexLock(SWITCHING_STATE);*/
 			Global.CurrentState->initDone = 3;
             //MutexUnlock(ACCESSING_OBJECTS);
-			MutexUnlock(ACCESSING_OBJECTS);
+			MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 			std::cout << "trying to lock render block for game unload" << std::endl;
-			MutexLock(RENDER_BLOCK);
+			MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
 
             //MutexLock(ACCESSING_OBJECTS);
             
 			std::cout << "trying to lock switch block for game unload" << std::endl;
-			MutexLock(SWITCHING_STATE);
+			MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
 			
 			Global.CurrentState->unload();
 			//MutexUnlock(ACCESSING_OBJECTS);
@@ -892,9 +892,9 @@ void GameManager::run(){
 
             Global.CurrentState.reset(new ResultsMenu());
             Global.CurrentState->init();
-			MutexLock(ACCESSING_OBJECTS);
-			MutexUnlock(SWITCHING_STATE);
-			MutexUnlock(RENDER_BLOCK);
+			MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+			MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+			MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
 
 			return;
 		}
@@ -1888,9 +1888,9 @@ void GameManager::unloadGame(){
 	//Global.mutex.unlock();
 	//LightLock_Unlock(&Global.lightlock);
 
-	MutexUnlock(ACCESSING_OBJECTS);
-	MutexUnlock(SWITCHING_STATE);
-	MutexUnlock(RENDER_BLOCK);
+	MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+	MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+	MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
 	
 	std::cout << "unlocking the hold access lock\n";
 	//MutexUnlock(SWITCHING_STATE);
@@ -1907,9 +1907,9 @@ void GameManager::unloadGame(){
 
 	
 
-	MutexLock(RENDER_BLOCK);
-	MutexLock(SWITCHING_STATE);
-	MutexLock(ACCESSING_OBJECTS);
+	MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+	MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
+	MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
 
 	
@@ -1948,7 +1948,7 @@ void GameManager::unloadGame(){
 		delete (HitObject*)deadObjectsLinkedList.getHead()->object;
 		deadObjectsLinkedList.deleteHead();
 	}
-	MutexUnlock(ACCESSING_OBJECTS);
+	MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 	//MutexUnlock(RENDER_BLOCK);
 	//Global.mutex2.unlock();
 }

@@ -52,7 +52,7 @@ void PlayMenu::render() {
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     bg.render();
     description.render();
     back.render();
@@ -64,7 +64,7 @@ void PlayMenu::render() {
     usedskin.render();
     usedsound.render();
     name.render();
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     //MutexUnlock(ACCESSING_OBJECTS);
     //MutexUnlock(SWITCHING_STATE);
     //Global.mutex.unlock();
@@ -72,7 +72,7 @@ void PlayMenu::render() {
 void PlayMenu::update() {
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     Global.enableMouse = true;
     dir_list.update();
     select.update();
@@ -90,25 +90,25 @@ void PlayMenu::update() {
     
     if(sound.state != Global.settings.useDefaultSounds)
         Global.settings.useDefaultSounds = sound.state;
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
     if(close.action){
         Global.Path = temp;
-        MutexLock(RENDER_BLOCK);
-        MutexLock(SWITCHING_STATE);
+        MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+        MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
         ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
-        MutexUnlock(SWITCHING_STATE);
-        MutexUnlock(RENDER_BLOCK);
+        MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+        MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
         return;
     }
 
     if(select.action or dir_list.action){
         if(dir_list.objects.size() > 0 and dir_list.objects[dir_list.selectedindex].text.size() > 0){
             if(dir_list.objects[dir_list.selectedindex].text[dir_list.objects[dir_list.selectedindex].text.size()-1] == '/'){
-                MutexLock(ACCESSING_OBJECTS);
+                MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
                 dir_list.objects[dir_list.selectedindex].text.pop_back();
                 if(Global.Path.size() == 1) Global.Path.pop_back();
                 Global.Path += '/' + dir_list.objects[dir_list.selectedindex].text;
@@ -117,30 +117,30 @@ void PlayMenu::update() {
                 dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
                 dir_list.init();
                 lastIndex = -3;
-                MutexUnlock(ACCESSING_OBJECTS);
+                MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
             }
             else{
-                MutexLock(RENDER_BLOCK);
-                MutexLock(SWITCHING_STATE);
-                MutexLock(ACCESSING_OBJECTS);
+                MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+                MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
+                MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
                 Global.selectedPath = Global.Path + '/' + dir_list.objects[dir_list.selectedindex].text;
                 Global.CurrentLocation = "beatmaps/" + lastPos + "/";
                 Global.CurrentState->unload();
                 Global.CurrentState.reset(new Game());
                 Global.CurrentState->init();
-                MutexUnlock(ACCESSING_OBJECTS);
-                MutexUnlock(SWITCHING_STATE);
-                MutexUnlock(RENDER_BLOCK);
+                MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+                MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+                MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
             }
         }
     }
     else if(back.action){
-        MutexLock(ACCESSING_OBJECTS);
+        MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
         Global.Path = Global.BeatmapLocation;
         auto dir = ls(".osu");
         dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color, dir, dir_list.textcolor, dir_list.textsize, dir_list.objectsize, dir_list.maxlength);
         dir_list.init();
-        MutexUnlock(ACCESSING_OBJECTS);
+        MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     }
     //MutexUnlock(ACCESSING_OBJECTS);
     //MutexUnlock(SWITCHING_STATE);
@@ -180,7 +180,7 @@ void LoadMenu::render() {
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     bg.render();
     description.render();
     back.render();
@@ -188,7 +188,7 @@ void LoadMenu::render() {
     select.render();
     dir_list.render();
     close.render();
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     //MutexUnlock(SWITCHING_STATE);
     //MutexUnlock(ACCESSING_OBJECTS);
     //Global.mutex.unlock();
@@ -196,27 +196,27 @@ void LoadMenu::render() {
 void LoadMenu::update() {
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     Global.enableMouse = true;
     dir_list.update();
     select.update();
     back.update();
     close.update();
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     
     if(close.action){
-        MutexLock(RENDER_BLOCK);
-        MutexLock(SWITCHING_STATE);
+        MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+        MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
         ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
-        MutexUnlock(SWITCHING_STATE);
-        MutexUnlock(RENDER_BLOCK);
+        MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+        MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
         return;
     }
 
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     if(select.action or dir_list.action){
         if(dir_list.objects.size() > 0 and dir_list.objects[dir_list.selectedindex].text.size() > 0){
             if(dir_list.objects[dir_list.selectedindex].text[dir_list.objects[dir_list.selectedindex].text.size()-1] == '/'){
@@ -262,7 +262,7 @@ void LoadMenu::update() {
         dir_list.init();
         path = TextBox(path.position, path.size, path.color, Global.Path, path.textcolor, path.textsize, path.maxlength);
     }
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     //MutexUnlock(SWITCHING_STATE);
     //MutexUnlock(ACCESSING_OBJECTS);
 }
@@ -528,23 +528,23 @@ void MainMenu::update() {
             wip2.color.a = 0;
 
             if(animation == -1){
-                MutexLock(RENDER_BLOCK);
-                MutexLock(SWITCHING_STATE);
+                MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+                MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
                 Global.CurrentState->unload();
                 Global.CurrentState.reset(new PlayMenu());
                 Global.CurrentState->init();
-                MutexUnlock(SWITCHING_STATE);
-                MutexUnlock(RENDER_BLOCK);
+                MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+                MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
                 return;
             }
             else if(animation == -2){
-                MutexLock(RENDER_BLOCK);
-                MutexLock(SWITCHING_STATE);
+                MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+                MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
                 Global.CurrentState->unload();
                 Global.CurrentState.reset(new LoadMenu());
                 Global.CurrentState->init();
-                MutexUnlock(SWITCHING_STATE);
-                MutexUnlock(RENDER_BLOCK);
+                MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+                MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
                 return;
             }
             animation = 0;
@@ -557,7 +557,7 @@ void MainMenu::update() {
         return;
     }
 
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     Global.enableMouse = true;
 
     popup.update();
@@ -580,7 +580,7 @@ void MainMenu::update() {
         popup.block = false;
     }
 
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
 
 
@@ -592,7 +592,7 @@ void MainMenu::update() {
         //Global.CurrentState->unload();
         //Global.CurrentState.reset(new WIPMenu());
         //Global.CurrentState->init();
-        MutexLock(ACCESSING_OBJECTS);
+        MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
         std::string temp = Global.Path;
         Global.Path = Global.GamePath + "/database";
 
@@ -706,7 +706,7 @@ void MainMenu::update() {
             fclose(pFile);
         }
         Global.Path = temp;
-        MutexUnlock(ACCESSING_OBJECTS);
+        MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
         return;
     }
     else if(play.action){
@@ -724,13 +724,13 @@ void MainMenu::update() {
         return;
     }
     else if(wip2.action){
-        MutexLock(RENDER_BLOCK);
-        MutexLock(SWITCHING_STATE);
+        MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+        MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new WipMenu2());
         Global.CurrentState->init();
-        MutexUnlock(SWITCHING_STATE);
-        MutexUnlock(RENDER_BLOCK);
+        MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+        MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
         return;
     }
 
@@ -751,7 +751,7 @@ void MainMenu::render() {
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     
     play.render();
     wip.render();
@@ -765,7 +765,7 @@ void MainMenu::render() {
    // DrawTextureCenter(&Global.OsusLogo, 320, 200, 400.0 / (float)Global.OsusLogo.width, WHITE);
     logo.render();
     popup.render();
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     //MutexUnlock(SWITCHING_STATE);
     //MutexUnlock(ACCESSING_OBJECTS);
     //test.render();
@@ -816,14 +816,14 @@ void StartMenu::update() {
         if(!animationDone)
             return;
         else{
-            MutexLock(RENDER_BLOCK);
-            MutexLock(SWITCHING_STATE);
+            MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+            MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
             Global.CurrentState->unload();
             Global.CurrentState.reset(new MainMenu());
             ((MainMenu*)(Global.CurrentState.get()))->animation = 1;
             Global.CurrentState->init();
-            MutexUnlock(SWITCHING_STATE);
-            MutexUnlock(RENDER_BLOCK);
+            MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+            MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
             return;
         }
 
@@ -831,7 +831,7 @@ void StartMenu::update() {
 
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     Global.enableMouse = true;
 
     popup.update();
@@ -872,7 +872,7 @@ void StartMenu::update() {
         popup.block = false;
     }
 
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
     if(action){
         animationStartTime = getTimer();
@@ -888,12 +888,12 @@ void StartMenu::render() {
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     //DrawTextureCenter(&Global.OsusLogo, 320, 200, 400.0 / (float)Global.OsusLogo.width, WHITE);
     logo.render();
     description.render();
     popup.render();
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     //MutexUnlock(SWITCHING_STATE);
     //MutexUnlock(ACCESSING_OBJECTS);
     //test.render();
@@ -938,8 +938,8 @@ void Game::init() {
     //While loading the game chaos can happen, no problem
     
     //MutexUnlock(SWITCHING_STATE);
-    MutexUnlock(SWITCHING_STATE);
-    MutexUnlock(RENDER_BLOCK);
+    MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+    MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
     parseSettings();
     Global.gameManager->loadGame(Global.selectedPath);
     //MutexLock(ACCESSING_OBJECTS);
@@ -955,8 +955,8 @@ void Game::init() {
     Global.errorDiv = 0;
     
     volume.location = Global.volume * 100.0f;
-    MutexLock(RENDER_BLOCK);
-	MutexLock(SWITCHING_STATE);
+    MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+	MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
     //MutexLock(SWITCHING_STATE);
     
 }
@@ -979,9 +979,9 @@ void Game::update() {
         if(IsKeyPressed(Global.GO_BACK_KEY) || !(!WindowShouldClose() and _os_should_program_run())){
             Global.CurrentState->initDone = 3;        
         }
-        MutexLock(ACCESSING_OBJECTS);
+        MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
         Global.gameManager->run();
-        MutexUnlock(ACCESSING_OBJECTS);
+        MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     }
     else{
         if(initDone == 0 or Global.GameTextures == 0){
@@ -998,7 +998,7 @@ void Game::render() {
     
     if(initDone == 1){
         //Global.enableMouse = false;
-        MutexLock(ACCESSING_OBJECTS);
+        MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         Global.gameManager->render();
         //Global.mutex.lock();
         if(IsMusicStreamPlaying(&Global.gameManager->backgroundMusic)){
@@ -1014,7 +1014,7 @@ void Game::render() {
         if(GetMusicTimeLength(&Global.gameManager->backgroundMusic) != 0){
             DrawLineEx({0, GetScreenHeight() - Scale(2)}, {static_cast<float>(GetScreenWidth() * ((Global.currentOsuTime/1000.0) / GetMusicTimeLength(&Global.gameManager->backgroundMusic))), GetScreenHeight() - Scale(2)}, Scale(3), Fade(WHITE, 0.8));
         }
-        MutexUnlock(ACCESSING_OBJECTS);
+        MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
         //Global.mutex.unlock();
     }
@@ -1086,26 +1086,26 @@ void Game::textureOps(){
     //std::cout << "Got Permission!\n";
 
     if(Global.sliderTexNeedDeleting){
-        MutexLock(ACCESSING_OBJECTS);
+        MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         Global.gameManager->unloadSliderTextures();
-        MutexUnlock(ACCESSING_OBJECTS);
+        MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     }
 
     if(Global.GameTextures == 1){
         std::cout << "trying to get lock for object access for game texture load" << std::endl;
-        MutexLock(ACCESSING_OBJECTS);
+        MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         std::cout << "got lock for object access for game texture load" << std::endl;
         Global.gameManager->loadGameTextures();
-        MutexUnlock(ACCESSING_OBJECTS);
+        MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         std::cout << "loaded textures and unlocked access lock" << std::endl;
     }
 
     if(Global.GameTextures == -1){
         std::cout << "trying to get lock for object access for game texture unload" << std::endl;
-        MutexLock(ACCESSING_OBJECTS);
+        MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         std::cout << "got lock for object access for game texture unload" << std::endl;
         Global.gameManager->unloadGameTextures();
-        MutexUnlock(ACCESSING_OBJECTS);
+        MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         std::cout << "unloaded textures and unlocked access lock" << std::endl;
     }
     
@@ -1585,14 +1585,14 @@ void WIPMenu::update(){
         init();
     }
     if(IsKeyPressed(Global.GO_BACK_KEY ) and !CanGoBack){
-        MutexLock(RENDER_BLOCK);
-        MutexLock(SWITCHING_STATE);
+        MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+        MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
         ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
-        MutexUnlock(SWITCHING_STATE);
-        MutexUnlock(RENDER_BLOCK);
+        MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+        MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
     }
 
 }
@@ -1646,7 +1646,7 @@ void ResultsMenu::init() {
     
 }
 void ResultsMenu::render() {
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     close.render();
     name.render();
     maxCombo.render();
@@ -1654,21 +1654,21 @@ void ResultsMenu::render() {
     hit100.render();
     hit50.render();
     hit0.render();
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     //Global.mutex.unlock();
 }
 void ResultsMenu::update() {
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     close.update();
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     if(close.action){
-        MutexLock(RENDER_BLOCK);
-        MutexLock(SWITCHING_STATE);
+        MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+        MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new PlayMenu());
         Global.CurrentState->init();
-        MutexUnlock(SWITCHING_STATE);
-        MutexUnlock(RENDER_BLOCK);
+        MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+        MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
         return;
     }
 }
@@ -1721,7 +1721,7 @@ void WipMenu2::init() {
 void WipMenu2::update() {
     if(initDone != 1)
         return;
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     if(Global.Key2P && addStuffAt == -1 && removeStuffAt == -1){
         removeStuffAt = lastStuffAt;
         addStuffAt = (lastStuffAt + 1) % 16;
@@ -1915,24 +1915,24 @@ void WipMenu2::update() {
         addStuffAt = -1;
     }
     
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
     if(IsKeyPressed(Global.GO_BACK_KEY)){
-        MutexLock(RENDER_BLOCK);
-        MutexLock(SWITCHING_STATE);
+        MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+        MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
         Global.CurrentState->unload();
         Global.CurrentState.reset(new MainMenu());
         ((MainMenu*)(Global.CurrentState.get()))->animation = 2;
         Global.CurrentState->init();
-        MutexUnlock(SWITCHING_STATE);
-        MutexUnlock(RENDER_BLOCK);
+        MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+        MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
         return;
     }
 }
 void WipMenu2::render(){
     if(initDone != 1)
         return;
-    MutexLock(ACCESSING_OBJECTS);
+    MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     Rectangle rect;
     rect.x = 322;
     rect.y = 240 -  18;
@@ -1981,7 +1981,7 @@ void WipMenu2::render(){
             DrawTextEx(&Global.DefaultFont, name.c_str(), {(float)((int)ScaleCordX(r.x + 10)), (float)((int)ScaleCordY(r.y + 18 - 10))}, Scale(20.05), Scale(2), BLACK);
         }
     }
-    MutexUnlock(ACCESSING_OBJECTS);
+    MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 }
 void WipMenu2::unload() {
     initDone = 0;

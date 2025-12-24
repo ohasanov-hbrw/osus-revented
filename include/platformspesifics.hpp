@@ -1,6 +1,6 @@
 #pragma once
-
-
+#include <atomic>
+// we need to add some mutex management stuff here with atomics, so that one thread cannot unlock twice, or lock twice
 
 #ifdef THREEDS_BUILD
     #define OSUS_MAX_TEXTURE_WIDTH 256
@@ -96,3 +96,5 @@ void _os_init_program(bool VSYNC);
 void _os_exit_program();
 
 void DrawTextureCenter(Texture2D *tex, float x, float y, float s, Color color);
+
+
