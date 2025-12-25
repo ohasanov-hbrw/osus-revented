@@ -330,6 +330,9 @@ struct Globals {
     bool readyForRenderLoop = false;
     bool readyForGameLoop = false;
 
+    // Slider Resolution Divider
+    int sliderResDiv = 2;
+    
     // IDK honestly, this does something important
     Globals() = default;
 };

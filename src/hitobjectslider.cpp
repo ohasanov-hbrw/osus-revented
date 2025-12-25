@@ -1482,7 +1482,7 @@ void Slider::unloadTextures(){
     if(readyToDelete){
         if(IsRenderTextureReady(&sliderTexture)){
             UnloadRenderTexture(&sliderTexture);
-            std::cout << "UnloadingSliderTexture\n";
+            //std::cout << "UnloadingSliderTexture\n";
             readyToDelete = false;
         }
         data.textureReady = false;
@@ -1499,7 +1499,6 @@ void Slider::dead_update(){
         }
     }
 }
-
 
 Slider::Slider(HitObjectData data){
     this->data = data;

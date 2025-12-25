@@ -424,7 +424,7 @@ int main(){
     deleteGlobalVariables();
 
     std::cout << "[INFO] bye bye :3 ~!\n";
-    SleepInMs(50);
+    SleepInMs(200);
 
     // Exit stuff
     _os_exit_program();
