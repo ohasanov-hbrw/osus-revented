@@ -1224,15 +1224,25 @@ RenderTexture2D LoadRenderTexture(int width, int height, bool vram){
     //TEST
     //target.id = 0;
     //return target;
+    if(width <= 0)
+        width = 1;
+    if(height <= 0)
+        height = 1;
     if (target.id > 0){
         target.texture.id = 1;
 
 		target.texture.subtex.width = static_cast<u16>(width);
         target.texture.subtex.height = static_cast<u16>(height);
 
+        
+        
         u32 w_pow2 = GetNextPowerOf2(target.texture.subtex.width);
 		u32 h_pow2 = GetNextPowerOf2(target.texture.subtex.height);
 
+        if(w_pow2 > 512)
+            w_pow2 = 512;
+        if(h_pow2 > 256)
+            h_pow2 = 256;
         //std::cout << w_pow2 << " w_pow2  -  ";
         //std::cout << h_pow2 << " h_pow2  -  ";
         

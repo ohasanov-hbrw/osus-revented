@@ -988,7 +988,7 @@ void Game::update() {
             initDone = -1;
         }
         if(initDone == -1 and getTimer() - initStartTime > 0.0f){
-            std::cout << "\e[1;38;5;236m[INFO] \e[38;5;40m" << "init done in " << getTimer() - initStartTime << " secs\n";
+            std::cout << "\e[1;38;5;236m[INFO] \e[38;5;40m" << "init done in " << getTimer() - initStartTime << " msecs\n";
             initDone = 1;
         }
     }

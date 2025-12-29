@@ -1952,6 +1952,7 @@ void GameManager::unloadGame(){
 	MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 	//MutexUnlock(RENDER_BLOCK);
 	//Global.mutex2.unlock();
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;40m" << "Game fully (?) unloaded\n";
 }
 
 void GameManager::spawnHitObject(HitObjectData data){

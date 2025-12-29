@@ -45,6 +45,7 @@ ICON				:= 	meta/icon.png
 BANNER_IMAGE        :=	meta/banner.png
 BANNER_AUDIO		:=  meta/banner.wav
 RSF_PATH            :=	meta/app.rsf
+RSF_PATH_OLD         :=	meta/appold.rsf
 
 APP_TITLE       := osus
 APP_DESCRIPTION := reverse engineered osu! map player
@@ -180,6 +181,7 @@ endif
 MAKEROM		?=	./makerom
 
 MAKEROM_ARGS		:=	-elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -major 1 -minor 2 -micro 3
+MAKEROM_ARGS_OLD	:=	-elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -major 1 -minor 2 -micro 3
 
 ifneq ($(strip $(LOGO)),)
 	MAKEROM_ARGS	+=	 -logo "$(LOGO)"
@@ -215,6 +217,7 @@ all:$(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)
 	@$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) "$(BANNER_IMAGE)" $(BANNER_AUDIO_ARG) "$(BANNER_AUDIO)" -o "$(BUILD)/banner.bnr"
 	@$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f nosavebackups,visible -o "$(BUILD)/icon.icn"
 	@$(MAKEROM) -f cia -o "$(OUTPUT).cia" -target t -exefslogo $(MAKEROM_ARGS)
+	@$(MAKEROM) -f cia -o "old.cia" -target t -exefslogo $(MAKEROM_ARGS_OLD)
 	@echo built ... cia file
 $(BUILD):
 	@mkdir -p $@

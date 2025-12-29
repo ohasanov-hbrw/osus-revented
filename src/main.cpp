@@ -265,7 +265,7 @@ void RenderLoop(void *){
     // Deinitialize GPU
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Trying to exit the rendering thread\n";
     _gpu_exit_render_thread();
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Finalized the renderthread";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Finalized the renderthread\n";
 	return;
 }
 
