@@ -950,6 +950,8 @@ void Slider::render(){
     //rlCustomDepthFunc(true);
     int maxDrawAtTime = 10;
     int drawn = 0;
+    //if(last < renderPoints.size() - 1)
+    //    last++;
     if(data.textureLoaded and data.textureReady){
         legacyRender = Global.legacyRender;
         if(legacyRender){   
