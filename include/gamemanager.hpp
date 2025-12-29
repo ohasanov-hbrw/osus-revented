@@ -42,22 +42,26 @@ class GameManager{
 		int * sliderPreInit(HitObjectData data);
 		void render();
 
+		float clip(float value, float min, float max);
+
+		GameFile gameFile;
+		Parser parser;
+		timingSettings currentTimingSettings;
+
+		Linkedlist objectsLinkedList;
+		Linkedlist deadObjectsLinkedList;
+
+		std::vector<HitObject*> objects;
+		std::vector<FollowPoint> followLines;
+		std::vector<HitObject*> dead_objects;
+		std::vector<timingSettings> timingSettingsForHitObject;
+
 		HitSound SoundFilesAll;
-
-
-		float windowScale = 2.0f;
         HitSound hitCircleHS;
+		HitSound SoundFiles;
 		
-		#ifdef THREEDS_BUILD
-			int skip = 10;
-		#endif
-		#ifndef THREEDS_BUILD
-			int skip = 3;
-		#endif
-
-		bool renderSpinnerCircle = false;
-		bool renderSpinnerMetre = false;
-		bool renderSpinnerBack = false;
+		Background backgroundTextures;
+		
 		Texture2D hitCircle;
 		Texture2D hitCircleOverlay;
 		Texture2D approachCircle;
@@ -82,80 +86,84 @@ class GameManager{
 		Texture2D spinnerMetre;
 		Texture2D spinnerBack;
 		Texture2D followPoint;
+
 		RenderTexture2D sliderInnerBall;
 		RenderTexture2D sliderOuterBall;
+
 		Music backgroundMusic;
+
+		Color comboColour;
+
 		double currentTime;
 		double currentTimeTemp = -1;
-		int combo = 1;
-		int clickCombo = 0;
-		int maxCombo;
-		Color comboColour;
+		double sliderSpeed = 1.0f;
+		double sliderSpeedOverride = 1.0f;
+		double verytempbeat2;
+		double verytempbeat;
+		double TimerLast = 0;
+		double TimeLast = 0;
+		double lastHitTime = 0;
+
 		long long int score = 0;
 		long long int animatedScore = 0;
-		float difficultyMultiplier = 0;
+
+		Vector2 MousePosition;
+		Vector2 lastCords = {0,0};
+		
+		char *musicData;
+		long musicSize;
+
+		#ifdef THREEDS_BUILD
+			int skip = 10;
+			int smallskip = 2;
+		#endif
+		#ifndef THREEDS_BUILD
+			int skip = 3;
+			int smallskip = 1;
+		#endif
 		int currentComboIndex = 0;
 		int time;
 		int meter;
-		float beatLength;
-		float slidertickrate = 1.0f;
+		int combo = 1;
+		int clickCombo = 0;
+		int maxCombo;
 		int sampleSet;
 		int sampleIndex;
 		int volume;
-		bool uninherited;
 		int effects;
-		double sliderSpeed = 1.0f;
-		double sliderSpeedOverride = 1.0f;
-		bool pressed = false;
-		bool down = false;
-		float angle = 0;
-		bool stop = false;
-		Vector2 MousePosition;
-		GameFile gameFile;
-		Parser parser;
-
-		Linkedlist objectsLinkedList;
-		Linkedlist deadObjectsLinkedList;
-
-		std::vector<HitObject*> objects;
-		std::vector<FollowPoint> followLines;
-		std::vector<HitObject*> dead_objects;
-		float clip(float value, float min, float max);
-		std::vector<timingSettings> timingSettingsForHitObject;
-
-		timingSettings currentTimingSettings;
-		int lastCurrentTiming;
-		double verytempbeat2;
 		int defaultSampleSet = 0;
 		int index;
-		float circlesize = 54.48*2.0f;
-		double verytempbeat;
-		float spinsPerSecond = 5.0f;
+		int lastCurrentTiming;
 		int spawnedHitObjects = 0;
-		bool startMusic = false;
-		double TimerLast = 0;
-		double TimeLast = 0;
-		HitSound SoundFiles;
-		int lastTimingLoc;
-		Vector2 lastCords = {0,0};
-		double lastHitTime = 0;
-		Background backgroundTextures;
-		std::string currentBackgroundTexture = "";
-
-		bool temprenderSpinnerCircle = false;
-		bool temprenderSpinnerMetre = false;
-		bool temprenderSpinnerBack = false;
-
 		int hit300s = 0;
 		int hit100s = 0;
 		int hit50s = 0;
 		int hit0s = 0;
+		int lastTimingLoc;
 
+		float difficultyMultiplier = 0;
+		float windowScale = 2.0f;
+		float beatLength;
+		float slidertickrate = 1.0f;
+		float angle = 0;
+		float circlesize = 54.48*2.0f;
+		float spinsPerSecond = 5.0f;
+		
+		bool uninherited;
+		bool pressed = false;
+		bool down = false;
+		bool stop = false;
+		bool renderSpinnerCircle = false;
+		bool renderSpinnerMetre = false;
+		bool renderSpinnerBack = false;
+		bool temprenderSpinnerCircle = false;
+		bool temprenderSpinnerMetre = false;
+		bool temprenderSpinnerBack = false;
+		bool startMusic = false;
+		
+		std::string currentBackgroundTexture = "";
 		std::string lastPath;
 		std::string GamePathWithSlash;
-
-		char *musicData;
-		long musicSize;
 	private:
 		static GameManager* inst_;
 		void init();
