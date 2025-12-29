@@ -1353,7 +1353,7 @@ void DrawCircleWithDepth(Vector2 center, float radius, int segments, float depth
 
 
     float stepLength = (endAngle - startAngle)/(float)segments;
-    float angle = startAngle;
+    float angle = startAngle + (360 / segments) / 2;
     for (int i = 0; i < segments; i++){
         //rlColor4ub(color.r, color.g, color.b, color.a);
 
@@ -1401,7 +1401,7 @@ void DrawCircleWithDepthGrad(Vector2 center, float radius, int segments, float d
 
 
     float stepLength = (endAngle - startAngle)/(float)segments;
-    float angle = startAngle;
+    float angle = startAngle + (360 / segments) / 2;
     for (int i = 0; i < segments; i++){
         //rlColor4ub(color.r, color.g, color.b, color.a);
 

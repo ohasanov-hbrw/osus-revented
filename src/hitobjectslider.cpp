@@ -1103,7 +1103,7 @@ void Slider::render(){
                                 if(true){
                                     Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset+ gm->circlesize/2.0f) * Global.sliderTexSize))};
                                     //DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.98)  * Global.sliderTexSize, Global.circleSector, 0.2f, {255, 255, 255, 255});
-                                    DrawTextureExDepth(&gm->sliderOuterBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize}, 0.0f, gm->circlesize / 64.0f * Global.sliderTexSize, WHITE);
+                                    DrawTextureExDepth(&gm->sliderOuterBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize, WHITE);
                                     last = std::max(i, 0);
                                     if(last == renderPoints.size() - 1){
                                         last = renderPoints.size();
@@ -1111,7 +1111,7 @@ void Slider::render(){
                                     if(i + gm->skip >= renderPoints.size()){
                                         Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset+ gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
                                         //DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.98)  * Global.sliderTexSize, Global.circleSector, 0.2f, {255, 255, 255, 255});
-                                        DrawTextureExDepth(&gm->sliderOuterBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize}, 0.0f, gm->circlesize / 64.0f * Global.sliderTexSize, WHITE);
+                                        DrawTextureExDepth(&gm->sliderOuterBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize, WHITE);
                                     }
                                 }
                             }
@@ -1132,7 +1132,11 @@ void Slider::render(){
                                 if(true){
                                     Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
                                     Color color = Color{(unsigned char)((float)data.colour[0]*0.5f),(unsigned char)((float)data.colour[1]*0.5f),(unsigned char)((float)data.colour[2]*0.5f)};
-                                    DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color, 0.4f));
+                                    Color color3 = Color{((unsigned char)((float)data.colour[0]*0.5f) + 255) / 2,((unsigned char)((float)data.colour[1]*0.5f) + 255) / 2,((unsigned char)((float)data.colour[2]*0.5f) + 255) / 2};
+                                    DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color3, 0.7f));
+                                    DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.75)  * Global.sliderTexSize, Global.circleSector*2, 0.3f, Fade(color, 0.4f));
+                                    
+                                    //DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(WHITE, 1), Fade(color, 0.4f));
                                     //DrawTextureExDepth(&gm->sliderInnerBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize * 0.85f, Fade(WHITE, 1.0f));
                                     //DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.9)  * Global.sliderTexSize, Global.circleSector, 0.5f, Fade(Color{255,255,255}, 0.2f), Fade(Color{255,255,255}, 0.0f));//{2, 0, 4, 128});
                                     //amogusLast = std::max(i, 0);
@@ -1141,7 +1145,10 @@ void Slider::render(){
                                     //}
                                     if(i + gm->skip >= renderPoints.size()){
                                         Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                        DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color, 0.4f));
+                                        //DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color, 0.4f));
+                                        DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color3, 0.7f));
+                                        DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.75)  * Global.sliderTexSize, Global.circleSector*2, 0.3f, Fade(color, 0.4f));
+                                        //DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(WHITE, 1), Fade(color, 0.4f));
                                         //DrawTextureExDepth(&gm->sliderInnerBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize * 0.85f, Fade(WHITE, 1.0f));
                                         //DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.9)  * Global.sliderTexSize, Global.circleSector, 0.5f, Fade(Color{255,255,255}, 0.2f), Fade(Color{255,255,255}, 0.0f));//{2, 0, 4, 128});
                                     }
@@ -1170,12 +1177,12 @@ void Slider::render(){
                                     Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
                                     Color color = Color{(unsigned char)((float)data.colour[0]*0.6f),(unsigned char)((float)data.colour[1]*0.6f),(unsigned char)((float)data.colour[2]*0.6f)};
                                     //DrawTextureExDepth(&gm->sliderInnerBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize * 0.85f, WHITE);
-                                    DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.76)  * Global.sliderTexSize, Global.circleSector*2, 0.4f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
+                                    DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.73)  * Global.sliderTexSize, Global.circleSector, 0.4f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
                                     if(i + gm->skip >= renderPoints.size()){
                                         Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
                                         
                                         //DrawTextureExDepth(&gm->sliderInnerBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize * 0.85f, WHITE);
-                                        DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.76)  * Global.sliderTexSize, Global.circleSector*2, 0.4f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
+                                        DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.73)  * Global.sliderTexSize, Global.circleSector, 0.4f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
                                     }
                                 }
                             }

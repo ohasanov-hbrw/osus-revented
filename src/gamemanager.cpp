@@ -2044,9 +2044,9 @@ void GameManager::loadGameTextures(){
 	//rlEnableDepthTest();
 	rlSetBlendFactorsSeparate(RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_MAX, RL_MAX);
 	DrawCircleWithDepth((Vector2){32, 32}, 30.5, 64, 0.5f, {255, 255, 255, 255});
-	DrawCircleWithDepth((Vector2){32, 32}, 31.7, 64, 0.4f, {255, 255, 255, 200});
-	DrawCircleWithDepth((Vector2){32, 32}, 31.0, 64, 0.3f, {255, 255, 255, 150});
-	DrawCircleWithDepth((Vector2){32, 32}, 31.3, 64, 0.2f, {255, 255, 255, 50});
+	DrawCircleWithDepth((Vector2){32, 32}, 31.0, 64, 0.4f, {255, 255, 255, 200});
+	DrawCircleWithDepth((Vector2){32, 32}, 31.2, 64, 0.3f, {255, 255, 255, 150});
+	DrawCircleWithDepth((Vector2){32, 32}, 31.5, 64, 0.2f, {255, 255, 255, 50});
 	//rlDisableDepthTest();
 	//rlSetBlendFactorsSeparate(RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_MIN, RL_MIN);
 	//DrawCircleWithDepth((Vector2){32, 32}, 30*0.85f, 60, 0.5f, {0, 0, 0, 0});

@@ -380,7 +380,7 @@ Music LoadMusicStream(const char *filename){
     u32 tag;
     //std::cout << "reading tag\n";
     if(fread(&tag, 1, 4, file) != 4){
-        std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed to read: " << get_filename(filename) << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to read: " << get_filename(filename) << std::endl;
         fclose(file);
         return music;
     }
@@ -388,11 +388,11 @@ Music LoadMusicStream(const char *filename){
 
     fseek(file, 0, SEEK_END);
     size_t lSize = ftell(file);
-    std::cout << "\e[1;36m[3DS]\e[38;5;236m" << lSize / 1024 << " kbytes of music\n";
+    std::cout << "\e[1;36m[3DS] \e[38;5;236m" << lSize / 1024 << " kbytes of music\n";
     fseek(file, 0, SEEK_SET);
     music.fileSize = lSize;
     if(lSize > 1024 * 1024 * 8){
-        std::cout << "\e[1;36m[3DS]\e[38;5;220m" << "Cant copy music into memory\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;220m" << "Cant copy music into memory\n";
         fclose(file);
         
     }
@@ -403,9 +403,9 @@ Music LoadMusicStream(const char *filename){
         }
         else{
             music.memory = true;
-            std::cout << "\e[1;36m[3DS]\e[38;5;17m"  << "Copy music into memory\n";
+            std::cout << "\e[1;36m[3DS] \e[38;5;17m"  << "Copy music into memory\n";
             if(fread(music.fileBuffer, sizeof(uint8_t), lSize, file) != lSize){
-                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Couldnt read file " << get_filename(filename) << std::endl;
+                std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Couldnt read file " << get_filename(filename) << std::endl;
                 free(music.fileBuffer);
                 fclose(file);
                 music.memory = false;
@@ -425,7 +425,7 @@ Music LoadMusicStream(const char *filename){
         music.decoder = (mp3dec_ex_t*)malloc(sizeof(mp3dec_ex_t));
         if(music.memory){
             if(mp3dec_ex_open_buf(music.decoder, music.fileBuffer, music.fileSize, MP3D_SEEK_TO_SAMPLE) != 0){
-                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed decoding music: " << get_filename(filename) << std::endl;
+                std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed decoding music: " << get_filename(filename) << std::endl;
                 free(music.decoder);
                 linearFree(music.fileBuffer);
                 music.memory = false;
@@ -434,7 +434,7 @@ Music LoadMusicStream(const char *filename){
         }
         else{
             if(mp3dec_ex_open(music.decoder, filename, MP3D_SEEK_TO_SAMPLE) != 0){
-                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed decoding music: " << get_filename(filename) << std::endl;
+                std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed decoding music: " << get_filename(filename) << std::endl;
                 free(music.decoder);
                 return music;
             }
@@ -443,7 +443,7 @@ Music LoadMusicStream(const char *filename){
         music.length = ((music.decoder->samples * 1000) / music.decoder->info.hz) / music.decoder->info.channels;
         //std::cout << music.length << std::endl;
 
-        std::cout << "\e[1;36m[3DS]\e[38;5;40m" << "Loaded music: " << get_filename(filename) << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;40m" << "Loaded music: " << get_filename(filename) << std::endl;
         music.sampleRate = music.decoder->info.hz;
         music.channels = music.decoder->info.channels;
         music.loaded = true;
@@ -454,7 +454,7 @@ Music LoadMusicStream(const char *filename){
             int error = 0;
             music.oggdecoder = stb_vorbis_open_memory(music.fileBuffer, music.fileSize, &error, NULL);
             if(music.oggdecoder == NULL || error != 0){
-                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed opening music: " << get_filename(filename) << std::endl;
+                std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed opening music: " << get_filename(filename) << std::endl;
                 linearFree(music.fileBuffer);
                 music.memory = false;
                 return music;
@@ -464,16 +464,16 @@ Music LoadMusicStream(const char *filename){
             int error = 0;
             music.oggdecoder = stb_vorbis_open_filename(filename, &error, NULL);
             if(music.oggdecoder == NULL || error != 0){
-                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed opening music: " << get_filename(filename) << std::endl;
+                std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed opening music: " << get_filename(filename) << std::endl;
                 return music;
             }
         }
 
         stb_vorbis_seek_start(music.oggdecoder);
         music.length = (u64)(stb_vorbis_stream_length_in_seconds(music.oggdecoder) * 1000.0f);
-        std::cout << "\e[1;36m[3DS]\e[38;5;236m" << "OGG length in miliseconds: " << music.length << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "OGG length in miliseconds: " << music.length << std::endl;
 
-        std::cout << "\e[1;36m[3DS]\e[38;5;40m" << "Loaded music: " << get_filename(filename) << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;40m" << "Loaded music: " << get_filename(filename) << std::endl;
 
         stb_vorbis_info ogginfo = stb_vorbis_get_info(music.oggdecoder);
         music.sampleRate = ogginfo.sample_rate;
@@ -534,7 +534,7 @@ Music LoadMusicStream(const char *filename){
             else{
                 music.waveBuf[i].nsamples = stb_vorbis_get_samples_short_interleaved(music.oggdecoder, music.channels, (short*)music.waveBuf[i].data_vaddr, bufferSamples * music.channels);
                 if(music.waveBuf[i].nsamples > 0){
-                    std::cout << "\e[1;36m[3DS]\e[38;5;236m" << "OGG preloaded buffer: " << i << std::endl;
+                    std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "OGG preloaded buffer: " << i << std::endl;
                     DSP_FlushDataCache(music.waveBuf[i].data_vaddr, bufferSize);
                 }
                 else{

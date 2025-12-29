@@ -33,7 +33,7 @@ int loadogg(const char *fileName, Sound *sound){
     uint8_t *fileBuffer = (uint8_t *)malloc(lSize * sizeof(uint8_t));
     
     if(fread(fileBuffer, sizeof(uint8_t), lSize, file) != lSize){
-        std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed to read: " << get_filename(fileName) << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to read: " << get_filename(fileName) << std::endl;
         free(fileBuffer);
         fclose(file);
         return 0;
