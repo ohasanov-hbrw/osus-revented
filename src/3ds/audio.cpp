@@ -6,6 +6,9 @@
 #include <vector>
 #include "soundloader.h"
 #include "time_util.hpp"
+#include "fs.hpp"
+
+#define MAKEDWORD(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 
 void SetSoundVolume(Sound *sound, float volume){
     sound->volume = volume;
@@ -75,7 +78,7 @@ void PlaySound(Sound *sound){
                 return;
             }
         }
-        std::cout << "No channels left...\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;220m" << "No free channels left...\n";
     }
 }
 
@@ -156,11 +159,11 @@ void StopMusicStream(Music *music){
         music->paused = true;
         u8 newCommand = 0x0000000F;
         music->command = newCommand;
-        std::cout << "music kill command sent\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "music kill command sent\n";
         if(music->playing){
             threadJoin(music->thread, U64_MAX);
             threadFree(music->thread);
-            std::cout << "music thread joined\n";
+            std::cout << "\e[1;36m[3DS] \e[38;5;40m" << "music thread joined\n";
         }
         for(int i = 0; i < 24; i++){
             ndspChnReset(i);
@@ -197,7 +200,7 @@ void MusicThread(Music *music){
     music->playedChannels = 0;
     music->lastTimePlayed = 0;
 
-    std::cout << "started music thread" << std::endl;
+    std::cout << "\e[1;36m[3DS] \e[38;5;40m" << "started music thread" << std::endl;
 
     ndspChnReset(channel);
     ndspChnWaveBufClear(channel);
@@ -228,26 +231,48 @@ void MusicThread(Music *music){
         SleepInMs(10);
         for(int i = 0; i < numberOfBuffers; i++){
             if (music->waveBuf[i].status == NDSP_WBUF_DONE) {
-                music->waveBuf[i].nsamples = mp3dec_ex_read(music->decoder, (mp3d_sample_t*)music->waveBuf[i].data_vaddr, bufferSamples * music->channels) / music->channels;
-                if(music->waveBuf[i].nsamples > 0){
-                    int playing = -1;
-                    for(int j = 0; j < numberOfBuffers; j++){
-                        if(music->waveBuf[j].status == NDSP_WBUF_PLAYING){
-                            playing = j;
-                            break;
+                if(!music->oggplayback){
+                    music->waveBuf[i].nsamples = mp3dec_ex_read(music->decoder, (mp3d_sample_t*)music->waveBuf[i].data_vaddr, bufferSamples * music->channels) / music->channels;
+                    if(music->waveBuf[i].nsamples > 0){
+                        int playing = -1;
+                        for(int j = 0; j < numberOfBuffers; j++){
+                            if(music->waveBuf[j].status == NDSP_WBUF_PLAYING){
+                                playing = j;
+                                break;
+                            }
                         }
+                        //std::cout << "queued: " << i << "  playing: " << playing << std::endl;
+                        DSP_FlushDataCache(music->waveBuf[i].data_vaddr, bufferSize);
+                        if(music->waveBuf[i].status == NDSP_WBUF_DONE){
+                            music->playedChannels++;
+                        }
+                        ndspChnWaveBufAdd(channel, &music->waveBuf[i]);
                     }
-                    //std::cout << "queued: " << i << "  playing: " << playing << std::endl;
-                    DSP_FlushDataCache(music->waveBuf[i].data_vaddr, bufferSize);
-                    if(music->waveBuf[i].status == NDSP_WBUF_DONE){
-                        music->playedChannels++;
+                    else{
+                        goto exitMusicThread;
                     }
-                    ndspChnWaveBufAdd(channel, &music->waveBuf[i]);
                 }
                 else{
-                    goto exitMusicThread;
+                    music->waveBuf[i].nsamples = stb_vorbis_get_samples_short_interleaved(music->oggdecoder, music->channels, (short*)music->waveBuf[i].data_vaddr, bufferSamples * music->channels);
+                    if(music->waveBuf[i].nsamples > 0){
+                        int playing = -1;
+                        for(int j = 0; j < numberOfBuffers; j++){
+                            if(music->waveBuf[j].status == NDSP_WBUF_PLAYING){
+                                playing = j;
+                                break;
+                            }
+                        }
+                        //std::cout << "queued: " << i << "  playing: " << playing << std::endl;
+                        DSP_FlushDataCache(music->waveBuf[i].data_vaddr, bufferSize);
+                        if(music->waveBuf[i].status == NDSP_WBUF_DONE){
+                            music->playedChannels++;
+                        }
+                        ndspChnWaveBufAdd(channel, &music->waveBuf[i]);
+                    }
+                    else{
+                        goto exitMusicThread;
+                    }
                 }
-                
             }
         }  
         if((music->command & 0x000000F0) == 0x000000F0){
@@ -269,23 +294,41 @@ void MusicThread(Music *music){
             for (int i = 0; i < numberOfBuffers; ++i) {
                 music->waveBuf[i].status = NDSP_WBUF_FREE;
             }
-            mp3dec_ex_seek(music->decoder, (music->seek * music->sampleRate * music->channels) / 1000);
-            for(int i = 0; i < numberOfBuffers; i++){
-                if (music->waveBuf[i].status == NDSP_WBUF_FREE) {
-                    music->waveBuf[i].nsamples = mp3dec_ex_read(music->decoder, (mp3d_sample_t*)music->waveBuf[i].data_pcm16, bufferSamples * music->channels) / music->channels;
-                    if(music->waveBuf[i].nsamples > 0){
-                        //std::cout << "preloaded buffer: " << i << std::endl;
-                        DSP_FlushDataCache(music->waveBuf[i].data_pcm16, bufferSize);
-                    }
-                    else{
-                        break;
+            if(!music->oggplayback){
+                mp3dec_ex_seek(music->decoder, (music->seek * music->sampleRate * music->channels) / 1000);
+                for(int i = 0; i < numberOfBuffers; i++){
+                    if (music->waveBuf[i].status == NDSP_WBUF_FREE) {
+                        music->waveBuf[i].nsamples = mp3dec_ex_read(music->decoder, (mp3d_sample_t*)music->waveBuf[i].data_vaddr, bufferSamples * music->channels) / music->channels;
+                        if(music->waveBuf[i].nsamples > 0){
+                            //std::cout << "preloaded buffer: " << i << std::endl;
+                            DSP_FlushDataCache(music->waveBuf[i].data_vaddr, bufferSize);
+                        }
+                        else{
+                            break;
+                        }
                     }
                 }
             }
+            else{
+                stb_vorbis_seek(music->oggdecoder, (music->seek * music->sampleRate) / 1000);
+                
+                for(int i = 0; i < numberOfBuffers; i++){
+                    if (music->waveBuf[i].status == NDSP_WBUF_FREE) {
+                        music->waveBuf[i].nsamples = stb_vorbis_get_samples_short_interleaved(music->oggdecoder, music->channels, (short*)music->waveBuf[i].data_vaddr, bufferSamples * music->channels);
+                        if(music->waveBuf[i].nsamples > 0){
+                            std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "OGG preloaded buffer: " << i << std::endl;
+                            DSP_FlushDataCache(music->waveBuf[i].data_vaddr, bufferSize);
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                }
+            }
+
             for(int i = 0; i < numberOfBuffers; i++){
                 ndspChnWaveBufAdd(channel, &music->waveBuf[i]);
             }
-
             music->offset = music->seek;
             music->playedChannels = 0;
             music->lastTimePlayed = music->seek;
@@ -317,7 +360,6 @@ void MusicThread(Music *music){
 
 Music LoadMusicStream(const char *filename){
     Music music = {0};
-    music.decoder = (mp3dec_ex_t*)malloc(sizeof(mp3dec_ex_t));
     if(Global.MusicLoaded){
         return music;
     }
@@ -326,77 +368,130 @@ Music LoadMusicStream(const char *filename){
     file = fopen(filename,"r");
     
     if(file == NULL){
-        std::cout << "CANT OPEN FILE " << filename << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to open: " << get_filename(filename) << std::endl;
         fclose(file);
         return music;
     }
 
+
     
+
+    fseek(file, 0, SEEK_SET);
+    u32 tag;
+    //std::cout << "reading tag\n";
+    if(fread(&tag, 1, 4, file) != 4){
+        std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed to read: " << get_filename(filename) << std::endl;
+        fclose(file);
+        return music;
+    }
+
 
     fseek(file, 0, SEEK_END);
     size_t lSize = ftell(file);
-    std::cout << lSize << "bytes are available\n";
+    std::cout << "\e[1;36m[3DS]\e[38;5;236m" << lSize / 1024 << " kbytes of music\n";
     fseek(file, 0, SEEK_SET);
     music.fileSize = lSize;
-    if(lSize > 1024 * 1024 * 16){
-        std::cout << "TOO BIG OF A FILE TO LOAD INTO MEMORY TBH\n";
+    if(lSize > 1024 * 1024 * 8){
+        std::cout << "\e[1;36m[3DS]\e[38;5;220m" << "Cant copy music into memory\n";
         fclose(file);
-        goto skipMemory;
         
     }
-    music.fileBuffer = (uint8_t *)linearAlloc(lSize * sizeof(uint8_t));
-    if(music.fileBuffer == NULL){
-        music.memory = false;
-    }
     else{
-        music.memory = true;
-        std::cout << "READING MP3 MUSIC TO MEMORY!!!\n";
-        if(fread(music.fileBuffer, sizeof(uint8_t), lSize, file) != lSize){
-            std::cout << "CANT READ FILE " << filename << std::endl;
-            free(music.fileBuffer);
+        music.fileBuffer = (uint8_t *)linearAlloc(lSize * sizeof(uint8_t));
+        if(music.fileBuffer == NULL){
+            music.memory = false;
+        }
+        else{
+            music.memory = true;
+            std::cout << "\e[1;36m[3DS]\e[38;5;17m"  << "Copy music into memory\n";
+            if(fread(music.fileBuffer, sizeof(uint8_t), lSize, file) != lSize){
+                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Couldnt read file " << get_filename(filename) << std::endl;
+                free(music.fileBuffer);
+                fclose(file);
+                music.memory = false;
+                return music;
+            }
             fclose(file);
-            music.memory = false;
-            return music;
         }
-        fclose(file);
     }
     
-    skipMemory:
+    music.oggplayback = false;
+    if(tag == (u32)MAKEDWORD('O','g','g','S')){
+        music.oggplayback = true;
+    }
 
     
-
-    
-    if(music.memory){
-        if(mp3dec_ex_open_buf(music.decoder, music.fileBuffer, music.fileSize, MP3D_SEEK_TO_SAMPLE) != 0){
-            std::cout << "Failed decoding music: " << filename << std::endl;
-            free(music.decoder);
-            linearFree(music.fileBuffer);
-            music.memory = false;
-            return music;
+    if(!music.oggplayback){
+        music.decoder = (mp3dec_ex_t*)malloc(sizeof(mp3dec_ex_t));
+        if(music.memory){
+            if(mp3dec_ex_open_buf(music.decoder, music.fileBuffer, music.fileSize, MP3D_SEEK_TO_SAMPLE) != 0){
+                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed decoding music: " << get_filename(filename) << std::endl;
+                free(music.decoder);
+                linearFree(music.fileBuffer);
+                music.memory = false;
+                return music;
+            }
         }
+        else{
+            if(mp3dec_ex_open(music.decoder, filename, MP3D_SEEK_TO_SAMPLE) != 0){
+                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed decoding music: " << get_filename(filename) << std::endl;
+                free(music.decoder);
+                return music;
+            }
+        }
+        mp3dec_ex_seek(music.decoder, 0);
+        music.length = ((music.decoder->samples * 1000) / music.decoder->info.hz) / music.decoder->info.channels;
+        //std::cout << music.length << std::endl;
+
+        std::cout << "\e[1;36m[3DS]\e[38;5;40m" << "Loaded music: " << get_filename(filename) << std::endl;
+        music.sampleRate = music.decoder->info.hz;
+        music.channels = music.decoder->info.channels;
+        music.loaded = true;
+        Global.MusicLoaded = true;
     }
     else{
-        if(mp3dec_ex_open(music.decoder, filename, MP3D_SEEK_TO_SAMPLE) != 0){
-            std::cout << "Failed decoding music: " << filename << std::endl;
-            free(music.decoder);
-            return music;
+        if(music.memory){
+            int error = 0;
+            music.oggdecoder = stb_vorbis_open_memory(music.fileBuffer, music.fileSize, &error, NULL);
+            if(music.oggdecoder == NULL || error != 0){
+                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed opening music: " << get_filename(filename) << std::endl;
+                linearFree(music.fileBuffer);
+                music.memory = false;
+                return music;
+            }
         }
-    }
-    mp3dec_ex_seek(music.decoder, 0);
-    music.length = ((music.decoder->samples * 1000) / music.decoder->info.hz) / music.decoder->info.channels;
-    //std::cout << music.length << std::endl;
+        else{
+            int error = 0;
+            music.oggdecoder = stb_vorbis_open_filename(filename, &error, NULL);
+            if(music.oggdecoder == NULL || error != 0){
+                std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed opening music: " << get_filename(filename) << std::endl;
+                return music;
+            }
+        }
 
-    std::cout << "Loaded music: " << filename << std::endl;
-    music.sampleRate = music.decoder->info.hz;
-    music.channels = music.decoder->info.channels;
-    music.loaded = true;
-    Global.MusicLoaded = true;
+        stb_vorbis_seek_start(music.oggdecoder);
+        music.length = (u64)(stb_vorbis_stream_length_in_seconds(music.oggdecoder) * 1000.0f);
+        std::cout << "\e[1;36m[3DS]\e[38;5;236m" << "OGG length in miliseconds: " << music.length << std::endl;
+
+        std::cout << "\e[1;36m[3DS]\e[38;5;40m" << "Loaded music: " << get_filename(filename) << std::endl;
+
+        stb_vorbis_info ogginfo = stb_vorbis_get_info(music.oggdecoder);
+        music.sampleRate = ogginfo.sample_rate;
+        music.channels = ogginfo.channels;
+        if(music.channels > 2)
+            music.channels = 2;
+        music.loaded = true;
+        Global.MusicLoaded = true;
+
+    }
 
     int channel = 0;
 	int bufferIndex = 0;
 	int sampleRate = music.sampleRate;
 	int bufferSamples = music.sampleRate / 4;
 	int bufferSize = bufferSamples * music.channels * sizeof(mp3d_sample_t);
+    if(music.oggplayback)
+        bufferSize = bufferSamples * music.channels * sizeof(short);
 
     int numberOfBuffers = 2;
 
@@ -426,13 +521,25 @@ Music LoadMusicStream(const char *filename){
 
     for(int i = 0; i < numberOfBuffers; i++){
         if (music.waveBuf[i].status == NDSP_WBUF_FREE) {
-            music.waveBuf[i].nsamples = mp3dec_ex_read(music.decoder, (mp3d_sample_t*)music.waveBuf[i].data_vaddr, bufferSamples * music.channels) / music.channels;
-            if(music.waveBuf[i].nsamples > 0){
-                //std::cout << "preloaded buffer: " << i << std::endl;
-                DSP_FlushDataCache(music.waveBuf[i].data_vaddr, bufferSize);
+            if(!music.oggplayback){
+                music.waveBuf[i].nsamples = mp3dec_ex_read(music.decoder, (mp3d_sample_t*)music.waveBuf[i].data_vaddr, bufferSamples * music.channels) / music.channels;
+                if(music.waveBuf[i].nsamples > 0){
+                    //std::cout << "preloaded buffer: " << i << std::endl;
+                    DSP_FlushDataCache(music.waveBuf[i].data_vaddr, bufferSize);
+                }
+                else{
+                    break;
+                }
             }
             else{
-                break;
+                music.waveBuf[i].nsamples = stb_vorbis_get_samples_short_interleaved(music.oggdecoder, music.channels, (short*)music.waveBuf[i].data_vaddr, bufferSamples * music.channels);
+                if(music.waveBuf[i].nsamples > 0){
+                    std::cout << "\e[1;36m[3DS]\e[38;5;236m" << "OGG preloaded buffer: " << i << std::endl;
+                    DSP_FlushDataCache(music.waveBuf[i].data_vaddr, bufferSize);
+                }
+                else{
+                    break;
+                }
             }
         }
     }
@@ -461,7 +568,7 @@ void UnloadSound(Sound *sound){
         sound->channels = 0;
         sound->sampleRate = 0;
         sound->sampleSize = 0;
-        std::cout << "free sounds in dsp\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;17m" << "freed sounds in dsp\n";
     }
 }
 
@@ -471,11 +578,11 @@ void UnloadMusicStream(Music *music){
         Global.MusicLoaded = false;
         u8 newCommand = 0x0000000F;
         music->command = newCommand;
-        std::cout << "music kill command sent\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "music kill command sent\n";
         if(music->playing){
             threadJoin(music->thread, U64_MAX);
             threadFree(music->thread);
-            std::cout << "music thread joined\n";
+            std::cout << "\e[1;36m[3DS] \e[38;5;17m" << "music thread joined\n";
         }
         for(int i = 0; i < 24; i++){
             ndspChnReset(i);
@@ -483,8 +590,14 @@ void UnloadMusicStream(Music *music){
         }
         music->loaded = false;
         music->playing = false;
-        mp3dec_ex_close(music->decoder);
-        free(music->decoder);
+        if(!music->oggplayback){
+            mp3dec_ex_close(music->decoder);
+            free(music->decoder);
+        }
+        else{
+            stb_vorbis_close(music->oggdecoder);
+        }
+        music->oggplayback = false;
         for (int i = 0; i < numberOfBuffers; i++)
 		    linearFree((void*)music->waveBuf[i].data_vaddr);
         if(music->memory){

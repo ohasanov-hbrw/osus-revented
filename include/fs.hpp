@@ -14,3 +14,4 @@ bool checkIfExists(const char *name);
 int check_dir(const std::string &path);
 void print_dir(const std::string &path);
 std::string correct_path_notation(const std::string &path);
+std::string get_filename(const std::string& path);

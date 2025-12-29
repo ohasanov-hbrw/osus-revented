@@ -86,12 +86,12 @@ void RenderLoop(void *){
     
     // Load some necessary files that are needed a bunch
     Global.OsusLogo = LoadTexture((Global.GamePath + "/resources/osus.png").c_str());
-    std::cout << "[INFO] Loaded logo: ";
-    std::cout << (Global.GamePath + "/resources/osus.png").c_str() << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded logo\n";
+    //std::cout << (Global.GamePath + "/resources/osus.png").c_str() << std::endl;
     
     //Global.DefaultFont = LoadFont("sdmc:/3ds/resources/telegrama_render.otf");
     Global.DefaultFont = GetFontDefault();
-    std::cout << "[INFO] Loaded font\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded font\n";
 
     // First ever frame is a loading screen
     MutexLock(RENDER_BLOCK, RENDERTHREAD_ID);
@@ -144,7 +144,7 @@ void RenderLoop(void *){
 	}
 	files.clear();
     Global.Path = lastPath;
-    std::cout << "[INFO] Loaded cursor";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded cursor";
 
     // 3DS doesn't support some fancy filters
     // TODO: Make some filter and graphics settings configurable (OGL1.1 - OGL2.2 differences)
@@ -159,7 +159,7 @@ void RenderLoop(void *){
     SetTextureFilter(&Global.cursor, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(&Global.OsusLogo, TEXTURE_FILTER_BILINEAR);
 
-    std::cout << "[INFO] Loaded initial files and filters\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded initial files and filters\n";
     
     // Signal readyness to the game logic loop
     Global.readyForGameLoop = true;
@@ -263,9 +263,9 @@ void RenderLoop(void *){
     _gpu_end_drawing();
 
     // Deinitialize GPU
-    std::cout << "[INFO] Trying to exit the rendering thread\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Trying to exit the rendering thread\n";
     _gpu_exit_render_thread();
-    std::cout << "[INFO] Finalized the renderthread! bye bye";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Finalized the renderthread";
 	return;
 }
 
@@ -284,11 +284,11 @@ int main(){
     InitilizeLocks();
 
     // Mainly a 3DS Debug option
-    std::cout << _os_get_free_linear_ram() << std::endl;    
+    //std::cout << _os_get_free_linear_ram() << std::endl;    
     Global.linearSpaceFree = _os_get_free_linear_ram();
     
     // Get settings from an ini file if they exist
-    std::cout << "[INFO] parsing the settings.ini file...\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "parsing the settings.ini file...\n";
     parseSettings();
 
     // Initialize audio engine 
@@ -302,7 +302,7 @@ int main(){
     }
 
     // Start the rendering loop
-    std::cout << "[INFO] Starting render loop\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Starting render loop\n";
     renderThread = _multithread_thread_create(RenderLoop);
 
     // Frametime statistics and cursor initialization
@@ -313,13 +313,14 @@ int main(){
     initMouseTrail();
     
     // Debug free memory on 3DS Systems
-    std::cout << "[INFO] Free Vram: " << _os_get_free_vram() << std::endl;
-	std::cout << "[INFO] Free M_ALL: " << _os_get_free_ram(MEMREGION_ALL) << "/" << _os_get_size_ram(MEMREGION_ALL) << std::endl;
-	std::cout << "[INFO] Free M_APP: " << _os_get_free_ram(MEMREGION_APPLICATION) << "/" << _os_get_size_ram(MEMREGION_APPLICATION) << std::endl;
-	std::cout << "[INFO] Free M_SYS: " << _os_get_free_ram(MEMREGION_SYSTEM) << "/" << _os_get_size_ram(MEMREGION_SYSTEM) << std::endl;
-	std::cout << "[INFO] Free M_BSE: " << _os_get_free_ram(MEMREGION_BASE) << "/" << _os_get_size_ram(MEMREGION_BASE) << std::endl;
-    std::cout << "[INFO] Free M_LIN: " << _os_get_free_linear_ram() << "/" << Global.linearSpaceFree << std::endl;
-
+#ifdef THREEDS_BUILD
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free Vram: " << _os_get_free_vram() / 1024 << "KB" << std::endl;
+	std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_ALL: " << _os_get_free_ram(MEMREGION_ALL) / 1024 << "/" << _os_get_size_ram(MEMREGION_ALL) / 1024 << "KB" << std::endl;
+	std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_APP: " << _os_get_free_ram(MEMREGION_APPLICATION) / 1024 << "/" << _os_get_size_ram(MEMREGION_APPLICATION) / 1024 << "KB" << std::endl;
+	std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_SYS: " << _os_get_free_ram(MEMREGION_SYSTEM) / 1024 << "/" << _os_get_size_ram(MEMREGION_SYSTEM) / 1024 << "KB" << std::endl;
+	std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_BSE: " << _os_get_free_ram(MEMREGION_BASE) / 1024<< "/" << _os_get_size_ram(MEMREGION_BASE) / 1024 << "KB" << std::endl;
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_LIN: " << _os_get_free_linear_ram() / 1024 << "/" << Global.linearSpaceFree / 1024 << "KB" << std::endl;
+#endif
     // Wait for rendering thread to be ready
     while(!Global.readyForGameLoop){
         // waiting for the render loop to be initialized
@@ -382,7 +383,7 @@ int main(){
     }
     
     // Signal the end of program
-    std::cout << "[INFO] exiting...\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "exiting...\n";
     
     // Make sure that the gpu has done drawing whatever it had in its buffer... if a frame is taking more than half a second we have other problems...
     SleepInMs(500); 
@@ -394,16 +395,16 @@ int main(){
     MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
     MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
     MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-    std::cout << "[INFO] unloading current situation\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "unloading current situation\n";
     Global.CurrentState->initDone = 3;
     
     
-    std::cout << "[INFO] locked the switching state\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "locked the switching state\n";
 
     // Unload current state, which may involve texture operations...
-    std::cout << "[INFO] calling unload\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "calling unload\n";
     Global.CurrentState->unload();
-    std::cout << "[INFO] done unloading\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "done unloading\n";
     
 
     // Reset to start? Maybe?
@@ -416,14 +417,14 @@ int main(){
     // Signal to kill rendering thread
     SleepInMs(5);
     Global.stop = true;
-    std::cout << "[INFO] Signaling stop to render thread\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << " Signaling stop to render thread\n";
 
     _multithread_join_thread(&renderThread);
     _multithread_free_thread(&renderThread);
 
     deleteGlobalVariables();
 
-    std::cout << "[INFO] bye bye :3 ~!\n";
+    std::cout <<  "\e[1;38;5;236m[INFO] \e[38;5;206m"  << "bye bye :3 ~!\n";
     SleepInMs(200);
 
     // Exit stuff

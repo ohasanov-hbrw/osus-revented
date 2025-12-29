@@ -304,7 +304,7 @@ void Slider::init(){
                             renderPoints.pop_back();
                         }
                         else{
-                            std::cout << "ya wtf ya \n";
+                            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "ya wtf ya \n";
                             renderPoints.push_back(tempEdges[0]);
                         }
                         curveIndex++;
@@ -904,8 +904,7 @@ void Slider::render(){
             else
                 sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
                                           (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset));
-            std::cout << "loaded legacy texture" << std::endl;
-            std::cout << renderPoints.size() << std::endl;
+            std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded legacy texture with length " << renderPoints.size()<< std::endl;
         }
         else
             sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)),

@@ -132,7 +132,7 @@ void GameManager::update(){
 	if(timingSettingsForHitObject.size() == 0){
 		int i = lastTimingLoc;
 		if(gameFile.timingPoints.size() == 0){
-			std::cout << "missing timingpoints? cant do much. crash imminent." << std::endl;
+			std::cout << "\e[1;38;5;52m[ERR] \e[38;5;52m" << "missing timingpoints? cant do much. crash imminent." << std::endl;
 		}
 		else{
 			tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
@@ -771,7 +771,7 @@ void GameManager::run(){
 		StopMusicStream(&backgroundMusic);
 		TimerLast = (double)GetMusicTimeLength(&backgroundMusic) * 1000.0;
 		TimeLast = getTimer();
-		std::cout << "waiting for 0.25 secs for the song to end\n";
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "waiting for 0.25 secs for the song to end\n";
 		while(true){
 			currentTime = (double)(TimerLast + (getTimer() - TimeLast)) / 1000.0;
 			GameManager::update();
@@ -788,12 +788,12 @@ void GameManager::run(){
 		Global.CurrentState->initDone = 3;
 		//MutexUnlock(ACCESSING_OBJECTS);
 		MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-		std::cout << "trying to lock render block for game unload" << std::endl;
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to lock render block for game unload" << std::endl;
 		MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
 
 		//MutexLock(ACCESSING_OBJECTS);
 		
-		std::cout << "trying to lock switch block for game unload" << std::endl;
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to lock switch block for game unload" << std::endl;
 		MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
 		
 		Global.CurrentState->unload();
@@ -816,7 +816,7 @@ void GameManager::run(){
 		//std::cout << Time << std::endl;
 	}
 	if(Global.startTime >= 0 and startMusic){
-		std::cout << "Starting Music Playback (only mp3 supported)" << std::endl;
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Starting Music Playback" << std::endl;
 		PlayMusicStream(&backgroundMusic);
 		//Global.volume = 1.0f;
 		//std::cout << Global.volume << std::endl;
@@ -835,7 +835,7 @@ void GameManager::run(){
 		startMusic = false;
 		double Time = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
 		double amog = getTimer();
-		std::cout << "Extra Judgement Time in ms " << Global.extraJudgementTime << std::endl;
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;51m" << "Extra Judgement Time in ms " << Global.extraJudgementTime << std::endl;
 
 		Global.LastFrameTime = getTimer();
 	}
@@ -861,7 +861,7 @@ void GameManager::run(){
 			StopMusicStream(&backgroundMusic);
 			TimerLast = (double)GetMusicTimeLength(&backgroundMusic) * 1000.0;
 			TimeLast = getTimer();
-			std::cout << "waiting for 1.5 secs for the song to end\n";
+			std::cout << "\e[1;38;5;236m[INFO] \e[38;5;40m" << "waiting for 1.5 secs for the beatmap to end\n";
 			while(true){
 				currentTime = (double)(TimerLast + (getTimer() - TimeLast)) / 1000.0;
 				GameManager::update();
@@ -878,12 +878,12 @@ void GameManager::run(){
 			Global.CurrentState->initDone = 3;
             //MutexUnlock(ACCESSING_OBJECTS);
 			MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-			std::cout << "trying to lock render block for game unload" << std::endl;
+			std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to lock render block for game unload" << std::endl;
 			MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
 
             //MutexLock(ACCESSING_OBJECTS);
             
-			std::cout << "trying to lock switch block for game unload" << std::endl;
+			std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to lock switch block for game unload" << std::endl;
 			MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
 			
 			Global.CurrentState->unload();
@@ -1321,9 +1321,9 @@ void GameManager::loadGame(std::string filename){
 	Parser parser = Parser();
 	Global.loadingState = 5;
 	gameFile.configGeneral["SampleSet"] = "Normal";
-	std::cout << "Parsing game!" << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parsing game!" << std::endl;
 	gameFile = parser.parse(filename);
-    std::cout << "Found " << gameFile.hitObjects.size() << " HitObjects and " << gameFile.timingPoints.size() << " Timing Points!" << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Found " << gameFile.hitObjects.size() << " HitObjects and " << gameFile.timingPoints.size() << " Timing Points!" << std::endl;
 	Global.loadingState = 1;
 	Global.numberLines = gameFile.hitObjects.size();
     Global.parsedLines = 0;
@@ -1382,7 +1382,7 @@ void GameManager::loadGame(std::string filename){
 	float circlesize2 = 54.4f - (4.48f * std::stof(gameFile.configDifficulty["CircleSize"]));
 
 	//precalculate all the sliders and check how long we need to wait for it
-	std::cout << "Loading sliders..." << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;20m" << "Loading sliders..." << std::endl;
 	double start = getTimer();
 	int amountOfSliders = 0;
 	for(int i = 0; i < gameFile.hitObjects.size(); i++){
@@ -1585,7 +1585,7 @@ void GameManager::loadGame(std::string filename){
 		//std::cout << "Calculated object at time: " << gameFile.hitObjects[i].time << std::endl;
 		amountOfSliders++;
 	}
-	std::cout << amountOfSliders << " Sliders precalculated in " << getTimer() - start << "ms" << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;32m" << amountOfSliders << " Sliders precalculated in " << getTimer() - start << "ms" << std::endl;
 	
 	
 
@@ -1836,17 +1836,18 @@ void GameManager::loadGame(std::string filename){
 
 	difficultyMultiplier = (((hpdrainrate + std::stof(gameFile.configDifficulty["CircleSize"]) + overalldifficulty) + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(&backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
 	
-	std::cout << hpdrainrate << " " << std::stof(gameFile.configDifficulty["CircleSize"]) << " " << overalldifficulty << " " << (float)gameFile.hitObjects.size() / GetMusicTimeLength(&backgroundMusic) * 8.f << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "hp cs od ??: " <<  hpdrainrate << " " << std::stof(gameFile.configDifficulty["CircleSize"]) << " " << overalldifficulty << " " << (float)gameFile.hitObjects.size() / GetMusicTimeLength(&backgroundMusic) * 8.f << std::endl;
 
 
 
-	std::cout << "Free Vram: " << _os_get_free_vram() << std::endl;
-	std::cout << "Free M_ALL: " << _os_get_free_ram(MEMREGION_ALL) << "/" << _os_get_size_ram(MEMREGION_ALL) << std::endl;
-	std::cout << "Free M_APP: " << _os_get_free_ram(MEMREGION_APPLICATION) << "/" << _os_get_size_ram(MEMREGION_APPLICATION) << std::endl;
-	std::cout << "Free M_SYS: " << _os_get_free_ram(MEMREGION_SYSTEM) << "/" << _os_get_size_ram(MEMREGION_SYSTEM) << std::endl;
-	std::cout << "Free M_BSE: " << _os_get_free_ram(MEMREGION_BASE) << "/" << _os_get_size_ram(MEMREGION_BASE) << std::endl;
-	std::cout << "Free M_LIN: " << _os_get_free_linear_ram() << "/" << Global.linearSpaceFree << std::endl;
-
+#ifdef THREEDS_BUILD
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free Vram: " << _os_get_free_vram() / 1024 << "KB" << std::endl;
+	std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_ALL: " << _os_get_free_ram(MEMREGION_ALL) / 1024 << "/" << _os_get_size_ram(MEMREGION_ALL) / 1024 << "KB" << std::endl;
+	std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_APP: " << _os_get_free_ram(MEMREGION_APPLICATION) / 1024 << "/" << _os_get_size_ram(MEMREGION_APPLICATION) / 1024 << "KB" << std::endl;
+	std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_SYS: " << _os_get_free_ram(MEMREGION_SYSTEM) / 1024 << "/" << _os_get_size_ram(MEMREGION_SYSTEM) / 1024 << "KB" << std::endl;
+	std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_BSE: " << _os_get_free_ram(MEMREGION_BASE) / 1024<< "/" << _os_get_size_ram(MEMREGION_BASE) / 1024 << "KB" << std::endl;
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_LIN: " << _os_get_free_linear_ram() / 1024 << "/" << Global.linearSpaceFree / 1024 << "KB" << std::endl;
+#endif
 
 
 
@@ -1892,12 +1893,12 @@ void GameManager::unloadGame(){
 	MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
 	MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
 	
-	std::cout << "unlocking the hold access lock\n";
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "unlocking the hold access lock\n";
 	//MutexUnlock(SWITCHING_STATE);
 	while(true){
 		SleepInMs(500);
 		
-		std::cout << "waiting for textures to unload\n";
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;32m" << "waiting for textures to unload\n";
 		if(Global.GameTextures == 15)
 			break;
 		
@@ -2020,7 +2021,6 @@ void GameManager::loadGameTextures(){
 	ImageColorReplace(&tempImage, {255,255,255,159}, {255,255,255,0});
 	sliderin = LoadTextureFromImage(&tempImage);
 	UnloadImage(&tempImage);
-	std::cout << "loaded tempImage to memory done, press select to continue" << std::endl;
 	Image tempImage2 = GenImageGradientRadial(sliderin.width, sliderin.height, 0.1, {255,0,0,255}, {0,0,0,0});
 	sliderblank = LoadTexture((Global.GamePath + "/resources/SliderBlank.png").c_str());
 	//sliderout = LoadTexture((Global.GamePath + "/resources/SliderBlank.png").c_str());
@@ -2113,10 +2113,10 @@ void GameManager::loadGameTextures(){
 
 	for(int i = 0; i < (int)gameFile.events.size(); i++){
 		if(gameFile.events[i].eventType == 0){
-			std::cout << "Time: " << gameFile.events[i].startTime << "ms - Filename: " << gameFile.events[i].filename << '.' << std::endl;
+			std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Time: " << gameFile.events[i].startTime << "ms - Filename: " << gameFile.events[i].filename << '.' << std::endl;
 			if(gameFile.events[i].startTime < 10000){
 				gameFile.events[i].startTime -= 87000;
-				std::cout << "Time changed to: " << gameFile.events[i].startTime << std::endl;
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Time changed to: " << gameFile.events[i].startTime << std::endl;
 			}
 		}
 	}
@@ -2130,7 +2130,7 @@ void GameManager::loadGameTextures(){
 	for(int i = 0; i < files.size(); i++){
 		for(int j = 0; j < (int)gameFile.events.size(); j++){
 			if(gameFile.events[j].eventType == 0){
-				std::cout << "attempting to load a background\n";
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "attempting to load a background\n";
 				int t = gameFile.events[j].filename.size() - 1;
 				while(gameFile.events[j].filename[t] == ' ' and t >= 0){
 					gameFile.events[j].filename.pop_back();
@@ -2150,14 +2150,14 @@ void GameManager::loadGameTextures(){
 					while(true){
 						if(image.width / divider > OSUS_MAX_TEXTURE_WIDTH or image.height / divider > OSUS_MAX_TEXTURE_HEIGHT){
 							divider += 1;
-							std::cout << "TOO BIG OF AN IMAGE!" << std::endl;
+							std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "TOO BIG OF AN IMAGE!" << std::endl;
 							
 						}
 						else{
 							break;
 						}
 					}
-					std::cout << "RESIZING TO" << (int)(image.height / divider) << " x " << (int)(image.width / divider) << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "RESIZING TO" << (int)(image.height / divider) << " x " << (int)(image.width / divider) << std::endl;
 					//std::cout << "resize" << std::endl;
 					//SleepInMs(200);
 					int resizeW = (int)(image.width / divider);
@@ -2176,7 +2176,7 @@ void GameManager::loadGameTextures(){
 					backgroundTextures.pos[gameFile.events[j].filename] = {static_cast<float>(gameFile.events[j].xOffset), static_cast<float>(gameFile.events[j].yOffset)};
 					if(backgroundTextures.data[gameFile.events[j].filename].width != 0){
 						backgroundTextures.loaded[gameFile.events[j].filename].value = true;
-						std::cout << "Loaded: Background with filename: " << gameFile.events[j].filename << std::endl;
+						std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded background: " << get_filename(gameFile.events[j].filename) << std::endl;
 						SetTextureFilter(&backgroundTextures.data[gameFile.events[j].filename], TEXTURE_FILTER_BILINEAR) ;
 					}
 					
@@ -2195,7 +2195,7 @@ void GameManager::loadGameTextures(){
 }
 
 void GameManager::unloadGameTextures(){
-	std::cout << "Unloading Textures" << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloading Textures" << std::endl;
     Global.GameTextures = 2;
     UnloadTexture(&hitCircleOverlay);
     UnloadTexture(&hitCircle);
@@ -2227,7 +2227,7 @@ void GameManager::unloadGameTextures(){
     std::string key;
     for(std::map<std::string, Texture2D>::iterator it = backgroundTextures.data.begin(); it != backgroundTextures.data.end(); ++it){
         key = it->first;
-        std::cout << "Removed: " << it->first << "\n";
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloaded background: " << it->first << "\n";
         UnloadTexture(&backgroundTextures.data[key]);
     }
 
@@ -2235,7 +2235,7 @@ void GameManager::unloadGameTextures(){
 
 
 	Global.GameTextures = 10;
-	std::cout << "Unloading STUFF" << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Started unloading hitobjects" << std::endl;
 	backgroundTextures.data.clear();
     backgroundTextures.pos.clear();
     backgroundTextures.loaded.clear();
@@ -2253,7 +2253,7 @@ void GameManager::unloadGameTextures(){
 		if(deadHitObject->data.type == 2){
 			if(Slider* tempslider = dynamic_cast<Slider*>(deadHitObject)){
 				tempslider->readyToDelete = true;
-				std::cout << "Unloading SLIDER" << std::endl;
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloading slider at time " << tempslider->data.time << std::endl;
 			}
 		}
 		
@@ -2273,7 +2273,7 @@ void GameManager::unloadGameTextures(){
 		if(hitObject->data.type == 2){
 			if(Slider* tempslider = dynamic_cast<Slider*>(hitObject)){
 				tempslider->readyToDelete = true;
-				std::cout << "Unloading SLIDER" << std::endl;
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloading slider at time " << tempslider->data.time << std::endl;
 			}
 		}
 		
@@ -2668,9 +2668,9 @@ void GameManager::loadGameSounds(){
 	std::string last = Global.Path;
 	std::string dontTouch = gameFile.configGeneral["AudioFilename"];
 	Global.Path = GamePathWithSlash;
-	std::cout << GamePathWithSlash << std::endl;
+	//std::cout << GamePathWithSlash << std::endl;
 	std::vector<std::string> ComboBreak = ls(".wav");
-	std::cout << ComboBreak.size() << std::endl;
+	//std::cout << ComboBreak.size() << std::endl;
 	if(Global.settings.useDefaultSounds) ComboBreak.clear();
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
@@ -2680,7 +2680,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "[INFO] Loaded " << ComboBreak[i] << " from beatmap files" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded " << ComboBreak[i] << " from beatmap files" << std::endl;
 				}
 			}
 		}
@@ -2694,7 +2694,7 @@ void GameManager::loadGameSounds(){
 			SoundFilesAll.data[name] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
 			SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 			if(SoundFilesAll.loaded[name].value){
-				std::cout << "[INFO] Loaded " << name << " from beatmap files" << std::endl;
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded " << name << " from beatmap files" << std::endl;
 			}
 		}
 		
@@ -2710,7 +2710,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from game" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from game" << std::endl;
 				}
 			}
 		}
@@ -2724,7 +2724,7 @@ void GameManager::loadGameSounds(){
 			SoundFilesAll.data[name] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
 			SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 			if(SoundFilesAll.loaded[name].value){
-				std::cout << "loaded " << name << " from game" << std::endl;
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from game" << std::endl;
 			}
 		}
 	}
@@ -2739,7 +2739,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from game" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from game" << std::endl;
 				}
 			}
 		}
@@ -2753,7 +2753,7 @@ void GameManager::loadGameSounds(){
 			SoundFilesAll.data[name] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
 			SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 			if(SoundFilesAll.loaded[name].value){
-				std::cout << "loaded " << name << " from game" << std::endl;
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from game" << std::endl;
 			}
 		}
 	}
@@ -2768,7 +2768,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from skin" << std::endl;
 				}
 			}
 		}
@@ -2781,7 +2781,7 @@ void GameManager::loadGameSounds(){
 				if(SoundFilesAll.loaded[name].value){
 					//std::filesystem::path p{Global.Path + ComboBreak[i]};
 					//loadedBytes += std::filesystem::file_size(p);
-					std::cout << "loaded " << name << " from skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from skin" << std::endl;
 				}
 			}
 		}
@@ -2796,7 +2796,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from skin" << std::endl;
 				}
 			}
 		}
@@ -2807,7 +2807,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
-					std::cout << "loaded " << name << " from skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from skin" << std::endl;
 				}
 			}
 		}
@@ -2823,7 +2823,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from skin" << std::endl;
 				}
 			}
 		}
@@ -2834,7 +2834,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
-					std::cout << "loaded " << name << " from skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from skin" << std::endl;
 				}
 			}
 		}
@@ -2852,7 +2852,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
 				}
 			}
 		}
@@ -2863,7 +2863,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
-					std::cout << "loaded " << name << " from default skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from default skin" << std::endl;
 				}
 			}
 		}
@@ -2877,7 +2877,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
 				}
 			}
 		}
@@ -2888,7 +2888,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
-					std::cout << "loaded " << name << " from default skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from default skin" << std::endl;
 				}
 			}
 		}
@@ -2902,7 +2902,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
-					std::cout << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
 				}
 			}
 		}
@@ -2913,7 +2913,7 @@ void GameManager::loadGameSounds(){
 				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
-					std::cout << "loaded " << name << " from default skin" << std::endl;
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from default skin" << std::endl;
 				}
 			}
 		}
@@ -2927,7 +2927,7 @@ void GameManager::loadGameSounds(){
 
 	/*SetSoundVolume(&SoundFilesAll.data["combobreak"], 1.0f);
 	PlaySound(&SoundFilesAll.data["combobreak"]);*/
-	std::cout << "loaded " << loadedBytes / 1024 << "KB of sound data" << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << loadedBytes / 1024 << "KB of sound data" << std::endl;
 	Global.Path = last;
 	
 }

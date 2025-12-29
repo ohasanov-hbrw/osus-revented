@@ -11,6 +11,7 @@
 #include "stb_vorbis.h"
 
 #include "globals.hpp"
+#include "fs.hpp"
 
 #define MAKEDWORD(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 
@@ -20,7 +21,7 @@ int loadogg(const char *fileName, Sound *sound){
     file = fopen(fileName,"r");
     
     if(file == NULL){
-        std::cout << "CANT OPEN FILE " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to open: " << get_filename(fileName) << std::endl;
         fclose(file);
         return 0;
     }
@@ -32,7 +33,7 @@ int loadogg(const char *fileName, Sound *sound){
     uint8_t *fileBuffer = (uint8_t *)malloc(lSize * sizeof(uint8_t));
     
     if(fread(fileBuffer, sizeof(uint8_t), lSize, file) != lSize){
-        std::cout << "CANT READ FILE " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS]\e[38;5;88m" << "Failed to read: " << get_filename(fileName) << std::endl;
         free(fileBuffer);
         fclose(file);
         return 0;
@@ -45,7 +46,7 @@ int loadogg(const char *fileName, Sound *sound){
     short *sampleBuffer;
     int samplesDecoded = stb_vorbis_decode_memory(fileBuffer, lSize, &channels, &sampleRate, &sampleBuffer);
     if(samplesDecoded <= 0){
-        std::cout << "Failed to decode ogg\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to decode ogg\n";
         free(fileBuffer);
         return 0;
     }
@@ -153,7 +154,7 @@ int loadwav(const char *fileName, Sound *sound){
     file = fopen(fileName,"r");
     
     if(file == NULL){
-        std::cout << "CANT OPEN FILE " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to open: " << get_filename(fileName) << std::endl;
         fclose(file);
         return 0;
     }
@@ -165,7 +166,7 @@ int loadwav(const char *fileName, Sound *sound){
     uint8_t *fileBuffer = (uint8_t *)malloc(lSize * sizeof(uint8_t));
     
     if(fread(fileBuffer, sizeof(uint8_t), lSize, file) != lSize){
-        std::cout << "CANT READ FILE " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to read: " << get_filename(fileName) << std::endl;
         free(fileBuffer);
         fclose(file);
         return 0;
@@ -175,13 +176,13 @@ int loadwav(const char *fileName, Sound *sound){
 
     drwav wav;
     if (!drwav_init_memory(&wav, fileBuffer, lSize, NULL)) {
-        std::cout << "Error: Could not open wav\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Could not open wav\n";
         free(fileBuffer);
         return 0;
     }
 
     if(wav.totalPCMFrameCount < 100){
-        std::cout << "Too small of a file..?\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;220m" << "Empty wav...\n";
         free(fileBuffer);
         return 0;
     }
@@ -299,7 +300,7 @@ int loadmp3(const char *fileName, Sound *sound){
     file = fopen(fileName,"r");
     
     if(file == NULL){
-        std::cout << "CANT OPEN FILE " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to open: " << get_filename(fileName) << std::endl;
         fclose(file);
         return 0;
     }
@@ -311,7 +312,7 @@ int loadmp3(const char *fileName, Sound *sound){
     uint8_t *fileBuffer = (uint8_t *)malloc(lSize * sizeof(uint8_t));
     
     if(fread(fileBuffer, sizeof(uint8_t), lSize, file) != lSize){
-        std::cout << "CANT READ FILE " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "Failed to read: " << get_filename(fileName) << std::endl;
         free(fileBuffer);
         fclose(file);
         return 0;
@@ -321,9 +322,9 @@ int loadmp3(const char *fileName, Sound *sound){
 
     mp3dec_ex_t* decoder = (mp3dec_ex_t*)malloc(sizeof(mp3dec_ex_t));
     int error = mp3dec_ex_open_buf(decoder, fileBuffer, lSize, MP3D_SEEK_TO_SAMPLE);
-    std::cout << error << std::endl;
+    //std::cout << error << std::endl;
     if(error){
-        std::cout << "CANT OPEN MP3 FILE????\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Could not open mp3: e" << error << std::endl;
         free(fileBuffer);
         free(decoder);
         return 0;
@@ -434,15 +435,15 @@ int loadmp3(const char *fileName, Sound *sound){
         
         offset += read;
         if(read == 0){
-            std::cout << "nothing left to read\n";
+            std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "mp3 finished\n";
             break;
         }
         else if(read != samplesReadAtOneTime){
-            std::cout << "nearing eof?\n";
+            std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "mp3 ending soon\n";
         }
     }
 
-    std::cout << offset << std::endl;
+    std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "mp3 offset:" << offset << std::endl;
 
     /*ndspWaveBuf waveBuf;
     memset(&waveBuf,0,sizeof(waveBuf));
@@ -487,7 +488,7 @@ Sound decodeSoundFromFile(const char *fileName){
     file = fopen(fileName,"r");
     
     if(file == NULL){
-        std::cout << "CANT OPEN FILE " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to open: " << get_filename(fileName) << std::endl;
         fclose(file);
         return sound;
     }
@@ -501,7 +502,7 @@ Sound decodeSoundFromFile(const char *fileName){
     u32 tag;
     //std::cout << "reading tag\n";
     if(fread(&tag, 1, 4, file) != 4){
-        std::cout << "CANT READ FILE " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "Failed to read: " << get_filename(fileName) << std::endl;
         fclose(file);
         return sound;
     }
@@ -510,19 +511,19 @@ Sound decodeSoundFromFile(const char *fileName){
     //std::cout << "closed file\n";
 
     if(tag == (u32)MAKEDWORD('O','g','g','S')){
-        std::cout << "ogg file: " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "ogg file: " << get_filename(fileName) << std::endl;
         loadogg(fileName, &sound);
     } 
     else if(tag == (u32)MAKEDWORD('R','I','F','F')){
-        std::cout << "wav file: " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "wav file: " << get_filename(fileName) << std::endl;
         loadwav(fileName, &sound);
     }
     else if(loadmp3(fileName, &sound) == 1){
-        std::cout << "mp3 file: " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "mp3 file: " << get_filename(fileName) << std::endl;
     }
     else{
-        std::cout << "no. file: " << fileName << std::endl;
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "no. file: " << get_filename(fileName) << std::endl;
     }
-    std::cout << Global.totalNumOfSamples * 2 << " bytes loaded total in audio memory" << std::endl;
+    std::cout << "\e[1;36m[3DS] \e[38;5;236m" << Global.totalNumOfSamples * 2 << " bytes loaded total in audio memory" << std::endl;
     return sound;
 }

@@ -9,6 +9,8 @@
 #include "minimp3.h"
 #include "minimp3_ex.h"
 
+#include "stb_vorbis.h"
+
 #define RAYLIB_VERSION  "version3dscustomosus"
 
 //----------------------------------------------------------------------------------
@@ -395,6 +397,8 @@ typedef struct Music {
     bool loaded = false;
     float volume = 1.0f;
     mp3dec_ex_t* decoder;
+    stb_vorbis* oggdecoder;
+    bool oggplayback = false;
     bool memory = false;
     uint8_t * fileBuffer;
     size_t fileSize;

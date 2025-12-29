@@ -234,16 +234,16 @@ void LoadMenu::update() {
                 std::string final_path = Global.GamePath + "/beatmaps/" + base_file; //  may be a bit cringe when it comes to unzipping stuff...
                 final_path = correct_path_notation(final_path);
                 if(check_dir(final_path)){
-                    std::cout << "the path already exists?" << std::endl;
+                    std::cout << "\e[1;38;5;219m[ZIP] \e[38;5;220m" << "the path already exists?" << std::endl;
                 }
                 else{
-                    std::cout << "trying to unzip new beatmap" << std::endl;
+                    std::cout << "\e[1;38;5;219m[ZIP] \e[38;5;219m" << "trying to unzip new beatmap" << std::endl;
                     create_dir(final_path);
                     int arg = 2;
                     //std::cout << Global.selectedPath.c_str() << std::endl;
                     print_dir(final_path);
                     int res = zip_extract(Global.selectedPath.c_str(), final_path.c_str(), on_extract_entry, NULL);
-                    std::cout << res << std::endl;
+                    std::cout << "\e[1;38;5;219m[ZIP] \e[38;5;219m" << "ZIP errorcode:" << res << std::endl;
                 }
             }
         }
@@ -622,7 +622,7 @@ void MainMenu::update() {
                     std::string GameAuthor;
 
                     if(geym.configMetadata.find("BeatmapSetID") == geym.configMetadata.end()){
-                        std::cout << "didnt find setid bro, tryin to improvise\n";
+                        std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m" << "didnt find setid bro, tryin to improvise\n";
                         std::string doublecheck = p.path().parent_path().filename().string();
                         int index = 0;
                         bool works = false;
@@ -655,7 +655,7 @@ void MainMenu::update() {
                     }
 
                     if(geym.configMetadata.find("Title") == geym.configMetadata.end()){
-                        std::cout << "didnt title bro, setting as Unknown\n";
+                        std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m" << "didnt title bro, setting as Unknown\n";
                         GameTitle = "Unknown";
                     }
                     else{
@@ -663,7 +663,7 @@ void MainMenu::update() {
                     }
 
                     if(geym.configMetadata.find("Artist") == geym.configMetadata.end()){
-                        std::cout << "didnt find artist bro, setting as Unknown\n";
+                        std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m" << "didnt find artist bro, setting as Unknown\n";
                         GameAuthor = "Unknown";
                     }
                     else{
@@ -988,7 +988,7 @@ void Game::update() {
             initDone = -1;
         }
         if(initDone == -1 and getTimer() - initStartTime > 0.0f){
-            std::cout << "init done in " << getTimer() - initStartTime << " secs\n";
+            std::cout << "\e[1;38;5;236m[INFO] \e[38;5;40m" << "init done in " << getTimer() - initStartTime << " secs\n";
             initDone = 1;
         }
     }
@@ -1092,21 +1092,21 @@ void Game::textureOps(){
     }
 
     if(Global.GameTextures == 1){
-        std::cout << "trying to get lock for object access for game texture load" << std::endl;
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to get lock for object access for game texture load" << std::endl;
         MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
-        std::cout << "got lock for object access for game texture load" << std::endl;
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "got lock for object access for game texture load" << std::endl;
         Global.gameManager->loadGameTextures();
         MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
-        std::cout << "loaded textures and unlocked access lock" << std::endl;
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded textures and unlocked access lock" << std::endl;
     }
 
     if(Global.GameTextures == -1){
-        std::cout << "trying to get lock for object access for game texture unload" << std::endl;
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to get lock for object access for game texture unload" << std::endl;
         MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
-        std::cout << "got lock for object access for game texture unload" << std::endl;
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "got lock for object access for game texture unload" << std::endl;
         Global.gameManager->unloadGameTextures();
         MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
-        std::cout << "unloaded textures and unlocked access lock" << std::endl;
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "unloaded textures and unlocked access lock" << std::endl;
     }
     
 
@@ -1988,8 +1988,8 @@ void WipMenu2::unload() {
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(ACCESSING_OBJECTS);
     //MutexLock(ACCESSING_OBJECTS);
-    std::cout << "locking render\n";
-    std::cout << "starting menu unload\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "locking render\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "starting menu unload\n";
     locations.clear();
     locations = std::list<MenuItem>();
 

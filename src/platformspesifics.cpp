@@ -90,7 +90,7 @@ void _multithread_free_thread(MULTITHREAD_THREAD * thread){
         threadFree(*thread);
     #endif
     #ifndef THREEDS_BUILD
-        std::cout << "IDK HOW TO FREE THREADS IN STDLIB?????" << std::endl;
+        //std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "IDK HOW TO FREE THREADS IN STDLIB?????" << std::endl;
     #endif
 }
 
@@ -182,11 +182,11 @@ void _gpu_init_render_thread(){
         C3D_Init(0x100000);//C3D_DEFAULT_CMDBUF_SIZE);
         C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
         
-        std::cout << "WAITING FOR 0.5SECS\n";
+        std::cout << "\e[1;36m[3DS] \033[38;5;236m" << "WAITING FOR 0.5SECS\n";
 
         SleepInUs(1*500*1000);
 
-        std::cout << "C2D INIT\n";
+        std::cout << "\e[1;36m[3DS] \033[38;5;236m"<< "C2D INIT\n";
         
         
         if(Global.useTopScreen){
@@ -214,13 +214,13 @@ void _gpu_init_render_thread(){
     #endif
     #ifndef THREEDS_BUILD
         SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), GetWindowGL());
-        std::cout << "Render make gl current\n";
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Render make gl current\n";
         BeginDrawing();
         ClearBackground(Global.Background);
         rlDrawRenderBatchActive();
         SDL_GL_SwapWindow((SDL_Window*)GetWindowSDL());
 
-        std::cout << "Clear first bg\n";
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Clear first bg\n";
     #endif
 }
 
@@ -243,7 +243,7 @@ void _gpu_exit_render_thread(){
 void _gpu_check_command_buffer(){
     #ifdef THREEDS_BUILD
         if(C3D_GetCmdBufUsage() > 0.8f){
-            std::cout << "NEARLY OVERFLOWING THE COMMAND BUFFER, BEWARE: " << C3D_GetCmdBufUsage() * 100.0f << "%\n";
+            std::cout << "\e[1;36m[3DS] \033[38;5;220m" << "CMDBUF OVERFLOW: " << C3D_GetCmdBufUsage() * 100.0f << "%\n";
         }
     #endif
     #ifndef THREEDS_BUILD
@@ -285,16 +285,16 @@ void _os_init_program(bool VSYNC){
         consoleGetDefault()->fg = 23;
         
         if(Global.useTopScreen){
-            consoleInit(GFX_BOTTOM, NULL);
+            consoleInit(GFX_BOTTOM, Global.pc);
         }
         else{
-            consoleInit(GFX_TOP, NULL);
+            consoleInit(GFX_TOP, Global.pc);
         }
 
         //consoleGetDefault()->flags &= ~CONSOLE_COLOR_BOLD;
         //consoleGetDefault()->flags |= CONSOLE_COLOR_FAINT;
         consoleGetDefault()->fg = 23;
-        std::cout << "Loaded gpu\n";
+        std::cout << "\e[1;36m[3DS] \033[38;5;200m" << "By ohasanov :3 with love <3\n";
     #endif
     #ifndef THREEDS_BUILD
         SDL_SetMainReady();
@@ -321,7 +321,7 @@ void _os_init_program(bool VSYNC){
         SDL_FreeSurface(pIcon);
 
         SDL_GL_SetSwapInterval(VSYNC);
-        std::cout << "SetVsync\n";
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "SetVsync\n";
         SDL_GL_MakeCurrent((SDL_Window*)GetWindowSDL(), NULL);
     #endif
 }

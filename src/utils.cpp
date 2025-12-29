@@ -6,6 +6,7 @@
 #include <gamemanager.hpp>
 #include <ctype.h>
 #include <parser.hpp>
+#include <iostream>
 
 
 
@@ -25,7 +26,7 @@ void MutexLock(int i, int j){
     if(i > 31) i = 31;
     if(i < 0) i = 0;
     if(__mutex_threads_locks[i][j]){
-        std::cout << "[CRIT] Thread " << j << " tried to relock " << i << std::endl;
+        std::cout << "\e[38;5;196m[CRIT] " << "Thread " << j << " tried to relock " << i << std::endl;
         return;
     }
     __mutex_threads_locks[i][j] = true;
@@ -53,7 +54,7 @@ void MutexUnlock(int i, int j){
     if(i > 31) i = 31;
     if(i < 0) i = 0;
     if(!__mutex_threads_locks[i][j]){
-        std::cout << "[CRIT] Thread " << j << " tried to relock " << i << std::endl;
+        std::cout << "\e[38;5;196m[CRIT] " << "Thread " << j << " tried to reunlock " << i << std::endl;
         return;
     }
     __mutex_threads_locks[i][j] = false;

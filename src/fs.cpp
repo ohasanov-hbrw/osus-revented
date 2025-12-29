@@ -87,19 +87,26 @@ std::string correct_path_notation(const std::string &path){
 // Debug, print string as a directory, both local and absolute
 void print_dir(const std::string &path){
     fs::path path_p(path);
-    std::cout << path_p << " or " << fs::absolute(path_p) << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << path_p << " or " << fs::absolute(path_p) << std::endl;
     return;
 }
 
 // Getting a file's name without the extension
 std::string get_without_ext(const std::string& path) {
-    fs::path path_p(Global.selectedPath);
+    fs::path path_p(path);
     return path_p.stem().string();
 }
 
+// Get filename
+std::string get_filename(const std::string& path) {
+    fs::path path_p(path);
+    return path_p.filename().string();
+}
+
+
 // Something about the zip library I am using needed this...
 int on_extract_entry(const char *filename, void *arg) {
-    std::cout << "[INFO] Extracted file " << filename << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;40m" << "Extracted file " << filename << std::endl;
     return 0;
 }
 

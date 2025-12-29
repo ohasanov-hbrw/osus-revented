@@ -87,6 +87,7 @@ When you encounter a bug, or see something missing, just report it using the "Is
 ## TODO List:
 - [x] Create a TODO list.
 - [x] Create a codebase for the 3DS Builds
+- [x] Implement .ogg playback for the 3DS
 - [ ] Debug some memory problems 
 - [ ] Menu rewrite
 - [ ] Error management

@@ -489,14 +489,14 @@ Texture2D LoadTexture(const char *fileName){
     while(true){
         if(image.width / divider > 128 or image.height / divider > 128){
             divider += 1;
-            std::cout << "TOO BIG OF AN IMAGE!" << std::endl;
+            std::cout << "\e[1;36m[3DS] \e[38;5;220m" << "Too big of an Image for the 3DS!" << std::endl;
             
         }
         else{
             break;
         }
     }
-    std::cout << "RESIZING TO" << (int)(image.height / divider) << " x " << (int)(image.width / divider) << std::endl;
+    std::cout << "\e[1;36m[3DS] \e[38;5;17m" << "Resizing to: " << (int)(image.height / divider) << " x " << (int)(image.width / divider) << std::endl;
     //std::cout << "resize" << std::endl;
     //SleepInMs(200);
     int initialW = (int)image.width;
@@ -1251,10 +1251,10 @@ RenderTexture2D LoadRenderTexture(int width, int height, bool vram){
         //std::cout << "texinitdone.\n";
 		if(target.texture.id == 0){
             target.id = 0;
-            std::cout << "TEXTURE INIT FAILED, MAYBE RUNNING OUT OF MEMORYY" << "bytes\n";
+            std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "TEXTURE INIT FAILED, MAYBE RUNNING OUT OF MEMORYY" << "bytes\n";
             return target;
         }
-        std::cout << target.texture.tex.size << " bytes for the texture, free: " << vramSpaceFree() << "bytes\n";
+        std::cout << "\e[1;36m[3DS] \e[38;5;236m" << target.texture.tex.size << " texture bytes loaded, free: " << vramSpaceFree() / 1024 << "kb\n";
 		target.texture.tex.border = 0x00000000;
 		C3D_TexSetWrap(&target.texture.tex, GPU_MIRRORED_REPEAT  , GPU_MIRRORED_REPEAT  );
         C3D_TexSetFilter(&target.texture.tex, GPU_LINEAR, GPU_LINEAR);
@@ -1447,7 +1447,7 @@ void DrawTextureEx(Texture2D *texture, Vector2 position, float rotation, float s
             //std::cout << "texdraw: " << texture.width << std::endl;
     }
     else{
-        std::cout << "nah bro no rotation in drawex\n"; //maybe use the function in drawtexturepro??? hmmm
+        std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "DrawTextureEx doesn't allow rotation\n"; //maybe use the function in drawtexturepro??? hmmm
     }
     C2D_Flush();  //test
 }

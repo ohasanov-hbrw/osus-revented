@@ -131,16 +131,16 @@ GameFile Parser::parse(std::string filename){
     }
     free(buffer);*/
 
-	std::cout << "fopen found " << numLines << "lines" << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "fopen found " << numLines << "lines to parse" << std::endl;
 	Global.numberLines = numLines;
     std::ifstream ifs(filename);
 	std::string line;
 	int lineNumber = 0;
 	Global.parsedLines = 0;
 	gameFile.hitObjects.reserve(numLines);
-	std::cout << "reserved " << numLines << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parser reserved " << numLines << std::endl;
 	if (ifs.is_open()){
-		std::cout << "file opened\n";
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Beatmap file opened\n";
 		while(std::getline(ifs, line)){
 			if(line[line.size()-1] == 13)
 				line.pop_back();
