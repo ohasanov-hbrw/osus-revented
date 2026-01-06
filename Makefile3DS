@@ -56,7 +56,7 @@ APP_AUTHOR      := ohasanov
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-Og -g -ggdb -w -Wall -mword-relocations -Wno-psabi \
+CFLAGS	:=	-Og -g -ggdb -w -mword-relocations -Wno-psabi \
 			-ffunction-sections \
 			$(ARCH)
 
@@ -180,7 +180,7 @@ endif
 #---------------------------------------------------------------------------------
 MAKEROM		?=	./makerom
 
-MAKEROM_ARGS		:=	-elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -major 1 -minor 2 -micro 3
+MAKEROM_ARGS		:=	-elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -major 2 -minor 6 -micro 7
 MAKEROM_ARGS_OLD	:=	-elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -major 1 -minor 2 -micro 3
 
 ifneq ($(strip $(LOGO)),)
@@ -217,7 +217,7 @@ all:$(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)
 	@$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) "$(BANNER_IMAGE)" $(BANNER_AUDIO_ARG) "$(BANNER_AUDIO)" -o "$(BUILD)/banner.bnr"
 	@$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f nosavebackups,visible -o "$(BUILD)/icon.icn"
 	@$(MAKEROM) -f cia -o "$(OUTPUT).cia" -target t -exefslogo $(MAKEROM_ARGS)
-	@$(MAKEROM) -f cia -o "old.cia" -target t -exefslogo $(MAKEROM_ARGS_OLD)
+#	@$(MAKEROM) -f cia -o "old.cia" -target t -exefslogo $(MAKEROM_ARGS_OLD)
 	@echo built ... cia file
 $(BUILD):
 	@mkdir -p $@

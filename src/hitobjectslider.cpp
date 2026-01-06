@@ -323,7 +323,7 @@ void Slider::init(){
                     float hipotenus = data.length - totalLength;
                     float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
                     float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-                    extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/abs(angle))};
+                    extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/std::abs(angle))};
                     int lerploc = renderPoints.size() - 1;
                     int res = 0;
                     for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {

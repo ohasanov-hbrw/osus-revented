@@ -1,1 +1,1 @@
-$DEVKITARM/bin/arm-none-eabi-addr2line -e osus-revented-3ds.elf
+$DEVKITARM/bin/arm-none-eabi-addr2line -e osus-revented.elf
