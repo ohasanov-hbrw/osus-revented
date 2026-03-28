@@ -2,6 +2,7 @@
 #include "parser.hpp"
 #include <raylib.h>
 #include "linkedListImpl.hpp"
+#include <deque>
 
 struct dbool
 {
@@ -54,7 +55,7 @@ class GameManager{
 		std::vector<HitObject*> objects;
 		std::vector<FollowPoint> followLines;
 		std::vector<HitObject*> dead_objects;
-		std::vector<timingSettings> timingSettingsForHitObject;
+		std::deque<timingSettings> timingSettingsForHitObject;
 
 		HitSound SoundFilesAll;
         HitSound hitCircleHS;

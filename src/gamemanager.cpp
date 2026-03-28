@@ -125,21 +125,22 @@ void GameManager::update(){
 			tempTiming.effects = gameFile.timingPoints[i].effects;
 			timingSettingsForHitObject.push_back(tempTiming);
 			lastTimingLoc = i - 1; 
+			if(lastTimingLoc < 0) 
+				lastTimingLoc = 0;
 		}
 		else
 			break;
 	}
 	if(timingSettingsForHitObject.size() == 0){
-		int i = lastTimingLoc;
 		if(gameFile.timingPoints.size() == 0){
 			std::cout << "\e[1;38;5;52m[ERR] \e[38;5;52m" << "missing timingpoints? cant do much. crash imminent." << std::endl;
 		}
 		else{
-			tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
+			tempTiming.renderTicks = gameFile.timingPoints[lastTimingLoc].renderTicks;
 			tempTiming.sliderSpeedOverride = 1;
-			tempTiming.time = gameFile.timingPoints[i].time;
+			tempTiming.time = gameFile.timingPoints[lastTimingLoc].time;
 			double tempBeatLength;
-			tempBeatLength = gameFile.timingPoints[i].beatLength;
+			tempBeatLength = gameFile.timingPoints[lastTimingLoc].beatLength;
 			if(tempBeatLength >= 0){
 				tempTiming.beatLength = tempBeatLength;
 				verytempbeat = tempBeatLength;
@@ -149,87 +150,22 @@ void GameManager::update(){
 				tempTiming.sliderSpeedOverride = (100 / tempBeatLength * (-1));
 				tempTiming.beatLength = verytempbeat;
 			}
-			tempTiming.meter = gameFile.timingPoints[i].meter;
-			tempTiming.sampleSet = gameFile.timingPoints[i].sampleSet;
-			tempTiming.sampleIndex = gameFile.timingPoints[i].sampleIndex;
-			tempTiming.volume = gameFile.timingPoints[i].volume;
-			tempTiming.uninherited = gameFile.timingPoints[i].uninherited;
-			tempTiming.effects = gameFile.timingPoints[i].effects;
+			tempTiming.meter = gameFile.timingPoints[lastTimingLoc].meter;
+			tempTiming.sampleSet = gameFile.timingPoints[lastTimingLoc].sampleSet;
+			tempTiming.sampleIndex = gameFile.timingPoints[lastTimingLoc].sampleIndex;
+			tempTiming.volume = gameFile.timingPoints[lastTimingLoc].volume;
+			tempTiming.uninherited = gameFile.timingPoints[lastTimingLoc].uninherited;
+			tempTiming.effects = gameFile.timingPoints[lastTimingLoc].effects;
 			timingSettingsForHitObject.push_back(tempTiming);
-			lastTimingLoc = i - 1; 
 		}
 	}
 	
 
 	//spawn the hitobjects when their time comes
-	/*int size = gameFile.hitObjects.size();	
-	for(int i = size-1; i >= 0; i--){
-		if(gameFile.hitObjects[i].time - gameFile.preempt <= currentTime*1000.0f){
-			//if(gameFile.hitObjects[i].type == 2 and gameFile.hitObjects[i].totalLength > Global.maxSliderSize){
-			//	std::cout << "well fuck this long slider i guess. \n";
-			//	gameFile.hitObjects.pop_back();
-			//}
-			//else{
-				spawnHitObject(gameFile.hitObjects[i]);
-				if(objects[objects.size()-1]->data.startingACombo){
-					currentComboIndex++;
-					if(gameFile.comboColours.size()) currentComboIndex = (currentComboIndex + objects[objects.size()-1]->data.skipComboColours) % gameFile.comboColours.size();
-					combo = 1;
-				}
-				if(gameFile.comboColours.size()) objects[objects.size()-1]->data.colour = gameFile.comboColours[currentComboIndex];
-				objects[objects.size()-1]->data.comboNumber = combo;
-				combo++;
-				int index = 0;
-				for(int amog = 0; amog < timingSettingsForHitObject.size(); amog++){
-					if(timingSettingsForHitObject[amog].time > gameFile.hitObjects[i].time)
-						break;
-					index = amog;
-				}
-
-				// o şejkilde lişğaksda başka ne uzun biliyor musun bence benim akıllığım terinde
-				// -ömer 2022
-				objects[objects.size()-1]->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
-				objects[objects.size()-1]->data.timing.meter = timingSettingsForHitObject[index].meter;
-				objects[objects.size()-1]->data.timing.sampleSet = timingSettingsForHitObject[index].sampleSet;
-				objects[objects.size()-1]->data.timing.sampleIndex = timingSettingsForHitObject[index].sampleIndex;
-				objects[objects.size()-1]->data.timing.volume = timingSettingsForHitObject[index].volume;
-				objects[objects.size()-1]->data.timing.uninherited = timingSettingsForHitObject[index].uninherited;
-				objects[objects.size()-1]->data.timing.effects = timingSettingsForHitObject[index].effects;
-				objects[objects.size()-1]->data.timing.sliderSpeedOverride = timingSettingsForHitObject[index].sliderSpeedOverride;
-				objects[objects.size()-1]->data.index = objects.size()-1;
-				objects[objects.size()-1]->data.textureReady = false;
-				objects[objects.size()-1]->data.textureLoaded = false;
-				objects[objects.size()-1]->data.timing.renderTicks = timingSettingsForHitObject[index].renderTicks;
-				//std::cout << "Time:" << timingSettingsForHitObject[index].time << " Beat:" << objects[objects.size()-1]->data.timing.beatLength <<
-				//" Meter:" << objects[objects.size()-1]->data.timing.meter << " SV:" << objects[objects.size()-1]->data.timing.sliderSpeedOverride <<
-				//" SS:" << sliderSpeed << " RT:" << objects[objects.size()-1]->data.timing.renderTicks;
-				
-
-				objects[objects.size()-1]->init();
-				//Vector2 templastCords = {objects[objects.size()-1]->data.ex, objects[objects.size()-1]->data.ey};
-				//objects[objects.size()-1]->data.ex = lastCords.x;
-				//objects[objects.size()-1]->data.ey = lastCords.y;
-				//objects[objects.size()-1]->data.lastTime = lastHitTime;
-				lastHitTime = objects[objects.size()-1]->data.time;
-				if(objects[objects.size()-1]->data.type == 2){
-					objects[objects.size()-1]->data.time + (objects[objects.size()-1]->data.length/100) * (objects[objects.size()-1]->data.timing.beatLength) / (sliderSpeed * objects[objects.size()-1]->data.timing.sliderSpeedOverride) * objects[objects.size()-1]->data.slides;
-				}
-				//lastCords = templastCords;
-
-				//std::thread objectThread(std::bind(&HitObject::init, objects[objects.size()-1]));
-				//objectThread.join();
-				gameFile.hitObjects.pop_back();
-				spawnedHitObjects++;
-				for(int amog = 0; amog < index - 1; amog++){
-					timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
-				}
-			//}
-		}
-		else
-			break;
-	}
-	*/
+	// o şejkilde lişğaksda başka ne uzun biliyor musun bence benim akıllığım terinde
+	// -ömer 2022
 	//Global.mutex2.lock();
+
 	int size = gameFile.hitObjects.size();	
 	for(int i = size-1; i >= 0; i--){
 		if(gameFile.hitObjects[i].time - gameFile.preempt <= currentTime*1000.0f){
@@ -256,10 +192,10 @@ void GameManager::update(){
 			combo++;
 
 			int index = 0;
-			for(int amog = 0; amog < timingSettingsForHitObject.size(); amog++){
-				if(timingSettingsForHitObject[amog].time > gameFile.hitObjects[i].time)
+			for(int j = 0; j < timingSettingsForHitObject.size(); j++){
+				if(timingSettingsForHitObject[j].time > gameFile.hitObjects[i].time)
 					break;
-				index = amog;
+				index = j;
 			}
 
 			hitObject->data.timing.beatLength = timingSettingsForHitObject[index].beatLength;
@@ -282,8 +218,9 @@ void GameManager::update(){
 			}
 			gameFile.hitObjects.pop_back();
 			spawnedHitObjects++;
-			for(int amog = 0; amog < index - 1; amog++){
-				timingSettingsForHitObject.erase(timingSettingsForHitObject.begin());
+			for(int j = 0; j < index - 1; j++){
+				timingSettingsForHitObject.pop_front();
+				//std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236mPopped front of timingSettings! Size: " << timingSettingsForHitObject.size() << std::endl;
 			}
 			//std::cout << "spawned\n";
 		}
@@ -296,11 +233,7 @@ void GameManager::update(){
 	bool stop = true;
 	int processed = 0;
 	int sizeOfList = objectsLinkedList.getSize();
-	while(true){
-		if(hitObjectNode == NULL){
-			break;
-		}
-
+	while(hitObjectNode != NULL){
 		hitObject = (HitObject*)hitObjectNode->object;
 		hitObjectNodeNext = hitObjectNode->next;
 		processed++;
@@ -560,34 +493,10 @@ void GameManager::update(){
 		hitObjectNode = hitObjectNodeNext;
 	}
 
-	if(processed != sizeOfList){
-		//std::cout << "what the actual fuck\n";
-	}
-
-	int deadoldsize = dead_objects.size();
-	int deadnewsize = dead_objects.size();
-
-	/*for(int i = 0; i < dead_objects.size(); i++){
-		dead_objects[i]->data.index = i;
-		dead_objects[i]->dead_update();
-		if(dead_objects[i]->data.expired == true){
-			destroyDeadHitObject(i);
-			//std::cout << "deleted an object\n";
-		}
-		deadnewsize = dead_objects.size();
-		if(deadnewsize != deadoldsize){
-			i--;
-			deadoldsize = deadnewsize;
-		}
-	}*/
-
 	Node * deadHitObjectNode = deadObjectsLinkedList.getHead();
 	Node * deadHitObjectNodeNext;
 	HitObject* deadHitObject;
-	while(true){
-		if(deadHitObjectNode == NULL){
-			break;
-		}
+	while(deadHitObjectNode != NULL){
 		deadHitObject = (HitObject*)deadHitObjectNode->object;
 		deadHitObjectNodeNext = deadHitObjectNode->next;
 
@@ -772,12 +681,10 @@ void GameManager::run(){
 		TimerLast = (double)GetMusicTimeLength(&backgroundMusic) * 1000.0;
 		TimeLast = getTimer();
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "waiting for 0.25 secs for the song to end\n";
-		while(true){
+		while((getTimer() - TimeLast) < 250.0){
 			currentTime = (double)(TimerLast + (getTimer() - TimeLast)) / 1000.0;
 			GameManager::update();
 			SleepInMs(5);
-			if((getTimer() - TimeLast) > 250.0)
-				break;
 		}
 		//std::cout << "waiting done\n";
 		/*MutexUnlock(ACCESSING_OBJECTS);
@@ -833,16 +740,11 @@ void GameManager::run(){
 		Global.LastOsuTime = 0;
 		TimeLast = ms;
 		startMusic = false;
-		double Time = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
-		double amog = getTimer();
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;51m" << "Extra Judgement Time in ms " << Global.extraJudgementTime << std::endl;
 
 		Global.LastFrameTime = getTimer();
 	}
 	if(Global.startTime >= 0){
-
-
-
 		if(Global.volumeChanged){
 			SetMusicVolume(&backgroundMusic, Global.volume);
 			Global.volumeChanged = false;
@@ -862,12 +764,10 @@ void GameManager::run(){
 			TimerLast = (double)GetMusicTimeLength(&backgroundMusic) * 1000.0;
 			TimeLast = getTimer();
 			std::cout << "\e[1;38;5;236m[INFO] \e[38;5;40m" << "waiting for 1.5 secs for the beatmap to end\n";
-			while(true){
+			while((getTimer() - TimeLast) < 1500.0){
 				currentTime = (double)(TimerLast + (getTimer() - TimeLast)) / 1000.0;
 				GameManager::update();
 				SleepInMs(5);
-				if((getTimer() - TimeLast) > 1500.0)
-					break;
 			}
 			//std::cout << "waiting done\n";
 			/*MutexUnlock(ACCESSING_OBJECTS);
@@ -899,6 +799,7 @@ void GameManager::run(){
 			return;
 		}
 	}
+	
 	if (IsMusicStreamPlaying(&backgroundMusic)){
 		Time = (double)GetMusicTimePlayed(&backgroundMusic) * 1000.0;
 		if(!AreSame(TimerLast, Time)){
@@ -908,6 +809,7 @@ void GameManager::run(){
 		}
 		else{
 			Time += ms - TimeLast;
+			Global.TimeStepSize = ms - TimeLast;
 		}
 	}
 	else{
@@ -938,9 +840,12 @@ void GameManager::run(){
 	Global.currentOsuTime = IsMusicStreamPlaying(&backgroundMusic) ? Global.CurrentInterpolatedTime : GetMusicTimePlayed(&backgroundMusic);
 
 	currentTime = (double)Time / 1000.0;
+
+
 	#ifndef THREEDS_BUILD
 		if(IsMusicStreamPlaying(&backgroundMusic)){
-			currentTime = (Global.currentOsuTime + Global.offsetTime) / 1000.0;
+			//currentTime = (Global.currentOsuTime + Global.offsetTime) / 1000.0;
+			currentTime += (Global.offsetTime / 1000.0f);
 			//currentTime = GetMusicTimePlayed(&backgroundMusic);
 			//std::cout << "music playin\n";
 		}
@@ -2596,19 +2501,19 @@ int * GameManager::sliderPreInit(HitObjectData data){
             
         }
         else if(data.curveType == 'C'){
-			std::vector<Vector2> amogus = interpolate2(edgePoints, data.length);
+			std::vector<Vector2> temporaryPoints = interpolate2(edgePoints, data.length);
             renderPoints = (Vector2*)malloc(sizeof(Vector2) * (data.length));
 			renderPointsSize = data.length;
 			int ending = 0;
-			for(int i = 0; i < renderPointsSize && i < amogus.size(); i++){
-				renderPoints[i] = amogus[i];
+			for(int i = 0; i < renderPointsSize && i < temporaryPoints.size(); i++){
+				renderPoints[i] = temporaryPoints[i];
 				ending++;
 			}
 			while(ending < renderPointsSize){
 				renderPoints[ending] = renderPoints[ending - 1];
 				ending++;
 			}
-			amogus.clear();
+			temporaryPoints.clear();
         }
         else{
             std::__throw_invalid_argument("Invalid Slider type!");

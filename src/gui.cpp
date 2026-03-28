@@ -241,13 +241,11 @@ void SelectableList::update() {
 
 void SelectableList::init() {
     for(int i = 0; i < text.size(); i++) {
-        //std::cout << "init of amogus nuumero " << i << std::endl;
         objects.push_back(TextBox({0,0}, {size.x, (float)objectsize}, color, text[i].c_str(), textcolor, textsize, maxlength));
         objects[objects.size()-1].init();
     }
     text.clear();
     bg = TextBox({position.x, position.y}, {size.x, size.y}, color, " ", BLACK, 0, 50);
-    //std::cout << "init of amogus done\n";
 }
 
 
@@ -295,7 +293,7 @@ void Popup::init() {
     size.y = std::max(size2.y, size.y);
     bg = TextBox({position.x, position.y}, {size.x, size.y}, color, " ", BLACK, 0, 50);
     msg = TextBox({position.x, position.y - 10}, {size.x, size.y}, {0,0,0,0} , text, WHITE, 15, 2000);
-    std::string BorderText = "amogus";
+    std::string BorderText = "Border";
     if (type & ERR_FILEIO){
         BorderText = "Error while reading/writing files!";
     }
@@ -310,9 +308,6 @@ void Popup::init() {
 
     block = true;
     //Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
-
-
-    //std::cout << "init of amogus done\n";
 }
 
 

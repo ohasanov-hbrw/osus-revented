@@ -278,6 +278,8 @@ struct Globals {
     #endif
     // IDK honestly, this does something important
     Globals() = default;
+
+    double TimeStepSize = 0; //in milliseconds
 };
 
 extern Globals Global;

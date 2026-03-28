@@ -369,7 +369,6 @@ Texture2D LoadTextureFromImage(Image *image, bool vram){
                 return texture;
             }
         }
-        //std::cout << "amogus:" << offset_bpp << std::endl;
 
         for(size_t x = 0; x < texture.tex.size; x++){
             ((uint8_t*)tiled_output)[x] = 0;

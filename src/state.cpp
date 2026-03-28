@@ -281,7 +281,7 @@ MainMenu::MainMenu() {
     wip2 = Button({500,300}, {120,40}, {255,135,198,0}, "WIP2", BLACK, 20);
     load = Button({390,420}, {120,60}, {255,135,198,255}, "Load", BLACK, 20);
     volume = TestSlider({510,460}, {240,20}, BLACK, PURPLE, WHITE, WHITE);
-    popup = Popup({320, 240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+    popup = Popup({320, 240}, {300, 120}, GRAY, "Test Popup", WHITE, 20, 1 << 0, -1);
     logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
     animation = 2;
     animationStart = 0;
@@ -302,7 +302,7 @@ void MainMenu::init() {
     Global.errorid++;
     tempMsg.message = "sugomatest\nsagop";
     tempMsg.type = ERR_FILEIO;
-    Global.errors.push(tempMsg);
+    //Global.errors.push(tempMsg);
 
     popup.block = !Global.errors.empty();
 
@@ -784,7 +784,7 @@ void MainMenu::textureOps() {
 
 StartMenu::StartMenu() {
     description = TextBox({320,440}, {520,40}, {240,98,161,0}, "Click the circles!", WHITE, 50, 50);
-    popup = Popup({320, 240}, {300, 120}, GRAY, "amoguss", WHITE, 20, 1 << 0, -1);
+    popup = Popup({320, 240}, {300, 120}, GRAY, "Test Popup", WHITE, 20, 1 << 0, -1);
     logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
 }
 

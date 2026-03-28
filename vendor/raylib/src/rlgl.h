@@ -2085,9 +2085,9 @@ void rlLoadExtensions(void *loader)
     // NOTE: glad is generated and contains only required OpenGL 3.3 Core extensions (and lower versions)
     #if !defined(__APPLE__)
         TRACELOG(RL_LOG_INFO, "GL: Trying to load functions");
-        int amogus = gladLoadGL((GLADloadfunc)loader);
-        TRACELOG(RL_LOG_INFO, "GL: %i reported", amogus);
-        if (amogus == 0) TRACELOG(RL_LOG_WARNING, "GLAD: Cannot load OpenGL extensions");
+        int func = gladLoadGL((GLADloadfunc)loader);
+        TRACELOG(RL_LOG_INFO, "GL: %i reported", func);
+        if (func == 0) TRACELOG(RL_LOG_WARNING, "GLAD: Cannot load OpenGL extensions");
         else TRACELOG(RL_LOG_INFO, "GLAD: OpenGL extensions loaded successfully");
     #endif
 
@@ -2502,7 +2502,7 @@ rlRenderBatch rlLoadRenderBatch(int numBuffers, int bufferElements)
         glGenBuffers(1, &batch.vertexBuffer[i].vboId[3]);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, batch.vertexBuffer[i].vboId[3]);
 
-        TRACELOG(RL_LOG_INFO, "OHASANOV: Gpu Amogus Stuff Done");
+        TRACELOG(RL_LOG_INFO, "OHASANOV: Gpu Spoof Stuff Done");
 #if defined(GRAPHICS_API_OPENGL_33)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferElements*6*sizeof(int), batch.vertexBuffer[i].indices, GL_STATIC_DRAW);
 #endif
