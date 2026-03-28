@@ -74,10 +74,10 @@ void FollowPoint::render(){
                 // Drawing a "circle" with 4 segments. Basically a diamond. The 3ds can't really handle more lol
                 // On PC we can comfortably run with 8 segments
                 #ifdef THREEDS_BUILD
-                    DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, {255,200,255,static_cast<unsigned char>(opacity)});
+                    DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, Fade(color, opacity1 / 2.0));//{255,200,255,static_cast<unsigned char>(opacity)});
                 #endif
                 #ifndef THREEDS_BUILD
-                    DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 8, 0, {255,200,255,static_cast<unsigned char>(opacity)});
+                    DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 8, 0, Fade(color, opacity1 / 2.0));//{255,200,255,static_cast<unsigned char>(opacity)});
                 #endif
             }
         }

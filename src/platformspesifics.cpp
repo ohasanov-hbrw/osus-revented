@@ -1,4 +1,3 @@
-#pragma once
 #include "platformspesifics.hpp"
 #include "globals.hpp"
 #include "utils.hpp"

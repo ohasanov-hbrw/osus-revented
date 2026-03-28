@@ -899,7 +899,7 @@ void GameManager::loadDefaultSkin(std::string filename){
 	files = ls(".png");
 
 	std::sort(files.begin(), files.end(), []
-    (const std::string& first, const std::string& second){
+    (std::string_view first, std::string_view second){
         return first.size() < second.size();
     });
 	std::reverse(files.begin(), files.end());
@@ -1006,7 +1006,7 @@ void GameManager::loadGameSkin(std::string filename){
 	files = ls(".png");
 
 	std::sort(files.begin(), files.end(), []
-    (const std::string& first, const std::string& second){
+    (std::string_view first, std::string_view second){
         return first.size() < second.size();
     });
 	std::reverse(files.begin(), files.end());
@@ -1110,7 +1110,7 @@ void GameManager::loadBeatmapSkin(std::string filename){
 	files = ls(".png");
 
 	std::sort(files.begin(), files.end(), []
-    (const std::string& first, const std::string& second){
+    (std::string_view first, std::string_view second){
         return first.size() < second.size();
     });
 	std::reverse(files.begin(), files.end());
@@ -1610,7 +1610,7 @@ void GameManager::loadGame(std::string filename){
 	//create temporary timing points for the follow points (useful for sliders)
     timingSettings tempTiming;
     std::vector<timingSettings> times;
-    double preCalcLength;
+    double preCalcLength = 0;
     for(int i = gameFile.timingPoints.size()-1; i >= 0; i--){
         tempTiming.renderTicks = gameFile.timingPoints[i].renderTicks;
         tempTiming.sliderSpeedOverride = 1;
@@ -1622,7 +1622,7 @@ void GameManager::loadGame(std::string filename){
             preCalcLength = tempBeatLength;
             tempTiming.sliderSpeedOverride = 1;
         }
-        if(tempBeatLength < 0){
+        else{
             tempTiming.sliderSpeedOverride = (100 / tempBeatLength * (-1));
             tempTiming.beatLength = preCalcLength;
         }
@@ -1639,17 +1639,30 @@ void GameManager::loadGame(std::string filename){
 	int index = 0;
 
 	//fade in time for followpoints, this part i dont really understand since its not really documented
-	
+	int followComboColors = 0;
 	float followPointFadeTime = gameFile.preempt - gameFile.fade_in;
 	followLines.clear();
+	
 	for(int i = 1; i < gameFile.hitObjects.size(); i++){
 		//float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides; //slider length
+		if(gameFile.hitObjects[i - 1].startingACombo){
+			followComboColors++;
+			if(gameFile.comboColours.size())
+				followComboColors = (followComboColors + gameFile.hitObjects[i - 1].skipComboColours) % gameFile.comboColours.size();
+		}
 		if(gameFile.hitObjects[i].startingACombo == false and gameFile.hitObjects[i - 1].type != 3){
 			FollowPoint tempPoint;
 			tempPoint.endTime = gameFile.hitObjects[i].time;
 			tempPoint.endTime2 = gameFile.hitObjects[i].time + followPointFadeTime;
 			tempPoint.endX = gameFile.hitObjects[i].x;
 			tempPoint.endY = gameFile.hitObjects[i].y;
+
+			
+			if(gameFile.comboColours.size())
+				tempPoint.color = Color{gameFile.comboColours[followComboColors][0], gameFile.comboColours[followComboColors][1], gameFile.comboColours[followComboColors][2], 255};
+			else{
+				tempPoint.color = Color{255,200,255,255};
+			}
 			
 			if(gameFile.hitObjects[i - 1].type == 2){
 				/*if(data.slides % 2 == 0){
@@ -2147,7 +2160,7 @@ void GameManager::unloadGameTextures(){
 		if(deadHitObject->data.type == 2){
 			if(Slider* tempslider = dynamic_cast<Slider*>(deadHitObject)){
 				tempslider->readyToDelete = true;
-				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloading slider at time " << tempslider->data.time << std::endl;
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloading dead slider at time " << tempslider->data.time << std::endl;
 			}
 		}
 		

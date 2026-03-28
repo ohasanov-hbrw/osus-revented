@@ -120,37 +120,37 @@ std::vector<std::string> ls(char* extension, std::string_view path) {
 }
 
 // Basically the "mkdir" command
-void create_dir(const std::string& path) {
+void create_dir(std::string_view path) {
     fs::create_directory(path);
 }
 
 // Check if a path exists
-int check_dir(const std::string &path){
+int check_dir(std::string_view path){
     fs::path path_p(path);
     return fs::exists(path_p);
 }
 
 // Convert path to a correct notation
-std::string correct_path_notation(const std::string &path){
+std::string correct_path_notation(std::string_view path){
     fs::path path_p(path);
     return path_p.string();
 }
 
 // Debug, print string as a directory, both local and absolute
-void print_dir(const std::string &path){
+void print_dir(std::string_view path){
     fs::path path_p(path);
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << path_p << " or " << fs::absolute(path_p) << std::endl;
     return;
 }
 
 // Getting a file's name without the extension
-std::string get_without_ext(const std::string& path) {
+std::string get_without_ext(std::string_view path) {
     fs::path path_p(path);
     return path_p.stem().string();
 }
 
 // Get filename
-std::string get_filename(const std::string& path) {
+std::string get_filename(std::string_view path) {
     fs::path path_p(path);
     return path_p.filename().string();
 }

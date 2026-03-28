@@ -23,6 +23,8 @@ class FollowPoint{
         float endLoc = 0.0f;
         float angle;
         
+        Color color;
+        
         bool shouldRender = false;
         bool shouldDelete = false;
     private:

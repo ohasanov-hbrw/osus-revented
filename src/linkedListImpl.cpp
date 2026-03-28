@@ -92,7 +92,7 @@ void Linkedlist::deleteTail(){
 }  
 
 void Linkedlist::deleteNode(int index){
-    Node *temp1 = head, *temp2 = NULL; 
+    Node *temp1 = head; 
     int ListLen = 0; 
     if(head == NULL || tail == NULL){ 
         std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "List empty." << std::endl; 

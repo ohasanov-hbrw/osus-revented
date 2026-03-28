@@ -102,36 +102,16 @@ GameFile Parser::parse(std::string filename){
 	gameFile.configDifficulty["SliderTickRate"] = "1";
 
 	int numLines = 0;
-	std::ifstream in(filename);
+	std::ifstream lineCounter(filename);
 	std::string unused;
-	while ( std::getline(in, unused) )
-		++numLines;
+	if (lineCounter.is_open()){
+		while ( std::getline(lineCounter, unused) )
+			++numLines;
+		lineCounter.close();
+	}
 	
-	/*int size = 1024, pos;
-    int c;
-    char *buffer = (char *)malloc(size);
 
-    FILE *f = fopen(filename.c_str(), "r");
-    if(f) {
-      do { // read all lines in file
-        pos = 0;
-        do{ // read one line
-          c = fgetc(f);
-          if(c != EOF) buffer[pos++] = (char)c;
-          if(pos >= size - 1) { // increase buffer length - leave room for 0
-            size *=2;
-            buffer = (char*)realloc(buffer, size);
-          }
-        }while(c != EOF && c != '\n');
-        buffer[pos] = 0;
-        // line is now in buffer
-        numLines++;
-      } while(c != EOF); 
-      fclose(f);           
-    }
-    free(buffer);*/
-
-	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "fopen found " << numLines << "lines to parse" << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Ifstream found " << numLines << " lines to parse" << std::endl;
 	Global.numberLines = numLines;
     std::ifstream ifs(filename);
 	std::string line;
@@ -548,7 +528,9 @@ GameFile Parser::parse(std::string filename){
 				}
 			}
 		}
+		ifs.close();
 	}
+	
 	return gameFile;	
 }
 

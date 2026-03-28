@@ -112,7 +112,7 @@ void RenderLoop(void *){
 	Global.Path = Global.GameBinaryPath + "/resources/default_skin/";
 	std::vector<std::string> files = ls(".png");
 	std::sort(files.begin(), files.end(), []
-    (const std::string& first, const std::string& second){
+    (std::string_view first, std::string_view second){
         return first.size() < second.size();
     });
 	std::reverse(files.begin(), files.end());
@@ -129,7 +129,7 @@ void RenderLoop(void *){
     Global.Path = Global.GameBinaryPath + "/resources/skin/";
     files = ls(".png");
 	std::sort(files.begin(), files.end(), []
-    (const std::string& first, const std::string& second){
+    (std::string_view first, std::string_view second){
         return first.size() < second.size();
     });
 	std::reverse(files.begin(), files.end());
@@ -144,7 +144,7 @@ void RenderLoop(void *){
 	}
 	files.clear();
     Global.Path = lastPath;
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded cursor";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded cursor\n";
 
     // 3DS doesn't support some fancy filters
     // TODO: Make some filter and graphics settings configurable (OGL1.1 - OGL2.2 differences)
@@ -417,12 +417,12 @@ int main(){
     // Signal to kill rendering thread
     SleepInMs(5);
     Global.stop = true;
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << " Signaling stop to render thread\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Signaling stop to render thread\n";
 
     _multithread_join_thread(&renderThread);
     _multithread_free_thread(&renderThread);
 
-    deleteGlobalVariables();
+    //deleteGlobalVariables();
 
     std::cout <<  "\e[1;38;5;236m[INFO] \e[38;5;206m"  << "bye bye :3 ~!\n";
     SleepInMs(200);

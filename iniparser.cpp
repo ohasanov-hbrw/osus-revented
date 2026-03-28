@@ -7,24 +7,17 @@
 #include <algorithm>
 #include <array>
 
-bool starts_with(const std::string& str, const std::string& thing) {
+bool starts_with(std::string_view str, std::string_view thing) {
     return str.rfind(thing, 0) == 0;
 }
 
-bool ends_with(std::string str, const std::string &thing) {
+bool ends_with(std::string str, std::string_view thing) {
     if(str.size() >= thing.size() && str.compare(str.size() - thing.size(), thing.size(), thing) == 0)
         return true;
     else
         return false;
 }
 
-std::string read_file(const std::string& path) {
-    std::ifstream ifs(path);
-    std::string content((std::istreambuf_iterator<char>(ifs)),
-                        (std::istreambuf_iterator<char>()));
-
-    return content;
-}
 
 struct INIValue {
     std::string ls;
