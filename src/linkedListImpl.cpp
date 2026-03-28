@@ -8,9 +8,9 @@ Node::Node(){
 } 
 
 Node::Node(void * data){ 
-    this->object = data; 
-    this->next = NULL; 
-    this->prev = NULL;
+    object = data; 
+    next = NULL; 
+    prev = NULL;
 }
 
 Linkedlist::Linkedlist(){
@@ -19,7 +19,15 @@ Linkedlist::Linkedlist(){
     size = 0;
 } 
 
+void Linkedlist::init(){
+    head = NULL;
+    tail = NULL;
+    size = 0;
+    return;
+} 
+
 void Linkedlist::insertHead(void * data){  
+    std::cout << "inserthead\n";
     Node *newNode = new Node(data);  
     newNode->next = head;
     newNode->prev = NULL;  
@@ -32,7 +40,9 @@ void Linkedlist::insertHead(void * data){
     newNode->next->prev = newNode;
 }  
 
+
 void Linkedlist::insertTail(void * data){  
+    std::cout << "inserttail\n";
     Node *newNode = new Node(data);  
     if(head == NULL) {  
         head = newNode;  
@@ -137,7 +147,8 @@ void Linkedlist::deleteNode(int index){
     }
 }
 
-size_t Linkedlist::getSize(){
+int Linkedlist::getSize(){
+    //std::cout << "checkedsize " << size << "\n";
     return size;
 }
 

@@ -17,14 +17,12 @@ class Node{
 }; 
 
 class Linkedlist { 
-    size_t size;
-    Node* head; 
-    Node* tail;
-
     public: 
         // Default constructor 
         
-    
+        int size;
+        Node* head; 
+        Node* tail;
 
         Linkedlist();
 
@@ -40,9 +38,11 @@ class Linkedlist {
         
         void deleteNodeUnsafe(Node* node);
 
+        void init();
+
         Node* getTail();
 
         Node* getHead();
 
-        size_t getSize();
+        int getSize();
 }; 

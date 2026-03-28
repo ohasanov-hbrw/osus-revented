@@ -1215,6 +1215,11 @@ void GameManager::loadGame(std::string filename){
 	//create a parser and parse the file
 	currentBackgroundTexture = "";
 
+
+	//clear linked lists, WARNING, WILL MEMORY LEAK!
+	deadObjectsLinkedList.init();
+	objectsLinkedList.init();
+
 	//misc variables
 	spawnedHitObjects = 0;
 	Parser parser = Parser();
@@ -1567,7 +1572,7 @@ void GameManager::loadGame(std::string filename){
 
 
 	
-	Global.GameTextures = 2;
+	//Global.GameTextures = 2;
 	/*GameManager::loadDefaultSkin(filename); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
 	GameManager::loadGameSkin(filename); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
 	if(!IsKeyDown(KEY_S)){
@@ -1779,7 +1784,7 @@ void GameManager::loadGame(std::string filename){
 void GameManager::unloadGame(){
 	//std::cout << "UnloadingGame" << std::endl;
 	currentComboIndex = 0;
-	Global.GameTextures = -1;
+	
 	SleepInMs(20);
 
 	for(auto& pair : SoundFilesAll.data) {
@@ -1794,7 +1799,7 @@ void GameManager::unloadGame(){
     Global.parsedLines = -1;
 	//Global.mutex.unlock();
 	//LightLock_Unlock(&Global.lightlock);
-
+	Global.GameTextures = -1;
 	MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 	MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
 	MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
@@ -2102,8 +2107,51 @@ void GameManager::loadGameTextures(){
 }
 
 void GameManager::unloadGameTextures(){
+
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloading Textures" << std::endl;
-    Global.GameTextures = 2;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Started marking sliders for unloading" << std::endl;
+	Node * HitObjectNode = objectsLinkedList.getHead();
+	Node * HitObjectNodeNext;
+	HitObject* hitObject;
+	while(true){
+		if(HitObjectNode == NULL or objectsLinkedList.getSize() == 0){
+			break;
+		}
+		hitObject = (HitObject*)HitObjectNode->object;
+		HitObjectNodeNext = HitObjectNode->next;
+
+		if(hitObject->data.type == 2){
+			if(Slider* tempslider = dynamic_cast<Slider*>(hitObject)){
+				tempslider->readyToDelete = true;
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Marking slider at time " << tempslider->data.time << std::endl;
+			}
+		}
+		
+		HitObjectNode = HitObjectNodeNext;
+	}
+
+	Node * deadHitObjectNode = deadObjectsLinkedList.getHead();
+	Node * deadHitObjectNodeNext;
+	HitObject* deadHitObject;
+	while(true){
+		if(deadHitObjectNode == NULL or deadObjectsLinkedList.getSize() == 0){
+			break;
+		}
+		deadHitObject = (HitObject*)deadHitObjectNode->object;
+		deadHitObjectNodeNext = deadHitObjectNode->next;
+
+		if(deadHitObject->data.type == 2){
+			if(Slider* tempslider = dynamic_cast<Slider*>(deadHitObject)){
+				tempslider->readyToDelete = true;
+
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Marking dead slider at time " << tempslider->data.time << " linked list size: " << deadObjectsLinkedList.getSize() << std::endl;
+			}
+		}
+		
+		deadHitObjectNode = deadHitObjectNodeNext;
+	}
+
+    //Global.GameTextures = 2;
     UnloadTexture(&hitCircleOverlay);
     UnloadTexture(&hitCircle);
     UnloadTexture(&sliderscorepoint);
@@ -2141,51 +2189,15 @@ void GameManager::unloadGameTextures(){
     
 
 
-	Global.GameTextures = 10;
-	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Started unloading hitobjects" << std::endl;
+	//Global.GameTextures = 10;
+	
 	backgroundTextures.data.clear();
     backgroundTextures.pos.clear();
     backgroundTextures.loaded.clear();
 	//Global.mutex2.lock();
-	Node * deadHitObjectNode = deadObjectsLinkedList.getHead();
-	Node * deadHitObjectNodeNext;
-	HitObject* deadHitObject;
-	while(true){
-		if(deadHitObjectNode == NULL){
-			break;
-		}
-		deadHitObject = (HitObject*)deadHitObjectNode->object;
-		deadHitObjectNodeNext = deadHitObjectNode->next;
+	
 
-		if(deadHitObject->data.type == 2){
-			if(Slider* tempslider = dynamic_cast<Slider*>(deadHitObject)){
-				tempslider->readyToDelete = true;
-				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloading dead slider at time " << tempslider->data.time << std::endl;
-			}
-		}
-		
-		deadHitObjectNode = deadHitObjectNodeNext;
-	}
-
-	Node * HitObjectNode = objectsLinkedList.getHead();
-	Node * HitObjectNodeNext;
-	HitObject* hitObject;
-	while(true){
-		if(HitObjectNode == NULL){
-			break;
-		}
-		hitObject = (HitObject*)HitObjectNode->object;
-		HitObjectNodeNext = HitObjectNode->next;
-
-		if(hitObject->data.type == 2){
-			if(Slider* tempslider = dynamic_cast<Slider*>(hitObject)){
-				tempslider->readyToDelete = true;
-				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Unloading slider at time " << tempslider->data.time << std::endl;
-			}
-		}
-		
-		HitObjectNode = HitObjectNodeNext;
-	}
+	
 
 	//Global.mutex.unlock();
     //LightLock_Unlock(&Global.lightlock);
