@@ -117,14 +117,14 @@ struct Globals {
     #ifdef THREEDS_BUILD
         std::string Path = "sdmc:/3ds";//std::filesystem::current_path().string();
         std::string BeatmapLocation = "sdmc:/3ds/beatmaps";
-        std::string GamePath = "sdmc:/3ds";//std::filesystem::current_path().string();
+        std::string GameBinaryPath = "sdmc:/3ds";//std::filesystem::current_path().string();
         std::string selectedPath = "sdmc:/3ds";
         std::string CurrentLocation = "sdmc:/3ds";
     #endif
     #ifndef THREEDS_BUILD
         std::string Path = std::filesystem::current_path().string();
         std::string BeatmapLocation = std::filesystem::current_path().string() + "/beatmaps";
-        std::string GamePath = "."; //std::filesystem::current_path().string();
+        std::string GameBinaryPath = "."; //std::filesystem::current_path().string();
         std::string selectedPath = "";
         std::string CurrentLocation = std::filesystem::current_path().string();
     #endif

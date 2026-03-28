@@ -85,9 +85,9 @@ void RenderLoop(void *){
     _gpu_init_render_thread();
     
     // Load some necessary files that are needed a bunch
-    Global.OsusLogo = LoadTexture((Global.GamePath + "/resources/osus.png").c_str());
+    Global.OsusLogo = LoadTexture((Global.GameBinaryPath + "/resources/osus.png").c_str());
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded logo\n";
-    //std::cout << (Global.GamePath + "/resources/osus.png").c_str() << std::endl;
+    //std::cout << (Global.GameBinaryPath + "/resources/osus.png").c_str() << std::endl;
     
     //Global.DefaultFont = LoadFont("sdmc:/3ds/resources/telegrama_render.otf");
     Global.DefaultFont = GetFontDefault();
@@ -103,13 +103,13 @@ void RenderLoop(void *){
     MutexUnlock(RENDER_BLOCK, RENDERTHREAD_ID);
     
     // Playing around with shaders sometimes... Sliders are a PITA
-    Global.shdrOutline = LoadShader(0, TextFormat((Global.GamePath + "/resources/shaders/glsl%i/outline.fs").c_str(), 100));
-    Global.shdrTest = LoadShader(TextFormat((Global.GamePath + "/resources/shaders/glsl%i/mcosu.vsh").c_str(), 330), TextFormat((Global.GamePath + "/resources/shaders/glsl%i/mcosu.fsh").c_str(), 330));
+    Global.shdrOutline = LoadShader(0, TextFormat((Global.GameBinaryPath + "/resources/shaders/glsl%i/outline.fs").c_str(), 100));
+    Global.shdrTest = LoadShader(TextFormat((Global.GameBinaryPath + "/resources/shaders/glsl%i/mcosu.vsh").c_str(), 330), TextFormat((Global.GameBinaryPath + "/resources/shaders/glsl%i/mcosu.fsh").c_str(), 330));
     
     // Loading textures for the custom cursors.
     // The game crashes here if you have no skins, which duh, you SHOULD
     std::string lastPath = Global.Path;
-	Global.Path = Global.GamePath + "/resources/default_skin/";
+	Global.Path = Global.GameBinaryPath + "/resources/default_skin/";
 	std::vector<std::string> files = ls(".png");
 	std::sort(files.begin(), files.end(), []
     (const std::string& first, const std::string& second){
@@ -126,7 +126,7 @@ void RenderLoop(void *){
 		}
 	}
 	files.clear();
-    Global.Path = Global.GamePath + "/resources/skin/";
+    Global.Path = Global.GameBinaryPath + "/resources/skin/";
     files = ls(".png");
 	std::sort(files.begin(), files.end(), []
     (const std::string& first, const std::string& second){
@@ -296,9 +296,9 @@ int main(){
     SetAudioStreamBufferSizeDefault(240);
 
     // Convert windows paths to linux path?
-    for(int i = 0; i < Global.GamePath.size(); i++) {
-        if (Global.GamePath[i] == '\\')
-            Global.GamePath[i] = '/';
+    for(int i = 0; i < Global.GameBinaryPath.size(); i++) {
+        if (Global.GameBinaryPath[i] == '\\')
+            Global.GameBinaryPath[i] = '/';
     }
 
     // Start the rendering loop

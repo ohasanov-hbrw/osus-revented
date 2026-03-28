@@ -6,6 +6,7 @@
 
 
 std::vector<std::string> ls(char*);
+std::vector<std::string> ls(char*, std::string_view path);
 
 std::string get_without_ext(const std::string& path);
 void create_dir(const std::string& path);

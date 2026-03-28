@@ -307,7 +307,7 @@ void _os_init_program(bool VSYNC){
         
         
         
-        InitWindow(640, 480, "osus - amogus");
+        InitWindow(640, 480, "osus - revented");
         
         SDL_Surface* pIcon = SDL_CreateRGBSurface(0,64,64,32,0,0,0,0);
         SDL_PixelFormat* PixelFormat{pIcon->format};

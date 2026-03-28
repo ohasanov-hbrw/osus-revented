@@ -28,9 +28,7 @@ class GameManager{
 		void unloadGame();
 		void loadGame(std::string filename);
 		void loadDefaultSkin(std::string filename);
-		void loadDefaultSound(std::string filename);
 		void loadGameSkin(std::string filename);
-		void loadGameSound(std::string filename);
 		void loadBeatmapSkin(std::string filename);
 		void loadBeatmapSound(std::string filename);
 		void loadGameTextures();
@@ -58,8 +56,6 @@ class GameManager{
 		std::deque<timingSettings> timingSettingsForHitObject;
 
 		HitSound SoundFilesAll;
-        HitSound hitCircleHS;
-		HitSound SoundFiles;
 		
 		Background backgroundTextures;
 		
@@ -164,7 +160,7 @@ class GameManager{
 		
 		std::string currentBackgroundTexture = "";
 		std::string lastPath;
-		std::string GamePathWithSlash;
+		std::string BeatmapFolderPathWithSlash;
 	private:
 		static GameManager* inst_;
 		void init();

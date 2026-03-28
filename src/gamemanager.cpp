@@ -895,7 +895,7 @@ void GameManager::loadDefaultSkin(std::string filename){
 	currentComboIndex = 0;
 	std::vector<std::string> files;
 	files.clear();
-	Global.Path = Global.GamePath + "/resources/default_skin/";
+	Global.Path = Global.GameBinaryPath + "/resources/default_skin/";
 	files = ls(".png");
 
 	std::sort(files.begin(), files.end(), []
@@ -994,9 +994,6 @@ void GameManager::loadDefaultSkin(std::string filename){
 	}
 }
 
-void GameManager::loadDefaultSound(std::string filename){
-
-}
 
 void GameManager::loadGameSkin(std::string filename){
 	temprenderSpinnerCircle = false;
@@ -1005,7 +1002,7 @@ void GameManager::loadGameSkin(std::string filename){
 
 	std::vector<std::string> files;
 	files.clear();
-	Global.Path = Global.GamePath + "/resources/skin/";
+	Global.Path = Global.GameBinaryPath + "/resources/skin/";
 	files = ls(".png");
 
 	std::sort(files.begin(), files.end(), []
@@ -1104,9 +1101,6 @@ void GameManager::loadGameSkin(std::string filename){
 	}
 }
 
-void GameManager::loadGameSound(std::string filename){
-
-}
 
 void GameManager::loadBeatmapSkin(std::string filename){
 	std::vector<std::string> files;
@@ -1249,7 +1243,7 @@ void GameManager::loadGame(std::string filename){
 		temporaryPath.pop_back();
 	}
 
-	GamePathWithSlash = temporaryPath + '/';
+	BeatmapFolderPathWithSlash = temporaryPath + '/';
 
 	lastPath = temporaryPath;
 
@@ -1728,9 +1722,9 @@ void GameManager::loadGame(std::string filename){
 	}
 
 	Global.loadingState = 4;
-	SoundFiles.data.clear();
-	SoundFiles.loaded.clear();
+	
 	loadGameSounds();
+	
 
 
 
@@ -1774,9 +1768,6 @@ void GameManager::unloadGame(){
 	currentComboIndex = 0;
 	Global.GameTextures = -1;
 	SleepInMs(20);
-	for(auto& pair : SoundFiles.data) {
-    	UnloadSound(&pair.second);
-  	}
 
 	for(auto& pair : SoundFilesAll.data) {
     	UnloadSound(&pair.second);
@@ -1788,9 +1779,6 @@ void GameManager::unloadGame(){
 	UnloadMusicStream(&backgroundMusic);
 	Global.numberLines = -1;
     Global.parsedLines = -1;
-
-	SoundFiles.data.clear();
-	SoundFiles.loaded.clear();
 	//Global.mutex.unlock();
 	//LightLock_Unlock(&Global.lightlock);
 
@@ -1923,16 +1911,16 @@ void GameManager::render_combo(){
 
 void GameManager::loadGameTextures(){
 	
-	Image tempImage = LoadImage((Global.GamePath + "/resources/sliderin.png").c_str());
+	Image tempImage = LoadImage((Global.GameBinaryPath + "/resources/sliderin.png").c_str());
 	ImageColorReplace(&tempImage, {255,255,255,159}, {255,255,255,0});
 	sliderin = LoadTextureFromImage(&tempImage);
 	UnloadImage(&tempImage);
 	Image tempImage2 = GenImageGradientRadial(sliderin.width, sliderin.height, 0.1, {255,0,0,255}, {0,0,0,0});
-	sliderblank = LoadTexture((Global.GamePath + "/resources/SliderBlank.png").c_str());
-	//sliderout = LoadTexture((Global.GamePath + "/resources/SliderBlank.png").c_str());
+	sliderblank = LoadTexture((Global.GameBinaryPath + "/resources/SliderBlank.png").c_str());
+	//sliderout = LoadTexture((Global.GameBinaryPath + "/resources/SliderBlank.png").c_str());
 	sliderout = LoadTextureFromImage(&tempImage2);
 	UnloadImage(&tempImage2);
-    //sliderout = LoadTexture((Global.GamePath + "/resources/sliderout.png").c_str());
+    //sliderout = LoadTexture((Global.GameBinaryPath + "/resources/sliderout.png").c_str());
 
 	_gpu_start_drawing(Global.window);
 
@@ -1976,7 +1964,7 @@ void GameManager::loadGameTextures(){
     //C3D_FrameEnd(0);
 	_gpu_end_drawing();
 
-	followPoint = LoadTexture((Global.GamePath + "/resources/followpoint.png").c_str());
+	followPoint = LoadTexture((Global.GameBinaryPath + "/resources/followpoint.png").c_str());
     loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
     loadGameSkin(Global.selectedPath); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
     if(!Global.settings.useDefaultSkin){
@@ -2516,6 +2504,8 @@ int * GameManager::sliderPreInit(HitObjectData data){
 			temporaryPoints.clear();
         }
         else{
+			renderPoints = (Vector2*)malloc(sizeof(Vector2) * (1));
+			renderPointsSize = 0;
             std::__throw_invalid_argument("Invalid Slider type!");
         }
 
@@ -2571,11 +2561,13 @@ void GameManager::loadGameSounds(){
 	long long int loadedBytes = 0;
 	SoundFilesAll.data.clear();
 	SoundFilesAll.loaded.clear();
-	std::string last = Global.Path;
+	//std::string last = Global.Path;
 	std::string dontTouch = gameFile.configGeneral["AudioFilename"];
-	Global.Path = GamePathWithSlash;
-	//std::cout << GamePathWithSlash << std::endl;
-	std::vector<std::string> ComboBreak = ls(".wav");
+	//Global.Path = BeatmapFolderPathWithSlash;
+	//std::cout << BeatmapFolderPathWithSlash << std::endl;
+
+	//std::vector<std::string> ComboBreak = ls(".wav");
+	std::vector<std::string> ComboBreak = ls(".wav", BeatmapFolderPathWithSlash);
 	//std::cout << ComboBreak.size() << std::endl;
 	if(Global.settings.useDefaultSounds) ComboBreak.clear();
 	for(int i = 0; i < ComboBreak.size(); i++){
@@ -2583,7 +2575,7 @@ void GameManager::loadGameSounds(){
 		SleepInUs(1*200*1000);
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((BeatmapFolderPathWithSlash + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded " << ComboBreak[i] << " from beatmap files" << std::endl;
@@ -2597,7 +2589,7 @@ void GameManager::loadGameSounds(){
 					name += '1';
 				}
 			}
-			SoundFilesAll.data[name] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
+			SoundFilesAll.data[name] = LoadSound((BeatmapFolderPathWithSlash + ComboBreak[i]).c_str());
 			SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 			if(SoundFilesAll.loaded[name].value){
 				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded " << name << " from beatmap files" << std::endl;
@@ -2607,13 +2599,13 @@ void GameManager::loadGameSounds(){
 	}
 	
 	//std::cout << "Done with all the waw stuff, press select to continue" << std::endl;
-	ComboBreak = ls(".ogg");
+	ComboBreak = ls(".ogg", BeatmapFolderPathWithSlash);
 	if(Global.settings.useDefaultSounds) ComboBreak.clear();
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((BeatmapFolderPathWithSlash + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from game" << std::endl;
@@ -2627,7 +2619,7 @@ void GameManager::loadGameSounds(){
 					name += '1';
 				}
 			}
-			SoundFilesAll.data[name] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
+			SoundFilesAll.data[name] = LoadSound((BeatmapFolderPathWithSlash + ComboBreak[i]).c_str());
 			SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 			if(SoundFilesAll.loaded[name].value){
 				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from game" << std::endl;
@@ -2636,13 +2628,13 @@ void GameManager::loadGameSounds(){
 	}
 	
 	//std::cout << "Done with all the ogg stuff, press select to continue" << std::endl;
-	ComboBreak = ls(".mp3");
+	ComboBreak = ls(".mp3", BeatmapFolderPathWithSlash);
 	if(Global.settings.useDefaultSounds) ComboBreak.clear();
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((BeatmapFolderPathWithSlash + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from game" << std::endl;
@@ -2656,7 +2648,7 @@ void GameManager::loadGameSounds(){
 					name += '1';
 				}
 			}
-			SoundFilesAll.data[name] = LoadSound((GamePathWithSlash + ComboBreak[i]).c_str());
+			SoundFilesAll.data[name] = LoadSound((BeatmapFolderPathWithSlash + ComboBreak[i]).c_str());
 			SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 			if(SoundFilesAll.loaded[name].value){
 				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from game" << std::endl;
@@ -2665,13 +2657,13 @@ void GameManager::loadGameSounds(){
 	}
 
 	//std::cout << "Done with all the mp3 stuff, press select to continue" << std::endl;
-	Global.Path = Global.GamePath + "/resources/skin/";
-	ComboBreak = ls(".wav");
+	//Global.Path = Global.GameBinaryPath + "/resources/skin/";
+	ComboBreak = ls(".wav", Global.GameBinaryPath + "/resources/skin/");
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((Global.GameBinaryPath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from skin" << std::endl;
@@ -2682,7 +2674,7 @@ void GameManager::loadGameSounds(){
 			std::string name = ComboBreak[i].substr(0, ComboBreak[i].length() - 4);
 			while(std::isdigit(name[name.size() - 1])) name.pop_back();
 			if(SoundFilesAll.loaded.count(name) == 0 or SoundFilesAll.loaded[name].value == false){
-				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data[name] = LoadSound((Global.GameBinaryPath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
 					//std::filesystem::path p{Global.Path + ComboBreak[i]};
@@ -2694,12 +2686,12 @@ void GameManager::loadGameSounds(){
 	}
 
 	//std::cout << "Done with all the skinwaw stuff, press select to continue" << std::endl;
-	ComboBreak = ls(".ogg");
+	ComboBreak = ls(".ogg", Global.GameBinaryPath + "/resources/skin/");
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((Global.GameBinaryPath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from skin" << std::endl;
@@ -2710,7 +2702,7 @@ void GameManager::loadGameSounds(){
 			std::string name = ComboBreak[i].substr(0, ComboBreak[i].length() - 4);
 			while(std::isdigit(name[name.size() - 1])) name.pop_back();
 			if(SoundFilesAll.loaded.count(name) == 0 or SoundFilesAll.loaded[name].value == false){
-				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data[name] = LoadSound((Global.GameBinaryPath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from skin" << std::endl;
@@ -2721,12 +2713,12 @@ void GameManager::loadGameSounds(){
 
 	//std::cout << "Done with all the skinogg stuff, press select to continue" << std::endl;
 
-	ComboBreak = ls(".mp3");
+	ComboBreak = ls(".mp3", Global.GameBinaryPath + "/resources/skin/");
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((Global.GameBinaryPath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from skin" << std::endl;
@@ -2737,7 +2729,7 @@ void GameManager::loadGameSounds(){
 			std::string name = ComboBreak[i].substr(0, ComboBreak[i].length() - 4);
 			while(std::isdigit(name[name.size() - 1])) name.pop_back();
 			if(SoundFilesAll.loaded.count(name) == 0 or SoundFilesAll.loaded[name].value == false){
-				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data[name] = LoadSound((Global.GameBinaryPath + "/resources/skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from skin" << std::endl;
@@ -2749,13 +2741,13 @@ void GameManager::loadGameSounds(){
 	//std::cout << "Done with all the skinmp3 stuff, press select to continue" << std::endl;
 
 
-	Global.Path = Global.GamePath + "/resources/default_skin/";
-	ComboBreak = ls(".wav");
+	//Global.Path = Global.GameBinaryPath + "/resources/default_skin/";
+	ComboBreak = ls(".wav", Global.GameBinaryPath + "/resources/default_skin/");
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((Global.GameBinaryPath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
@@ -2766,7 +2758,7 @@ void GameManager::loadGameSounds(){
 			std::string name = ComboBreak[i].substr(0, ComboBreak[i].length() - 4);
 			while(std::isdigit(name[name.size() - 1])) name.pop_back();
 			if(SoundFilesAll.loaded.count(name) == 0 or SoundFilesAll.loaded[name].value == false){
-				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data[name] = LoadSound((Global.GameBinaryPath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from default skin" << std::endl;
@@ -2775,12 +2767,12 @@ void GameManager::loadGameSounds(){
 		}
 	}
 	//std::cout << "Done with all the dskinwaw stuff, press select to continue" << std::endl;
-	ComboBreak = ls(".ogg");
+	ComboBreak = ls(".ogg", Global.GameBinaryPath + "/resources/default_skin/");
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((Global.GameBinaryPath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
@@ -2791,7 +2783,7 @@ void GameManager::loadGameSounds(){
 			std::string name = ComboBreak[i].substr(0, ComboBreak[i].length() - 4);
 			while(std::isdigit(name[name.size() - 1])) name.pop_back();
 			if(SoundFilesAll.loaded.count(name) == 0 or SoundFilesAll.loaded[name].value == false){
-				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data[name] = LoadSound((Global.GameBinaryPath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from default skin" << std::endl;
@@ -2800,12 +2792,12 @@ void GameManager::loadGameSounds(){
 		}
 	}
 	//std::cout << "Done with all the dskinogg stuff, press select to continue" << std::endl;
-	ComboBreak = ls(".mp3");
+	ComboBreak = ls(".mp3", Global.GameBinaryPath + "/resources/default_skin/");
 	for(int i = 0; i < ComboBreak.size(); i++){
 		if(ComboBreak[i][ComboBreak[i].size() - 1] == '/') continue;
 		if(ComboBreak[i].rfind("combobreak", 0) == 0){
 			if(SoundFilesAll.loaded.count("combobreak") == 0 or SoundFilesAll.loaded["combobreak"].value == false){
-				SoundFilesAll.data["combobreak"] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data["combobreak"] = LoadSound((Global.GameBinaryPath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded["combobreak"].value = IsSoundReady(&SoundFilesAll.data["combobreak"]);
 				if(SoundFilesAll.loaded["combobreak"].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << ComboBreak[i] << " from default skin" << std::endl;
@@ -2816,7 +2808,7 @@ void GameManager::loadGameSounds(){
 			std::string name = ComboBreak[i].substr(0, ComboBreak[i].length() - 4);
 			while(std::isdigit(name[name.size() - 1])) name.pop_back();
 			if(SoundFilesAll.loaded.count(name) == 0 or SoundFilesAll.loaded[name].value == false){
-				SoundFilesAll.data[name] = LoadSound((Global.GamePath + "/resources/default_skin/" + ComboBreak[i]).c_str());
+				SoundFilesAll.data[name] = LoadSound((Global.GameBinaryPath + "/resources/default_skin/" + ComboBreak[i]).c_str());
 				SoundFilesAll.loaded[name].value = IsSoundReady(&SoundFilesAll.data[name]);
 				if(SoundFilesAll.loaded[name].value){
 					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << name << " from default skin" << std::endl;
@@ -2825,15 +2817,7 @@ void GameManager::loadGameSounds(){
 		}
 	}
 
-
-
-
-	//gameFile.configGeneral["AudioFilename"]
-
-
-	/*SetSoundVolume(&SoundFilesAll.data["combobreak"], 1.0f);
-	PlaySound(&SoundFilesAll.data["combobreak"]);*/
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << loadedBytes / 1024 << "KB of sound data" << std::endl;
-	Global.Path = last;
+	//Global.Path = last;
 	
 }

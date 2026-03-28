@@ -79,6 +79,6 @@ bool IsFileExtension(const char *fileName, const char *ext){
 Image GenImageGradientRadial(int width, int height, float density, Color inner, Color outer){
     Image image;
     //PLACEHOLDER :)
-    image = LoadImage((Global.GamePath + "/resources/sliderin.png").c_str());
+    image = LoadImage((Global.GameBinaryPath + "/resources/sliderin.png").c_str());
     return image;
 }

@@ -231,7 +231,7 @@ void LoadMenu::update() {
             else{
                 Global.selectedPath = Global.Path + '/' + dir_list.objects[dir_list.selectedindex].text;
                 std::string base_file = get_without_ext(Global.selectedPath);
-                std::string final_path = Global.GamePath + "/beatmaps/" + base_file; //  may be a bit cringe when it comes to unzipping stuff...
+                std::string final_path = Global.GameBinaryPath + "/beatmaps/" + base_file; //  may be a bit cringe when it comes to unzipping stuff...
                 final_path = correct_path_notation(final_path);
                 if(check_dir(final_path)){
                     std::cout << "\e[1;38;5;219m[ZIP] \e[38;5;220m" << "the path already exists?" << std::endl;
@@ -594,7 +594,7 @@ void MainMenu::update() {
         //Global.CurrentState->init();
         MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
         std::string temp = Global.Path;
-        Global.Path = Global.GamePath + "/database";
+        Global.Path = Global.GameBinaryPath + "/database";
 
         struct dirent *de;
         DIR *dr = opendir(Global.Path.c_str()); 
@@ -670,7 +670,7 @@ void MainMenu::update() {
                         GameAuthor = geym.configMetadata["Artist"];
                     }
 
-                    std::string filename = Global.GamePath + "/database/" + GameTitle + " {" + GameSetId + "}.db";
+                    std::string filename = Global.GameBinaryPath + "/database/" + GameTitle + " {" + GameSetId + "}.db";
                     bool firstLine = !checkIfExists((filename).c_str());
                     FILE * pFile;
                     pFile = fopen((filename).c_str()  ,"a");
@@ -691,12 +691,12 @@ void MainMenu::update() {
             }
         }
 
-        Global.Path = Global.GamePath + "/database";
+        Global.Path = Global.GameBinaryPath + "/database";
 
         std::vector<std::string> files;
         files = ls(".db");
         std::sort(files.begin(), files.end(), strcasecmp2);
-        std::string filename = Global.GamePath + "/database/mainFolder.db";
+        std::string filename = Global.GameBinaryPath + "/database/mainFolder.db";
         FILE * pFile;
         pFile = fopen((filename).c_str()  ,"a");
         if(pFile != NULL){

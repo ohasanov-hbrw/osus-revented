@@ -12,7 +12,7 @@ std::pair<std::string, std::string> parseLine(std::string line, bool hasSpaceBef
 }
 
 void parseSettings(){
-	std::ifstream ifs(Global.GamePath + "/resources/settings.ini");
+	std::ifstream ifs(Global.GameBinaryPath + "/resources/settings.ini");
 	std::string line;
 	if (ifs.is_open()){
         std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Settings ini opened.\n";
@@ -89,9 +89,9 @@ void parseSettings(){
                             Global.BeatmapLocation = keyValue.second;
                             std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set BeatmapLocation to: " << keyValue.second << std::endl;                      
                         }
-                        else if(keyValue.first == "GamePath"){
-                            Global.GamePath = keyValue.second;
-                            std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set GamePath to: " << keyValue.second << std::endl;                      
+                        else if(keyValue.first == "GameBinaryPath"){
+                            Global.GameBinaryPath = keyValue.second;
+                            std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set GameBinaryPath to: " << keyValue.second << std::endl;                      
                         }
                         else if(keyValue.first == "selectedPath"){
                             Global.selectedPath = keyValue.second;

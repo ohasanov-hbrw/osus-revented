@@ -45,10 +45,62 @@ std::vector<std::string> ls(char* extension) {
     
             closedir(dr);
             free(de);
+            std::sort(text.begin(), text.end());
         }
     #endif
     #ifndef _DIRENT_HAVE_D_TYPE
         for (const auto & entry : fs::directory_iterator(Global.Path)){
+            std::string filename = entry.path().filename().string();
+            fs::directory_entry isDirectory(entry.path());
+            if(filename[0] != '.'){
+                if(isDirectory.is_directory()){
+                    filename.push_back('/');
+                    text.push_back(filename);
+                }
+                else if(entry.path().extension() == extension){
+                    text.push_back(filename);
+                }
+                
+            }
+        }
+        std::sort(text.begin(), text.end());
+    #endif
+    return text;
+}
+
+std::vector<std::string> ls(char* extension, std::string_view path) {
+    std::vector<std::string> text;
+    text.clear();
+
+    #ifdef _DIRENT_HAVE_D_TYPE
+        struct dirent *de;
+
+        DIR *dr = opendir(path.c_str()); 
+    
+        if (dr == NULL){ // opendir returns NULL if couldn't open directory { 
+            printf("Could not open current directory" ); 
+        }
+        else{
+            while ((de = readdir(dr)) != NULL) {
+                std::string filename = de->d_name;
+                if(filename[0] != '.'){
+                    if(de->d_type == DT_DIR){
+                        filename.push_back('/');
+                        text.push_back(filename);
+                    }
+                    else if(IsFileExtension(filename.c_str(), extension)){
+                        text.push_back(filename);
+                    }
+                }
+            }
+    
+            closedir(dr);
+            free(de);
+            std::sort(text.begin(), text.end());
+        }
+    #endif
+    #ifndef _DIRENT_HAVE_D_TYPE
+        for (const auto & entry : fs::directory_iterator(path)){
             std::string filename = entry.path().filename().string();
             fs::directory_entry isDirectory(entry.path());
             if(filename[0] != '.'){
