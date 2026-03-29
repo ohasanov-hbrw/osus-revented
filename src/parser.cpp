@@ -122,11 +122,14 @@ GameFile Parser::parse(std::string filename){
 	if (ifs.is_open()){
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Beatmap file opened\n";
 		while(std::getline(ifs, line)){
-			if(line[line.size()-1] == 13)
+			if(line.size() > 0 and line[line.size()-1] == 13){
 				line.pop_back();
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Popped back of " << line << " - size: " << line.size() << std::endl;
+			}
 			lineNumber++;
+			std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parsing line " << lineNumber << " with size " << line.size() << std::endl;
 			Global.parsedLines++;
-			if(line[0] == '[' and line[line.size()-1] == ']'){
+			if(line.size() > 0 and line[0] == '[' and line[line.size()-1] == ']'){
 				std::string header = line.substr(1);
 				header.pop_back();
 				if(header == "General"){
@@ -526,9 +529,13 @@ GameFile Parser::parse(std::string filename){
 						gameFile.hitObjects.push_back(tempHitObject);
 					}
 				}
+				else{
+					std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Empty Line? " << lineNumber << " with size " << line.size() << std::endl;
+				}
 			}
 		}
 		ifs.close();
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Beatmap file closed\n";
 	}
 	
 	return gameFile;	

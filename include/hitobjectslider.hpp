@@ -1,5 +1,6 @@
 #include "hitobjectdefinition.hpp"
 #include "rlgl.h"
+#include <climits>
 class Slider : public HitObject{
     public:
         Slider(HitObjectData data);

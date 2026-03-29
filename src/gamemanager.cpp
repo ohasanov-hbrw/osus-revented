@@ -675,13 +675,15 @@ void GameManager::run(){
 	gettimeofday(&tp, NULL);
 	long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
 	//ms = getTimer() / 1000.0;
-	if(Global.CurrentState->initDone == 3){
+	if(Global.CurrentState->initializationStage == STATE_UNLOAD || Global.CurrentState->initializationStage == STATE_FORCED_EXIT){
 		maxCombo = std::max(maxCombo, clickCombo);
 		StopMusicStream(&backgroundMusic);
 		TimerLast = (double)GetMusicTimeLength(&backgroundMusic) * 1000.0;
 		TimeLast = getTimer();
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "waiting for 0.25 secs for the song to end\n";
 		while((getTimer() - TimeLast) < 250.0){
+			if(Global.CurrentState->initializationStage == STATE_FORCED_EXIT)
+				break;
 			currentTime = (double)(TimerLast + (getTimer() - TimeLast)) / 1000.0;
 			GameManager::update();
 			SleepInMs(5);
@@ -692,7 +694,7 @@ void GameManager::run(){
 		MutexLock(ACCESSING_OBJECTS);
 		MutexUnlock(SWITCHING_STATE);
 		MutexLock(SWITCHING_STATE);*/
-		Global.CurrentState->initDone = 3;
+		Global.CurrentState->initializationStage = STATE_UNLOAD;
 		//MutexUnlock(ACCESSING_OBJECTS);
 		MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to lock render block for game unload" << std::endl;
@@ -775,7 +777,7 @@ void GameManager::run(){
 			MutexLock(ACCESSING_OBJECTS);
 			MutexUnlock(SWITCHING_STATE);
 			MutexLock(SWITCHING_STATE);*/
-			Global.CurrentState->initDone = 3;
+			Global.CurrentState->initializationStage = STATE_UNLOAD;
             //MutexUnlock(ACCESSING_OBJECTS);
 			MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 			std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to lock render block for game unload" << std::endl;
@@ -889,7 +891,6 @@ Vector2 get2BezierPoint(std::vector<Vector2> &points, int numPoints, float t){
     delete[] tmp;
     return answer;
 }
-
 //load the beatmap
 void GameManager::loadDefaultSkin(std::string filename){
 	currentComboIndex = 0;
@@ -993,7 +994,6 @@ void GameManager::loadDefaultSkin(std::string filename){
 		}
 	}
 }
-
 
 void GameManager::loadGameSkin(std::string filename){
 	temprenderSpinnerCircle = false;
@@ -1100,7 +1100,6 @@ void GameManager::loadGameSkin(std::string filename){
 		}
 	}
 }
-
 
 void GameManager::loadBeatmapSkin(std::string filename){
 	std::vector<std::string> files;
@@ -1829,20 +1828,40 @@ void GameManager::unloadGame(){
 	//LightLock_Lock(&Global.lightlock);
 
 
+	for(int i = gameFile.hitObjects.size() - 1; i >= 0; i--){
+		gameFile.hitObjects[i].curvePoints.clear();
+		gameFile.hitObjects[i].edgeSounds.clear();
+		gameFile.hitObjects[i].edgeSets.clear();
+		gameFile.hitObjects[i].colour.clear();
+		gameFile.hitObjects[i].lengths.clear();
+		gameFile.hitObjects[i].filename = "";
+
+		gameFile.hitObjects[i].curvePoints.shrink_to_fit();
+		gameFile.hitObjects[i].edgeSounds.shrink_to_fit();
+		gameFile.hitObjects[i].edgeSets.shrink_to_fit();
+		gameFile.hitObjects[i].colour.shrink_to_fit();
+		gameFile.hitObjects[i].lengths.shrink_to_fit();
+	}
+
+	for(int i = gameFile.followPoints.size() - 1; i >= 0; i--){
+		gameFile.followPoints[i].points.clear();
+
+		gameFile.followPoints[i].points.shrink_to_fit();
+	}
+
 	gameFile.hitObjects.clear();
 	gameFile.timingPoints.clear();
 	gameFile.followPoints.clear();
 	gameFile.events.clear();
 	
-	gameFile.hitObjects = std::vector<HitObjectData>();
-	gameFile.timingPoints = std::vector<TimingPoint>();
-	gameFile.followPoints = std::vector<FollowPoint>();
-	gameFile.events = std::vector<Event>();
+	gameFile.hitObjects.shrink_to_fit();
+	gameFile.timingPoints.shrink_to_fit();
+	gameFile.followPoints.shrink_to_fit();
+	gameFile.events.shrink_to_fit();
 
 
 	followLines.clear();
-
-	followLines = std::vector<FollowPoint>();
+	followLines.shrink_to_fit();
 
 	
 	//Global.mutex2.lock();

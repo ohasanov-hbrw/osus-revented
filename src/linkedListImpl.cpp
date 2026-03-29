@@ -27,7 +27,7 @@ void Linkedlist::init(){
 } 
 
 void Linkedlist::insertHead(void * data){  
-    std::cout << "inserthead\n";
+    //std::cout << "inserthead\n";
     Node *newNode = new Node(data);  
     newNode->next = head;
     newNode->prev = NULL;  
@@ -42,7 +42,7 @@ void Linkedlist::insertHead(void * data){
 
 
 void Linkedlist::insertTail(void * data){  
-    std::cout << "inserttail\n";
+    //std::cout << "inserttail\n";
     Node *newNode = new Node(data);  
     if(head == NULL) {  
         head = newNode;  

@@ -5,15 +5,29 @@
 #include <globals.hpp>
 #include <list>
 
+
+enum INITSTATE {
+    STATE_FORCED_EXIT = 4,
+    STATE_UNLOAD = 3,
+    STATE_UNINITIALIZED = 0,
+    STATE_INITIALIZED = 1,
+    STATE_LOADING_GAME = -2,
+    STATE_COUNTDOWN = -1
+};
+
+
 class State {
+private:
+    
 public:
+
     State() = default;
     virtual ~State() = default;
-    int initDone = 0;
+    enum INITSTATE initializationStage = STATE_UNINITIALIZED;
     double initStartTime = 0;
 
-    int animationStart;
-    bool animationDone;
+    int animationStart = 0;
+    bool animationDone = false;
     double animationStartTime = 0;
     double animationMs = 10;
 
@@ -129,10 +143,10 @@ private:
     ImageObject logo;
     TextBox description;
 
-    bool focused;
-    bool focusbreak;
-    bool clicked;
-    bool action;
+    bool focused = false;
+    bool focusbreak = false;
+    bool clicked = false;
+    bool action = false;
 public:
     StartMenu();
 

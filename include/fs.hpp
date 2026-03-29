@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-
+#include <algorithm>
 
 
 std::vector<std::string> ls(char*);

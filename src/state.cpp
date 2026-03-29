@@ -43,11 +43,11 @@ void PlayMenu::init() {
 
     std::vector<std::string> dir = ls(".osu");
     dir_list = SelectableList({320, 250}, {520, 160}, {255,135,198,255}, dir, BLACK, 20, 20, 65);
-    initDone = 1;
+    initializationStage = STATE_INITIALIZED;
     //MutexUnlock(SWITCHING_STATE);
 }
 void PlayMenu::render() {
-    if(initDone != 1)
+    if(initializationStage != STATE_INITIALIZED)
         return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
@@ -146,7 +146,7 @@ void PlayMenu::update() {
     //MutexUnlock(SWITCHING_STATE);
 }
 void PlayMenu::unload() {
-    initDone = 0;
+    initializationStage = STATE_UNINITIALIZED;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -171,11 +171,11 @@ void LoadMenu::init() {
     Global.useAuto = false;
     Global.LastFrameTime = getTimer();
     Global.FrameTime = 0.5;
-    initDone = 1;
+    initializationStage = STATE_INITIALIZED;
     //MutexUnlock(SWITCHING_STATE);
 }
 void LoadMenu::render() {
-    if(initDone != 1)
+    if(initializationStage != STATE_INITIALIZED)
         return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
@@ -267,7 +267,7 @@ void LoadMenu::update() {
     //MutexUnlock(ACCESSING_OBJECTS);
 }
 void LoadMenu::unload() {
-    initDone = 0;
+    initializationStage = STATE_UNINITIALIZED;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -349,7 +349,7 @@ void MainMenu::init() {
         animationMs = 200;
     }
     animationStartTime = getTimer();
-    initDone = 1;
+    initializationStage = STATE_INITIALIZED;
     //MutexUnlock(SWITCHING_STATE);
 }
 
@@ -746,7 +746,7 @@ void MainMenu::update() {
     //MutexUnlock(ACCESSING_OBJECTS);
 }
 void MainMenu::render() {
-    if(initDone != 1)
+    if(initializationStage != STATE_INITIALIZED)
         return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
@@ -772,7 +772,7 @@ void MainMenu::render() {
     //Global.mutex.unlock();
 }
 void MainMenu::unload() {
-    initDone = 0;
+    initializationStage = STATE_UNINITIALIZED;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -800,7 +800,7 @@ void StartMenu::init() {
     popup.block = !Global.errors.empty();
     animation = 0;
     //MutexUnlock(SWITCHING_STATE);
-    initDone = 1;
+    initializationStage = STATE_INITIALIZED;
 }
 
 
@@ -883,7 +883,7 @@ void StartMenu::update() {
     }
 }
 void StartMenu::render() {
-    if(initDone != 1)
+    if(initializationStage != STATE_INITIALIZED)
         return;
     //Global.mutex.lock();
     //MutexLock(SWITCHING_STATE);
@@ -900,7 +900,7 @@ void StartMenu::render() {
     //Global.mutex.unlock();
 }
 void StartMenu::unload() {
-    initDone = 0;
+    initializationStage = STATE_UNINITIALIZED;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -922,7 +922,7 @@ void Game::init() {
     //MutexLock(SWITCHING_STATE);
     Global.NeedForBackgroundClear = true;
     Global.useAuto = false;
-    initDone = 0;
+    initializationStage = STATE_UNINITIALIZED;
     Global.LastFrameTime = getTimer();
     //std::cout << Global.selectedPath << std::endl;
 
@@ -930,7 +930,7 @@ void Game::init() {
     Global.numberLines = 0;
     Global.parsedLines = 0;
     Global.loadingState = 0;
-    initDone = -2;
+    initializationStage = STATE_LOADING_GAME;
     initStartTime = getTimer();
     //Global.mutex.unlock();
     //LightLock_Unlock(&Global.lightlock);
@@ -971,32 +971,32 @@ void Game::update() {
         Global.volumeChanged = true;
     }
 
-    if(initDone == 1){
+    if(initializationStage == STATE_INITIALIZED){
         //Global.enableMouse = false;
         
         //MutexLock(SWITCHING_STATE);
         
         if(IsKeyPressed(Global.GO_BACK_KEY) || !(!WindowShouldClose() and _os_should_program_run())){
-            Global.CurrentState->initDone = 3;        
+            Global.CurrentState->initializationStage = STATE_FORCED_EXIT;        
         }
         MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
         Global.gameManager->run();
         MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     }
     else{
-        if(initDone == 0 or Global.GameTextures == 0){
-            initDone = -1;
+        if(initializationStage == STATE_UNINITIALIZED or Global.GameTextures == 0){
+            initializationStage = STATE_COUNTDOWN;
         }
-        if(initDone == -1 and getTimer() - initStartTime > 0.0f){
+        if(initializationStage == STATE_COUNTDOWN and getTimer() - initStartTime > 0.0f){
             std::cout << "\e[1;38;5;236m[INFO] \e[38;5;40m" << "init done in " << getTimer() - initStartTime << " msecs\n";
-            initDone = 1;
+            initializationStage = STATE_INITIALIZED;
         }
     }
 
 }
 void Game::render() {
     
-    if(initDone == 1){
+    if(initializationStage == STATE_INITIALIZED){
         //Global.enableMouse = false;
         MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         Global.gameManager->render();
@@ -1018,7 +1018,7 @@ void Game::render() {
 
         //Global.mutex.unlock();
     }
-    else if(initDone == -1){
+    else if(initializationStage == STATE_COUNTDOWN){
         std::string message;
         if(getTimer() - initStartTime < 2000.0f)
             message = "Loaded Game!";
@@ -1036,7 +1036,7 @@ void Game::render() {
         DrawTextEx(&Global.DefaultFont, message.c_str(), {static_cast<float>((int)ScaleCordX(320 - message.size() * 7.5f)), static_cast<float>((int)ScaleCordY(220))}, Scale(20.05), Scale(2), WHITE);
         //Global.mutex.unlock();
     }
-    else if(initDone == -2){
+    else if(initializationStage == STATE_LOADING_GAME){
         //Global.mutex.lock();
         std::string message;
         message = "Loading Game...";
@@ -1199,7 +1199,7 @@ void WIPMenu::init(){
     }
     applyMouse = true;
 	//SetTextureFilter(menu, TEXTURE_FILTER_BILINEAR );
-    initDone = 1;
+    initializationStage = STATE_INITIALIZED;
 
 }
 void WIPMenu::render(){
@@ -1642,7 +1642,7 @@ void ResultsMenu::init() {
     Global.NeedForBackgroundClear = true;
     Global.useAuto = false;
     Global.LastFrameTime = getTimer();
-    initDone = 1;
+    initializationStage = STATE_INITIALIZED;
     
 }
 void ResultsMenu::render() {
@@ -1673,7 +1673,7 @@ void ResultsMenu::update() {
     }
 }
 void ResultsMenu::unload() {
-    initDone = 0;
+    initializationStage = STATE_UNINITIALIZED;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -1716,10 +1716,10 @@ void WipMenu2::init() {
     lastStuffAt = -1;
     canAddStuff = true;
     canRemoveStuff = false;
-    initDone = 1;
+    initializationStage = STATE_INITIALIZED;
 }
 void WipMenu2::update() {
-    if(initDone != 1)
+    if(initializationStage != STATE_INITIALIZED)
         return;
     MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     if(Global.Key2P && addStuffAt == -1 && removeStuffAt == -1){
@@ -1930,7 +1930,7 @@ void WipMenu2::update() {
     }
 }
 void WipMenu2::render(){
-    if(initDone != 1)
+    if(initializationStage != STATE_INITIALIZED)
         return;
     MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     Rectangle rect;
@@ -1984,7 +1984,7 @@ void WipMenu2::render(){
     MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 }
 void WipMenu2::unload() {
-    initDone = 0;
+    initializationStage = STATE_UNINITIALIZED;
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(ACCESSING_OBJECTS);
     //MutexLock(ACCESSING_OBJECTS);

@@ -3275,6 +3275,8 @@ RenderTexture2D LoadRenderTextureMSAA(int width, int height)
 // Unload texture from GPU memory (VRAM)
 void UnloadTexture(Texture2D * texture)
 {
+    if(texture == NULL)
+        return;
     if (texture->id > 0)
     {
         rlUnloadTexture(texture->id);

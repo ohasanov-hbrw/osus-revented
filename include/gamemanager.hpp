@@ -55,48 +55,48 @@ class GameManager{
 		std::vector<HitObject*> dead_objects;
 		std::deque<timingSettings> timingSettingsForHitObject;
 
-		HitSound SoundFilesAll;
+		HitSound SoundFilesAll = {};
 		
-		Background backgroundTextures;
+		Background backgroundTextures = {};
 		
-		Texture2D hitCircle;
-		Texture2D hitCircleOverlay;
-		Texture2D approachCircle;
-		Texture2D cursor;
-		Texture2D selectCircle;
-		Texture2D hit0;
-		Texture2D hit50;
-		Texture2D hit100;
-		Texture2D hit300;
-		Texture2D sliderb;
-		Texture2D sliderscorepoint;
-		Texture2D sliderfollow;
-		Texture2D reverseArrow;
-		Texture2D sliderin;
-		Texture2D sliderblank;
-		Texture2D sliderout;
-		Texture2D numbers[10];
-		Texture2D spinnerBottom;
-		Texture2D spinnerTop;
-		Texture2D spinnerCircle;
-		Texture2D spinnerApproachCircle;
-		Texture2D spinnerMetre;
-		Texture2D spinnerBack;
-		Texture2D followPoint;
+		Texture2D hitCircle = {};
+		Texture2D hitCircleOverlay = {};
+		Texture2D approachCircle = {};
+		Texture2D cursor = {};
+		Texture2D selectCircle = {};
+		Texture2D hit0 = {};
+		Texture2D hit50 = {};
+		Texture2D hit100 = {};
+		Texture2D hit300 = {};
+		Texture2D sliderb = {};
+		Texture2D sliderscorepoint = {};
+		Texture2D sliderfollow = {};
+		Texture2D reverseArrow = {};
+		Texture2D sliderin = {};
+		Texture2D sliderblank = {};
+		Texture2D sliderout = {};
+		Texture2D numbers[10] = {};
+		Texture2D spinnerBottom = {};
+		Texture2D spinnerTop = {};
+		Texture2D spinnerCircle = {};
+		Texture2D spinnerApproachCircle = {};
+		Texture2D spinnerMetre = {};
+		Texture2D spinnerBack = {};
+		Texture2D followPoint = {};
 
-		RenderTexture2D sliderInnerBall;
-		RenderTexture2D sliderOuterBall;
+		RenderTexture2D sliderInnerBall = {};
+		RenderTexture2D sliderOuterBall = {};
 
-		Music backgroundMusic;
+		Music backgroundMusic = {};
 
-		Color comboColour;
+		Color comboColour = {};
 
-		double currentTime;
+		double currentTime = 0;
 		double currentTimeTemp = -1;
 		double sliderSpeed = 1.0f;
 		double sliderSpeedOverride = 1.0f;
-		double verytempbeat2;
-		double verytempbeat;
+		double verytempbeat2 = 0;
+		double verytempbeat = 0;
 		double TimerLast = 0;
 		double TimeLast = 0;
 		double lastHitTime = 0;
@@ -104,11 +104,11 @@ class GameManager{
 		long long int score = 0;
 		long long int animatedScore = 0;
 
-		Vector2 MousePosition;
+		Vector2 MousePosition = {0,0};
 		Vector2 lastCords = {0,0};
 		
-		char *musicData;
-		long musicSize;
+		char *musicData = NULL;
+		long musicSize = 0;
 
 		#ifdef THREEDS_BUILD
 			int skip = 10;
@@ -119,34 +119,34 @@ class GameManager{
 			int smallskip = 1;
 		#endif
 		int currentComboIndex = 0;
-		int time;
-		int meter;
+		int time = 0;
+		int meter = 0;
 		int combo = 1;
 		int clickCombo = 0;
-		int maxCombo;
-		int sampleSet;
-		int sampleIndex;
-		int volume;
-		int effects;
+		int maxCombo = 0;
+		int sampleSet = 0;
+		int sampleIndex = 0;
+		int volume = 0;
+		int effects = 0;
 		int defaultSampleSet = 0;
-		int index;
-		int lastCurrentTiming;
+		int index = 0;
+		int lastCurrentTiming = 0;
 		int spawnedHitObjects = 0;
 		int hit300s = 0;
 		int hit100s = 0;
 		int hit50s = 0;
 		int hit0s = 0;
-		int lastTimingLoc;
+		int lastTimingLoc = 0;
 
 		float difficultyMultiplier = 0;
 		float windowScale = 2.0f;
-		float beatLength;
+		float beatLength = 0;
 		float slidertickrate = 1.0f;
 		float angle = 0;
 		float circlesize = 54.48*2.0f;
 		float spinsPerSecond = 5.0f;
 		
-		bool uninherited;
+		bool uninherited = false;
 		bool pressed = false;
 		bool down = false;
 		bool stop = false;
@@ -159,8 +159,8 @@ class GameManager{
 		bool startMusic = false;
 		
 		std::string currentBackgroundTexture = "";
-		std::string lastPath;
-		std::string BeatmapFolderPathWithSlash;
+		std::string lastPath = "";
+		std::string BeatmapFolderPathWithSlash = "";
 	private:
 		static GameManager* inst_;
 		void init();

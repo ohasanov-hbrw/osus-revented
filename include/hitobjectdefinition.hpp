@@ -33,7 +33,7 @@ struct HitObjectData{
     std::vector<short> colour;
     std::vector<float> lengths;
     std::string filename = "";
-
+    
     timingSettings timing;
     Vector2 extraPos;
 

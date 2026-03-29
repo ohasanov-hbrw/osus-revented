@@ -187,7 +187,7 @@ void RenderLoop(void *){
             // Dont want to be rendering stuff while loading stuff
             MutexLock(SWITCHING_STATE, RENDERTHREAD_ID);
             // Dont flash while loading, just keep the last image
-            if(Global.NeedForBackgroundClear && Global.CurrentState->initDone != 0)
+            if(Global.NeedForBackgroundClear && Global.CurrentState->initializationStage != STATE_UNINITIALIZED)
                 ClearBackground(Global.Background);
             // The state should know not to render while its loading
             Global.CurrentState->render();
@@ -396,7 +396,7 @@ int main(){
     MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
     MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "unloading current situation\n";
-    Global.CurrentState->initDone = 3;
+    Global.CurrentState->initializationStage = STATE_FORCED_EXIT;
     
     
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "locked the switching state\n";

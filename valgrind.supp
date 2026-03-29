@@ -1,0 +1,1567 @@
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+   obj:/usr/lib/wsl/lib/libdxcore.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   fun:D3DKMTQueryAdapterInfo
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   fun:OpenAdapter12
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   fun:D3DKMTQueryAdapterInfo
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   fun:call_init
+   fun:call_init
+   fun:_dl_init
+   fun:_dl_catch_exception
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   fun:call_init
+   fun:call_init
+   fun:_dl_init
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   fun:call_init
+   fun:call_init
+   fun:_dl_init
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   fun:call_init
+   fun:call_init
+   fun:_dl_init
+   fun:_dl_catch_exception
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   fun:D3DKMTLock2
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memset
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memset
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memset
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memset
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+    aaaaaaaaa
+    Memcheck:Addr4
+    obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+    ...
+    obj:/usr/lib/wsl/lib/libd3d12core.so
+    ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr2
+   fun:memcpy@GLIBC_2.2.5
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memset
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr2
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr2
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   fun:start_thread
+   fun:clone
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memcpy@GLIBC_2.2.5
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memcpy@GLIBC_2.2.5
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memset
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memcpy@GLIBC_2.2.5
+   ...
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   ...
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   ...
+   fun:D3DKMTQueryAdapterInfo
+   ...
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   ...
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   ...
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memset
+   ...
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   ...
+}
+
+{
+   name
+   Memcheck:Cond
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   name
+   Memcheck:Free
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   name
+   Memcheck:Value8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   name
+   Memcheck:Cond
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   name
+   Memcheck:Free
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   name
+   Memcheck:Value8
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   obj:obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   fun:D3DKMTQueryAdapterInfo
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:free
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:free
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z29d3d12_process_batch_residencyP12d3d12_screenP11d3d12_batch
+   fun:_Z15d3d12_end_batchP13d3d12_contextP11d3d12_batch
+   fun:_ZL21d3d12_context_destroyP12pipe_context
+   fun:tc_destroy
+   fun:st_destroy_context_priv
+   fun:st_destroy_context
+   fun:dri_destroy_context
+   fun:dri_destroy_context
+   fun:glXDestroyContext
+   fun:glXDestroyContext
+   fun:UnknownInlinedFun
+   fun:X11_GL_LoadLibrary.part.0
+   fun:SDL_GL_LoadLibrary_REAL
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   fun:D3DKMTWaitForSynchronizationObjectFromCpu
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z22d3d12_create_fence_rawP11ID3D12Fencem
+   fun:_Z18d3d12_create_fenceP12d3d12_screenb
+   fun:_Z15d3d12_end_batchP13d3d12_contextP11d3d12_batch
+   fun:_ZL21d3d12_context_destroyP12pipe_context
+   fun:tc_destroy
+   fun:st_destroy_context_priv
+   fun:st_destroy_context
+   fun:dri_destroy_context
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z18d3d12_fence_finishP11d3d12_fencem.part.0
+   fun:_Z17d3d12_reset_batchP13d3d12_contextP11d3d12_batchm
+   fun:_Z19d3d12_destroy_batchP13d3d12_contextP11d3d12_batch
+   fun:_ZL21d3d12_context_destroyP12pipe_context
+   fun:tc_destroy
+   fun:st_destroy_context_priv
+   fun:st_destroy_context
+   fun:dri_destroy_context
+   fun:dri_destroy_context
+   fun:glXDestroyContext
+   fun:glXDestroyContext
+   fun:UnknownInlinedFun
+   fun:X11_GL_LoadLibrary.part.0
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr1
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   fun:D3DKMTFreeGpuVirtualAddress
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdlPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdlPv
+   ...
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   fun:dl_iterate_phdr
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   ...
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:tc_buffer_subdata.part.0
+   fun:bufferobj_data
+   fun:_mesa_bufferobj_data
+   fun:buffer_data
+   fun:buffer_data_error
+   fun:_mesa_buffer_data
+   fun:_mesa_BufferData
+   fun:rlLoadRenderBatch
+   fun:rlglInit
+   fun:InitWindow
+   fun:_Z16_os_init_programb
+   fun:main
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr2
+   fun:memmove
+   fun:memcpy
+   fun:util_copy_rect
+   fun:util_copy_box
+   fun:u_default_texture_subdata
+   fun:tc_call_texture_subdata
+   fun:batch_execute
+   fun:tc_batch_execute
+   fun:_tc_sync.isra.0
+   fun:tc_texture_map
+   fun:pipe_texture_map_3d
+   fun:st_texture_image_map
+   fun:st_MapTextureImage
+   fun:store_texsubimage
+   fun:_mesa_store_texsubimage
+   fun:st_TexSubImage
+   fun:st_TexImage
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:convert_ubyte
+   fun:_mesa_format_convert
+   fun:texstore_rgba
+   fun:_mesa_texstore
+   fun:store_texsubimage
+   fun:_mesa_store_texsubimage
+   fun:st_TexSubImage
+   fun:st_TexImage
+   fun:teximage
+   fun:teximage_err
+   fun:_mesa_TexImage2D
+   fun:rlLoadTexture
+   fun:LoadTextureFromImage
+   fun:LoadFontDefault
+   fun:InitWindow
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z29d3d12_process_batch_residencyP12d3d12_screenP11d3d12_batch
+   fun:_Z15d3d12_end_batchP13d3d12_contextP11d3d12_batch
+   fun:d3d12_flush_cmdlist
+   fun:d3d12_flush_cmdlist
+   fun:_ZL11d3d12_flushP12pipe_contextPP17pipe_fence_handlej
+   fun:tc_flush
+   fun:st_flush
+   fun:st_glFlush
+   fun:_mesa_make_current
+   fun:st_api_make_current
+   fun:dri_unbind_context
+   fun:driUnbindContext
+   fun:MakeContextCurrent
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z17d3d12_start_batchP13d3d12_contextP11d3d12_batch
+   fun:d3d12_flush_cmdlist
+   fun:d3d12_flush_cmdlist
+   fun:_ZL11d3d12_flushP12pipe_contextPP17pipe_fence_handlej
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr16
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z18d3d12_fence_finishP11d3d12_fencem.part.0
+   fun:d3d12_fence_finish
+   fun:_ZL12fence_finishP11pipe_screenP12pipe_contextP17pipe_fence_handlem
+   fun:drisw_swap_buffers_with_damage
+   fun:driswSwapBuffers
+   fun:glXSwapBuffers
+   fun:X11_GL_SwapWindow
+   fun:_Z23_gpu_init_render_threadv
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+   fun:_ZSt8__invokeIPFvPvEJS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_
+   fun:_ZNSt6thread8_InvokerISt5tupleIJPFvPvES2_EEE9_M_invokeIJLm0ELm1EEEEvSt12_Index_tupleIJXspT_EEE
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z18d3d12_fence_finishP11d3d12_fencem.part.0
+   fun:_Z17d3d12_reset_batchP13d3d12_contextP11d3d12_batchm
+   fun:fence_finish
+   fun:_ZL12fence_finishP11pipe_screenP12pipe_contextP17pipe_fence_handlem
+   fun:drisw_swap_buffers_with_damage
+   fun:driswSwapBuffers
+   fun:glXSwapBuffers
+   fun:X11_GL_SwapWindow
+   fun:_Z23_gpu_init_render_threadv
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+   fun:_ZSt8__invokeIPFvPvEJS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z29d3d12_process_batch_residencyP12d3d12_screenP11d3d12_batch
+   fun:_Z15d3d12_end_batchP13d3d12_contextP11d3d12_batch
+   fun:d3d12_flush_cmdlist
+   fun:d3d12_flush_cmdlist
+   fun:_Z28d3d12_flush_cmdlist_and_waitP13d3d12_context
+   fun:_ZL18d3d12_transfer_mapP12pipe_contextP13pipe_resourcejjPK8pipe_boxPP13pipe_transfer
+   fun:pipe_texture_map
+   fun:_ZL23d3d12_flush_frontbufferP11pipe_screenP12pipe_contextP13pipe_resourcejjPvjP8pipe_box
+   fun:drisw_present_texture
+   fun:drisw_copy_to_front
+   fun:drisw_swap_buffers_with_damage
+   fun:driswSwapBuffers
+   fun:glXSwapBuffers
+   fun:X11_GL_SwapWindow
+   fun:_Z23_gpu_init_render_threadv
+   fun:_Z10RenderLoopPv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z18d3d12_fence_finishP11d3d12_fencem.part.0
+   fun:_Z17d3d12_reset_batchP13d3d12_contextP11d3d12_batchm
+   fun:_ZL18d3d12_transfer_mapP12pipe_contextP13pipe_resourcejjPK8pipe_boxPP13pipe_transfer
+   fun:pipe_texture_map
+   fun:_ZL23d3d12_flush_frontbufferP11pipe_screenP12pipe_contextP13pipe_resourcejjPvjP8pipe_box
+   fun:drisw_present_texture
+   fun:drisw_copy_to_front
+   fun:drisw_swap_buffers_with_damage
+   fun:driswSwapBuffers
+   fun:glXSwapBuffers
+   fun:X11_GL_SwapWindow
+   fun:_Z23_gpu_init_render_threadv
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr16
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:util_copy_rect
+   fun:_ZL23d3d12_flush_frontbufferP11pipe_screenP12pipe_contextP13pipe_resourcejjPvjP8pipe_box
+   fun:drisw_present_texture
+   fun:drisw_copy_to_front
+   fun:drisw_swap_buffers_with_damage
+   fun:driswSwapBuffers
+   fun:glXSwapBuffers
+   fun:X11_GL_SwapWindow
+   fun:_Z23_gpu_init_render_threadv
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+   fun:_ZSt8__invokeIPFvPvEJS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_
+   fun:_ZNSt6thread8_InvokerISt5tupleIJPFvPvES2_EEE9_M_invokeIJLm0ELm1EEEEvSt12_Index_tupleIJXspT_EEE
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:util_copy_rect
+   fun:util_copy_box
+   fun:u_default_texture_subdata
+   fun:st_TexSubImage
+   fun:st_TexImage
+   fun:teximage
+   fun:teximage_err
+   fun:_mesa_TexImage2D
+   fun:rlLoadTexture
+   fun:LoadTextureFromImage
+   fun:LoadTexture
+   fun:_Z10RenderLoopPv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:util_copy_rect
+   fun:util_copy_box
+   fun:u_default_texture_subdata
+   fun:st_TexSubImage
+   fun:st_TexImage
+   fun:teximage
+   fun:teximage_err
+   fun:_mesa_TexImage2D
+   fun:rlLoadTexture
+   fun:LoadTextureFromImage
+   fun:LoadTexture
+   fun:_Z10RenderLoopPv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:tc_buffer_subdata.part.0
+   fun:rlDrawRenderBatch
+   fun:rlDrawRenderBatchActive
+   fun:_Z16_gpu_end_drawingb
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+   fun:_ZSt8__invokeIPFvPvEJS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_
+   fun:_ZNSt6thread8_InvokerISt5tupleIJPFvPvES2_EEE9_M_invokeIJLm0ELm1EEEEvSt12_Index_tupleIJXspT_EEE
+   fun:_ZNSt6thread8_InvokerISt5tupleIJPFvPvES2_EEEclEv
+   fun:_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvPvES3_EEEEE6_M_runEv
+   fun:execute_native_thread_routine
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:st_upload_constants
+   fun:st_validate_state
+   fun:st_prepare_draw
+   fun:_mesa_validated_drawrangeelements
+   fun:_mesa_DrawElementsBaseVertex
+   fun:rlDrawRenderBatch
+   fun:rlDrawRenderBatchActive
+   fun:_Z16_gpu_end_drawingb
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+   fun:_ZSt8__invokeIPFvPvEJS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_
+   fun:_ZNSt6thread8_InvokerISt5tupleIJPFvPvES2_EEE9_M_invokeIJLm0ELm1EEEEvSt12_Index_tupleIJXspT_EEE
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:st_upload_constants
+   fun:st_validate_state
+   fun:st_prepare_draw
+   fun:_mesa_validated_drawrangeelements
+   fun:_mesa_DrawElementsBaseVertex
+   fun:rlDrawRenderBatch
+   fun:rlDrawRenderBatchActive
+   fun:_Z16_gpu_end_drawingb
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+   fun:_ZSt8__invokeIPFvPvEJS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_
+   fun:_ZNSt6thread8_InvokerISt5tupleIJPFvPvES2_EEE9_M_invokeIJLm0ELm1EEEEvSt12_Index_tupleIJXspT_EEE
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:u_default_buffer_subdata
+   fun:tc_call_buffer_subdata
+   fun:batch_execute
+   fun:tc_batch_execute
+   fun:_tc_sync.isra.0
+   fun:tc_flush
+   fun:st_flush
+   fun:st_glFlush
+   fun:driswSwapBuffers
+   fun:glXSwapBuffers
+   fun:X11_GL_SwapWindow
+   fun:_Z16_gpu_end_drawingb
+   fun:_Z10RenderLoopPv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memcpy@GLIBC_2.2.5
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z36d3d12_descriptor_heap_append_handlesP21d3d12_descriptor_heapP27D3D12_CPU_DESCRIPTOR_HANDLEj
+   fun:_ZL20fill_srv_descriptorsP13d3d12_contextP12d3d12_shaderj
+   fun:_ZL35update_shader_stage_root_parametersP13d3d12_contextPK21d3d12_shader_selectorRjS4_P27D3D12_GPU_DESCRIPTOR_HANDLEPi
+   fun:update_graphics_root_parameters
+   fun:_Z14d3d12_draw_vboP12pipe_contextPK14pipe_draw_infojPK23pipe_draw_indirect_infoPK26pipe_draw_start_count_biasj
+   fun:tc_call_draw_single
+   fun:batch_execute
+   fun:tc_batch_execute
+   fun:_tc_sync.isra.0
+   fun:tc_flush
+   fun:st_flush
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memcpy@GLIBC_2.2.5
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z36d3d12_descriptor_heap_append_handlesP21d3d12_descriptor_heapP27D3D12_CPU_DESCRIPTOR_HANDLEj
+   fun:_ZL24fill_sampler_descriptorsP13d3d12_contextPK21d3d12_shader_selectorj
+   fun:_ZL35update_shader_stage_root_parametersP13d3d12_contextPK21d3d12_shader_selectorRjS4_P27D3D12_GPU_DESCRIPTOR_HANDLEPi
+   fun:update_graphics_root_parameters
+   fun:_Z14d3d12_draw_vboP12pipe_contextPK14pipe_draw_infojPK23pipe_draw_indirect_infoPK26pipe_draw_start_count_biasj
+   fun:tc_call_draw_single
+   fun:batch_execute
+   fun:tc_batch_execute
+   fun:_tc_sync.isra.0
+   fun:tc_flush
+   fun:st_flush
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Free
+   fun:_ZdaPv
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/drivers/nv_dispi.inf_amd64_4646b47d9477048e/libnvwgf2umx.so
+   obj:/usr/lib/wsl/lib/libd3d12core.so
+   fun:_Z15d3d12_end_batchP13d3d12_contextP11d3d12_batch
+   fun:d3d12_flush_cmdlist
+   fun:d3d12_flush_cmdlist
+   fun:_ZL11d3d12_flushP12pipe_contextPP17pipe_fence_handlej
+   fun:tc_flush
+   fun:st_flush
+   fun:st_glFlush
+   fun:driswSwapBuffers
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:st_upload_constants
+   fun:st_validate_state
+   fun:st_prepare_draw
+   fun:_mesa_draw_arrays.part.0
+   fun:rlDrawRenderBatch
+   fun:rlDrawRenderBatchActive
+   fun:EndTextureMode
+   fun:_ZN11GameManager16loadGameTexturesEv
+   fun:_ZN4Game10textureOpsEv
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+   fun:_ZSt8__invokeIPFvPvEJS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:memmove
+   fun:memcpy
+   fun:tc_buffer_subdata.part.0
+   fun:rlDrawRenderBatch
+   fun:rlSetBlendMode
+   fun:_ZN6Slider6renderEv
+   fun:_ZN11GameManager6renderEv
+   fun:_ZN4Game6renderEv
+   fun:_Z10RenderLoopPv
+   fun:_ZSt13__invoke_implIvPFvPvEJS0_EET_St14__invoke_otherOT0_DpOT1_
+   fun:_ZSt8__invokeIPFvPvEJS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_
+   fun:_ZNSt6thread8_InvokerISt5tupleIJPFvPvES2_EEE9_M_invokeIJLm0ELm1EEEEvSt12_Index_tupleIJXspT_EEE
+   fun:_ZNSt6thread8_InvokerISt5tupleIJPFvPvES2_EEEclEv
+}
+

@@ -75,7 +75,7 @@ std::vector<std::string> ls(char* extension, std::string_view path) {
     #ifdef _DIRENT_HAVE_D_TYPE
         struct dirent *de;
 
-        DIR *dr = opendir(path.c_str()); 
+        DIR *dr = opendir(std::string(path).c_str()); 
     
         if (dr == NULL){ // opendir returns NULL if couldn't open directory { 
             printf("Could not open current directory" ); 

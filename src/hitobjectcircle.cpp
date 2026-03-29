@@ -133,14 +133,6 @@ void Circle::dead_update(){
 
 // Free up memory
 void Circle::deinit(){
-    // Create empty vectors
-    std::vector<std::pair<short,short> > curvePoints;
-    std::vector<int> edgeSounds;
-    std::vector<std::pair<short, short> > edgeSets;
-    std::string filename;
-    std::vector<short> colour;
-    std::vector<float> lengths;
-
     // Clear all vectors
     data.curvePoints.clear();
     data.edgeSounds.clear();
@@ -150,10 +142,9 @@ void Circle::deinit(){
     data.lengths.clear();
 
     // Set all vectors to empty vectors, hopefully freeing memory
-    data.curvePoints = curvePoints;
-    data.edgeSounds = edgeSounds;
-    data.edgeSets = edgeSets;
-    data.filename = filename;
-    data.colour = colour;
-    data.lengths = lengths;
+    data.curvePoints.shrink_to_fit();
+    data.edgeSounds.shrink_to_fit();
+    data.edgeSets.shrink_to_fit();
+    data.colour.shrink_to_fit();
+    data.lengths.shrink_to_fit();
 }
