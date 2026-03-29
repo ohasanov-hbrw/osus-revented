@@ -1369,6 +1369,7 @@ void DrawCircleWithDepth(Vector2 center, float radius, int segments, float depth
 
     C2D_Flush();  //test
 }
+
 void DrawCircleWithDepthGrad(Vector2 center, float radius, int segments, float depth, Color color, Color color2){
     //C2D_DrawCircleSolid(center.x, center.y, depth, radius, C2D_Color32(color.r, color.g, color.b, color.a));
     if (radius <= 0.0f) radius = 0.1f;  // Avoid div by zero
@@ -1640,4 +1641,10 @@ void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
 
         free(pixels);
     }
+}
+
+void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color){
+    u32 c = C2D_Color32(color.r, color.g, color.b, color.a);
+    C2D_DrawTriangle(v1.x, v1.y, c, v2.x, v2.y, c, v3.x, v3.y, c, 0.0f);
+    C2D_Flush();
 }
