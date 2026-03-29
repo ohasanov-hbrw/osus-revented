@@ -2888,7 +2888,9 @@ static bool InitGraphicsDevice(int width, int height)
     
     //SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, “2”);
 
-    SDL_Init(SDL_INIT_EVERYTHING);
+    
+    
+    
 
 
     //SDL_GL_LoadLibrary(NULL);
@@ -2923,6 +2925,8 @@ static bool InitGraphicsDevice(int width, int height)
     printf("%d", rlGetVersion()); 
     printf("\n"); 
     SetupViewport(CORE.Window.screen.width, CORE.Window.screen.height);
+
+    glEnable(GL_MULTISAMPLE);  
 
     ClearBackground(RAYWHITE);      // Default background color for raylib games :P
 

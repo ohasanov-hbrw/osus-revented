@@ -300,9 +300,22 @@ void _os_init_program(bool VSYNC){
         SetTraceLogLevel(LOG_WARNING);
         SetConfigFlags(FLAG_WINDOW_RESIZABLE);
         
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-        SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+
+        SDL_Init(SDL_INIT_EVERYTHING);
+
+
+        if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1))
+            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLEBUFFERS returned " << SDL_GetError() << "\n";
+        if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2))
+            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLESAMPLES 2 returned " << SDL_GetError() << "\n";
+        if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4))
+            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLESAMPLES 4 returned " << SDL_GetError() << "\n";
+        if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8))
+            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLESAMPLES 8 returned " << SDL_GetError() << "\n";
+        if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16))
+            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLESAMPLES 16 returned " << SDL_GetError() << "\n";
+        if(SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1))
+            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_ACCELERATED_VISUAL returned " << SDL_GetError() << "\n";
         
         
         

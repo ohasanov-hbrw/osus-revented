@@ -73,11 +73,17 @@ void FollowPoint::render(){
                 
                 // Drawing a "circle" with 4 segments. Basically a diamond. The 3ds can't really handle more lol
                 // On PC we can comfortably run with 8 segments
+                Vector2 triangleTip = (Vector2){points[i].x + cos(angle) * 4, points[i].y + sin(angle) * 4};
+                Vector2 triangleRightWingTip =  (Vector2){points[i].x + cos(angle - ((2.0 * M_PI) / 3.0)) * 4, points[i].y + sin(angle - ((2.0 * M_PI) / 3.0)) * 4};
+                Vector2 triangleLeftWingTip =   (Vector2){points[i].x + cos(angle + ((2.0 * M_PI) / 3.0)) * 4, points[i].y + sin(angle + ((2.0 * M_PI) / 3.0)) * 4};
+
                 #ifdef THREEDS_BUILD
                     DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 4, 0, Fade(color, opacity1 / 2.0));//{255,200,255,static_cast<unsigned char>(opacity)});
                 #endif
                 #ifndef THREEDS_BUILD
-                    DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 8, 0, Fade(color, opacity1 / 2.0));//{255,200,255,static_cast<unsigned char>(opacity)});
+                    //DrawCircleWithDepth((Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, Scale(3), 8, 0, Fade(color, opacity1 / 2.0));//{255,200,255,static_cast<unsigned char>(opacity)});
+                    DrawTriangle(ScaleCords(triangleRightWingTip), (Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, ScaleCords(triangleTip) , Fade(color, opacity1 / 2.0));
+                    DrawTriangle(ScaleCords(triangleTip), (Vector2){ScaleCordX(points[i].x), ScaleCordY(points[i].y)}, ScaleCords(triangleLeftWingTip)  , Fade(color, opacity1 / 2.0));
                 #endif
             }
         }

@@ -926,10 +926,10 @@ void Game::init() {
     Global.LastFrameTime = getTimer();
     //std::cout << Global.selectedPath << std::endl;
 
-    Global.GameTextures = 0;
+    Global.GameTextures = TEXTUREOPS_UNLOADED; //0???
     Global.numberLines = 0;
     Global.parsedLines = 0;
-    Global.loadingState = 0;
+    Global.loadingState = LOADINGSTATE_DEFAULT;
     initializationStage = STATE_LOADING_GAME;
     initStartTime = getTimer();
     //Global.mutex.unlock();
@@ -984,7 +984,7 @@ void Game::update() {
         MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     }
     else{
-        if(initializationStage == STATE_UNINITIALIZED or Global.GameTextures == 0){
+        if(initializationStage == STATE_UNINITIALIZED or Global.GameTextures == TEXTUREOPS_LOADED){
             initializationStage = STATE_COUNTDOWN;
         }
         if(initializationStage == STATE_COUNTDOWN and getTimer() - initStartTime > 0.0f){
@@ -1041,29 +1041,29 @@ void Game::render() {
         std::string message;
         message = "Loading Game...";
         
-        if(Global.loadingState == 1){
+        if(Global.loadingState == LOADINGSTATE_PRECALC_HITOBJECT){
             //std::cout << "Precalculating HitObjects" << std::endl;
             message = "Precalculating HitObjects";
         }
-        else if(Global.loadingState == 2){
+        else if(Global.loadingState == LOADINGSTATE_LOADING_BACKGROUND_MUSIC){
             //std::cout << "Loading Background Music" << std::endl;
             message = "Loading Background Music";
         }
-        else if(Global.loadingState == 3){
+        else if(Global.loadingState == LOADINGSTATE_LOADING_COMBOBREAK){
             //std::cout << "Loading ComboBreak Sound" << std::endl;
             message = "Loading ComboBreak Sound";
         }
-        else if(Global.loadingState == 4){
+        else if(Global.loadingState == LOADINGSTATE_LISTING_HITSOUNDS){
             //std::cout << "Loading Hit Sounds" << std::endl;
             message = "Loading Hitsounds";
         }
-        else if(Global.loadingState == 5){
+        else if(Global.loadingState == LOADINGSTATE_PARSING_LINES){
             message = "Parsing line " + std::to_string(Global.parsedLines) + " of " + std::to_string(Global.numberLines);
         }
-        else if(Global.loadingState == 6){
+        else if(Global.loadingState == LOADINGSTATE_LOADING_SOUNDS){
             message = "Parsing Sounds";
         }
-        else if(Global.loadingState == 7){
+        else if(Global.loadingState == LOADINGSTATE_LOADING_TEXTURES){
             message = "Loading Textures";
         }
         DrawTextEx(&Global.DefaultFont, message.c_str(), {static_cast<float>((int)ScaleCordX(320 - message.size() * 7.5f)), static_cast<float>((int)ScaleCordY(220))}, Scale(20.05), Scale(2), WHITE);
@@ -1091,7 +1091,7 @@ void Game::textureOps(){
         MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     }
 
-    if(Global.GameTextures == 1){
+    if(Global.GameTextures == TEXTUREOPS_START_LOADING){
         std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to get lock for object access for game texture load" << std::endl;
         MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "got lock for object access for game texture load" << std::endl;
@@ -1100,7 +1100,7 @@ void Game::textureOps(){
         std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded textures and unlocked access lock" << std::endl;
     }
 
-    if(Global.GameTextures == -1){
+    if(Global.GameTextures == TEXTUREOPS_START_UNLOADING){
         std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to get lock for object access for game texture unload" << std::endl;
         MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
         std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "got lock for object access for game texture unload" << std::endl;

@@ -49,6 +49,43 @@ struct TextureSizes{
     bool render300 = false;
 };
 
+// Current state of the textures
+// 0 -> Textures are loaded
+// 1 -> Mark textures to be loaded
+// -1 -> Mark textures to be unloaded
+// 2 -> Starting to unload textures
+// 10 -> Some basic textures are unloaded
+// 15 -> Hopefully all textures are unloaded
+
+enum TEXTUREOPS {
+    TEXTUREOPS_LOADED = 0,
+    TEXTUREOPS_START_LOADING = 1,
+    TEXTUREOPS_START_UNLOADING = -1,
+    TEXTUREOPS_UNLOADING_IN_PROGRESS = 2,
+    TEXTUREOPS_UNLOADING_DONE_BASIC = 10,
+    TEXTUREOPS_UNLOADED = 15
+};
+
+
+// Current game loading state:
+    // 1 -> Hitobject precalculation
+    // 2 -> Background music
+    // 3 -> Combobreak sound
+    // 4 -> Hitsound list
+    // 5 -> Line parsing
+    // 6 -> Sound load
+    // 7 -> Load textures
+enum LOADINGSTATE {
+    LOADINGSTATE_PRECALC_HITOBJECT = 1,
+    LOADINGSTATE_LOADING_BACKGROUND_MUSIC = 2,
+    LOADINGSTATE_LOADING_COMBOBREAK = 3,
+    LOADINGSTATE_LISTING_HITSOUNDS = 4,
+    LOADINGSTATE_PARSING_LINES = 5,
+    LOADINGSTATE_LOADING_SOUNDS = 6,
+    LOADINGSTATE_LOADING_TEXTURES = 7,
+    LOADINGSTATE_DEFAULT = 0
+};
+
 // Global data struct
 struct Globals {
     // Default background color
@@ -143,9 +180,9 @@ struct Globals {
     // 1 -> Mark textures to be loaded
     // -1 -> Mark textures to be unloaded
     // 2 -> Starting to unload textures
-    // 10 -> Some basic textures are unlaoded
+    // 10 -> Some basic textures are unloaded
     // 15 -> Hopefully all textures are unloaded
-    std::atomic_int32_t GameTextures = -1;
+    std::atomic<TEXTUREOPS> GameTextures = TEXTUREOPS_START_UNLOADING;
     #ifdef THREEDS_BUILD
         int TPS = 240;
     #endif
@@ -212,7 +249,7 @@ struct Globals {
     // 5 -> Line parsing
     // 6 -> Sound load
     // 7 -> Load textures
-    int loadingState = 0;
+    std::atomic<LOADINGSTATE> loadingState = LOADINGSTATE_DEFAULT;
     // Slider Resolution Divider
     int sliderResDiv = 2;
     // Number of trailing objects behind the Mouse

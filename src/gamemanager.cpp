@@ -581,10 +581,7 @@ void GameManager::unloadSliderTextures(){
 }
 
 void GameManager::render(){
-	if(Global.GameTextures == 15){
-		return;
-	}
-	if(Global.GameTextures == -1){
+	if(Global.GameTextures != TEXTUREOPS_LOADED){
 		return;
 	}
 	Global.NeedForBackgroundClear = true;
@@ -1222,12 +1219,12 @@ void GameManager::loadGame(std::string filename){
 	//misc variables
 	spawnedHitObjects = 0;
 	Parser parser = Parser();
-	Global.loadingState = 5;
+	Global.loadingState = LOADINGSTATE_PARSING_LINES;
 	gameFile.configGeneral["SampleSet"] = "Normal";
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parsing game!" << std::endl;
 	gameFile = parser.parse(filename);
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Found " << gameFile.hitObjects.size() << " HitObjects and " << gameFile.timingPoints.size() << " Timing Points!" << std::endl;
-	Global.loadingState = 1;
+	Global.loadingState = LOADINGSTATE_PRECALC_HITOBJECT;
 	Global.numberLines = gameFile.hitObjects.size();
     Global.parsedLines = 0;
 
@@ -1537,7 +1534,7 @@ void GameManager::loadGame(std::string filename){
 	//free(musicData);
 
 
-	Global.loadingState = 6;
+	Global.loadingState = LOADINGSTATE_LOADING_SOUNDS;
 
 	//reset the score and the combo
 	score = 0;
@@ -1571,7 +1568,7 @@ void GameManager::loadGame(std::string filename){
 
 
 	
-	//Global.GameTextures = 2;
+	//Global.GameTextures = TEXTUREOPS_UNLOADING_IN_PROGRESS;
 	/*GameManager::loadDefaultSkin(filename); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
 	GameManager::loadGameSkin(filename); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
 	if(!IsKeyDown(KEY_S)){
@@ -1660,7 +1657,7 @@ void GameManager::loadGame(std::string filename){
 			tempPoint.endTime2 = gameFile.hitObjects[i].time + followPointFadeTime;
 			tempPoint.endX = gameFile.hitObjects[i].x;
 			tempPoint.endY = gameFile.hitObjects[i].y;
-
+			
 			
 			if(gameFile.comboColours.size())
 				tempPoint.color = Color{gameFile.comboColours[followComboColors][0], gameFile.comboColours[followComboColors][1], gameFile.comboColours[followComboColors][2], 255};
@@ -1698,6 +1695,8 @@ void GameManager::loadGame(std::string filename){
 				tempPoint.startX = output[0];
 				tempPoint.startY = output[1];
 
+				
+
 				free(output);
 
 				//std::cout << "done calculation of follow line starting from slider at time: " << tempData.time << "\n";
@@ -1711,6 +1710,7 @@ void GameManager::loadGame(std::string filename){
 				tempPoint.startY = gameFile.hitObjects[i - 1].y;
 			}
 			tempPoint.distance = std::sqrt(std::pow(std::abs(tempPoint.startX - tempPoint.endX),2) + std::pow(std::abs(tempPoint.startY - tempPoint.endY),2));
+			tempPoint.angle = atan2(tempPoint.endY - tempPoint.startY, tempPoint.endX - tempPoint.startX);
 			int numberOfPoints = tempPoint.distance / 32.0f;
 			float offset = (tempPoint.distance - numberOfPoints * 32.0f) / 2.0f;
 			for(int i = 0; i < numberOfPoints; i++){
@@ -1738,14 +1738,14 @@ void GameManager::loadGame(std::string filename){
 		defaultSampleSet = 2;
 	}
 
-	Global.loadingState = 4;
+	Global.loadingState = LOADINGSTATE_LISTING_HITSOUNDS;
 	
 	loadGameSounds();
 	
 
 
 
-	Global.loadingState = 2;
+	Global.loadingState = LOADINGSTATE_LOADING_BACKGROUND_MUSIC;
 	Global.Path.pop_back();
 	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
 
@@ -1771,10 +1771,10 @@ void GameManager::loadGame(std::string filename){
 
 	
 
-	Global.loadingState = 7;
+	Global.loadingState = LOADINGSTATE_LOADING_TEXTURES;
 
 	Global.Path = lastPath;
-	Global.GameTextures = 1;
+	Global.GameTextures = TEXTUREOPS_START_LOADING;
 	
 	startMusic = true;
 	stop = false;
@@ -1798,7 +1798,7 @@ void GameManager::unloadGame(){
     Global.parsedLines = -1;
 	//Global.mutex.unlock();
 	//LightLock_Unlock(&Global.lightlock);
-	Global.GameTextures = -1;
+	Global.GameTextures = TEXTUREOPS_START_UNLOADING;
 	MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 	MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
 	MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
@@ -1809,7 +1809,7 @@ void GameManager::unloadGame(){
 		SleepInMs(500);
 		
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;32m" << "waiting for textures to unload\n";
-		if(Global.GameTextures == 15)
+		if(Global.GameTextures == TEXTUREOPS_UNLOADED)
 			break;
 		
 	}
@@ -2122,7 +2122,7 @@ void GameManager::loadGameTextures(){
 
 	//AAAAAAAAAAA
 
-    Global.GameTextures = 0;
+    Global.GameTextures = TEXTUREOPS_LOADED;
 }
 
 void GameManager::unloadGameTextures(){
@@ -2170,7 +2170,7 @@ void GameManager::unloadGameTextures(){
 		deadHitObjectNode = deadHitObjectNodeNext;
 	}
 
-    //Global.GameTextures = 2;
+    //Global.GameTextures = TEXTUREOPS_UNLOADING_IN_PROGRESS;
     UnloadTexture(&hitCircleOverlay);
     UnloadTexture(&hitCircle);
     UnloadTexture(&sliderscorepoint);
@@ -2208,7 +2208,7 @@ void GameManager::unloadGameTextures(){
     
 
 
-	//Global.GameTextures = 10;
+	//Global.GameTextures = TEXTUREOPS_UNLOADING_DONE_BASIC;
 	
 	backgroundTextures.data.clear();
     backgroundTextures.pos.clear();
@@ -2224,7 +2224,7 @@ void GameManager::unloadGameTextures(){
 	//Global.mutex.lock();
     //LightLock_Lock(&Global.lightlock);
 	//Global.mutex2.unlock();
-	Global.GameTextures = 15;
+	Global.GameTextures = TEXTUREOPS_UNLOADED;
 }
 
 int orientation2(Vector2 &p1, Vector2 &p2, Vector2 &p3){

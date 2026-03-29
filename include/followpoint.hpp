@@ -21,7 +21,7 @@ class FollowPoint{
         float distance = 0;
         float startLoc = 0.0f;
         float endLoc = 0.0f;
-        float angle;
+        double angle;
         
         Color color;
         
