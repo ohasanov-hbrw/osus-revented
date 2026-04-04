@@ -317,7 +317,7 @@ void DrawCircleWithDepth(Vector2 center, float radius, int segments, float depth
     }
 
     float stepLength = (360)/(float)segments;
-    float angle = 0;
+    float angle = stepLength/2.0;
     rlCheckRenderBatchLimit(3*segments);
 
     rlBegin(RL_TRIANGLES);
@@ -348,7 +348,7 @@ void DrawCircleWithDepthGrad(Vector2 center, float radius, int segments, float d
     }
 
     float stepLength = (360)/(float)segments;
-    float angle = 0;
+    float angle = stepLength/2.0;
     rlCheckRenderBatchLimit(3*segments);
 
     rlBegin(RL_TRIANGLES);

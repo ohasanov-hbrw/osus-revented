@@ -229,13 +229,15 @@ struct Globals {
     #ifdef THREEDS_BUILD
         int mipmaps = 1;
         float sliderTexSize = 0.5f;
+        int circleSector = 24;
     #endif
     #ifndef THREEDS_BUILD
         int mipmaps = 4;
-        float sliderTexSize = 2.5f;
+        float sliderTexSize = 3.0f;
+        int circleSector = 36;
     #endif
     // When using polygonal rendering for the circles, how many sectors to use
-    int circleSector = 24;
+    
     // Number of lines in a document and number of them the parser parsed, this is a debug thing
     int numberLines = -1;
     int parsedLines = -1;
