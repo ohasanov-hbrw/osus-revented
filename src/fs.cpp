@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 
 // Basic "ls" or "dir" function for listing files in a directory into a string vector.
 std::vector<std::string> ls(char* extension) {
-    for (int i = 0; i < Global.Path.size(); i++) {
+    for (int i = 0; i < (int)Global.Path.size(); i++) {
         if (Global.Path[i] == '\\') {
             Global.Path[i] = '/';
         }

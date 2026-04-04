@@ -46,7 +46,7 @@ void FollowPoint::render(){
         // The new way includes actual points
         bool newWay = true;
         if(newWay){
-            for(int i = 0; i < points.size(); i++){
+            for(int i = 0; i < (int)points.size(); i++){
                 float range = 16.0f / distance;
                 float opacity1 = 0.0f;
                 
@@ -69,7 +69,7 @@ void FollowPoint::render(){
                 if (startLoc > points[i].z + range and endLoc > points[i].z + range){
                     opacity1 = 0.0f;
                 }
-                int opacity = (int)(128.0f * (opacity1));
+                //int opacity = (int)(128.0f * (opacity1));
                 
                 // Drawing a "circle" with 4 segments. Basically a diamond. The 3ds can't really handle more lol
                 // On PC we can comfortably run with 8 segments

@@ -129,9 +129,9 @@ void TextBox::init() {
             break;
     }
     //std::cout << maxlength << std::endl;
-    if(text.length() > maxlength){
+    if((int)text.length() > maxlength){
         rendertext = text;
-        while(rendertext.length() > 0 and rendertext.length() > maxlength - 3){
+        while((int)rendertext.length() > 0 and (int)rendertext.length() > maxlength - 3){
             rendertext.pop_back();
         }
         rendertext.push_back('.');
@@ -141,7 +141,7 @@ void TextBox::init() {
 }
 
 void TextBox::update() {
-    if(text.size() > maxlength){
+    if((int)text.size() > maxlength){
         if(focused){
             if(counter < 0.f)
                 counter = 0.f;
@@ -240,7 +240,7 @@ void SelectableList::update() {
 }
 
 void SelectableList::init() {
-    for(int i = 0; i < text.size(); i++) {
+    for(int i = 0; i < (int)text.size(); i++) {
         objects.push_back(TextBox({0,0}, {size.x, (float)objectsize}, color, text[i].c_str(), textcolor, textsize, maxlength));
         objects[objects.size()-1].init();
     }

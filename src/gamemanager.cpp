@@ -192,7 +192,7 @@ void GameManager::update(){
 			combo++;
 
 			int index = 0;
-			for(int j = 0; j < timingSettingsForHitObject.size(); j++){
+			for(int j = 0; j < (int)timingSettingsForHitObject.size(); j++){
 				if(timingSettingsForHitObject[j].time > gameFile.hitObjects[i].time)
 					break;
 				index = j;
@@ -303,7 +303,7 @@ void GameManager::update(){
 						volume = hitObject->data.volume;
 					}
 					std::vector<std::string> sounds = getAudioFilenames(currentTimingSettings.sampleSet, currentTimingSettings.sampleIndex, defaultSampleSet, hitObject->data.normalSet, hitObject->data.additionSet, hitObject->data.hitSound, hitObject->data.hindex, hitObject->data.filename);
-					for(int soundIndex = 0; soundIndex < sounds.size(); soundIndex+=2){
+					for(int soundIndex = 0; soundIndex < (int)sounds.size(); soundIndex+=2){
 						if(SoundFilesAll.data.count(sounds[soundIndex]) == 1 and SoundFilesAll.loaded[sounds[soundIndex]].value){
 							SetSoundPan(&SoundFilesAll.data[sounds[soundIndex]], 1-clip(hitObject->data.x / 640.0, 0, 1));
 							SetSoundVolume(&SoundFilesAll.data[sounds[soundIndex]], Global.hitVolume * ((float)volume/100.0f));
