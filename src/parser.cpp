@@ -109,16 +109,19 @@ GameFile Parser::parse(std::string filename){
 			++numLines;
 		lineCounter.close();
 	}
-	
-
+	//\\wsl.localhost\archlinux\home\nyarch\Projects\osus-revented\beatmaps\1639480 ichigo from KISIDA KYODAN & THE AKEBOSI ROCKETS - STONE OCEAN (TV Size) [no video]
+	////wsl.localhost/archlinux/home/nyarch/Projects/osus-revented/beatmaps/1639480 ichigo from KISIDA KYODAN & THE AKEBOSI ROCKETS - STONE OCEAN (TV Size) [no video]/ichigo from KISIDA KYODAN & THE AKEBOSI ROCKETS - STONE OCEAN (TV Size) (Sotarks) [Akitoshi's NORMAL].osu
+	//  This thing crashes the game?
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Opening: " << filename << std::endl;
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Ifstream found " << numLines << " lines to parse" << std::endl;
 	Global.numberLines = numLines;
     std::ifstream ifs(filename);
 	std::string line;
 	int lineNumber = 0;
 	Global.parsedLines = 0;
+	gameFile.hitObjects.shrink_to_fit();
 	gameFile.hitObjects.reserve(numLines);
-	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parser reserved " << numLines << std::endl;
+	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parser reserved " << numLines << " HitObjects based on the number of lines" << std::endl;
 	if (ifs.is_open()){
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Beatmap file opened\n";
 		while(std::getline(ifs, line)){
@@ -127,7 +130,7 @@ GameFile Parser::parse(std::string filename){
 				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Popped back of " << line << " - size: " << line.size() << std::endl;
 			}
 			lineNumber++;
-			std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parsing line " << lineNumber << " with size " << line.size() << std::endl;
+			//std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parsing line " << lineNumber << " with size " << line.size() << std::endl;
 			Global.parsedLines++;
 			if(line.size() > 0 and line[0] == '[' and line[line.size()-1] == ']'){
 				std::string header = line.substr(1);

@@ -2096,8 +2096,9 @@ void GameManager::loadGameTextures(){
 					ImageResize(&image, resizeW, resizeH);
 					//std::cout << "T " << image.width << " " << image.height << std::endl;
 
-					ImageColorTint(&image, Color{30,30,30,255});
 					ImageBlurGaussian(&image, 2.0f / divider);
+					ImageColorTint(&image, Color{30,30,30,255});
+					
 					#ifdef THREEDS_BUILD
 						ImageDither(&image, 5, 6, 5, 0);
 					#endif

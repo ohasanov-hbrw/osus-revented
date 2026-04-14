@@ -306,7 +306,7 @@ void Popup::init() {
         b2 = Button({position.x + 40, position.y + (size.y / 2.0f) - 20}, {70,30}, {200,200,200,255}, "Retry", BLACK, 15);
     }
 
-    block = true;
+    block = false;
     //Vector2 TextBoxLocation = GetRaylibOrigin({GetCenter(this->getRect()).x, GetCenter(this->getRect()).y, TextBoxSize.x, TextBoxSize.y});
 }
 

@@ -8,6 +8,7 @@
 #include <parser.hpp>
 #include <iostream>
 
+#include "rlgl.h"
 
 
 // Multithreading mutex initializations
@@ -644,3 +645,71 @@ std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
 }
 
 
+void DrawCoolBackground(Vector2 **tris, Color *colors, Vector2 *velocity, int number, double delta){
+    if(delta > 17)
+        delta = 17;
+    if(delta < 0)
+        delta = 0.001;
+        //case RL_BLEND_MULTIPLIED: glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA); glBlendEquation(GL_FUNC_ADD); break;
+    //BeginBlendMode(BLEND_MULTIPLIED);
+
+    rlSetBlendFactorsSeparate(RL_DST_COLOR, RL_ONE_MINUS_SRC_ALPHA, RL_DST_COLOR, RL_ONE_MINUS_SRC_ALPHA, RL_BLEND_ADD_COLORS, RL_BLEND_ADD_COLORS);
+    rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
+
+    for(int i = 0; i < number; i++){
+        DrawTriangle(ScaleCords(tris[i][0]), ScaleCords(tris[i][1]), ScaleCords(tris[i][2]), colors[i]);
+        tris[i][0].x += velocity[i].x * delta;
+        tris[i][0].y += velocity[i].y * delta;
+        tris[i][1].x += velocity[i].x * delta;
+        tris[i][1].y += velocity[i].y * delta;
+        tris[i][2].x += velocity[i].x * delta;
+        tris[i][2].y += velocity[i].y * delta;
+        //std::cout << "Drawing Tri: " << i << std::endl;
+        double sizex = std::max(tris[i][1].x - tris[i][0].x, tris[i][2].x - tris[i][0].x);
+        bool upFacing = true;
+        if(AreSame(tris[i][0].y, tris[i][1].y))
+            upFacing = false;
+        
+        double sizey = tris[i][1].y - tris[i][0].y;
+        if(upFacing) 
+            sizey = -(tris[i][2].y - tris[i][0].y);
+        
+        if(tris[i][0].x > 640 + 640 / 2){
+            tris[i][0].x -= 640 * 2 + sizex;
+            tris[i][1].x -= 640 * 2 + sizex;
+            tris[i][2].x -= 640 * 2 + sizex;
+        }
+        else if(tris[i][0].x + sizex < -640 / 2){
+            tris[i][0].x += 640 * 2;
+            tris[i][1].x += 640 * 2;
+            tris[i][2].x += 640 * 2;
+        }
+        if(upFacing){
+            if(tris[i][0].y - sizey > 480 + 480 / 2){
+                tris[i][0].y -= 480 * 2;
+                tris[i][1].y -= 480 * 2;
+                tris[i][2].y -= 480 * 2;
+            }
+            else if(tris[i][0].y < -480 / 2){
+                tris[i][0].y += 480 * 2 + sizey;
+                tris[i][1].y += 480 * 2 + sizey;
+                tris[i][2].y += 480 * 2 + sizey;
+            }
+        }
+        else{
+            if(tris[i][0].y > 480 + 480 / 2){
+                tris[i][0].y -= 480 * 2 + sizey;
+                tris[i][1].y -= 480 * 2 + sizey;
+                tris[i][2].y -= 480 * 2 + sizey;
+            }
+            else if(tris[i][0].y + sizey < -480 / 2){
+                tris[i][0].y += 480 * 2;
+                tris[i][1].y += 480 * 2;
+                tris[i][2].y += 480 * 2;
+            }
+        }
+    }
+    
+    EndBlendMode();
+    return;
+}

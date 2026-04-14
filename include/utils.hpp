@@ -141,6 +141,6 @@ float getAngle(Vector2, Vector2);
 std::vector<std::string> getAudioFilenames(int , int , int , int , int , int , int , std::string);
 
 
-
+void DrawCoolBackground(Vector2 **tris, Color *colors, Vector2 *velocity, int number, double delta);
 
 

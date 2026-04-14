@@ -299,7 +299,7 @@ void MainMenu::init() {
     
     ErrorMessage tempMsg;
     tempMsg.id = Global.errorid;
-    Global.errorid++;
+    //Global.errorid++;
     tempMsg.message = "sugomatest\nsagop";
     tempMsg.type = ERR_FILEIO;
     //Global.errors.push(tempMsg);
@@ -798,6 +798,7 @@ void StartMenu::init() {
 
     setlocale(LC_ALL, "en_US.utf8");
     popup.block = !Global.errors.empty();
+    popup.update();
     animation = 0;
     //MutexUnlock(SWITCHING_STATE);
     initializationStage = STATE_INITIALIZED;

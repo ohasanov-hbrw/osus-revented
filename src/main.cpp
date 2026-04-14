@@ -41,6 +41,20 @@
 #include <queue>
 #include "settingsParser.hpp"
 
+
+#define NUMBER_BACKGROUND_TRIS 150
+#define SIZE_BACKGROUND_TRIS 200
+#define SIZE_VARIATION_BACKGROUND_TRIS 300
+#define COLOR_VARIATION_BACKGROUND_TRIS 10
+#define OPACITY_VARIATION_BACKGROUND_TRIS 20
+#define SPEED_BACKGROUND_TRIS 10
+
+Vector2 **backgroundTriangles;
+Color *backgroundTriangleColors;
+Vector2 *backgroundTriangleVelocity;
+
+Color backgroundTriangleBase = {72, 72, 72, 128};
+
 // Main data storage struct is first initialized here
 Globals Global;
 
@@ -74,6 +88,8 @@ std::queue<double> avgHZq;
 // To use spinlocks, or not to use spinlocks...
 bool dumbsleep = false;
 
+
+
 // Seperate thread for rendering
 void RenderLoop(void *){
     // Used for calculating frametimes
@@ -93,10 +109,44 @@ void RenderLoop(void *){
     Global.DefaultFont = GetFontDefault();
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded font\n";
 
+
+    backgroundTriangles = (Vector2**) malloc(NUMBER_BACKGROUND_TRIS * sizeof(Vector2*));
+    for(int i = 0; i < NUMBER_BACKGROUND_TRIS; i++)
+        backgroundTriangles[i] = (Vector2*) malloc(3 * sizeof(Vector2));
+    backgroundTriangleColors = (Color*) malloc(NUMBER_BACKGROUND_TRIS * sizeof(Color));
+    backgroundTriangleVelocity = (Vector2*) malloc(NUMBER_BACKGROUND_TRIS * sizeof(Vector2));
+
+
+    //Generate random sized triangles that are defined counter-clockwise
+    std::srand(std::time({}));
+    for(int i = 0; i < NUMBER_BACKGROUND_TRIS; i++){
+        backgroundTriangles[i][0] = Vector2{std::rand() % (640 * 2) - 640 / 2, std::rand() % (480 * 2)  - 480 / 2}; //Bigger than screen!
+        backgroundTriangleVelocity[i] = Vector2{std::rand() % SPEED_BACKGROUND_TRIS - SPEED_BACKGROUND_TRIS / 2, std::rand() % SPEED_BACKGROUND_TRIS - SPEED_BACKGROUND_TRIS / 2}; //SPEED!!!
+        int upDown = std::rand() % 2;
+        if(upDown == 0){ // Triangle going to be facing up
+            int size = std::rand() % SIZE_VARIATION_BACKGROUND_TRIS + SIZE_BACKGROUND_TRIS - SIZE_VARIATION_BACKGROUND_TRIS / 2;
+            backgroundTriangles[i][1] = Vector2{backgroundTriangles[i][0].x + size, backgroundTriangles[i][0].y};
+            backgroundTriangles[i][2] = Vector2{backgroundTriangles[i][0].x + (size / 2.0), backgroundTriangles[i][0].y - size * std::sin(M_PI / 3.0)}; //Raylib coord system is weird, down is y+
+        }
+        else{ // Triangle going to be facing down
+            int size = std::rand() % SIZE_VARIATION_BACKGROUND_TRIS + SIZE_BACKGROUND_TRIS - SIZE_VARIATION_BACKGROUND_TRIS / 2;
+            backgroundTriangles[i][1] = Vector2{backgroundTriangles[i][0].x + (size / 2.0), backgroundTriangles[i][0].y + size * std::sin(M_PI / 3.0)};
+            backgroundTriangles[i][2] = Vector2{backgroundTriangles[i][0].x + size, backgroundTriangles[i][0].y};
+        }
+        Color tempColor = {128,128,128,128};
+        tempColor.r = backgroundTriangleBase.r + (std::rand() % COLOR_VARIATION_BACKGROUND_TRIS - COLOR_VARIATION_BACKGROUND_TRIS / 2);
+        tempColor.g = backgroundTriangleBase.g + (std::rand() % COLOR_VARIATION_BACKGROUND_TRIS - COLOR_VARIATION_BACKGROUND_TRIS / 2);
+        tempColor.b = backgroundTriangleBase.b + (std::rand() % COLOR_VARIATION_BACKGROUND_TRIS - COLOR_VARIATION_BACKGROUND_TRIS / 2);
+        tempColor.a = backgroundTriangleBase.a + (std::rand() % OPACITY_VARIATION_BACKGROUND_TRIS - OPACITY_VARIATION_BACKGROUND_TRIS / 2);
+        backgroundTriangleColors[i] = tempColor;
+
+    }            
+
     // First ever frame is a loading screen
     MutexLock(RENDER_BLOCK, RENDERTHREAD_ID);
     _gpu_start_drawing(Global.window);
     ClearBackground(Global.Background);
+    DrawCoolBackground(backgroundTriangles, backgroundTriangleColors, backgroundTriangleVelocity, NUMBER_BACKGROUND_TRIS, 0);
     DrawTextEx(&Global.DefaultFont, TextFormat("Loading game..."), {static_cast<float>((int)Scale(10)), static_cast<float>((int)Scale(10))}, Scale(40.15), Scale(2), WHITE);
     _gpu_check_command_buffer();
     _gpu_end_drawing();
@@ -161,12 +211,18 @@ void RenderLoop(void *){
 
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Loaded initial files and filters\n";
     
+    
+
+
+
+
     // Signal readyness to the game logic loop
     Global.readyForGameLoop = true;
 
     // Main render loop
     while(true){
         auto t1 = std::chrono::steady_clock::now();
+        double delta = getTimer() - last;
         last = getTimer();
 
         // While loading/initializing nothing should be rendered...
@@ -187,8 +243,10 @@ void RenderLoop(void *){
             // Dont want to be rendering stuff while loading stuff
             MutexLock(SWITCHING_STATE, RENDERTHREAD_ID);
             // Dont flash while loading, just keep the last image
-            if(Global.NeedForBackgroundClear && Global.CurrentState->initializationStage != STATE_UNINITIALIZED)
+            if(Global.NeedForBackgroundClear && Global.CurrentState->initializationStage != STATE_UNINITIALIZED){
                 ClearBackground(Global.Background);
+                DrawCoolBackground(backgroundTriangles, backgroundTriangleColors, backgroundTriangleVelocity, NUMBER_BACKGROUND_TRIS, delta / 1000.0);
+            }
             // The state should know not to render while its loading
             Global.CurrentState->render();
             MutexUnlock(SWITCHING_STATE, RENDERTHREAD_ID);
@@ -252,7 +310,7 @@ void RenderLoop(void *){
             avgFPSq.pop();
         }
         avgFPS = avgFPSqueueSUM / (double)(avgFPSq.size());
-
+        
     }
 
     // We need to go out with a bang! or at least say bye...
@@ -261,6 +319,12 @@ void RenderLoop(void *){
     DrawTextEx(&Global.DefaultFont, "Bye bye!~ :3", {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(40.05), Scale(2), WHITE);
     _gpu_check_command_buffer();
     _gpu_end_drawing();
+
+    for(int i = 0; i < NUMBER_BACKGROUND_TRIS; i++)
+        free(backgroundTriangles[i]);
+    free(backgroundTriangles);
+    free(backgroundTriangleColors);
+    free(backgroundTriangleVelocity);
 
     // Deinitialize GPU
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Trying to exit the rendering thread\n";

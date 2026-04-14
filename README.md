@@ -54,7 +54,9 @@ To build the game for the Nintendo 3DS, you will need to have devkitPro installe
 - GCC and G++ - from the devkitPro repository
 - Make
 - CMake
-- SDL - from the devkitPro repository
+- 3DS-Dev Tools - from the devkitPro repository `3ds-dev`
+- SDL - from the devkitPro repository `3ds-sdl`
+- libpng - from the devkitPro repository `3ds-libpng`
 
 To actually build the game follow the steps below:
 
