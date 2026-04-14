@@ -550,6 +550,12 @@ std::pair<std::string, std::string> Parser::parseKeyValue(std::string line, bool
 	for(spliceLocation = 0; spliceLocation < line.size(); spliceLocation++)
 		if(line[spliceLocation] == ':')
 			break;
+	if(hasSpaceAfter)
+		if(spliceLocation + 1 < line.size() && line[spliceLocation + 1] != ' ')
+			hasSpaceAfter = false;
+	if(hasSpaceBefore)
+		if(spliceLocation - 1 >= 0 && line[spliceLocation - 1] != ' ')
+			hasSpaceBefore = false;
 	return make_pair(line.substr(0, spliceLocation - hasSpaceBefore), 
 	line.substr(spliceLocation + hasSpaceAfter + 1, line.size() - 1 - spliceLocation - hasSpaceAfter));
 }
