@@ -63,7 +63,9 @@ MULTITHREAD_MUTEX stateLock;
 MULTITHREAD_MUTEX accessLock;
 MULTITHREAD_MUTEX osuGameLock;
 MULTITHREAD_MUTEX wholeRenderLock;
+MULTITHREAD_MUTEX audioEngineLock;
 MULTITHREAD_THREAD renderThread;
+
 std::atomic<bool> __mutex_threads_locks[32][32];
 
 // This is mainly for the 3DS, shouldn't affect PC builds

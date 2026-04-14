@@ -379,29 +379,39 @@ typedef struct Sound {
 typedef struct Music {
     ndspWaveBuf waveBuf[4];
     Thread thread;
-    u64 offset = 0;
-    int playedChannels = 0;
-    u64 lastTimePlayed;
-    bool reset = false;
-    u8 command = 0;
+    
     u64 seek = 0;
-    bool playing = false;
-    bool paused = false;
-    char* filename;
+    u64 offset = 0;
+    u64 lastTimePlayed;
     u64 length;
-    bool ended = false;
+
+    char* filename;
+    mp3dec_ex_t* decoder;
+    stb_vorbis* oggdecoder;
+    uint8_t * fileBuffer;
+
     unsigned int numberOfSamples;
     unsigned int sampleRate;    // Frequency (samples per second)
     unsigned int sampleSize;    // Bit depth (bits per sample): 8, 16, 32 (24 not supported)
     unsigned int channels;      // Number of channels (1-mono, 2-stereo, ...)
-    bool loaded = false;
+    
+    u32 command = 0;
+
+    
+    int playedChannels = 0;
     float volume = 1.0f;
-    mp3dec_ex_t* decoder;
-    stb_vorbis* oggdecoder;
+    
+    size_t fileSize;
+
+    bool reset = false;
     bool oggplayback = false;
     bool memory = false;
-    uint8_t * fileBuffer;
-    size_t fileSize;
+    bool playing = false;
+    bool paused = false;
+    bool ended = false;
+    bool loaded = false;
+   
+    
 } Music;
 
 // VrDeviceInfo, Head-Mounted-Display device parameters

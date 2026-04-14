@@ -20,6 +20,8 @@ void InitilizeLocks(){
     _multithread_mutex_init(&accessLock);
     _multithread_mutex_init(&osuGameLock);
     _multithread_mutex_init(&wholeRenderLock);
+    _multithread_mutex_init(&audioEngineLock);
+    return;
 }
 
 // Lock spesific mutexes
@@ -43,6 +45,9 @@ void MutexLock(int i, int j){
             break;
         case RENDER_BLOCK:
             _multithread_mutex_lock(&wholeRenderLock);
+            break;
+        case MUSIC_BLOCK:
+            //_multithread_mutex_lock(&audioEngineLock);
             break;
         default:
             // code block
@@ -71,6 +76,9 @@ void MutexUnlock(int i, int j){
             break;
         case RENDER_BLOCK:
             _multithread_mutex_unlock(&wholeRenderLock);
+            break;
+        case MUSIC_BLOCK:
+            //_multithread_mutex_unlock(&audioEngineLock);
             break;
         default:
             // code block

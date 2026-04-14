@@ -16,12 +16,14 @@ extern MULTITHREAD_MUTEX stateLock;
 extern MULTITHREAD_MUTEX accessLock;
 extern MULTITHREAD_MUTEX osuGameLock;
 extern MULTITHREAD_MUTEX wholeRenderLock;
+extern MULTITHREAD_MUTEX audioEngineLock;
 
 
 #define SWITCHING_STATE 0
 #define ACCESSING_OBJECTS 1
 #define OSU_UPDATE 2
 #define RENDER_BLOCK 3
+#define MUSIC_BLOCK 4
 
 
 extern std::atomic<bool> __mutex_threads_locks[32][32];

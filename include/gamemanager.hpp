@@ -55,41 +55,41 @@ class GameManager{
 		std::vector<HitObject*> dead_objects;
 		std::deque<timingSettings> timingSettingsForHitObject;
 
-		HitSound SoundFilesAll = {};
+		HitSound SoundFilesAll;
 		
-		Background backgroundTextures = {};
+		Background backgroundTextures;
 		
-		Texture2D hitCircle = {};
-		Texture2D hitCircleOverlay = {};
-		Texture2D approachCircle = {};
-		Texture2D cursor = {};
-		Texture2D selectCircle = {};
-		Texture2D hit0 = {};
-		Texture2D hit50 = {};
-		Texture2D hit100 = {};
-		Texture2D hit300 = {};
-		Texture2D sliderb = {};
-		Texture2D sliderscorepoint = {};
-		Texture2D sliderfollow = {};
-		Texture2D reverseArrow = {};
-		Texture2D sliderin = {};
-		Texture2D sliderblank = {};
-		Texture2D sliderout = {};
-		Texture2D numbers[10] = {};
-		Texture2D spinnerBottom = {};
-		Texture2D spinnerTop = {};
-		Texture2D spinnerCircle = {};
-		Texture2D spinnerApproachCircle = {};
-		Texture2D spinnerMetre = {};
-		Texture2D spinnerBack = {};
-		Texture2D followPoint = {};
+		Texture2D hitCircle;
+		Texture2D hitCircleOverlay;
+		Texture2D approachCircle;
+		Texture2D cursor;
+		Texture2D selectCircle;
+		Texture2D hit0;
+		Texture2D hit50;
+		Texture2D hit100;
+		Texture2D hit300;
+		Texture2D sliderb;
+		Texture2D sliderscorepoint;
+		Texture2D sliderfollow;
+		Texture2D reverseArrow;
+		Texture2D sliderin;
+		Texture2D sliderblank;
+		Texture2D sliderout;
+		Texture2D numbers[10];
+		Texture2D spinnerBottom;
+		Texture2D spinnerTop;
+		Texture2D spinnerCircle;
+		Texture2D spinnerApproachCircle;
+		Texture2D spinnerMetre;
+		Texture2D spinnerBack;
+		Texture2D followPoint;
 
-		RenderTexture2D sliderInnerBall = {};
-		RenderTexture2D sliderOuterBall = {};
+		RenderTexture2D sliderInnerBall;
+		RenderTexture2D sliderOuterBall;
 
-		Music backgroundMusic = {};
+		Music backgroundMusic;
 
-		Color comboColour = {};
+		Color comboColour;
 
 		double currentTime = 0;
 		double currentTimeTemp = -1;

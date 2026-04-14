@@ -83,9 +83,14 @@ void PlaySound(Sound *sound){
 }
 
 void PlayMusicStream(Music *music){
-    if(!Global.MusicLoaded || !music->loaded)
+    MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
+
+    if(!Global.MusicLoaded || !music->loaded){
+        MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
         return;
+    }
     if(music->playing){
+        MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
         return;
     }
     else{
@@ -93,13 +98,16 @@ void PlayMusicStream(Music *music){
         music->playing = true;
         music->ended = false;
         music->paused = false;
-        AtomicSwap(&music->command, 0x00000000);
+        AtomicSwap(&(music->command), 0x00000000);
+        //music->command = 0x00000000;
+
         music->thread = threadCreate((void (*)(void*))MusicThread, music, 512*1024, 0x27, -1, false);
     }
-
+    MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
 }
 
 void SetMusicVolume(Music *music, float volume){
+    MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
     music->volume = volume;
     if(music->volume > 1.0f){
         music->volume = 1.0f;
@@ -112,23 +120,28 @@ void SetMusicVolume(Music *music, float volume){
     mix[0] = music->volume;
     mix[1] = music->volume;
     ndspChnSetMix(0, mix);
+    MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
 }
 
 void SeekMusicStream(Music *music, float time){
+    MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
     //return;
-    if(!Global.MusicLoaded || !music->loaded || !music->playing)
+    if(!Global.MusicLoaded || !music->loaded || !music->playing){
+        MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
         return;
+    }
     if(time < 0){
         time = 0;
     }
     music->seek = (u64)(time * 1000.0f);
-    u8 newCommand = music->command | 0x000000F0;
-    AtomicSwap(&music->command, newCommand);
+    u32 newCommand = music->command | 0x000000F0;
+    AtomicSwap(&(music->command), newCommand);
+    //music->command = newCommand;
     while((music->command & 0x000000F0) == 0x000000F0){
         SleepInMs(5);
     }
 
-
+    MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
 }
 
 void UpdateMusicStream(Music *music){
@@ -137,10 +150,11 @@ void UpdateMusicStream(Music *music){
 
 float GetMusicTimePlayed(Music *music){
     int channel = 0;
+    MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
     u64 timePlayed = music->playedChannels * 250 + music->offset + (ndspChnGetSamplePos(channel) * 1000) / music->sampleRate;
     timePlayed = std::max(music->lastTimePlayed, timePlayed);
     music->lastTimePlayed = timePlayed;
-    
+    MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
     return (float)timePlayed / 1000.0f;
 }
 
@@ -149,17 +163,24 @@ float GetMusicTimeLength(Music *music){
 }
 
 void StopMusicStream(Music *music){
-    if(!Global.MusicLoaded)
+    MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
+    if(!Global.MusicLoaded){
+        MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
         return;
+    }
     if(!music->playing){
+        MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
         return;
     }
     else{
         int channel = 0;
         music->paused = true;
-        u8 newCommand = 0x0000000F;
-        AtomicSwap(&music->command, newCommand);
+        u32 newCommand = 0x0000000F;
+        AtomicSwap(&(music->command), newCommand);
+        //music->command = newCommand;
+
         std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "music kill command sent\n";
+        MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
         if(music->playing){
             threadJoin(music->thread, U64_MAX);
             threadFree(music->thread);
@@ -171,6 +192,7 @@ void StopMusicStream(Music *music){
         }
         music->playing = false;
         music->ended = true;
+        return;
     }
 
 }
@@ -224,11 +246,13 @@ void MusicThread(Music *music){
     }
 
     while(true){
-        u16 command = music->command & 0x0000000F;
+        MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
+        u32 command = music->command & 0x0000000F;
+        MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
         if(command == 0x0000000F){
             break;
         }
-        if((music->command & 0x000000F0) == 0x000000F0){
+        if((command & 0x000000F0) == 0x000000F0){
             ndspChnSetPaused(channel, true);
             ndspChnReset(channel);
             ndspChnWaveBufClear(channel);
@@ -277,11 +301,14 @@ void MusicThread(Music *music){
                     }
                 }
             }
+            MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
             music->offset = music->seek;
             music->playedChannels = 0;
             music->lastTimePlayed = music->seek;
-            u8 newCommand = music->command & 0xFFFFFF0F;
-            AtomicSwap(&music->command, newCommand);
+            u32 newCommand = music->command & 0xFFFFFF0F;
+            AtomicSwap(&(music->command), newCommand);
+            //music->command = newCommand;
+            MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
         }
 
         SleepInMs(10);
@@ -350,8 +377,10 @@ void MusicThread(Music *music){
     }
     ndspChnReset(channel);
     ndspChnWaveBufClear(channel);
+    MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
     music->playing = false;
     music->ended = true;
+    MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
     return;
 }
 
@@ -573,8 +602,9 @@ void UnloadMusicStream(Music *music){
     if(Global.MusicLoaded && music->loaded){
         int numberOfBuffers = 2;
         Global.MusicLoaded = false;
-        u8 newCommand = 0x0000000F;
-        AtomicSwap(&music->command, newCommand);
+        u32 newCommand = 0x0000000F;
+        AtomicSwap(&(music->command), newCommand);
+        //music->command = newCommand;
         std::cout << "\e[1;36m[3DS] \e[38;5;236m" << "music kill command sent\n";
         if(music->playing){
             threadJoin(music->thread, U64_MAX);
