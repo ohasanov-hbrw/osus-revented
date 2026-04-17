@@ -3,8 +3,9 @@
 #include <stdarg.h>   
 #include <cstdint>
 #include <cstddef>
-#include <tex3ds.h>
 #include <3ds.h>
+#include <tex3ds.h>
+
 
 #include "minimp3.h"
 #include "minimp3_ex.h"

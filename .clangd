@@ -1,4 +1,70 @@
-CompileFlags:                     # Tweak the parse settings
-  Add: [-ferror-limit=0] 
+# 1. Force all .h files to be treated as C++
+If:
+  PathMatch: .*\.h
+CompileFlags:
+  Add: [-x, c++-header]
+
+---
+
+# 2. 3DS Specific Configuration (only for 3ds folders)
+If:
+  PathMatch: (include/3ds/.*|src/3ds/.*)
+CompileFlags:
+  Add: [
+    -I/opt/devkitpro/libctru/include/, 
+    -I/opt/devkitpro/libctru/include/c3d/, 
+    -I/opt/devkitpro/libctru/include/c2d/, 
+    -I/opt/devkitpro/libctru/include/arpa/, 
+    -I/opt/devkitpro/libctru/include/3ds/, 
+    -I/opt/devkitpro/libctru/include/sys/, 
+    -I/opt/devkitpro/libctru/include/3ds/allocator/, 
+    -I/opt/devkitpro/libctru/include/3ds/gpu/, 
+    -I/opt/devkitpro/libctru/include/3ds/ndsp/, 
+    -I/opt/devkitpro/libctru/include/3ds/services/,
+    -I/opt/devkitpro/libctru/include/3ds/util/,
+    -I/opt/devkitpro/libctru/include/3ds/applets/,
+    -I/opt/devkitpro/devkitARM/arm-none-eabi/include/,
+    -Iinclude/3ds/AudioDecoders/,
+    -Iinclude/3ds/,
+    -Iinclude/external/,
+    -I$$DEVKITPRO/portlibs/3ds/include, 
+    -I$$DEVKITPRO/portlibs/3ds/include/opus,
+    -D__3DS__  # Highly recommended to define this for 3ds headers
+  ]
+
+---
+
+# 3. Global Configuration (Common flags for all files)
+CompileFlags:
+  Add: [
+    -std=c++20, 
+    -O0, 
+    -g, 
+    -ggdb, 
+    -Wall, 
+    -Wno-write-strings, 
+    -Wno-narrowing, 
+    -ferror-limit=0, 
+    -Iinclude, 
+    -Iinclude/external, 
+    -Ivendor/raylib/src, 
+    -Ivendor/zip/src, 
+    -Iinclude/sound, 
+    -I/usr/x86_64-w64-mingw32/include/SDL2, 
+    -I/usr/include/SDL2, 
+    -D_REENTRANT, 
+    -D_FILE_OFFSET_BITS=64
+  ]
 Diagnostics:
-  Suppress: ["-Wsign-compare", "-Wmissing-field-initializers", "-Wunused-variable", "-Wunused-but-set-variable", "-Wwritable-strings", "readability-misleading-indentation"]
+  Suppress: [
+    -Wnarrowing, 
+    "-Wsign-compare", 
+    "-Wmissing-field-initializers", 
+    "-Wunused-variable", 
+    "-Wunused-but-set-variable", 
+    "-Wwritable-strings", 
+    "readability-misleading-indentation"
+  ]
+Index:
+  StandardLibrary: true
+  Background: Build

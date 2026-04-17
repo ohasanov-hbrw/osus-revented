@@ -7,6 +7,8 @@
 #include "soundloader.h"
 #include "time_util.hpp"
 #include "fs.hpp"
+#include "utils.hpp"
+#include <iostream>
 
 #define MAKEDWORD(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 

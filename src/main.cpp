@@ -122,8 +122,8 @@ void RenderLoop(void *){
     //Generate random sized triangles that are defined counter-clockwise
     std::srand(std::time({}));
     for(int i = 0; i < NUMBER_BACKGROUND_TRIS; i++){
-        backgroundTriangles[i][0] = Vector2{std::rand() % (640 * 2) - 640 / 2, std::rand() % (480 * 2)  - 480 / 2}; //Bigger than screen!
-        backgroundTriangleVelocity[i] = Vector2{std::rand() % SPEED_BACKGROUND_TRIS - SPEED_BACKGROUND_TRIS / 2, std::rand() % SPEED_BACKGROUND_TRIS - SPEED_BACKGROUND_TRIS / 2}; //SPEED!!!
+        backgroundTriangles[i][0] = Vector2{std::rand() % (640 * 2) - 640.0 / 2, std::rand() % (480 * 2)  - 480.0 / 2}; //Bigger than screen!
+        backgroundTriangleVelocity[i] = Vector2{std::rand() % SPEED_BACKGROUND_TRIS - SPEED_BACKGROUND_TRIS / 2.0, std::rand() % SPEED_BACKGROUND_TRIS - SPEED_BACKGROUND_TRIS / 2.0}; //SPEED!!!
         int upDown = std::rand() % 2;
         if(upDown == 0){ // Triangle going to be facing up
             int size = std::rand() % SIZE_VARIATION_BACKGROUND_TRIS + SIZE_BACKGROUND_TRIS - SIZE_VARIATION_BACKGROUND_TRIS / 2;
