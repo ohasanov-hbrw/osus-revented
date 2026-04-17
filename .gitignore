@@ -5,6 +5,7 @@ object
 beatmaps
 resources
 .vscode
+.cache
 
 
 # vscode bs?
