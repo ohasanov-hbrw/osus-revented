@@ -20,6 +20,8 @@
 #include "utils.hpp"
 #include "settingsParser.hpp"
 
+#include "menu_shapes/shapes.hpp"
+
 PlayMenu::PlayMenu() {
     name = TextBox({320,440}, {520,40}, {0,0,0,0}, "BETA VERSION!", WHITE, 20, 50);
     description = TextBox({320,140}, {520,40}, {240,98,161,255}, "Select a Beatmap to play!", WHITE, 20, 50);
@@ -53,38 +55,14 @@ void PlayMenu::init() {
     menu.elements[1].get()->baseColor = {64, 48, 64, 192};
     //std::cout << menu.elements[0]->baseColor.r << " " << menu.elements[0]->baseColor.g << " " << menu.elements[0]->baseColor.b << std::endl;
 
-    float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
-    float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
-    float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
-    float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
-
-
     float spacingWidth = 160;
     float spacingWidthTop = 240;
     float spacingHeight = 40;
     float spacingAngleWidth = 20;
     float height = 10;
 
-
-    menu.elements[0].get()->positions.push_back(Vector2{rightMostX, topMostY + height});
-    menu.elements[0].get()->positions.push_back(Vector2{rightMostX, topMostY});
-    menu.elements[0].get()->positions.push_back(Vector2{leftMostX + spacingWidthTop + spacingAngleWidth, topMostY + height});
-    menu.elements[0].get()->positions.push_back(Vector2{leftMostX + spacingWidthTop + spacingAngleWidth, topMostY});
-    menu.elements[0].get()->positions.push_back(Vector2{leftMostX + spacingWidthTop, topMostY + spacingHeight});
-    menu.elements[0].get()->positions.push_back(Vector2{leftMostX + spacingWidthTop, topMostY});
-    menu.elements[0].get()->positions.push_back(Vector2{leftMostX, topMostY + spacingHeight});
-    menu.elements[0].get()->positions.push_back(Vector2{leftMostX, topMostY});
-
-    menu.elements[1].get()->positions.push_back(Vector2{leftMostX, bottomMostY - height});
-    menu.elements[1].get()->positions.push_back(Vector2{leftMostX, bottomMostY});
-    menu.elements[1].get()->positions.push_back(Vector2{rightMostX - spacingWidth - spacingAngleWidth, bottomMostY - height});
-    menu.elements[1].get()->positions.push_back(Vector2{rightMostX - spacingWidth - spacingAngleWidth, bottomMostY});
-    menu.elements[1].get()->positions.push_back(Vector2{rightMostX - spacingWidth, bottomMostY - spacingHeight});
-    menu.elements[1].get()->positions.push_back(Vector2{rightMostX - spacingWidth, bottomMostY});
-    menu.elements[1].get()->positions.push_back(Vector2{rightMostX, bottomMostY - spacingHeight});
-    menu.elements[1].get()->positions.push_back(Vector2{rightMostX, bottomMostY});
-
-
+    menu.elements[0].get()->positions = Create_Shape_Rectangle_With_Trapezoid(MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height, 0, 0, MenuSizes.bottomCard.edgeHeight, MenuSizes.bottomCard.edgeWidth, MenuSizes.bottomCard.edgeRampWidth);
+    menu.elements[1].get()->positions = Create_Shape_Rectangle_With_Trapezoid(MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0, MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth, MenuSizes.topCard.edgeRampWidth);
     //std::cout << menu.elements.size() << " " << menu.elements[0]->positions.size() << std::endl;
     initializationStage = STATE_INITIALIZED;
     //MutexUnlock(SWITCHING_STATE);
@@ -118,34 +96,14 @@ void PlayMenu::render() {
 void PlayMenu::update() {
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
-    float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
-    float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
-    float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
-    float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
-
     float spacingWidth = 160;
     float spacingWidthTop = 240;
     float spacingHeight = 40;
     float spacingAngleWidth = 20;
     float height = 20;
 
-    menu.elements[0].get()->positions[0] = (Vector2{rightMostX, topMostY + height});
-    menu.elements[0].get()->positions[1] = (Vector2{rightMostX, topMostY});
-    menu.elements[0].get()->positions[2] = (Vector2{leftMostX + spacingWidthTop + spacingAngleWidth, topMostY + height});
-    menu.elements[0].get()->positions[3] = (Vector2{leftMostX + spacingWidthTop + spacingAngleWidth, topMostY});
-    menu.elements[0].get()->positions[4] = (Vector2{leftMostX + spacingWidthTop, topMostY + spacingHeight});
-    menu.elements[0].get()->positions[5] = (Vector2{leftMostX + spacingWidthTop, topMostY});
-    menu.elements[0].get()->positions[6] = (Vector2{leftMostX, topMostY + spacingHeight});
-    menu.elements[0].get()->positions[7] = (Vector2{leftMostX, topMostY});
-
-    menu.elements[1].get()->positions[0] = (Vector2{leftMostX, bottomMostY - height});
-    menu.elements[1].get()->positions[1] = (Vector2{leftMostX, bottomMostY});
-    menu.elements[1].get()->positions[2] = (Vector2{rightMostX - spacingWidth - spacingAngleWidth, bottomMostY - height});
-    menu.elements[1].get()->positions[3] = (Vector2{rightMostX - spacingWidth - spacingAngleWidth, bottomMostY});
-    menu.elements[1].get()->positions[4] = (Vector2{rightMostX - spacingWidth, bottomMostY - spacingHeight});
-    menu.elements[1].get()->positions[5] = (Vector2{rightMostX - spacingWidth, bottomMostY});
-    menu.elements[1].get()->positions[6] = (Vector2{rightMostX, bottomMostY - spacingHeight});
-    menu.elements[1].get()->positions[7] = (Vector2{rightMostX, bottomMostY});
+    Update_Shape_Rectangle_With_Trapezoid(MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height, 0, 0, MenuSizes.bottomCard.edgeHeight, MenuSizes.bottomCard.edgeWidth, MenuSizes.bottomCard.edgeRampWidth, &(menu.elements[0].get()->positions));
+    Update_Shape_Rectangle_With_Trapezoid(MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0, MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth, MenuSizes.topCard.edgeRampWidth, &(menu.elements[1].get()->positions));
 
     menu.update();
 

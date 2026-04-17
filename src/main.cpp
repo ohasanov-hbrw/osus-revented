@@ -40,7 +40,7 @@
 #include "time_util.hpp"
 #include <queue>
 #include "settingsParser.hpp"
-
+#include "menu_shapes/shapes.hpp"
 
 #define NUMBER_BACKGROUND_TRIS 150
 #define SIZE_BACKGROUND_TRIS 200
@@ -57,6 +57,7 @@ Color backgroundTriangleBase = {72, 72, 72, 128};
 
 // Main data storage struct is first initialized here
 Globals Global;
+CommonMenuSizes MenuSizes;
 
 // Overlays for platform spesific multithreading functions and datatypes
 MULTITHREAD_MUTEX stateLock;
@@ -255,15 +256,16 @@ void RenderLoop(void *){
             MutexUnlock(RENDER_BLOCK, RENDERTHREAD_ID);
             
             // Draw input indicator
-            DrawRectangle(GetScreenWidth() - Scale(640 - 580), GetScreenHeight() - Scale(480 - 450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
-            DrawRectangle(GetScreenWidth() - Scale(640 - 610), GetScreenHeight() - Scale(480 - 450), Scale(20), Scale(20), (Color){0, (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+            DrawRectangle(Scale(200), Scale(5), Scale(20), Scale(20), (Color){(unsigned char)(255 * (int)Global.Key1D), (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+            DrawRectangle(Scale(230), Scale(5), Scale(20), Scale(20), (Color){(unsigned char)(255 * (int)Global.Key2D), (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
             
             // Render mouse and its trail
             renderMouse(); 
 
             // Show fps and game ticks per second
-            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.0f TPS: %.0f",  avgFPS, avgHZ), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
-            
+            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.0f", avgFPS), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
+            DrawTextEx(&Global.DefaultFont, TextFormat("TPS: %.0f", avgHZ), {static_cast<float>((int)Scale(100)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
+
             // Mainly for 3DS Debugging purposes
             _gpu_check_command_buffer();
 
