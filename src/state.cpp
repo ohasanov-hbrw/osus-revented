@@ -1,7 +1,9 @@
 #include "state.hpp"
 #include "fs.hpp"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
+#include "menuElements.hpp"
 #include "utils.hpp"
 #include "gamemanager.hpp"
 #include "zip.h"
@@ -14,6 +16,7 @@
 #include <cstring>
 #include <clocale>
 #include <memory>
+#include <ostream>
 #include "utils.hpp"
 #include "settingsParser.hpp"
 
@@ -43,6 +46,46 @@ void PlayMenu::init() {
 
     std::vector<std::string> dir = ls(".osu");
     dir_list = SelectableList({320, 250}, {520, 160}, {255,135,198,255}, dir, BLACK, 20, 20, 65);
+    
+    menu.elements.push_back(std::make_unique<ClickableObject>());
+    menu.elements[0].get()->baseColor = {32, 16, 32, 192};
+    menu.elements.push_back(std::make_unique<ClickableObject>());
+    menu.elements[1].get()->baseColor = {64, 48, 64, 192};
+    //std::cout << menu.elements[0]->baseColor.r << " " << menu.elements[0]->baseColor.g << " " << menu.elements[0]->baseColor.b << std::endl;
+
+    float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+    float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+    float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+    float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
+
+
+    float spacingWidth = 160;
+    float spacingWidthTop = 240;
+    float spacingHeight = 40;
+    float spacingAngleWidth = 20;
+    float height = 10;
+
+
+    menu.elements[0].get()->positions.push_back(Vector2{rightMostX, topMostY + height});
+    menu.elements[0].get()->positions.push_back(Vector2{rightMostX, topMostY});
+    menu.elements[0].get()->positions.push_back(Vector2{leftMostX + spacingWidthTop + spacingAngleWidth, topMostY + height});
+    menu.elements[0].get()->positions.push_back(Vector2{leftMostX + spacingWidthTop + spacingAngleWidth, topMostY});
+    menu.elements[0].get()->positions.push_back(Vector2{leftMostX + spacingWidthTop, topMostY + spacingHeight});
+    menu.elements[0].get()->positions.push_back(Vector2{leftMostX + spacingWidthTop, topMostY});
+    menu.elements[0].get()->positions.push_back(Vector2{leftMostX, topMostY + spacingHeight});
+    menu.elements[0].get()->positions.push_back(Vector2{leftMostX, topMostY});
+
+    menu.elements[1].get()->positions.push_back(Vector2{leftMostX, bottomMostY - height});
+    menu.elements[1].get()->positions.push_back(Vector2{leftMostX, bottomMostY});
+    menu.elements[1].get()->positions.push_back(Vector2{rightMostX - spacingWidth - spacingAngleWidth, bottomMostY - height});
+    menu.elements[1].get()->positions.push_back(Vector2{rightMostX - spacingWidth - spacingAngleWidth, bottomMostY});
+    menu.elements[1].get()->positions.push_back(Vector2{rightMostX - spacingWidth, bottomMostY - spacingHeight});
+    menu.elements[1].get()->positions.push_back(Vector2{rightMostX - spacingWidth, bottomMostY});
+    menu.elements[1].get()->positions.push_back(Vector2{rightMostX, bottomMostY - spacingHeight});
+    menu.elements[1].get()->positions.push_back(Vector2{rightMostX, bottomMostY});
+
+
+    //std::cout << menu.elements.size() << " " << menu.elements[0]->positions.size() << std::endl;
     initializationStage = STATE_INITIALIZED;
     //MutexUnlock(SWITCHING_STATE);
 }
@@ -65,6 +108,9 @@ void PlayMenu::render() {
     usedsound.render();
     name.render();
     MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
+
+    menu.render();
+
     //MutexUnlock(ACCESSING_OBJECTS);
     //MutexUnlock(SWITCHING_STATE);
     //Global.mutex.unlock();
@@ -72,6 +118,37 @@ void PlayMenu::render() {
 void PlayMenu::update() {
     //MutexLock(SWITCHING_STATE);
     //MutexLock(ACCESSING_OBJECTS);
+    float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+    float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+    float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+    float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
+
+    float spacingWidth = 160;
+    float spacingWidthTop = 240;
+    float spacingHeight = 40;
+    float spacingAngleWidth = 20;
+    float height = 20;
+
+    menu.elements[0].get()->positions[0] = (Vector2{rightMostX, topMostY + height});
+    menu.elements[0].get()->positions[1] = (Vector2{rightMostX, topMostY});
+    menu.elements[0].get()->positions[2] = (Vector2{leftMostX + spacingWidthTop + spacingAngleWidth, topMostY + height});
+    menu.elements[0].get()->positions[3] = (Vector2{leftMostX + spacingWidthTop + spacingAngleWidth, topMostY});
+    menu.elements[0].get()->positions[4] = (Vector2{leftMostX + spacingWidthTop, topMostY + spacingHeight});
+    menu.elements[0].get()->positions[5] = (Vector2{leftMostX + spacingWidthTop, topMostY});
+    menu.elements[0].get()->positions[6] = (Vector2{leftMostX, topMostY + spacingHeight});
+    menu.elements[0].get()->positions[7] = (Vector2{leftMostX, topMostY});
+
+    menu.elements[1].get()->positions[0] = (Vector2{leftMostX, bottomMostY - height});
+    menu.elements[1].get()->positions[1] = (Vector2{leftMostX, bottomMostY});
+    menu.elements[1].get()->positions[2] = (Vector2{rightMostX - spacingWidth - spacingAngleWidth, bottomMostY - height});
+    menu.elements[1].get()->positions[3] = (Vector2{rightMostX - spacingWidth - spacingAngleWidth, bottomMostY});
+    menu.elements[1].get()->positions[4] = (Vector2{rightMostX - spacingWidth, bottomMostY - spacingHeight});
+    menu.elements[1].get()->positions[5] = (Vector2{rightMostX - spacingWidth, bottomMostY});
+    menu.elements[1].get()->positions[6] = (Vector2{rightMostX, bottomMostY - spacingHeight});
+    menu.elements[1].get()->positions[7] = (Vector2{rightMostX, bottomMostY});
+
+    menu.update();
+
     MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     Global.enableMouse = true;
     dir_list.update();
@@ -147,6 +224,7 @@ void PlayMenu::update() {
 }
 void PlayMenu::unload() {
     initializationStage = STATE_UNINITIALIZED;
+    menu.deinit();
     //MutexLock(SWITCHING_STATE);
     //MutexUnlock(SWITCHING_STATE);
 }

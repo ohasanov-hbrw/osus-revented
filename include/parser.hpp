@@ -5,6 +5,7 @@
 class Parser{
     public:
         Parser();
+        ~Parser() = default;
         GameFile parse(std::string file);
         GameFile parseMetadata(std::string file);
         std::string parseBackground(std::string file);

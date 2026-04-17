@@ -4,7 +4,8 @@
 #include "parser.hpp"
 #include <globals.hpp>
 #include <list>
-
+#include "menuElements.hpp"
+#include "menuOverlay.hpp"
 
 enum INITSTATE {
     STATE_FORCED_EXIT = 4,
@@ -54,6 +55,7 @@ private:
     TextBox usedskin;
     TextBox usedsound;
     std::string temp;
+    MenuOverlay menu;
 public:
     PlayMenu();
     std::string lastPos = "";

@@ -186,6 +186,7 @@ float ScaleCordX(float a){
     return a * Global.Scale + Global.ZeroPoint.x;
 }
 
+
 // Seperate functions for ScaleCords
 float ScaleCordY(float a){
     //Do the same thing as the ScaleCords function but only for the y axis

@@ -1,13 +1,13 @@
-
-
-#include <deque>
+#pragma once
 #include "menuElements.hpp"
+#include <memory>
 
 class MenuOverlay {
 public:
-    std::deque<MenuElement> elements;
+    std::vector<std::unique_ptr<MenuElement>> elements;
 
-    MenuOverlay();
+    MenuOverlay() = default;
+    ~MenuOverlay() = default;
 
     void init();
     void deinit();

@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include "raylib.h"
 
@@ -9,7 +10,7 @@ enum MenuObjectModes{
 
 class MenuElement {
 public:
-    std::vector<int> positions;
+    
     bool drawOutline = false;
     
     Color outlineColor;
@@ -22,6 +23,10 @@ public:
     Color textColor;
     Color textColorActive;
 
+    std::vector<Vector2> positions;
+    
+    MenuElement() = default;
+    virtual ~MenuElement() = default;
 
     virtual void render();
     virtual void update();
@@ -37,7 +42,10 @@ public:
     enum MenuObjectModes mode = CLICKABLEOBJECT_INACTIVE;
 
     ClickableObject() = default;
-
+    ~ClickableObject() = default;
     void render() override;
     void update() override;
+
+    void init() override;
+    void deinit() override;
 };
