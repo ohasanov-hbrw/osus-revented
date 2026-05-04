@@ -66,3 +66,9 @@ std::vector<Vector2> Create_Shape_Rectangle_With_Trapezoid(enum SHAPES_POSITION_
 
 //Update already existing object to save on alloc calls 
 void Update_Shape_Rectangle_With_Trapezoid(enum SHAPES_POSITION_ANCHORS anchor, bool fillX, bool fillY, float width, float height, float x, float y, float edgeHeight, float edgeWidth, float edgeRampWidth, std::vector<Vector2>* points);
+
+//Create Triangle Strip Vertices for a edgy menu object, these vertices are not automatically scaled!
+std::vector<Vector2> Create_Shape_Trapezoid(enum SHAPES_POSITION_ANCHORS anchor, bool fillX, bool fillY, float width, float height, float x, float y, float edgeHeight, float edgeWidth, float edgeRampWidth);
+
+//Update already existing object to save on alloc calls 
+void Update_Shape_Trapezoid(enum SHAPES_POSITION_ANCHORS anchor, bool fillX, bool fillY, float width, float height, float x, float y, float edgeHeight, float edgeWidth, float edgeRampWidth, std::vector<Vector2>* points);
