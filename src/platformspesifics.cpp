@@ -302,7 +302,7 @@ void _os_init_program(bool VSYNC){
         
 
         SDL_Init(SDL_INIT_EVERYTHING);
-
+        std::cout << SDL_GetError() << std::endl;
 
         if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1))
             std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLEBUFFERS returned " << SDL_GetError() << "\n";
@@ -312,13 +312,13 @@ void _os_init_program(bool VSYNC){
             std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLESAMPLES 4 returned " << SDL_GetError() << "\n";
         if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8))
             std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLESAMPLES 8 returned " << SDL_GetError() << "\n";
-        if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16))
-            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLESAMPLES 16 returned " << SDL_GetError() << "\n";
+        //if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16))
+        //    std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLESAMPLES 16 returned " << SDL_GetError() << "\n";
         if(SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1))
             std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_ACCELERATED_VISUAL returned " << SDL_GetError() << "\n";
         
         
-        
+        std::cout << "Init Window" << std::endl;
         InitWindow(640, 480, "osus - revented");
         
         SDL_Surface* pIcon = SDL_CreateRGBSurface(0,64,64,32,0,0,0,0);

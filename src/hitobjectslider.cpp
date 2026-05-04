@@ -1139,7 +1139,7 @@ void Slider::render(){
                                 if(true){
                                     Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
                                     Color color = Color{(unsigned char)((float)data.colour[0]*0.5f),(unsigned char)((float)data.colour[1]*0.5f),(unsigned char)((float)data.colour[2]*0.5f)};
-                                    Color color3 = Color{((unsigned char)((float)data.colour[0]*0.5f) + 255) / 2,((unsigned char)((float)data.colour[1]*0.5f) + 255) / 2,((unsigned char)((float)data.colour[2]*0.5f) + 255) / 2};
+                                    Color color3 = Color{((unsigned char)((float)data.colour[0]*0.5f) + 255) / 2, ((unsigned char)((float)data.colour[1]*0.5f) + 255) / 2,((unsigned char)((float)data.colour[2]*0.5f) + 255) / 2};
                                     DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color3, 0.7f));
                                     DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.75)  * Global.sliderTexSize, Global.circleSector*2, 0.3f, Fade(color, 0.4f));
                                     
