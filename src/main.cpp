@@ -46,14 +46,14 @@
 #define SIZE_BACKGROUND_TRIS 200
 #define SIZE_VARIATION_BACKGROUND_TRIS 300
 #define COLOR_VARIATION_BACKGROUND_TRIS 10
-#define OPACITY_VARIATION_BACKGROUND_TRIS 20
+#define OPACITY_VARIATION_BACKGROUND_TRIS 40
 #define SPEED_BACKGROUND_TRIS 10
 
 Vector2 **backgroundTriangles;
 Color *backgroundTriangleColors;
 Vector2 *backgroundTriangleVelocity;
 
-Color backgroundTriangleBase = {128, 128, 128, 192};
+Color backgroundTriangleBase = {128, 128, 128, 128};
 
 // Main data storage struct is first initialized here
 Globals Global;

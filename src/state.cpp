@@ -61,6 +61,8 @@ void PlayMenu::init() {
   menu.elements[1].get()->baseColor = {48, 32, 48, 192};
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[2].get()->baseColor = {0, 0, 0, 192};
+  menu.elements.push_back(std::make_unique<ClickableObject>());
+  menu.elements[3].get()->baseColor = {0, 0, 0, 192};
   // std::cout << menu.elements[0]->baseColor.r << " " <<
   // menu.elements[0]->baseColor.g << " " << menu.elements[0]->baseColor.b <<
   // std::endl;
@@ -80,7 +82,9 @@ void PlayMenu::init() {
       MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
       MenuSizes.topCard.edgeRampWidth);
   menu.elements[2].get()->positions =
-      Create_Shape_Trapezoid(BOTTOM_RIGHT, 110, 40, 120, 10, 2./3. * 40., 0);
+      Create_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0);
+      menu.elements[3].get()->positions =
+      Create_Shape_Trapezoid(BOTTOM_RIGHT, 50, 40, 230, 10, 40.,  (-40.));
   // std::cout << menu.elements.size() << " " <<
   // menu.elements[0]->positions.size() << std::endl;
   initializationStage = STATE_INITIALIZED;
@@ -129,8 +133,10 @@ void PlayMenu::update() {
       MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0,
       MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
       MenuSizes.topCard.edgeRampWidth, &(menu.elements[1].get()->positions));
-  Update_Shape_Trapezoid(BOTTOM_RIGHT, 110, 40, 120, 10, 2./3. * 40., 0,
+  Update_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0,
                          &(menu.elements[2].get()->positions));
+  Update_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.),
+                         &(menu.elements[3].get()->positions));
   menu.update();
 
   MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
