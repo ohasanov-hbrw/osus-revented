@@ -89,7 +89,7 @@ enum LOADINGSTATE {
 // Global data struct
 struct Globals {
     // Default background color
-    Color Background = { 15, 0, 30, 255 };
+    Color Background = { 32, 16, 48, 255 };
     // Mouse Zero
     Vector2 ZeroPoint = {0.f, 0.f};
     // Mouse location to be got from a callback

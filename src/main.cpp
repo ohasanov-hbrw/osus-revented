@@ -53,7 +53,7 @@ Vector2 **backgroundTriangles;
 Color *backgroundTriangleColors;
 Vector2 *backgroundTriangleVelocity;
 
-Color backgroundTriangleBase = {72, 72, 72, 128};
+Color backgroundTriangleBase = {128, 128, 128, 192};
 
 // Main data storage struct is first initialized here
 Globals Global;
