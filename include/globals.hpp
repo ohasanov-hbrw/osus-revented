@@ -187,7 +187,7 @@ struct Globals {
         int TPS = 240;
     #endif
     #ifndef THREEDS_BUILD
-        int TPS = 1000;
+        int TPS = 4000; //1000
     #endif
     // Default width and height
     int Width = 400;

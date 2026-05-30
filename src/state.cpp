@@ -117,9 +117,10 @@ void PlayMenu::render() {
   usedskin.render();
   usedsound.render();
   name.render();
+  menu.render();
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
-  menu.render();
+  
 
   // MutexUnlock(ACCESSING_OBJECTS);
   // MutexUnlock(SWITCHING_STATE);
@@ -134,21 +135,7 @@ void PlayMenu::update() {
   float spacingAngleWidth = 20;
   float height = 20;
 
-  Update_Shape_Rectangle_With_Trapezoid(
-      MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height,
-      0, 0, MenuSizes.bottomCard.edgeHeight, MenuSizes.bottomCard.edgeWidth,
-      MenuSizes.bottomCard.edgeRampWidth, &(menu.elements[0].get()->positions));
-  Update_Shape_Rectangle_With_Trapezoid(
-      MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0,
-      MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
-      MenuSizes.topCard.edgeRampWidth, &(menu.elements[1].get()->positions));
-  Update_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0,
-                         &(menu.elements[2].get()->positions));
-  Update_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.),
-                         &(menu.elements[3].get()->positions));
   
-  dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->objectOffset += (float)(5.0f * -Global.Wheel);
-  menu.update();
   
 
 
@@ -171,6 +158,25 @@ void PlayMenu::update() {
 
   if (sound.state != Global.settings.useDefaultSounds)
     Global.settings.useDefaultSounds = sound.state;
+
+
+
+  Update_Shape_Rectangle_With_Trapezoid(
+      MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height,
+      0, 0, MenuSizes.bottomCard.edgeHeight, MenuSizes.bottomCard.edgeWidth,
+      MenuSizes.bottomCard.edgeRampWidth, &(menu.elements[0].get()->positions));
+  Update_Shape_Rectangle_With_Trapezoid(
+      MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0,
+      MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
+      MenuSizes.topCard.edgeRampWidth, &(menu.elements[1].get()->positions));
+  Update_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0,
+                         &(menu.elements[2].get()->positions));
+  Update_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.),
+                         &(menu.elements[3].get()->positions));
+  
+  dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->objectOffset += (float)(5.0f * -Global.Wheel);
+  dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTextBox = AreSame((float)(5.0f * -Global.Wheel), 0) ? false : true;
+  menu.update();
   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
   if (close.action) {
