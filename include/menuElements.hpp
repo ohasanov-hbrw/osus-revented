@@ -24,6 +24,12 @@ public:
     
     Color textColor;
     Color textColorActive;
+    std::string text = "";
+
+    Rectangle textRect = {0,0,0,0};
+    double textSpacing = 5.0f;
+
+    double textSize = 10.0f;
 
     std::vector<Vector2> positions;
     
@@ -42,7 +48,8 @@ private:
     
 public:
     enum MenuObjectModes mode = CLICKABLEOBJECT_INACTIVE;
-    std::string text;
+    
+    
     ClickableObject() = default;
     ~ClickableObject() = default;
     void render() override;
@@ -63,6 +70,7 @@ public:
     double objectOffset = 0;
     const int hardCodedOffset = -2;
     int numberOfObjects = 0;
+    
     std::vector<std::string> objectNames;
     std::vector<std::unique_ptr<ClickableObject>> objects;
     FancyScrollingList() = default;

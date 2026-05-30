@@ -66,6 +66,7 @@ void PlayMenu::init() {
 
   menu.elements.push_back(std::make_unique<FancyScrollingList>());
   menu.elements[4].get()->baseColor = {64, 48, 64, 192};
+  menu.elements[4].get()->textColor = WHITE;
   // std::cout << menu.elements[0]->baseColor.r << " " <<
   // menu.elements[0]->baseColor.g << " " << menu.elements[0]->baseColor.b <<
   // std::endl;
@@ -91,6 +92,7 @@ void PlayMenu::init() {
 
   menu.elements[4].get()->positions.push_back({320, 0});
   menu.elements[4].get()->positions.push_back({640, 480});
+  
 
   menu.init();
   //std::cout << menu.elements.size() << " " << menu.elements[0]->positions.size() << std::endl;
