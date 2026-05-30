@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include "raylib.h"
+#include <string>
+#include <memory>
 
 enum MenuObjectModes{
     CLICKABLEOBJECT_BUTTON = 0,
@@ -40,9 +42,31 @@ private:
     
 public:
     enum MenuObjectModes mode = CLICKABLEOBJECT_INACTIVE;
-
+    std::string text;
     ClickableObject() = default;
     ~ClickableObject() = default;
+    void render() override;
+    void update() override;
+
+    void init() override;
+    void deinit() override;
+};
+
+class FancyScrollingList : public MenuElement {
+private:
+    
+public:
+    enum MenuObjectModes mode = CLICKABLEOBJECT_INACTIVE;
+    double objectDistance = 40.0f;
+    double objectFreeSpace = 2.0f;
+    int objectOffsetFull = 0;
+    double objectOffset = 0;
+    const int hardCodedOffset = -2;
+    int numberOfObjects = 0;
+    std::vector<std::string> objectNames;
+    std::vector<std::unique_ptr<ClickableObject>> objects;
+    FancyScrollingList() = default;
+    ~FancyScrollingList() = default;
     void render() override;
     void update() override;
 

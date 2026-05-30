@@ -50,8 +50,8 @@ void PlayMenu::init() {
   Global.LastFrameTime = getTimer();
   temp = Global.Path;
   Global.Path = Global.BeatmapLocation;
-
   std::vector<std::string> dir = ls(".osu");
+
   dir_list = SelectableList({320, 250}, {520, 160}, {255, 135, 198, 255}, dir,
                             BLACK, 20, 20, 65);
 
@@ -63,6 +63,9 @@ void PlayMenu::init() {
   menu.elements[2].get()->baseColor = {0, 0, 0, 192};
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[3].get()->baseColor = {0, 0, 0, 192};
+
+  menu.elements.push_back(std::make_unique<FancyScrollingList>());
+  menu.elements[4].get()->baseColor = {64, 48, 64, 192};
   // std::cout << menu.elements[0]->baseColor.r << " " <<
   // menu.elements[0]->baseColor.g << " " << menu.elements[0]->baseColor.b <<
   // std::endl;
@@ -83,10 +86,14 @@ void PlayMenu::init() {
       MenuSizes.topCard.edgeRampWidth);
   menu.elements[2].get()->positions =
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0);
-      menu.elements[3].get()->positions =
+  menu.elements[3].get()->positions =
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 50, 40, 230, 10, 40.,  (-40.));
-  // std::cout << menu.elements.size() << " " <<
-  // menu.elements[0]->positions.size() << std::endl;
+
+  menu.elements[4].get()->positions.push_back({320, 0});
+  menu.elements[4].get()->positions.push_back({640, 480});
+
+  menu.init();
+  //std::cout << menu.elements.size() << " " << menu.elements[0]->positions.size() << std::endl;
   initializationStage = STATE_INITIALIZED;
   // MutexUnlock(SWITCHING_STATE);
 }
@@ -137,7 +144,12 @@ void PlayMenu::update() {
                          &(menu.elements[2].get()->positions));
   Update_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.),
                          &(menu.elements[3].get()->positions));
+  
+  dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->objectOffset += (float)(5.0f * -Global.Wheel);
   menu.update();
+  
+
+
 
   MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
   Global.enableMouse = true;
@@ -1940,6 +1952,9 @@ void WipMenu2::init() {
   canRemoveStuff = false;
   initializationStage = STATE_INITIALIZED;
 }
+
+
+
 void WipMenu2::update() {
   if (initializationStage != STATE_INITIALIZED)
     return;
