@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include "raylib.h"
+#include "globals.hpp"
 
 
 void MenuElement::init() {
@@ -75,7 +76,10 @@ void FancyScrollingList::init() {
         objects[i].get()->textColor = textColor;
     }
     updateTextBox = true;
-    update();
+    objectOffsetFull = 0;
+    objectOffset = 0;
+    if(!Global.ScaleUpdated)
+        update();
 }
 
 void FancyScrollingList::deinit() {
@@ -90,6 +94,17 @@ void FancyScrollingList::deinit() {
 }
 
 void FancyScrollingList::update() {
+
+    if(Global.ScaleUpdated){
+        for(int i = 0; i < objects.size(); i++){
+            objects[i]->deinit();
+            objects[i].reset();
+        }
+        objects.clear();
+        objects.shrink_to_fit();  
+        init();
+    }
+
     objectOffsetFull += (int)trunc((objectOffset / objectDistance));
 
 
@@ -103,9 +118,9 @@ void FancyScrollingList::update() {
     for(int i = 0; i < objects.size(); i++){
         objects[i].get()->positions[0] = positions[0] + (Vector2){0, objectDistance * (i - 2) + objectFreeSpace + objectOffset};
         objects[i].get()->positions[1] = positions[0] + (Vector2){positions[1].x - positions[0].x, objectDistance * (i - 1) - objectFreeSpace + objectOffset};
-        if(objects[i].get()->positions[0].y + objects[i].get()->positions[1].y < positions[0].y){
-            objects[i].get()->baseColor = Fade(baseColor, clip(1 - ((positions[0].y - (objects[i].get()->positions[0].y + objects[i].get()->positions[1].y)) / (objectDistance * 1.5)), 0.0f, 1.0f));
-            objects[i].get()->textColor = Fade(textColor, clip(1 - ((positions[0].y - (objects[i].get()->positions[0].y + objects[i].get()->positions[1].y)) / (objectDistance * 1.5)), 0.0f, 1.0f));
+        if(objects[i].get()->positions[0].y + objectFreeSpace < positions[0].y){
+            objects[i].get()->baseColor = Fade(baseColor, clip(1 - ((positions[0].y - (objects[i].get()->positions[0].y + objectFreeSpace)) / (objectDistance * 1.5)), 0.0f, 1.0f));
+            objects[i].get()->textColor = Fade(textColor, clip(1 - ((positions[0].y - (objects[i].get()->positions[0].y + objectFreeSpace)) / (objectDistance * 1.5)), 0.0f, 1.0f));
         }
         else if(objects[i].get()->positions[0].y > positions[1].y){
             objects[i].get()->baseColor = Fade(baseColor, clip(1 - ((objects[i].get()->positions[0].y - positions[1].y) / (objectDistance * 1.5)), 0.0f, 1.0f));

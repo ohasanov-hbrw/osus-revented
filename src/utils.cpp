@@ -123,6 +123,17 @@ void updateUpDown() {
 void GetScale() {
   // Get the scale and also get the current offset for the zero point of the
   // game area
+  Global.ScaleUpdated = false;
+#ifndef THREEDS_BUILD
+  if(Global.lastWindowHeight != GetScreenHeight()){
+    Global.ScaleUpdated = true;
+    Global.lastWindowHeight = GetScreenHeight();
+  }
+  if(Global.lastWindowWidth != GetScreenWidth()){
+    Global.ScaleUpdated = true;
+    Global.lastWindowWidth = GetScreenWidth();
+  }
+#endif
   Global.Scale =
       std::min(GetScreenWidth() / 640.0f, GetScreenHeight() / 480.0f);
   Global.ZeroPoint = {GetScreenWidth() / 2.0f - (Global.Scale * 320.0f),

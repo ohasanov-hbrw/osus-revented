@@ -317,7 +317,9 @@ struct Globals {
     #endif
     // IDK honestly, this does something important
     Globals() = default;
-
+    bool ScaleUpdated = true;
+    int lastWindowHeight = 0;
+    int lastWindowWidth = 0;
     double TimeStepSize = 0; //in milliseconds
 };
 

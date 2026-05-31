@@ -210,8 +210,8 @@ private:
     
 public:
     enum MenuObjectModes mode = CLICKABLEOBJECT_INACTIVE;
-    double objectDistance = 40.0f;
-    double objectFreeSpace = 2.0f;
+    double objectDistance = 80.0f;
+    double objectFreeSpace = 4.0f;
     int objectOffsetFull = 0;
     double objectOffset = 0;
     const int hardCodedOffset = -2;

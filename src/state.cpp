@@ -89,9 +89,12 @@ void PlayMenu::init() {
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0);
   menu.elements[3].get()->positions =
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 50, 40, 230, 10, 40.,  (-40.));
-
-  menu.elements[4].get()->positions.push_back({320, 0});
-  menu.elements[4].get()->positions.push_back({640, 480});
+  float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+  float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+  float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+  float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
+  menu.elements[4].get()->positions.push_back({rightMostX - 310, topMostY});
+  menu.elements[4].get()->positions.push_back({rightMostX, bottomMostY});
   
 
   menu.init();
@@ -161,21 +164,37 @@ void PlayMenu::update() {
 
 
 
-  Update_Shape_Rectangle_With_Trapezoid(
-      MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height,
-      0, 0, MenuSizes.bottomCard.edgeHeight, MenuSizes.bottomCard.edgeWidth,
-      MenuSizes.bottomCard.edgeRampWidth, &(menu.elements[0].get()->positions));
-  Update_Shape_Rectangle_With_Trapezoid(
-      MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0,
-      MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
-      MenuSizes.topCard.edgeRampWidth, &(menu.elements[1].get()->positions));
-  Update_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0,
-                         &(menu.elements[2].get()->positions));
-  Update_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.),
-                         &(menu.elements[3].get()->positions));
-  
+  if(Global.ScaleUpdated){
+    Update_Shape_Rectangle_With_Trapezoid(
+        MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height,
+        0, 0, MenuSizes.bottomCard.edgeHeight, MenuSizes.bottomCard.edgeWidth,
+        MenuSizes.bottomCard.edgeRampWidth, &(menu.elements[0].get()->positions));
+    Update_Shape_Rectangle_With_Trapezoid(
+        MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0,
+        MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
+        MenuSizes.topCard.edgeRampWidth, &(menu.elements[1].get()->positions));
+    Update_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0,
+                          &(menu.elements[2].get()->positions));
+    Update_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.),
+                          &(menu.elements[3].get()->positions));
+
+    float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+    float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+    float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+    float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
+
+
+    menu.elements[4].get()->positions[0] = {rightMostX - 310, topMostY};
+    menu.elements[4].get()->positions[1] = {rightMostX, bottomMostY};
+  }
+
   dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->objectOffset += (float)(5.0f * -Global.Wheel);
   dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTextBox = AreSame((float)(5.0f * -Global.Wheel), 0) ? false : true;
+
+
+  
+
+
   menu.update();
   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
