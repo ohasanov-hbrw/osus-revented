@@ -175,7 +175,7 @@ public:
     Rectangle textRect = {0,0,0,0};
     double textSpacing = 5.0f;
 
-    double textSize = 10.0f;
+    double textSize = 20.0f;
 
     std::vector<Vector2> positions;
     
@@ -214,9 +214,15 @@ public:
     double objectFreeSpace = 4.0f;
     int objectOffsetFull = 0;
     double objectOffset = 0;
+
+    int graphicalObjectOffsetFull = 0;
+    double graphicalObjectOffset = 0;
+    double graphicalVelocity = 0;
+
     const int hardCodedOffset = -2;
     int numberOfObjects = 0;
     bool updateTextBox = false;
+    bool updateTexts = false;
     std::vector<std::string> objectNames;
     std::vector<std::unique_ptr<ClickableObject>> objects;
     FancyScrollingList() = default;
