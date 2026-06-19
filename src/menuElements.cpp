@@ -56,6 +56,7 @@ void ClickableObject::deinit() {
     positions.shrink_to_fit(); 
 }
 
+bool initFunctionRan = false;
 
 void FancyScrollingList::init() {
     numberOfObjects = (int)((positions[1].y - positions[0].y) / objectDistance) + 5;
@@ -76,11 +77,17 @@ void FancyScrollingList::init() {
         objects[i].get()->textColor = textColor;
     }
     updateTextBox = true;
-    objectOffsetFull = 0;
+    objectOffsetFull = -hardCodedOffset;
+    graphicalObjectOffsetFull = -hardCodedOffset;
+    currentSelection = -objectOffsetFull - hardCodedOffset;
     objectOffset = 0;
     updateTexts = true;
-    if(!Global.ScaleUpdated)
+    if(!Global.ScaleUpdated){
+        initFunctionRan = true;
         update();
+        initFunctionRan = false;
+        std::cout << "calling initial update for list\n";
+    }
     updateTexts = false;
 }
 
@@ -120,7 +127,7 @@ void FancyScrollingList::update() {
 
     double distance = (objectOffsetFull - graphicalObjectOffsetFull) * objectDistance + (objectOffset - graphicalObjectOffset);
     updateTextBox = true;
-    if(std::abs(distance) < 0.5){
+    if(std::abs(distance) < 0.5 && !initFunctionRan){
         //graphicalObjectOffsetFull = objectOffsetFull;
         //graphicalObjectOffset = objectOffset;
         updateTextBox = false;
@@ -128,7 +135,7 @@ void FancyScrollingList::update() {
     }
     else {
         // Define the distance at which full speed is reached
-        double maxDistance = objectDistance * 2.0; // Increased to handle fast scrolls better
+        double maxDistance = objectDistance * 8.0; // Increased to handle fast scrolls better
         
         // Normalize distance between -1.0 and 1.0
         double t = std::max(-1.0, std::min(1.0, distance / maxDistance));
@@ -138,10 +145,10 @@ void FancyScrollingList::update() {
         double easeFactor = (absT < 0.5) ? (2.0 * absT * absT) : (1.0 - std::pow(-2.0 * absT + 2.0, 2.0) / 2.0);
 
         double sign = (distance > 0) ? 1.0 : -1.0;
-        double baseSpeed = 25.0f; // Increased base speed to eliminate lag
+        double baseSpeed = 250.0f; // Increased base speed to eliminate lag
         
         // Calculate step, ensuring a minimum speed so it doesn't crawl at the end
-        double minSpeed = 0.5; 
+        double minSpeed = 0.3; 
         double step = (Global.FrameTime / 1000.f) * easeFactor * baseSpeed * objectDistance;
         
         if (step < minSpeed) {
@@ -151,18 +158,23 @@ void FancyScrollingList::update() {
         graphicalObjectOffset += step * sign;
     }
 
-    graphicalObjectOffsetFull += (int)trunc((graphicalObjectOffset / objectDistance));
+    int change = (int)trunc((graphicalObjectOffset / (0.5*objectDistance)));
+    graphicalObjectOffsetFull += change;
 
-    if((int)trunc((graphicalObjectOffset / objectDistance)) != 0){
+    if(change != 0){
         updateTexts = true;
         updateTextBox = true;
     }
 
-    graphicalObjectOffset -= trunc((graphicalObjectOffset / objectDistance)) * objectDistance;
+    graphicalObjectOffset -= change * objectDistance;
+
+    float centeringOffset = objectDistance / 2.;
+
+    currentSelection = -objectOffsetFull - hardCodedOffset;
 
     for(int i = 0; i < objects.size(); i++){
-        objects[i].get()->positions[0] = positions[0] + (Vector2){0, objectDistance * (i - 2) + objectFreeSpace + graphicalObjectOffset};
-        objects[i].get()->positions[1] = positions[0] + (Vector2){positions[1].x - positions[0].x, objectDistance * (i - 1) - objectFreeSpace + graphicalObjectOffset};
+        objects[i].get()->positions[0] = positions[0] + (Vector2){0, objectDistance * (i - 2) + objectFreeSpace + graphicalObjectOffset} + (Vector2){0, centeringOffset};
+        objects[i].get()->positions[1] = positions[0] + (Vector2){positions[1].x - positions[0].x, objectDistance * (i - 1) - objectFreeSpace + graphicalObjectOffset} + (Vector2){0, centeringOffset};
         if(objects[i].get()->positions[0].y + objectFreeSpace < positions[0].y){
             objects[i].get()->baseColor = Fade(baseColor, clip(1 - ((positions[0].y - (objects[i].get()->positions[0].y + objectFreeSpace)) / (objectDistance * 1.5)), 0.0f, 1.0f));
             objects[i].get()->textColor = Fade(textColor, clip(1 - ((positions[0].y - (objects[i].get()->positions[0].y + objectFreeSpace)) / (objectDistance * 1.5)), 0.0f, 1.0f));
@@ -194,8 +206,10 @@ void FancyScrollingList::update() {
 }
 
 void FancyScrollingList::render() {
-   for(int i = 0; i < objects.size(); i++){
+    DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", currentSelection, graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
+    for(int i = 0; i < objects.size(); i++){
 //if (i - objectOffsetFull + hardCodedOffset >= 0)
-            objects[i]->render();
+            if(i - graphicalObjectOffsetFull + hardCodedOffset >= 0)
+                objects[i]->render();
     }
 }
