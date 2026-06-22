@@ -188,7 +188,7 @@ void PlayMenu::update() {
     menu.elements[4].get()->positions[1] = {rightMostX, bottomMostY};
   }
 
-  dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->objectOffsetFull += (-Global.Wheel);
+  dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->frameChange += (Global.Wheel);
   //dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTextBox = Global.Wheel != 0 ? true : false;
   //dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTexts = Global.Wheel != 0 ? true : false;
 

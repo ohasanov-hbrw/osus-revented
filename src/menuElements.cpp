@@ -103,7 +103,16 @@ void FancyScrollingList::deinit() {
 }
 
 void FancyScrollingList::update() {
+    objectOffsetFull += frameChange;
+    
+    if(objectOffsetFull > -hardCodedOffset){
+        objectOffsetFull = -hardCodedOffset;
+    }
 
+    if(objectOffsetFull < -hardCodedOffset - 50){
+        objectOffsetFull = -hardCodedOffset -50;
+    }
+    frameChange = 0;
     if(Global.ScaleUpdated){
         for(int i = 0; i < objects.size(); i++){
             objects[i]->deinit();
@@ -112,8 +121,11 @@ void FancyScrollingList::update() {
         objects.clear();
         objects.shrink_to_fit();  
         init();
+        initFunctionRan = true;
+        updateTextBox = true;
+        updateTexts = true;
     }
-
+    
     objectOffsetFull += (int)trunc((objectOffset / objectDistance));
 
 
@@ -158,6 +170,7 @@ void FancyScrollingList::update() {
         graphicalObjectOffset += step * sign;
     }
 
+    if(initFunctionRan) initFunctionRan = false;
     int change = (int)trunc((graphicalObjectOffset / (0.5*objectDistance)));
     graphicalObjectOffsetFull += change;
 
@@ -209,7 +222,7 @@ void FancyScrollingList::render() {
     DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", currentSelection, graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
     for(int i = 0; i < objects.size(); i++){
 //if (i - objectOffsetFull + hardCodedOffset >= 0)
-            if(i - graphicalObjectOffsetFull + hardCodedOffset >= 0)
+            if(i - graphicalObjectOffsetFull + hardCodedOffset >= 0 && i - graphicalObjectOffsetFull + hardCodedOffset <= 50)
                 objects[i]->render();
     }
 }

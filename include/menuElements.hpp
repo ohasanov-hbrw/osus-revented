@@ -225,6 +225,9 @@ public:
     bool updateTexts = false;
 
     int currentSelection = 0;
+
+    int frameChange = 0;
+    
     std::vector<std::string> objectNames;
     std::vector<std::unique_ptr<ClickableObject>> objects;
     FancyScrollingList() = default;
