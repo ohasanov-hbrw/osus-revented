@@ -192,10 +192,34 @@ void writeBeatmapSetFile(const std::string& filename,
         ids_list += std::to_string(namesOfSets[beatmap_set_id][i].id);
     }
 
+    std::string artists_list = "";
+
+    for(int i = 0; i < namesOfSets[beatmap_set_id].size(); i++){
+        if(artists_list.find(namesOfSets[beatmap_set_id][i].artist) == std::string::npos){
+            if (!artists_list.empty()) {
+                artists_list += ", ";
+            }
+            artists_list += namesOfSets[beatmap_set_id][i].artist;
+        }
+    }
+
+    std::string creators_list = "";
+
+    for(int i = 0; i < namesOfSets[beatmap_set_id].size(); i++){
+        if(creators_list.find(namesOfSets[beatmap_set_id][i].creator) == std::string::npos){
+            if (!creators_list.empty()) {
+                creators_list += ", ";
+            }
+            creators_list += namesOfSets[beatmap_set_id][i].creator;
+        }
+    }
+
     // 3. Write them to the file structure
     //fprintf(file, "Maps: %s\n", maps_list.c_str());
     fprintf(file, "Maps:%d\n", numberOfMaps[beatmap_set_id]);
-    fprintf(file, "IDs:%s\n\n", ids_list.c_str());
+    fprintf(file, "IDs:%s\n", ids_list.c_str());
+    fprintf(file, "Artists:%s\n", artists_list.c_str());
+    fprintf(file, "Creators:%s\n\n", creators_list.c_str());
     // Always close your file pointers!
     fclose(file);
 }
@@ -279,6 +303,12 @@ std::vector<SetFileMetadata> parseCachedSets(const std::string& db_path) {
         else if (line_str.rfind("Maps:", 0) == 0) {
             std::string number_raw = line_str.substr(5);
             current_meta.number = std::stoi(number_raw);
+        }
+        else if (line_str.rfind("Artists:", 0) == 0) {
+            current_meta.artists = line_str.substr(8);
+        }
+        else if (line_str.rfind("Creators:", 0) == 0) {
+            current_meta.creators = line_str.substr(9);
         }
     }
     if (processing_entry) {

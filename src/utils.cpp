@@ -8,7 +8,6 @@
 #include <utils.hpp>
 #include <vector>
 
-
 #include "rlgl.h"
 
 // Multithreading mutex initializations
@@ -125,11 +124,11 @@ void GetScale() {
   // game area
   Global.ScaleUpdated = false;
 #ifndef THREEDS_BUILD
-  if(Global.lastWindowHeight != GetScreenHeight()){
+  if (Global.lastWindowHeight != GetScreenHeight()) {
     Global.ScaleUpdated = true;
     Global.lastWindowHeight = GetScreenHeight();
   }
-  if(Global.lastWindowWidth != GetScreenWidth()){
+  if (Global.lastWindowWidth != GetScreenWidth()) {
     Global.ScaleUpdated = true;
     Global.lastWindowWidth = GetScreenWidth();
   }
@@ -793,4 +792,120 @@ void DrawCoolBackground(Vector2 **tris, Color *colors, Vector2 *velocity,
 
   EndBlendMode();
   return;
+}
+
+//----------------------------------------------------------------------------------
+// Module Functions Definition
+//----------------------------------------------------------------------------------
+// Draw text using inline styling
+// PARAM: color is the default text color, background color is BLANK by default
+// NOTE: Using input color as the base alpha multiplied to inline styles
+void DrawTextStyled(Font *font, const char *text, Vector2 position,
+                    float fontSize, float spacing, Color color) {
+  // Text inline styling strategy used: [ ] delimiters for format
+  // - Define foreground color:      [cRRGGBBAA]
+  // - Define background color:      [bRRGGBBAA]
+  // - Reset formating:              [r]
+  // Example: [bAA00AAFF][cFF0000FF]red text on gray background[r] normal text
+
+  if (font->texture.id == 0)
+    *font = GetFontDefault();
+
+  int textLen = TextLength(text);
+
+  Color colFront = color;
+  Color colBack = BLANK;
+  int backRecPadding = 4; // Background rectangle padding
+
+  float textOffsetY = 0.0f;
+  float textOffsetX = 0.0f;
+  float textLineSpacing = 0.0f;
+  float scaleFactor = fontSize / font->baseSize;
+
+  for (int i = 0; i < textLen;) {
+    int codepointByteCount = 0;
+    int codepoint = GetCodepointNext(&text[i], &codepointByteCount);
+
+    if (codepoint == '\n') {
+      textOffsetY += (fontSize + textLineSpacing);
+      textOffsetX = 0.0f;
+    } else {
+      if (text[i] == '\006') // Process pipe styling
+      {
+        if (((i + 2) < textLen) && (text[i + 1] == 'r') &&
+            (text[i + 2] == '\007')) // Reset styling
+        {
+          colFront = color;
+          colBack = BLANK;
+
+          i += 3;   // Skip "[r]"
+          continue; // Do not draw characters
+        } else if (((i + 1) < textLen) &&
+                   ((text[i + 1] == 'c') || (text[i + 1] == 'b'))) {
+          i += 2; // Skip "[c" or "[b" to start parsing color
+
+          // Parse following color
+          char colHexText[9] = {0};
+          const char *textPtr =
+              &text[i]; // Color should start here, let's see...
+
+          int colHexCount = 0;
+          while ((textPtr != NULL) && (textPtr[colHexCount] != '\0') &&
+                 (textPtr[colHexCount] != '\007')) {
+            if (((textPtr[colHexCount] >= '0') &&
+                 (textPtr[colHexCount] <= '9')) ||
+                ((textPtr[colHexCount] >= 'A') &&
+                 (textPtr[colHexCount] <= 'F')) ||
+                ((textPtr[colHexCount] >= 'a') &&
+                 (textPtr[colHexCount] <= 'f'))) {
+              colHexText[colHexCount] = textPtr[colHexCount];
+              colHexCount++;
+            } else
+              break; // Only affects while loop
+          }
+
+          // Convert hex color text into actual Color
+          unsigned int colHexValue = strtoul(colHexText, NULL, 16);
+          if (text[i - 1] == 'c') {
+            colFront = GetColor(colHexValue);
+            // colFront.a *= (unsigned char)(colFront.a*(float)color.a/255.0f);
+            // // TODO: Review
+          } else if (text[i - 1] == 'b') {
+            colBack = GetColor(colHexValue);
+            // colBack.a *= (unsigned char)(colFront.a*(float)color.a/255.0f);
+          }
+
+          i += (colHexCount + 1); // Skip color value retrieved and ']'
+          continue;               // Do not draw characters
+        }
+      }
+
+      int index = GetGlyphIndex(font, codepoint);
+      float increaseX = 0.0f;
+
+      if (font->glyphs[index].advanceX == 0)
+        increaseX = ((float)font->recs[index].width * scaleFactor + spacing);
+      else
+        increaseX +=
+            ((float)font->glyphs[index].advanceX * scaleFactor + spacing);
+
+      // Draw background rectangle color (if required)
+      if (colBack.a > 0)
+        DrawRectangleRec((Rectangle){position.x + textOffsetX,
+                                     position.y + textOffsetY - backRecPadding,
+                                     increaseX, fontSize + 2 * backRecPadding},
+                         colBack);
+
+      if ((codepoint != ' ') && (codepoint != '\t')) {
+        DrawTextCodepoint(
+            font, codepoint,
+            (Vector2){position.x + textOffsetX, position.y + textOffsetY},
+            fontSize, colFront);
+      }
+
+      textOffsetX += increaseX;
+    }
+
+    i += codepointByteCount;
+  }
 }

@@ -77,9 +77,9 @@ void FancyScrollingList::init() {
         objects[i].get()->textColor = textColor;
     }
     updateTextBox = true;
-    objectOffsetFull = -hardCodedOffset;
-    graphicalObjectOffsetFull = -hardCodedOffset;
-    currentSelection = -objectOffsetFull - hardCodedOffset;
+    objectOffsetFull = 0;
+    graphicalObjectOffsetFull = 0;
+    currentSelection = -objectOffsetFull;
     objectOffset = 0;
     updateTexts = true;
     if(!Global.ScaleUpdated){
@@ -105,12 +105,12 @@ void FancyScrollingList::deinit() {
 void FancyScrollingList::update() {
     objectOffsetFull += frameChange;
     
-    if(objectOffsetFull > -hardCodedOffset){
-        objectOffsetFull = -hardCodedOffset;
+    if(objectOffsetFull > 0){
+        objectOffsetFull = 0;
     }
 
-    if(objectOffsetFull < -hardCodedOffset - std::max(1, (int)objectNames.size()) + 1){ // + 1 critical!
-        objectOffsetFull = -hardCodedOffset - std::max(1, (int)objectNames.size()) + 1;
+    if(objectOffsetFull < 0 - std::max(1, (int)objectNames.size()) + 1){ // + 1 critical!
+        objectOffsetFull = 0 - std::max(1, (int)objectNames.size()) + 1;
     }
     frameChange = 0;
     if(Global.ScaleUpdated){
@@ -183,11 +183,11 @@ void FancyScrollingList::update() {
 
     float centeringOffset = objectDistance / 2.;
 
-    currentSelection = -objectOffsetFull - hardCodedOffset;
+    currentSelection = -objectOffsetFull;
 
     for(int i = 0; i < objects.size(); i++){
-        objects[i].get()->positions[0] = positions[0] + (Vector2){0, objectDistance * (i - 2) + objectFreeSpace + graphicalObjectOffset} + (Vector2){0, centeringOffset};
-        objects[i].get()->positions[1] = positions[0] + (Vector2){positions[1].x - positions[0].x, objectDistance * (i - 1) - objectFreeSpace + graphicalObjectOffset} + (Vector2){0, centeringOffset};
+        objects[i].get()->positions[0] = positions[0] - (Vector2){0, (positions[0].y - positions[1].y) / 2} + (Vector2){0, objectDistance * (float)(i - 1 - (int)objects.size() / 2) + objectFreeSpace + graphicalObjectOffset} + (Vector2){0, centeringOffset};
+        objects[i].get()->positions[1] = positions[0] - (Vector2){0, (positions[0].y - positions[1].y) / 2} + (Vector2){positions[1].x - positions[0].x, objectDistance * (float)(i - 0 - (int)objects.size() / 2) - objectFreeSpace + graphicalObjectOffset} + (Vector2){0, centeringOffset};
         if(objects[i].get()->positions[0].y + objectFreeSpace < positions[0].y){
             objects[i].get()->baseColor = Fade(baseColor, clip(1 - ((positions[0].y - (objects[i].get()->positions[0].y + objectFreeSpace)) / (objectDistance * 1.5)), 0.0f, 1.0f));
             objects[i].get()->textColor = Fade(textColor, clip(1 - ((positions[0].y - (objects[i].get()->positions[0].y + objectFreeSpace)) / (objectDistance * 1.5)), 0.0f, 1.0f));
@@ -204,7 +204,7 @@ void FancyScrollingList::update() {
         double distanceFromCenter = (objects[i].get()->positions[0].y + objectDistance / 2) - (positions[0].y + ((positions[1].y - positions[0].y) / 2.0f));
         objects[i].get()->positions[0].x += (distanceFromCenter / 50.0) * (distanceFromCenter / 50.0);
         if(updateTexts){
-            objects[i].get()->text = objectNames.size() > 0 ? objectNames[std::max(0, i - graphicalObjectOffsetFull + hardCodedOffset) % objectNames.size()]: "Error, object: " + std::to_string(i - graphicalObjectOffsetFull + hardCodedOffset);
+            objects[i].get()->text = objectNames.size() > 0 ? objectNames[std::max(0, i - graphicalObjectOffsetFull) % objectNames.size()]: "Error, object: " + std::to_string(i - (int)objects.size() / 2 - graphicalObjectOffsetFull);
             objects[i].get()->internalBox.SetText(objects[i].get()->text);
         }
         if(updateTextBox){
@@ -219,10 +219,10 @@ void FancyScrollingList::update() {
 }
 
 void FancyScrollingList::render() {
-    //DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", currentSelection, graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
+    //DrawTextEx(&Global.DefaultFont, TextFormat("OffsetFull: %d Graphical: %.0f", graphicalObjectOffsetFull, graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(400))}, Scale(20.05), Scale(2), BLUE);
     for(int i = 0; i < objects.size(); i++){
 //if (i - objectOffsetFull + hardCodedOffset >= 0)
-            if(i - graphicalObjectOffsetFull + hardCodedOffset >= 0 && i - graphicalObjectOffsetFull + hardCodedOffset < std::max(1, (int)objectNames.size()))
+            if(i - (int)objects.size() / 2 - graphicalObjectOffsetFull >= 0 && i - (int)objects.size() / 2 - graphicalObjectOffsetFull < std::max(1, (int)objectNames.size()))
                 objects[i]->render();
     }
 }

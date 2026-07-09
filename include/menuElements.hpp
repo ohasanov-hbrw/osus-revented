@@ -63,7 +63,7 @@ public:
                     }
                 }
                 
-                DrawTextEx(&font, m_cachedLines[i].c_str(), Vector2{ xPos, currentY }, (float)Scale(m_fontSize), (float)Scale(m_spacing), color);
+                DrawTextStyled(&font, m_cachedLines[i].c_str(), Vector2{ xPos, currentY }, (float)Scale(m_fontSize), (float)Scale(m_spacing), color);
             }
         }
     }
@@ -89,6 +89,7 @@ private:
         int maxLinesPossible = static_cast<int>(ScaleRect(m_box).height / lineHeight);
         if (maxLinesPossible < 1) maxLinesPossible = 1;
 
+
         size_t cursor = 0;
         size_t textLength = m_text.length();
 
@@ -108,7 +109,19 @@ private:
                 if (nextChar == ' ') lastSpace = takeChars;
 
                 std::string testLine = m_text.substr(cursor, takeChars + 1);
-                Vector2 size = MeasureTextEx(&font, testLine.c_str(), (float)Scale(m_fontSize), (float)Scale(m_spacing));
+                std::string cleanLine = "";
+                for (size_t i = 0; i < testLine.length(); ++i) {
+                    if (testLine[i] == '\006') {
+                        size_t end = testLine.find('\007', i);
+                        if (end != std::string::npos) {
+                            i = end; // Skip past the closing delimiter
+                            continue;
+                        }
+                    }
+                    cleanLine += testLine[i];
+                }
+
+                Vector2 size = MeasureTextEx(&font, cleanLine.c_str(), (float)Scale(m_fontSize), (float)Scale(m_spacing));
 
                 if (size.x > ScaleRect(m_box).width) break;
                 takeChars++;
@@ -128,8 +141,23 @@ private:
             if (isLastVisibleLine && textOverflows) {
                 std::string cutText = m_text.substr(cursor, takeChars);
                 while (!cutText.empty()) {
+
                     std::string testEllipsis = cutText + "...";
-                    Vector2 size = MeasureTextEx(&font, testEllipsis.c_str(), (float)Scale(m_fontSize), (float)Scale(m_spacing));
+
+                    std::string cleanEllipsis = "";
+                    for (size_t i = 0; i < testEllipsis.length(); ++i) {
+                        if (testEllipsis[i] == '\006') {
+                            size_t end = testEllipsis.find('\007', i);
+                            if (end != std::string::npos) {
+                                i = end;
+                                continue;
+                            }
+                        }
+                        cleanEllipsis += testEllipsis[i];
+                    }
+
+
+                    Vector2 size = MeasureTextEx(&font, cleanEllipsis.c_str(), (float)Scale(m_fontSize), (float)Scale(m_spacing));
                     if (size.x <= ScaleRect(m_box).width) {
                         m_cachedLines.push_back(testEllipsis);
                         break;
@@ -141,8 +169,12 @@ private:
             } else {
                 m_cachedLines.push_back(m_text.substr(cursor, takeChars));
                 cursor += takeChars;
-                while (cursor < textLength && m_text[cursor] == ' ') {
-                    cursor++;
+                if (cursor < textLength && m_text[cursor] == '\n') {
+                    cursor++; 
+                } else {
+                    while (cursor < textLength && m_text[cursor] == ' ') {
+                        cursor++;
+                    }
                 }
             }
         }
@@ -219,7 +251,6 @@ public:
     double graphicalObjectOffset = 0;
     double graphicalVelocity = 0;
 
-    const int hardCodedOffset = -2;
     int numberOfObjects = 0;
     bool updateTextBox = false;
     bool updateTexts = false;

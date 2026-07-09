@@ -102,6 +102,11 @@ void PlayMenu::init() {
     dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->objectNames.push_back(beatmapSets[i].title);
   }
   menu.init();
+  leftSideBox.SetText(leftSideFormatted);
+  leftSideBox.SetFontSize(30.05);
+  leftSideBox.SetSpacing(1);
+  leftSideBox.SetWrapWords(true);
+  leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40, (rightMostX - 330) - (leftMostX + 20), (bottomMostY - topMostY) - 80});
   //std::cout << menu.elements.size() << " " << menu.elements[0]->positions.size() << std::endl;
   initializationStage = STATE_INITIALIZED;
   // MutexUnlock(SWITCHING_STATE);
@@ -128,12 +133,7 @@ void PlayMenu::render() {
 
   int selection = dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->currentSelection;
   DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", selection, dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
-  if(!beatmapSets.empty()){
-    selection %= beatmapSets.size();
-    DrawTextEx(&Global.DefaultFont, TextFormat("Title: %s", beatmapSets[selection].title.c_str()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(50))}, Scale(20.05), Scale(2), PURPLE);
-    DrawTextEx(&Global.DefaultFont, TextFormat("Maps: %d", beatmapSets[selection].number), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(75))}, Scale(20.05), Scale(2), PURPLE);
-    DrawTextEx(&Global.DefaultFont, TextFormat("SetID: %d", beatmapSets[selection].setid), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(100))}, Scale(20.05), Scale(2), PURPLE);
-  }
+  leftSideBox.Draw(HAlign::Left, VAlign::Top, WHITE);
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
   
@@ -199,6 +199,9 @@ void PlayMenu::update() {
 
     menu.elements[0].get()->positions[0] = {rightMostX - 310, topMostY};
     menu.elements[0].get()->positions[1] = {rightMostX, bottomMostY};
+
+    leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40, (rightMostX - 330) - (leftMostX + 20), (bottomMostY - topMostY) - 80});
+
   }
 
   dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->frameChange += (Global.Wheel);
@@ -206,11 +209,34 @@ void PlayMenu::update() {
   
   //dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTextBox = Global.Wheel != 0 ? true : false;
   //dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTexts = Global.Wheel != 0 ? true : false;
-
-  
-
-
   menu.update();
+
+  int selection = dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->currentSelection;
+  if(!beatmapSets.empty()){
+    selection %= beatmapSets.size();
+    //DrawTextEx(&Global.DefaultFont, TextFormat("Title: %s", beatmapSets[selection].title.c_str()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(50))}, Scale(20.05), Scale(2), PURPLE);
+    //DrawTextEx(&Global.DefaultFont, TextFormat("Maps: %d", beatmapSets[selection].number), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(75))}, Scale(20.05), Scale(2), PURPLE);
+    //DrawTextEx(&Global.DefaultFont, TextFormat("Artists: %s", beatmapSets[selection].artists.c_str()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(100))}, Scale(20.05), Scale(2), PURPLE);
+    //DrawTextEx(&Global.DefaultFont, TextFormat("Creators: %s", beatmapSets[selection].creators.c_str()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(125))}, Scale(20.05), Scale(2), PURPLE);
+    //DrawTextEx(&Global.DefaultFont, TextFormat("SetID: %d", beatmapSets[selection].setid), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(150))}, Scale(20.05), Scale(2), PURPLE);
+    std::string newString = TextFormat("\006cCC00AAFF\007Title: \006r\007%s\n\006cCC00AAFF\007Maps: \006r\007%d\n\006cCC00AAFF\007Artists: \006r\007%s\n\006cCC00AAFF\007Creators: \006r\007%s\n\006cCC00AA99\007SetID: \006cFFFFFF99\007%d", beatmapSets[selection].title.c_str(),
+                                                                                                          beatmapSets[selection].number,
+                                                                                                          beatmapSets[selection].artists.c_str(),
+                                                                                                          beatmapSets[selection].creators.c_str(),
+                                                                                                          beatmapSets[selection].setid);
+    if(newString != leftSideFormatted){
+      leftSideFormatted = newString;
+      leftSideBox.SetText(leftSideFormatted);
+      /*std::cout << "set new text:\n " << leftSideFormatted << std::endl;
+      if (!newString.empty()) {
+        std::cout << "First byte integer value: " << (int)newString[0] << std::endl;
+      }*/
+    }
+  }
+
+
+
+
   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
   if (close.action) {

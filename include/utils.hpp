@@ -146,3 +146,5 @@ std::vector<std::string> getAudioFilenames(int , int , int , int , int , int , i
 void DrawCoolBackground(Vector2 **tris, Color *colors, Vector2 *velocity, int number, double delta);
 
 
+
+void DrawTextStyled(Font *font, const char *text, Vector2 position, float fontSize, float spacing, Color color);

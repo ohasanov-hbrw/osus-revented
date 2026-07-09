@@ -58,9 +58,8 @@ private:
     std::string temp;
     MenuOverlay menu;
     std::vector<SetFileMetadata> beatmapSets;
-    TextBox beatmapNumber;
-    TextBox beatmapID;
-    TextBox beatmapSetID;
+    TextBoxSmart leftSideBox;
+    std::string leftSideFormatted = "";
 public:
     PlayMenu();
     std::string lastPos = "";

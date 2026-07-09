@@ -17,7 +17,8 @@ struct FileMetadata{
 struct SetFileMetadata{
     std::string path;
     std::string title;
-    std::string artist;
+    std::string artists;
+    std::string creators;
     int setid;
     int number;
 };
