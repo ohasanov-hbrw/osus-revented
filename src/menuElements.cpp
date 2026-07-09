@@ -66,7 +66,7 @@ void FancyScrollingList::init() {
         objects.push_back(std::make_unique<ClickableObject>());
         objects[i].get()->positions.push_back(positions[0] + (Vector2){0, objectFreeSpace});
         objects[i].get()->positions.push_back(positions[0] + (Vector2){positions[1].x - positions[0].x, objectDistance - objectFreeSpace});
-        objects[i].get()->text = "Object: " + std::to_string(i);
+        objects[i].get()->text = objectNames.size() > 0 ? objectNames[i % objectNames.size()]: "Error, object: " + std::to_string(i);
         objects[i].get()->internalBox.SetText(objects[i].get()->text);
         objects[i].get()->internalBox.SetFontSize(textSize);
         objects[i].get()->internalBox.SetSpacing(1);
@@ -109,8 +109,8 @@ void FancyScrollingList::update() {
         objectOffsetFull = -hardCodedOffset;
     }
 
-    if(objectOffsetFull < -hardCodedOffset - 50){
-        objectOffsetFull = -hardCodedOffset -50;
+    if(objectOffsetFull < -hardCodedOffset - std::max(1, (int)objectNames.size()) + 1){ // + 1 critical!
+        objectOffsetFull = -hardCodedOffset - std::max(1, (int)objectNames.size()) + 1;
     }
     frameChange = 0;
     if(Global.ScaleUpdated){
@@ -204,7 +204,7 @@ void FancyScrollingList::update() {
         double distanceFromCenter = (objects[i].get()->positions[0].y + objectDistance / 2) - (positions[0].y + ((positions[1].y - positions[0].y) / 2.0f));
         objects[i].get()->positions[0].x += (distanceFromCenter / 50.0) * (distanceFromCenter / 50.0);
         if(updateTexts){
-            objects[i].get()->text = "Object: " + std::to_string(i - graphicalObjectOffsetFull + hardCodedOffset);
+            objects[i].get()->text = objectNames.size() > 0 ? objectNames[std::max(0, i - graphicalObjectOffsetFull + hardCodedOffset) % objectNames.size()]: "Error, object: " + std::to_string(i - graphicalObjectOffsetFull + hardCodedOffset);
             objects[i].get()->internalBox.SetText(objects[i].get()->text);
         }
         if(updateTextBox){
@@ -219,10 +219,10 @@ void FancyScrollingList::update() {
 }
 
 void FancyScrollingList::render() {
-    DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", currentSelection, graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
+    //DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", currentSelection, graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
     for(int i = 0; i < objects.size(); i++){
 //if (i - objectOffsetFull + hardCodedOffset >= 0)
-            if(i - graphicalObjectOffsetFull + hardCodedOffset >= 0 && i - graphicalObjectOffsetFull + hardCodedOffset <= 50)
+            if(i - graphicalObjectOffsetFull + hardCodedOffset >= 0 && i - graphicalObjectOffsetFull + hardCodedOffset < std::max(1, (int)objectNames.size()))
                 objects[i]->render();
     }
 }

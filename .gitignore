@@ -4,6 +4,7 @@ build
 object
 beatmaps
 resources
+database
 .vscode
 .cache
 

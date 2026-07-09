@@ -378,6 +378,16 @@ int main(){
     
     buildFileMap(Global.BeatmapLocation);
     listAllMaps();
+    decideNamesForSets();
+
+
+    /*std::vector<SetFileMetadata> test = parseCachedSets(Global.DatabaseLocation + "/beatmapsets.db");
+    for (const auto& meta : test) {
+        std::cout << "Set ID: " << meta.setid << "\n";
+        std::cout << "Title:  " << meta.title << "\n";
+        std::cout << "Number: " << meta.number << "\n";
+        std::cout << "-------------------------\n";
+    }*/
 
     // Start the rendering loop
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Starting render loop\n";

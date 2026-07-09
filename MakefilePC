@@ -15,7 +15,7 @@ deps = $(objects:.o=.d)
 all: files deps $(name)
 
 files:
-	mkdir -p bin object
+	mkdir -p bin object database
 	@for dir in $(sort $(dir $(sources))); do \
 		mkdir -p $${dir/src/object}; \
 	done
@@ -25,7 +25,7 @@ deps:
 	cd vendor/zip && mkdir -p build && cd build && cmake .. -DCMAKE_DISABLE_TESTING=1 && make -j12
 
 run: $(name)
-	mkdir -p beatmaps
+	mkdir -p beatmaps database
 	bin/$(name) 
 
 $(name): $(objects)

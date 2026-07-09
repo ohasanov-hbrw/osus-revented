@@ -158,6 +158,7 @@ struct Globals {
         std::string selectedPath = "sdmc:/3ds";
         std::string CurrentLocation = "sdmc:/3ds";
         std::string RemoveToRelative = "sdmc:/3ds";
+        std::string DatabaseLocation = "sdmc:/3ds/database";
     #endif
     #ifndef THREEDS_BUILD
         std::string Path = std::filesystem::current_path().string();
@@ -166,6 +167,7 @@ struct Globals {
         std::string selectedPath = "";
         std::string CurrentLocation = std::filesystem::current_path().string();
         std::string RemoveToRelative = std::filesystem::current_path().string();
+        std::string DatabaseLocation = std::filesystem::current_path().string() + "/database";
     #endif
     // 3DS Spesific music state
     std::vector<Sound *> soundAtChannel;

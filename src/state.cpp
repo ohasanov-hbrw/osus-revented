@@ -55,18 +55,19 @@ void PlayMenu::init() {
   dir_list = SelectableList({320, 250}, {520, 160}, {255, 135, 198, 255}, dir,
                             BLACK, 20, 20, 65);
 
-  menu.elements.push_back(std::make_unique<ClickableObject>());
+  menu.elements.push_back(std::make_unique<FancyScrollingList>());
   menu.elements[0].get()->baseColor = {64, 48, 64, 192};
+  menu.elements[0].get()->textColor = WHITE;
   menu.elements.push_back(std::make_unique<ClickableObject>());
-  menu.elements[1].get()->baseColor = {48, 32, 48, 192};
+  menu.elements[1].get()->baseColor = {64, 48, 64, 192};
   menu.elements.push_back(std::make_unique<ClickableObject>());
-  menu.elements[2].get()->baseColor = {0, 0, 0, 192};
+  menu.elements[2].get()->baseColor = {48, 32, 48, 192};
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[3].get()->baseColor = {0, 0, 0, 192};
+  menu.elements.push_back(std::make_unique<ClickableObject>());
+  menu.elements[4].get()->baseColor = {0, 0, 0, 192};
 
-  menu.elements.push_back(std::make_unique<FancyScrollingList>());
-  menu.elements[4].get()->baseColor = {64, 48, 64, 192};
-  menu.elements[4].get()->textColor = WHITE;
+  
   // std::cout << menu.elements[0]->baseColor.r << " " <<
   // menu.elements[0]->baseColor.g << " " << menu.elements[0]->baseColor.b <<
   // std::endl;
@@ -77,26 +78,29 @@ void PlayMenu::init() {
   float spacingAngleWidth = 20;
   float height = 10;
 
-  menu.elements[0].get()->positions = Create_Shape_Rectangle_With_Trapezoid(
+  menu.elements[1].get()->positions = Create_Shape_Rectangle_With_Trapezoid(
       MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height,
       0, 0, MenuSizes.bottomCard.edgeHeight, MenuSizes.bottomCard.edgeWidth,
       MenuSizes.bottomCard.edgeRampWidth);
-  menu.elements[1].get()->positions = Create_Shape_Rectangle_With_Trapezoid(
+  menu.elements[2].get()->positions = Create_Shape_Rectangle_With_Trapezoid(
       MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0,
       MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
       MenuSizes.topCard.edgeRampWidth);
-  menu.elements[2].get()->positions =
-      Create_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0);
   menu.elements[3].get()->positions =
+      Create_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0);
+  menu.elements[4].get()->positions =
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 50, 40, 230, 10, 40.,  (-40.));
   float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
   float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
   float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
   float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
-  menu.elements[4].get()->positions.push_back({rightMostX - 310, topMostY});
-  menu.elements[4].get()->positions.push_back({rightMostX, bottomMostY});
+  menu.elements[0].get()->positions.push_back({rightMostX - 310, topMostY});
+  menu.elements[0].get()->positions.push_back({rightMostX, bottomMostY});
   
-
+  beatmapSets = parseCachedSets(Global.DatabaseLocation + "/beatmapsets.db");
+  for(int i = 0; i < beatmapSets.size(); i++){
+    dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->objectNames.push_back(beatmapSets[i].title);
+  }
   menu.init();
   //std::cout << menu.elements.size() << " " << menu.elements[0]->positions.size() << std::endl;
   initializationStage = STATE_INITIALIZED;
@@ -121,6 +125,15 @@ void PlayMenu::render() {
   usedsound.render();
   name.render();
   menu.render();
+
+  int selection = dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->currentSelection;
+  DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", selection, dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
+  if(!beatmapSets.empty()){
+    selection %= beatmapSets.size();
+    DrawTextEx(&Global.DefaultFont, TextFormat("Title: %s", beatmapSets[selection].title.c_str()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(50))}, Scale(20.05), Scale(2), PURPLE);
+    DrawTextEx(&Global.DefaultFont, TextFormat("Maps: %d", beatmapSets[selection].number), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(75))}, Scale(20.05), Scale(2), PURPLE);
+    DrawTextEx(&Global.DefaultFont, TextFormat("SetID: %d", beatmapSets[selection].setid), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(100))}, Scale(20.05), Scale(2), PURPLE);
+  }
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
   
@@ -168,15 +181,15 @@ void PlayMenu::update() {
     Update_Shape_Rectangle_With_Trapezoid(
         MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height,
         0, 0, MenuSizes.bottomCard.edgeHeight, MenuSizes.bottomCard.edgeWidth,
-        MenuSizes.bottomCard.edgeRampWidth, &(menu.elements[0].get()->positions));
+        MenuSizes.bottomCard.edgeRampWidth, &(menu.elements[1].get()->positions));
     Update_Shape_Rectangle_With_Trapezoid(
         MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0,
         MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
-        MenuSizes.topCard.edgeRampWidth, &(menu.elements[1].get()->positions));
+        MenuSizes.topCard.edgeRampWidth, &(menu.elements[2].get()->positions));
     Update_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0,
-                          &(menu.elements[2].get()->positions));
-    Update_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.),
                           &(menu.elements[3].get()->positions));
+    Update_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.),
+                          &(menu.elements[4].get()->positions));
 
     float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
     float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
@@ -184,14 +197,15 @@ void PlayMenu::update() {
     float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
 
 
-    menu.elements[4].get()->positions[0] = {rightMostX - 310, topMostY};
-    menu.elements[4].get()->positions[1] = {rightMostX, bottomMostY};
+    menu.elements[0].get()->positions[0] = {rightMostX - 310, topMostY};
+    menu.elements[0].get()->positions[1] = {rightMostX, bottomMostY};
   }
 
-  dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->frameChange += (Global.Wheel);
+  dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->frameChange += (Global.Wheel);
+
+  
   //dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTextBox = Global.Wheel != 0 ? true : false;
   //dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTexts = Global.Wheel != 0 ? true : false;
-
 
   
 
@@ -263,6 +277,7 @@ void PlayMenu::update() {
 void PlayMenu::unload() {
   initializationStage = STATE_UNINITIALIZED;
   menu.deinit();
+  beatmapSets.clear();
   // MutexLock(SWITCHING_STATE);
   // MutexUnlock(SWITCHING_STATE);
 }

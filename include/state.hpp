@@ -6,6 +6,7 @@
 #include <list>
 #include "menuElements.hpp"
 #include "menuOverlay.hpp"
+#include "cachebuilder/metadataParser.hpp"
 
 enum INITSTATE {
     STATE_FORCED_EXIT = 4,
@@ -56,6 +57,10 @@ private:
     TextBox usedsound;
     std::string temp;
     MenuOverlay menu;
+    std::vector<SetFileMetadata> beatmapSets;
+    TextBox beatmapNumber;
+    TextBox beatmapID;
+    TextBox beatmapSetID;
 public:
     PlayMenu();
     std::string lastPos = "";
