@@ -33,9 +33,9 @@ include $(DEVKITARM)/3ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	src/3ds/AudioDecoders src/external src/3ds src src/menu_shapes
+SOURCES		:=	src/3ds/AudioDecoders src/external src/3ds src src/menu_shapes src/cachebuilder
 #DATA		:=	data
-INCLUDES	:=	include/3ds/AudioDecoders include/external include/3ds  include include/menu_shapes
+INCLUDES	:=	include/3ds/AudioDecoders include/external include/3ds  include include/menu_shapes include/cachebuilder
 #GRAPHICS	:=	gfx
 #GFXBUILD	:=	$(BUILD)
 #ROMFS		:=	romfs

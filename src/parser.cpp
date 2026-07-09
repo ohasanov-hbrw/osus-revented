@@ -1,13 +1,18 @@
 #include "parser.hpp"
 #include "globals.hpp"
 #include <algorithm>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
+
+
 
 Parser::Parser(){}
 
+// old implementation with ifstream, fopen should be way faster
 //this here is just a dumb parser, nothing to document here tbh
-GameFile Parser::parseMetadata(std::string filename){
+/*GameFile Parser::parseMetadata(std::string filename){
 	std::ifstream ifs(filename);
 	std::string line;
 	GameFile gameFile;
@@ -37,8 +42,107 @@ GameFile Parser::parseMetadata(std::string filename){
 			}
 		}
 	}
+	else{
+		std::cout << "failed to open file" << std::endl;
+	}
 	return gameFile;
+}*/
+
+
+std::filesystem::path prepare_long_path(const std::string& input_path) {
+#ifdef _WIN32
+    // If it's already a UNC/WSL path, use the UNC long path prefix
+    if (input_path.rfind("\\\\", 0) == 0) { 
+        // Checks if path starts with "\\"
+        // Converts \\wsl.localhost\... to \\?\UNC\wsl.localhost\...
+        return std::filesystem::path("\\\\?\\UNC\\" + input_path.substr(2));
+    }
+    // If it's a standard local drive path (e.g., C:\)
+    else if (input_path.size() >= 3 && input_path[1] == ':' && input_path[2] == '\\') {
+        return std::filesystem::path("\\\\?\\" + input_path);
+    }
+#endif
+
+    // On Linux/macOS, return the path exactly as-is
+    return std::filesystem::path(input_path);
 }
+
+// Helper to strip trailing CR (\r, ASCII 13) or LF (\n) from fgets buffer
+void sanitizeLine(std::string& line) {
+    while (!line.empty() && (line.back() == 13 || line.back() == '\n' || line.back() == '\r')) {
+        line.pop_back();
+    }
+}
+
+// Helper function to read an entire line of any length using a fixed buffer chunk
+bool readFullLine(FILE* file, std::string& outLine) {
+    outLine.clear();
+    char buffer[512]; // Small, efficient stack chunk size
+
+    while (fgets(buffer, sizeof(buffer), file) != nullptr) {
+        outLine.append(buffer);
+
+        // fgets stops reading when it hits a newline character ('\n') or EOF.
+        // If the last character in our string is '\n', we have completed the line!
+        if (!outLine.empty() && outLine.back() == '\n') {
+            break;
+        }
+    }
+
+    // Return true if we actually read data, false if we hit EOF right away
+    return !outLine.empty();
+}
+
+GameFile Parser::parseMetadata(std::string filename) {
+    GameFile gameFile;
+	FILE* file = fopen(filename.c_str(), "r");
+    if (file == nullptr) {
+		std::cout << "Couldn't open file for parsing, retrying, maybe length? " << filename.size() << std::endl;
+		for (int i = 0; i < filename.size(); i++) {
+			if (filename[i] == '/') {
+				filename[i] = '\\';
+			}
+		}
+		filename = prepare_long_path(filename).string();
+		std::cout << filename << std::endl;
+		file = fopen(filename.c_str(), "r");
+		if (file == nullptr) {
+			std::cout << "welp... messy solution didnt work" << std::endl;
+        	return gameFile; // Could not open file
+		}
+    }
+	std::string line;
+    while (readFullLine(file, line)) {
+        sanitizeLine(line);
+        if (line.empty()) continue;
+        if (line.front() == '[' && line.back() == ']') {
+            std::string header = line.substr(1);
+            header.pop_back(); // Remove ']'
+            if (header == "Metadata") {
+				std::string subLine;
+                while (readFullLine(file, subLine)) {
+                    sanitizeLine(subLine);
+					if (subLine.empty()) continue;
+                    if (subLine.front() == '[' && subLine.back() == ']') {
+						break; //break with next header
+					}
+                    if (subLine.size() >= 2 && subLine[0] == '/' && subLine[1] == '/') {
+                        continue;
+                    }
+					//std::cout << subLine << std::endl;
+                    std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, false);
+                    gameFile.configMetadata[keyValue.first] = keyValue.second;
+                }
+                break; // Found Metadata block and finished it, exit outer loop
+            }
+        }
+    }
+
+    fclose(file); // Always close your file handle
+    return gameFile;
+}
+
+
 
 //this here is just a dumb parser, nothing to document here tbh
 std::string Parser::parseBackground(std::string filename){

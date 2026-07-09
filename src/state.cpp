@@ -1733,7 +1733,7 @@ void WIPMenu::update() {
             dir[index][size - 4] == '.') {
           output = ParseNameFile(Path + dir[index]);
         }
-        if (output.size() == 5) {
+        if (output.size() >= 5) {
           Metadata.push_back("Title: " + output[0]);
           Metadata.push_back("Artist: " + output[1]);
           Metadata.push_back("Creator: " + output[2]);

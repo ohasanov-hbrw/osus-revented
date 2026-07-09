@@ -157,6 +157,7 @@ struct Globals {
         std::string GameBinaryPath = "sdmc:/3ds";//std::filesystem::current_path().string();
         std::string selectedPath = "sdmc:/3ds";
         std::string CurrentLocation = "sdmc:/3ds";
+        std::string RemoveToRelative = "sdmc:/3ds";
     #endif
     #ifndef THREEDS_BUILD
         std::string Path = std::filesystem::current_path().string();
@@ -164,6 +165,7 @@ struct Globals {
         std::string GameBinaryPath = "."; //std::filesystem::current_path().string();
         std::string selectedPath = "";
         std::string CurrentLocation = std::filesystem::current_path().string();
+        std::string RemoveToRelative = std::filesystem::current_path().string();
     #endif
     // 3DS Spesific music state
     std::vector<Sound *> soundAtChannel;

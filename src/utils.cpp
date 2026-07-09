@@ -549,6 +549,7 @@ std::vector<std::string> ParseNameFile(std::string file) {
   output.push_back(geym.configMetadata["Creator"]);
   output.push_back(geym.configMetadata["Version"]);
   output.push_back(geym.configMetadata["BeatmapSetID"]);
+  output.push_back(geym.configMetadata["BeatmapID"]);
   return output;
 }
 

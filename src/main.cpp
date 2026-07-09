@@ -42,6 +42,8 @@
 #include "settingsParser.hpp"
 #include "menu_shapes/shapes.hpp"
 
+#include "cachebuilder/metadataParser.hpp"
+
 #define NUMBER_BACKGROUND_TRIS 150
 #define SIZE_BACKGROUND_TRIS 200
 #define SIZE_VARIATION_BACKGROUND_TRIS 300
@@ -355,19 +357,27 @@ int main(){
     //std::cout << _os_get_free_linear_ram() << std::endl;    
     Global.linearSpaceFree = _os_get_free_linear_ram();
     
-    // Get settings from an ini file if they exist
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "parsing the settings.ini file...\n";
-    parseSettings();
-
-    // Initialize audio engine 
-    InitAudioDevice();
-    SetAudioStreamBufferSizeDefault(240);
-
     // Convert windows paths to linux path?
     for(int i = 0; i < Global.GameBinaryPath.size(); i++) {
         if (Global.GameBinaryPath[i] == '\\')
             Global.GameBinaryPath[i] = '/';
     }
+
+    // Get settings from an ini file if they exist
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "parsing the settings.ini file...\n";
+    parseSettings();
+
+
+
+    
+
+    // Initialize audio engine 
+    InitAudioDevice();
+    SetAudioStreamBufferSizeDefault(240);
+
+    
+    buildFileMap(Global.BeatmapLocation);
+    listAllMaps();
 
     // Start the rendering loop
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Starting render loop\n";
