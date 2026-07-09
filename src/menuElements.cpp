@@ -222,7 +222,7 @@ void FancyScrollingList::render() {
     //DrawTextEx(&Global.DefaultFont, TextFormat("OffsetFull: %d Graphical: %.0f", graphicalObjectOffsetFull, graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(400))}, Scale(20.05), Scale(2), BLUE);
     for(int i = 0; i < objects.size(); i++){
 //if (i - objectOffsetFull + hardCodedOffset >= 0)
-            if(i - (int)objects.size() / 2 - graphicalObjectOffsetFull >= 0 && i - (int)objects.size() / 2 - graphicalObjectOffsetFull < std::max(1, (int)objectNames.size()))
+            if(i - (int)objects.size() / 2 - graphicalObjectOffsetFull >= 0 && i - (int)objects.size() / 2 - graphicalObjectOffsetFull < std::max(1, (int)objectNames.size()) && objects[i]->positions[1].y > positions[0].y && objects[i]->positions[0].y < positions[1].y)
                 objects[i]->render();
     }
 }

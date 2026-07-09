@@ -132,7 +132,7 @@ void PlayMenu::render() {
   menu.render();
 
   int selection = dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->currentSelection;
-  DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", selection, dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
+  //DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f", selection, dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->graphicalObjectOffset), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))}, Scale(20.05), Scale(2), BLUE);
   leftSideBox.Draw(HAlign::Left, VAlign::Top, WHITE);
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
