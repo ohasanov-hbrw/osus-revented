@@ -140,7 +140,10 @@ bool IsRenderTextureReady(RenderTexture2D*);
 
 float getAngle(Vector2, Vector2);
 
-std::vector<std::string> getAudioFilenames(int , int , int , int , int , int , int , std::string);
+std::vector<std::string> getAudioFilenames(int timingSet, int timingSampleIndex,
+                                           int defaultSampleSet, int normalSet,
+                                           int additionSet, int hitSound,
+                                           int index, std::string filename);
 
 
 void DrawCoolBackground(Vector2 **tris, Color *colors, Vector2 *velocity, int number, double delta);

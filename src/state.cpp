@@ -67,6 +67,7 @@ void PlayMenu::init() {
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[4].get()->baseColor = {0, 0, 0, 192};
 
+
   
   // std::cout << menu.elements[0]->baseColor.r << " " <<
   // menu.elements[0]->baseColor.g << " " << menu.elements[0]->baseColor.b <<
@@ -77,6 +78,11 @@ void PlayMenu::init() {
   float spacingHeight = 40;
   float spacingAngleWidth = 20;
   float height = 10;
+
+  float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+  float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+  float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+  float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
 
   menu.elements[1].get()->positions = Create_Shape_Rectangle_With_Trapezoid(
       MenuSizes.bottomCard.anchor, true, false, 0, MenuSizes.bottomCard.height,
@@ -90,10 +96,18 @@ void PlayMenu::init() {
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0);
   menu.elements[4].get()->positions =
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40.,  (-40.));
-  float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
-  float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
-  float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
-  float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
+
+  menu.elements[3].get()->text = "Select";
+  menu.elements[3].get()->internalBox.SetText(menu.elements[3].get()->text);
+  menu.elements[3].get()->internalBox.SetFontSize(20.05);
+  menu.elements[3].get()->internalBox.SetSpacing(1);
+  menu.elements[3].get()->internalBox.SetWrapWords(false);
+  menu.elements[3].get()->textColor = WHITE;
+  menu.elements[3].get()->horizontalAlign = HAlign::Center;
+  menu.elements[3].get()->textRect = Rectangle{rightMostX - 115, bottomMostY - 10 - 40, 105, 40};
+  menu.elements[3].get()->internalBox.SetBox(menu.elements[3].get()->textRect);
+
+  
   menu.elements[0].get()->positions.push_back({rightMostX - 310, topMostY});
   menu.elements[0].get()->positions.push_back({rightMostX, bottomMostY});
   
@@ -201,7 +215,8 @@ void PlayMenu::update() {
     menu.elements[0].get()->positions[1] = {rightMostX, bottomMostY};
 
     leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40, (rightMostX - 330) - (leftMostX + 20), (bottomMostY - topMostY) - 80});
-
+    menu.elements[3].get()->textRect = Rectangle{rightMostX - 115, bottomMostY - 10 - 40, 105, 40};
+    menu.elements[3].get()->internalBox.SetBox(menu.elements[3].get()->textRect);
   }
 
   dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->frameChange += (Global.Wheel);

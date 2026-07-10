@@ -17,10 +17,11 @@ public:
 
     // Setters that trigger re-calculation only when mutated
     void SetBox(const Rectangle& newBox) {
-        if (m_box.x != newBox.x || m_box.y != newBox.y || m_box.width != newBox.width || m_box.height != newBox.height) {
+        if (m_box.width != newBox.width || m_box.height != newBox.height) {
             m_box = newBox;
             UpdateLayout();
         }
+        m_box = newBox;
     }
 
     void SetText(const std::string& newText) {
@@ -204,6 +205,8 @@ public:
     Color textColorActive;
     std::string text = "";
     TextBoxSmart internalBox;
+    HAlign horizontalAlign = HAlign::Left;
+    VAlign verticalAlign = VAlign::Middle;
     Rectangle textRect = {0,0,0,0};
     double textSpacing = 5.0f;
 

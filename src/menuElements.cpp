@@ -39,7 +39,7 @@ void ClickableObject::render() {
         
     }
     if(text != ""){
-        internalBox.Draw(HAlign::Left, VAlign::Middle, textColor);
+        internalBox.Draw(horizontalAlign, verticalAlign, textColor);
     }
 }
 
