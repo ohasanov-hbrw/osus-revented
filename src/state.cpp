@@ -89,7 +89,7 @@ void PlayMenu::init() {
   menu.elements[3].get()->positions =
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10,  40., 0);
   menu.elements[4].get()->positions =
-      Create_Shape_Trapezoid(BOTTOM_RIGHT, 50, 40, 230, 10, 40.,  (-40.));
+      Create_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40.,  (-40.));
   float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
   float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
   float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
@@ -245,7 +245,7 @@ void PlayMenu::update() {
     MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
     Global.CurrentState->unload();
     Global.CurrentState.reset(new MainMenu());
-    ((MainMenu *)(Global.CurrentState.get()))->animation = 2;
+    ((MainMenu *)(Global.CurrentState.get()))->animation = 2; // 2
     Global.CurrentState->init();
     MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
     MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
@@ -370,7 +370,7 @@ void LoadMenu::update() {
     MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
     Global.CurrentState->unload();
     Global.CurrentState.reset(new MainMenu());
-    ((MainMenu *)(Global.CurrentState.get()))->animation = 2;
+    ((MainMenu *)(Global.CurrentState.get()))->animation = 2; // 2
     Global.CurrentState->init();
     MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
     MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
@@ -459,7 +459,7 @@ MainMenu::MainMenu() {
   popup =
       Popup({320, 240}, {300, 120}, GRAY, "Test Popup", WHITE, 20, 1 << 0, -1);
   logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
-  animation = 2;
+  animation = 0;
   animationStart = 0;
   animationDone = false;
 }
@@ -505,7 +505,7 @@ void MainMenu::init() {
     logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
     popup.block = false;
     animationDone = false;
-    animationMs = 200;
+    animationMs = 0;//200
   } else if (animation == 2) {
     play = Button({0, 240}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
     wip = Button({0, 290}, {120, 40}, {150, 80, 120, 255}, "WIP", BLACK, 20);
@@ -516,7 +516,7 @@ void MainMenu::init() {
                   20, 1 << 0, -1);
     logo = ImageObject({0, 240}, {400, 400}, WHITE, 0, 0, &Global.OsusLogo);
     animationDone = false;
-    animationMs = 200;
+    animationMs = 0;//200
   } else if (animation == -1 || animation == -2) {
     play =
         Button({380, 240}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
@@ -529,9 +529,9 @@ void MainMenu::init() {
                   20, 1 << 0, -1);
     logo = ImageObject({160, 240}, {300, 300}, WHITE, 0, 0, &Global.OsusLogo);
     animationDone = false;
-    animationMs = 200;
+    animationMs = 0; //200
   }
-  animationStartTime = getTimer();
+  animationStartTime = getTimer(); // disable animation
   initializationStage = STATE_INITIALIZED;
   // MutexUnlock(SWITCHING_STATE);
 }
@@ -882,13 +882,13 @@ void MainMenu::update() {
     MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     return;
   } else if (play.action) {
-    animationMs = 200;
+    animationMs = 0; //200
     animationStartTime = getTimer();
     animation = -1;
     animationDone = false;
     return;
   } else if (load.action) {
-    animationMs = 200;
+    animationMs = 0; //200
     animationStartTime = getTimer();
     animation = -2;
     animationDone = false;
@@ -1047,7 +1047,7 @@ void StartMenu::update() {
     animationStartTime = getTimer();
     animation = 1;
     animationDone = false;
-    animationMs = 100;
+    animationMs = 0; //200
     return;
   }
 }
