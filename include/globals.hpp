@@ -174,7 +174,7 @@ struct Globals {
     // Error management queue
     std::queue<ErrorMessage> errors;
     // System timer variables
-    std::chrono::time_point<std::chrono::steady_clock> start, end;
+    std::chrono::time_point<std::chrono::steady_clock> start, end, globalstart;
     // 3DS CONSOLE
     #ifdef THREEDS_BUILD
     PrintConsole * pc;
@@ -325,6 +325,9 @@ struct Globals {
     int lastWindowHeight = 0;
     int lastWindowWidth = 0;
     double TimeStepSize = 0; //in milliseconds
+
+    std::atomic<bool> doingTimeConsumingOp = false;
+
 };
 
 extern Globals Global;

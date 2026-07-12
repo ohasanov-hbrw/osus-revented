@@ -13,3 +13,5 @@ void initMouseTrail();
 void updateMouseTrail();
 
 void renderMouse();
+
+void DrawLoadingCircle(Vector2 center, float radius, float thickness, double time, Color color);

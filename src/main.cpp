@@ -95,8 +95,10 @@ bool dumbsleep = false;
 
 
 
+
 // Seperate thread for rendering
 void RenderLoop(void *){
+    Global.globalstart = std::chrono::steady_clock::now();
     // Used for calculating frametimes
     double last = 0;
     int loc = 0;
@@ -147,12 +149,18 @@ void RenderLoop(void *){
 
     }            
 
+    float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+    float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+    float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+    float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
+
     // First ever frame is a loading screen
     MutexLock(RENDER_BLOCK, RENDERTHREAD_ID);
     _gpu_start_drawing(Global.window);
     ClearBackground(Global.Background);
     DrawCoolBackground(backgroundTriangles, backgroundTriangleColors, backgroundTriangleVelocity, NUMBER_BACKGROUND_TRIS, 0);
     DrawTextEx(&Global.DefaultFont, TextFormat("Loading game..."), {static_cast<float>((int)Scale(10)), static_cast<float>((int)Scale(10))}, Scale(40.15), Scale(2), WHITE);
+    DrawLoadingCircle(ScaleCords((Vector2){leftMostX + 40, bottomMostY - 40}), Scale(20), Scale(5), 0, Fade(WHITE, 1));
     _gpu_check_command_buffer();
     _gpu_end_drawing();
     MutexUnlock(RENDER_BLOCK, RENDERTHREAD_ID);
@@ -224,14 +232,22 @@ void RenderLoop(void *){
     // Signal readyness to the game logic loop
     Global.readyForGameLoop = true;
 
+
+    bool signifyLoading = true;
+    double loadingChangeTime = getGlobalTimer();
+    double loadingOffset = 0;
     // Main render loop
     while(true){
         auto t1 = std::chrono::steady_clock::now();
-        double delta = getTimer() - last;
-        last = getTimer();
+        double delta = getGlobalTimer() - last;
+        last = getGlobalTimer();
 
         // While loading/initializing nothing should be rendered...
         if(Global.readyForRenderLoop){
+            leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+            rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+            topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+            bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
             // Lock Mutexes to drive away multithreading-goblins
             MutexLock(RENDER_BLOCK, RENDERTHREAD_ID);
             // Texture Unloading has a high priority
@@ -254,6 +270,14 @@ void RenderLoop(void *){
             }
             // The state should know not to render while its loading
             Global.CurrentState->render();
+
+            //signifyLoading = false; //dynamic?
+            if(Global.doingTimeConsumingOp != signifyLoading){
+                loadingOffset = getGlobalTimer() - loadingChangeTime;
+                loadingChangeTime = getGlobalTimer();
+            }
+            signifyLoading = Global.doingTimeConsumingOp;
+
             MutexUnlock(SWITCHING_STATE, RENDERTHREAD_ID);
             MutexUnlock(RENDER_BLOCK, RENDERTHREAD_ID);
             
@@ -267,6 +291,11 @@ void RenderLoop(void *){
             // Show fps and game ticks per second
             DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.0f", avgFPS), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
             DrawTextEx(&Global.DefaultFont, TextFormat("TPS: %.0f", avgHZ), {static_cast<float>((int)Scale(100)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
+
+            if(signifyLoading)
+                DrawLoadingCircle(ScaleCords((Vector2){leftMostX + 40, bottomMostY - 40}), Scale(20), Scale(5),getGlobalTimer() - loadingChangeTime, Fade(WHITE, 1));
+            else if(getGlobalTimer() - loadingChangeTime < 1000)
+                DrawLoadingCircle(ScaleCords((Vector2){leftMostX + 40, bottomMostY - 40}), Scale(20), Scale(5),getGlobalTimer() - loadingChangeTime + loadingOffset, Fade(WHITE, 1.0 - clip(((getGlobalTimer() - loadingChangeTime) / 1000.0), 0., 1.)));
 
             // Mainly for 3DS Debugging purposes
             _gpu_check_command_buffer();
@@ -296,7 +325,7 @@ void RenderLoop(void *){
                 if(!dumbsleep)
                     SleepInUs(sleepTimeInt);
                 // Spinlock.
-                while(getTimer() - last < 1000.0/Global.FPS and getTimer() - last >= 0)
+                while(getGlobalTimer() - last < 1000.0/Global.FPS and getGlobalTimer() - last >= 0)
                     continue;
             }
         #endif
@@ -376,9 +405,9 @@ int main(){
     SetAudioStreamBufferSizeDefault(240);
 
     
-    buildFileMap(Global.BeatmapLocation);
-    listAllMaps();
-    decideNamesForSets();
+    //buildFileMap(Global.BeatmapLocation);
+    //listAllMaps();
+    //decideNamesForSets();
 
 
     /*std::vector<SetFileMetadata> test = parseCachedSets(Global.DatabaseLocation + "/beatmapsets.db");
@@ -395,8 +424,8 @@ int main(){
 
     // Frametime statistics and cursor initialization
     double avgFrameTime;
-    Global.LastFrameTime = getTimer();
-    double lastFrame = getTimer();
+    Global.LastFrameTime = getGlobalTimer();
+    double lastFrame = getGlobalTimer();
     HideCursor();
     initMouseTrail();
     
@@ -428,10 +457,10 @@ int main(){
     // Main game loop
     while(!WindowShouldClose() and _os_should_program_run()){
         // Start timer for sleep and stats
-        double timerXXX = getTimer();
+        double timerXXX = getGlobalTimer();
         auto t1 = std::chrono::steady_clock::now();
-        Global.FrameTime = getTimer() - Global.LastFrameTime;
-        Global.LastFrameTime = getTimer();
+        Global.FrameTime = getGlobalTimer() - Global.LastFrameTime;
+        Global.LastFrameTime = getGlobalTimer();
         
         // Quasi "System" functions, mouse, input and whatnot
         PollInputEvents();
@@ -455,7 +484,7 @@ int main(){
         unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/(float)(Global.TPS)) - sleepTime.count()) * 980.0);
         if(!dumbsleep)
             SleepInUs(sleepTimeInt);
-        while(getTimer() - timerXXX < 1000.0/(float)(Global.TPS) and getTimer() - timerXXX >= 0)
+        while(getGlobalTimer() - timerXXX < 1000.0/(float)(Global.TPS) and getGlobalTimer() - timerXXX >= 0)
             continue;
     
         // Calculate statistics for game speed

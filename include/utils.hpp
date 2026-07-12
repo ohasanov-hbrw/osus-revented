@@ -132,6 +132,7 @@ void initTimer();
 void pauseTimer();
 void resumeTimer();
 double getTimer();
+double getGlobalTimer();
 void addOffsetTimer(unsigned long long int);
 void updateTimer();
 

@@ -2,6 +2,7 @@
 #include "fastrender.hpp"
 #include "fs.hpp"
 #include "gamemanager.hpp"
+#include "globals.hpp"
 #include "menuElements.hpp"
 #include "raylib.h"
 #include "rlgl.h"
@@ -47,7 +48,7 @@ void PlayMenu::init() {
   // std::cout << "loading the playmenu/n";
   Global.NeedForBackgroundClear = true;
   Global.useAuto = false;
-  Global.LastFrameTime = getTimer();
+  Global.LastFrameTime = getGlobalTimer();
   temp = Global.Path;
   Global.Path = Global.BeatmapLocation;
   std::vector<std::string> dir = ls(".osu");
@@ -345,7 +346,7 @@ void LoadMenu::init() {
   // MutexLock(SWITCHING_STATE);
   Global.NeedForBackgroundClear = true;
   Global.useAuto = false;
-  Global.LastFrameTime = getTimer();
+  Global.LastFrameTime = getGlobalTimer();
   Global.FrameTime = 0.5;
   initializationStage = STATE_INITIALIZED;
   // MutexUnlock(SWITCHING_STATE);
@@ -467,7 +468,7 @@ void LoadMenu::textureOps() {}
 
 MainMenu::MainMenu() {
   play = Button({250, 420}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
-  wip = Button({500, 340}, {120, 40}, {255, 135, 198, 0}, "WIP", BLACK, 20);
+  wip = Button({500, 340}, {220, 40}, {255, 135, 198, 0}, "  Load Database", BLACK, 20);
   wip2 = Button({500, 300}, {120, 40}, {255, 135, 198, 0}, "WIP2", BLACK, 20);
   load = Button({390, 420}, {120, 60}, {255, 135, 198, 255}, "Load", BLACK, 20);
   volume = TestSlider({510, 460}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
@@ -482,7 +483,7 @@ MainMenu::MainMenu() {
 void MainMenu::init() {
   // MutexLock(SWITCHING_STATE);
   Global.NeedForBackgroundClear = true;
-  Global.LastFrameTime = getTimer();
+  Global.LastFrameTime = getGlobalTimer();
   Global.FrameTime = 0.5;
   Global.useAuto = false;
   volume.location = Global.volume * 100.0f;
@@ -500,7 +501,7 @@ void MainMenu::init() {
   if (animation == 0) {
     play =
         Button({250, 420}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
-    wip = Button({500, 340}, {120, 40}, {255, 135, 198, 0}, "WIP", BLACK, 20);
+    wip = Button({500, 340}, {220, 40}, {255, 135, 198, 0}, "  Load Database", BLACK, 20);
     wip2 = Button({500, 300}, {120, 40}, {255, 135, 198, 0}, "WIP2", BLACK, 20);
     load =
         Button({390, 420}, {120, 60}, {255, 135, 198, 255}, "Load", BLACK, 20);
@@ -510,8 +511,8 @@ void MainMenu::init() {
   } else if (animation == 1) {
     play =
         Button({320, 240}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
-    wip = Button({320, 290}, {120, 40}, {150, 80, 120, 255}, "WIP", BLACK, 20);
-    wip2 = Button({440, 290}, {120, 40}, {100, 60, 80, 255}, "WIP2", BLACK, 20);
+    wip = Button({370, 290}, {220, 40}, {150, 80, 120, 255}, "  Load Database", BLACK, 20);
+    wip2 = Button({540, 290}, {120, 40}, {100, 60, 80, 255}, "WIP2", BLACK, 20);
     load =
         Button({320, 240}, {120, 60}, {200, 100, 160, 255}, "Load", BLACK, 20);
     volume = TestSlider({320, 240}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
@@ -523,7 +524,7 @@ void MainMenu::init() {
     animationMs = 0;//200
   } else if (animation == 2) {
     play = Button({0, 240}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
-    wip = Button({0, 290}, {120, 40}, {150, 80, 120, 255}, "WIP", BLACK, 20);
+    wip = Button({0, 290}, {220, 40}, {150, 80, 120, 255}, "  Load Database", BLACK, 20);
     wip2 = Button({0, 290}, {120, 40}, {100, 60, 80, 255}, "WIP2", BLACK, 20);
     load = Button({0, 240}, {120, 60}, {200, 100, 160, 255}, "Load", BLACK, 20);
     volume = TestSlider({320, 240}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
@@ -535,8 +536,8 @@ void MainMenu::init() {
   } else if (animation == -1 || animation == -2) {
     play =
         Button({380, 240}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
-    wip = Button({320, 290}, {120, 40}, {150, 80, 120, 255}, "WIP", BLACK, 20);
-    wip2 = Button({440, 290}, {160, 40}, {100, 60, 80, 255}, "WIP2", BLACK, 20);
+    wip = Button({370, 290}, {220, 40}, {150, 80, 120, 255}, "  Load Database", BLACK, 20);
+    wip2 = Button({540, 290}, {160, 40}, {100, 60, 80, 255}, "WIP2", BLACK, 20);
     load =
         Button({540, 240}, {160, 60}, {200, 100, 160, 255}, "Load", BLACK, 20);
     volume = TestSlider({320, 240}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
@@ -546,7 +547,7 @@ void MainMenu::init() {
     animationDone = false;
     animationMs = 0; //200
   }
-  animationStartTime = getTimer(); // disable animation
+  animationStartTime = getGlobalTimer(); // disable animation
   initializationStage = STATE_INITIALIZED;
   // MutexUnlock(SWITCHING_STATE);
 }
@@ -569,7 +570,7 @@ void MainMenu::update() {
   if (animation == 0) {
     animationDone = true;
   } else if (animation == 1) {
-    double position = (getTimer() - animationStartTime) / animationMs;
+    double position = (getGlobalTimer() - animationStartTime) / animationMs;
     play.position = lerp({320, 240}, {380, 240}, position);
     play.textsize = 20 + 20 * position;
     load.position = lerp({320, 240}, {540, 240}, position);
@@ -585,7 +586,7 @@ void MainMenu::update() {
     play.size = lerp({120, 60}, {160, 60}, position);
     load.size = lerp({120, 60}, {160, 60}, position);
 
-    if (getTimer() - animationStartTime > animationMs) {
+    if (getGlobalTimer() - animationStartTime > animationMs) {
       animation = 0;
       animationDone = true;
 
@@ -599,17 +600,17 @@ void MainMenu::update() {
       logo.size = {300, 300};
       logo.position = {160, 240};
 
-      wip2.position = {440, 290};
+      wip2.position = {540, 290};
     }
   } else if (animation == 2) {
-    double position = (getTimer() - animationStartTime) / animationMs;
+    double position = (getGlobalTimer() - animationStartTime) / animationMs;
     play.position = lerp({0, 240}, {380, 240}, position);
     play.textsize = 20 + 20 * position;
     load.position = lerp({0, 240}, {540, 240}, position);
     load.textsize = 20 + 20 * position;
 
-    wip.position = lerp({0, 290}, {320, 290}, position);
-    wip2.position = lerp({0, 290}, {440, 290}, position);
+    wip.position = lerp({0, 290}, {370, 290}, position);
+    wip2.position = lerp({0, 290}, {540, 290}, position);
 
     logo.position = lerp({0, 240}, {160, 240}, position);
 
@@ -630,7 +631,7 @@ void MainMenu::update() {
     wip.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
     wip2.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
 
-    if (getTimer() - animationStartTime > animationMs) {
+    if (getGlobalTimer() - animationStartTime > animationMs) {
       animation = 0;
       animationDone = true;
 
@@ -644,8 +645,8 @@ void MainMenu::update() {
       logo.size = {300, 300};
       logo.position = {160, 240};
 
-      wip2.position = {440, 290};
-      wip.position = {320, 290};
+      wip2.position = {540, 290};
+      wip.position = {370, 290};
 
       play.textcolor.a = 255;
       load.textcolor.a = 255;
@@ -664,14 +665,14 @@ void MainMenu::update() {
     load.focused = false;
     wip.focused = false;
     wip2.focused = false;
-    double position = 1 - ((getTimer() - animationStartTime) / animationMs);
+    double position = 1 - ((getGlobalTimer() - animationStartTime) / animationMs);
     play.position = lerp({0, 240}, {380, 240}, position);
     play.textsize = 20 + 20 * position;
     load.position = lerp({0, 240}, {540, 240}, position);
     load.textsize = 20 + 20 * position;
 
-    wip.position = lerp({0, 290}, {320, 290}, position);
-    wip2.position = lerp({0, 290}, {440, 290}, position);
+    wip.position = lerp({0, 290}, {370, 290}, position);
+    wip2.position = lerp({0, 290}, {540, 290}, position);
 
     logo.position = lerp({0, 240}, {160, 240}, position);
 
@@ -692,7 +693,7 @@ void MainMenu::update() {
     wip.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
     wip2.color.a = (unsigned char)((int)clip((position * 255.0), 0, 255));
 
-    if (getTimer() - animationStartTime > animationMs) {
+    if (getGlobalTimer() - animationStartTime > animationMs) {
       play.position = {0, 240};
       play.textsize = 20;
       load.position = {0, 240};
@@ -768,9 +769,21 @@ void MainMenu::update() {
     popup.block = false;
   }
 
+  
+
   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
+  if(wip.action){
+    Global.doingTimeConsumingOp = true;
+    buildFileMap(Global.BeatmapLocation);
+    listAllMaps();
+    decideNamesForSets();
+    std::cout << "Done rebuilding database" << std::endl;
+    Global.doingTimeConsumingOp = 0;
+  }
+
   // test.update();
+  
   if (false && wip.action) {
     // Global.CurrentState->unload();
     // Global.CurrentState.reset(new WIPMenu());
@@ -898,13 +911,13 @@ void MainMenu::update() {
     return;
   } else if (play.action) {
     animationMs = 0; //200
-    animationStartTime = getTimer();
+    animationStartTime = getGlobalTimer();
     animation = -1;
     animationDone = false;
     return;
   } else if (load.action) {
     animationMs = 0; //200
-    animationStartTime = getTimer();
+    animationStartTime = getGlobalTimer();
     animation = -2;
     animationDone = false;
     return;
@@ -977,7 +990,7 @@ StartMenu::StartMenu() {
 void StartMenu::init() {
   // MutexLock(SWITCHING_STATE);
   Global.NeedForBackgroundClear = true;
-  Global.LastFrameTime = getTimer();
+  Global.LastFrameTime = getGlobalTimer();
   Global.FrameTime = 0.5;
   Global.useAuto = false;
   action = false;
@@ -993,10 +1006,10 @@ void StartMenu::init() {
 void StartMenu::update() {
 
   if (animation == 1) {
-    double position = (getTimer() - animationStartTime) / animationMs;
+    double position = (getGlobalTimer() - animationStartTime) / animationMs;
     description.textcolor.a =
         (unsigned char)((int)clip(255 - (position * 255.0), 0, 255));
-    if (getTimer() - animationStartTime > animationMs) {
+    if (getGlobalTimer() - animationStartTime > animationMs) {
       animation = -1;
       animationDone = true;
     }
@@ -1059,7 +1072,7 @@ void StartMenu::update() {
   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
   if (action) {
-    animationStartTime = getTimer();
+    animationStartTime = getGlobalTimer();
     animation = 1;
     animationDone = false;
     animationMs = 0; //200
@@ -1102,7 +1115,7 @@ void Game::init() {
   Global.NeedForBackgroundClear = true;
   Global.useAuto = false;
   initializationStage = STATE_UNINITIALIZED;
-  Global.LastFrameTime = getTimer();
+  Global.LastFrameTime = getGlobalTimer();
   // std::cout << Global.selectedPath << std::endl;
 
   Global.GameTextures = TEXTUREOPS_UNLOADED; // 0???
@@ -1120,6 +1133,7 @@ void Game::init() {
   MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
   MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
   parseSettings();
+  Global.doingTimeConsumingOp = true;
   Global.gameManager->loadGame(Global.selectedPath);
   // MutexLock(ACCESSING_OBJECTS);
   // MutexUnlock(ACCESSING_OBJECTS);
@@ -1134,6 +1148,7 @@ void Game::init() {
   Global.errorDiv = 0;
 
   volume.location = Global.volume * 100.0f;
+  Global.doingTimeConsumingOp = false;
   MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
   MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
   // MutexLock(SWITCHING_STATE);
@@ -1288,7 +1303,9 @@ void Game::render() {
 void Game::unload() {
   // MutexLock(SWITCHING_STATE);
   // MutexLock(ACCESSING_OBJECTS);
+  Global.doingTimeConsumingOp = true;
   Global.gameManager->unloadGame();
+  Global.doingTimeConsumingOp = false;
   Global.NeedForBackgroundClear = true;
   // MutexUnlock(ACCESSING_OBJECTS);
   // MutexUnlock(SWITCHING_STATE);

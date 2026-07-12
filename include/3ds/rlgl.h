@@ -157,3 +157,5 @@ void BeginBlendMode(int type);
 void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp);
 
 void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color);  
+
+void DrawTriangleStrip(Vector2 *points, int pointCount, Color color);                              // Draw a triangle strip defined by points

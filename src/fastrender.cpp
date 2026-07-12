@@ -37,3 +37,38 @@ void renderMouse(){
     }
     
 }
+
+
+void DrawLoadingCircle(Vector2 center, float radius, float thickness, double time, Color color){
+    time /= 1000.;
+    double baseRotation = time *300.f; 
+    double arcLength = 150.0f + sinf(time * 4.0f) * 120.0f;
+    double dynamicOffset = time * 100.0f + sinf(time * 2.0f) * 50.0f;
+    
+    double startAngle = baseRotation + dynamicOffset;
+
+    #define ARC_SEGMENTS 30
+    #define VERTEX_COUNT (ARC_SEGMENTS * 2)
+    Vector2 points[VERTEX_COUNT];
+
+    double innerRadius = radius - thickness;
+    double outerRadius = radius;
+
+    for (int i = 0; i < ARC_SEGMENTS; i++)
+    {
+        double progress = (double)i / (ARC_SEGMENTS - 1);
+        double angleRad = (startAngle + (progress * arcLength)) * DEG2RAD;
+
+        double cosA = cosf(angleRad);
+        double sinA = sinf(angleRad);
+
+        // Vertex 2i: Outer point
+        points[2 * i].x = center.x + cosA * outerRadius;
+        points[2 * i].y = center.y + sinA * outerRadius;
+
+        // Vertex 2i + 1: Inner point
+        points[2 * i + 1].x = center.x + cosA * innerRadius;
+        points[2 * i + 1].y = center.y + sinA * innerRadius;
+    }
+    DrawTriangleStrip(points, VERTEX_COUNT, color);
+}

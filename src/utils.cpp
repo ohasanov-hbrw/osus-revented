@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <ctype.h>
 #include <gamemanager.hpp>
@@ -572,7 +573,16 @@ void resumeTimer() {
 double getTimer() {
   // get the current time elapsed
   Global.end = std::chrono::steady_clock::now();
-  return (Global.end - Global.start).count() / 1000000.0;
+  auto duration = Global.end - Global.start;
+  std::chrono::duration<double, std::milli> milli = duration;
+  return milli.count();
+}
+
+// Get time time elapsed globally
+double getGlobalTimer() {
+  auto duration = std::chrono::steady_clock::now() - Global.globalstart;
+  std::chrono::duration<double, std::milli> milli = duration;
+  return milli.count();
 }
 
 // Add an offset to the game timer, so that the time the game has been paused
@@ -909,3 +919,6 @@ void DrawTextStyled(Font *font, const char *text, Vector2 position,
     i += codepointByteCount;
   }
 }
+
+
+
