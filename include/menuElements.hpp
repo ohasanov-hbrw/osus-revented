@@ -69,6 +69,14 @@ public:
         }
     }
 
+    void Unload(){
+        for(int i = 0; i < m_cachedLines.size(); i++){
+            m_cachedLines[i].clear();
+        }
+        m_cachedLines.clear();
+        m_text.clear();
+    }
+
     const Rectangle& GetBox() const { return ScaleRect(m_box); }
 
 private:
@@ -112,8 +120,8 @@ private:
                 std::string testLine = m_text.substr(cursor, takeChars + 1);
                 std::string cleanLine = "";
                 for (size_t i = 0; i < testLine.length(); ++i) {
-                    if (testLine[i] == '\006') {
-                        size_t end = testLine.find('\007', i);
+                    if (testLine[i] == '[') {
+                        size_t end = testLine.find(']', i);
                         if (end != std::string::npos) {
                             i = end; // Skip past the closing delimiter
                             continue;
@@ -147,8 +155,8 @@ private:
 
                     std::string cleanEllipsis = "";
                     for (size_t i = 0; i < testEllipsis.length(); ++i) {
-                        if (testEllipsis[i] == '\006') {
-                            size_t end = testEllipsis.find('\007', i);
+                        if (testEllipsis[i] == '\033') {
+                            size_t end = testEllipsis.find('\034', i);
                             if (end != std::string::npos) {
                                 i = end;
                                 continue;

@@ -101,7 +101,7 @@ void PlayMenu::init() {
   menu.elements[3].get()->text = "Select";
   menu.elements[3].get()->internalBox.SetText(menu.elements[3].get()->text);
   menu.elements[3].get()->internalBox.SetFontSize(20.05);
-  menu.elements[3].get()->internalBox.SetSpacing(1);
+  menu.elements[3].get()->internalBox.SetSpacing(2);
   menu.elements[3].get()->internalBox.SetWrapWords(false);
   menu.elements[3].get()->textColor = WHITE;
   menu.elements[3].get()->horizontalAlign = HAlign::Center;
@@ -235,7 +235,7 @@ void PlayMenu::update() {
     //DrawTextEx(&Global.DefaultFont, TextFormat("Artists: %s", beatmapSets[selection].artists.c_str()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(100))}, Scale(20.05), Scale(2), PURPLE);
     //DrawTextEx(&Global.DefaultFont, TextFormat("Creators: %s", beatmapSets[selection].creators.c_str()), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(125))}, Scale(20.05), Scale(2), PURPLE);
     //DrawTextEx(&Global.DefaultFont, TextFormat("SetID: %d", beatmapSets[selection].setid), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(150))}, Scale(20.05), Scale(2), PURPLE);
-    std::string newString = TextFormat("\006cCC00AAFF\007Title: \006r\007%s\n\006cCC00AAFF\007Maps: \006r\007%d\n\006cCC00AAFF\007Artists: \006r\007%s\n\006cCC00AAFF\007Creators: \006r\007%s\n\006cCC00AA99\007SetID: \006cFFFFFF99\007%d", beatmapSets[selection].title.c_str(),
+    std::string newString = TextFormat("[cCC00AAFF]Title: [r]%s\n[cCC00AAFF]Maps: [r]%d\n[cCC00AAFF]Artists: [r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: [cFFFFFF99]%d", beatmapSets[selection].title.c_str(),
                                                                                                           beatmapSets[selection].number,
                                                                                                           beatmapSets[selection].artists.c_str(),
                                                                                                           beatmapSets[selection].creators.c_str(),
@@ -320,6 +320,7 @@ void PlayMenu::unload() {
   initializationStage = STATE_UNINITIALIZED;
   menu.deinit();
   beatmapSets.clear();
+  leftSideFormatted.clear();
   // MutexLock(SWITCHING_STATE);
   // MutexUnlock(SWITCHING_STATE);
 }
@@ -777,7 +778,16 @@ void MainMenu::update() {
     Global.doingTimeConsumingOp = true;
     buildFileMap(Global.BeatmapLocation);
     listAllMaps();
+    #ifdef THREEDS_BUILD
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free Vram: " << _os_get_free_vram() / 1024 << "KB" << std::endl;
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_ALL: " << _os_get_free_ram(MEMREGION_ALL) / 1024 << "/" << _os_get_size_ram(MEMREGION_ALL) / 1024 << "KB" << std::endl;
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_APP: " << _os_get_free_ram(MEMREGION_APPLICATION) / 1024 << "/" << _os_get_size_ram(MEMREGION_APPLICATION) / 1024 << "KB" << std::endl;
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_SYS: " << _os_get_free_ram(MEMREGION_SYSTEM) / 1024 << "/" << _os_get_size_ram(MEMREGION_SYSTEM) / 1024 << "KB" << std::endl;
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_BSE: " << _os_get_free_ram(MEMREGION_BASE) / 1024<< "/" << _os_get_size_ram(MEMREGION_BASE) / 1024 << "KB" << std::endl;
+    std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_LIN: " << _os_get_free_linear_ram() / 1024 << "/" << Global.linearSpaceFree / 1024 << "KB" << std::endl;
+    #endif
     decideNamesForSets();
+    std::cout << "Decided Names" << std::endl;
     std::cout << "Done rebuilding database" << std::endl;
     Global.doingTimeConsumingOp = 0;
   }

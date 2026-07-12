@@ -139,13 +139,7 @@ void FancyScrollingList::update() {
 
     double distance = (objectOffsetFull - graphicalObjectOffsetFull) * objectDistance + (objectOffset - graphicalObjectOffset);
     updateTextBox = true;
-    if(std::abs(distance) < 0.5 && !initFunctionRan){
-        //graphicalObjectOffsetFull = objectOffsetFull;
-        //graphicalObjectOffset = objectOffset;
-        updateTextBox = false;
-        //graphicalVelocity = 0.0; // Clear momentum when snapped
-    }
-    else {
+    if(!(std::abs(distance) < 0.5 && !initFunctionRan)){
         // Define the distance at which full speed is reached
         double maxDistance = objectDistance * 8.0; // Increased to handle fast scrolls better
         
@@ -160,15 +154,20 @@ void FancyScrollingList::update() {
         double baseSpeed = 250.0f; // Increased base speed to eliminate lag
         
         // Calculate step, ensuring a minimum speed so it doesn't crawl at the end
-        double minSpeed = 0.3; 
-        double step = (Global.FrameTime / 1000.f) * easeFactor * baseSpeed * objectDistance;
+        double minSpeed = 300; 
+        double step = easeFactor * baseSpeed * objectDistance;
         
         if (step < minSpeed) {
             step = minSpeed; // Prevents the infinite slow crawl at the end
         }
-
+        step*=(Global.FrameTime / 1000.f);
         graphicalObjectOffset += step * sign;
     }
+
+    if(std::abs(distance) < 5 && !initFunctionRan)
+        updateTextBox = false;
+
+
 
     if(initFunctionRan) initFunctionRan = false;
     int change = (int)trunc((graphicalObjectOffset / (0.5*objectDistance)));

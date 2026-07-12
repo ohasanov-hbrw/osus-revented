@@ -60,6 +60,13 @@ typedef enum {
 } rlTextureFilter;
 
 
+// 128 vertices * 12 bytes (3 floats) = 1536 bytes (~1.5 KB)
+#define MAX_STRIP_VERTICES 128 
+
+struct StripVertexInteger{
+    int16_t x, y, z;
+};
+
 
 
 
@@ -159,3 +166,7 @@ void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp);
 void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color);  
 
 void DrawTriangleStrip(Vector2 *points, int pointCount, Color color);                              // Draw a triangle strip defined by points
+
+void DrawRectangleV(Vector2 position, Vector2 size, Color color);                                  // Draw a color-filled rectangle (Vector version)
+
+void DrawTextCodepoint(Font *font, int codepoint, Vector2 position, float fontSize, Color tint); // Draw one character (codepoint)

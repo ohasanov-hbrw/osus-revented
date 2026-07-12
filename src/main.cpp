@@ -98,6 +98,8 @@ bool dumbsleep = false;
 
 // Seperate thread for rendering
 void RenderLoop(void *){
+    
+
     Global.globalstart = std::chrono::steady_clock::now();
     // Used for calculating frametimes
     double last = 0;
@@ -396,6 +398,13 @@ int main(){
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "parsing the settings.ini file...\n";
     parseSettings();
 
+    // 1. Create the directory name string
+    std::string dir_name = Global.DatabaseLocation;
+
+    // Create the folder securely
+    if (!std::filesystem::exists(dir_name)) {
+        std::filesystem::create_directory(dir_name);
+    }
 
 
     
@@ -417,6 +426,8 @@ int main(){
         std::cout << "Number: " << meta.number << "\n";
         std::cout << "-------------------------\n";
     }*/
+
+    GetScale();
 
     // Start the rendering loop
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Starting render loop\n";

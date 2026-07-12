@@ -840,10 +840,10 @@ void DrawTextStyled(Font *font, const char *text, Vector2 position,
       textOffsetY += (fontSize + textLineSpacing);
       textOffsetX = 0.0f;
     } else {
-      if (text[i] == '\006') // Process pipe styling
+      if (codepoint == '[') // Process pipe styling
       {
         if (((i + 2) < textLen) && (text[i + 1] == 'r') &&
-            (text[i + 2] == '\007')) // Reset styling
+            (text[i + 2] == ']')) // Reset styling
         {
           colFront = color;
           colBack = BLANK;
@@ -861,7 +861,7 @@ void DrawTextStyled(Font *font, const char *text, Vector2 position,
 
           int colHexCount = 0;
           while ((textPtr != NULL) && (textPtr[colHexCount] != '\0') &&
-                 (textPtr[colHexCount] != '\007')) {
+                 (textPtr[colHexCount] != ']')) {
             if (((textPtr[colHexCount] >= '0') &&
                  (textPtr[colHexCount] <= '9')) ||
                 ((textPtr[colHexCount] >= 'A') &&

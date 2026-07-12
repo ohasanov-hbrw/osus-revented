@@ -1651,41 +1651,35 @@ void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color){
 
 
 
-// 128 vertices * 12 bytes (3 floats) = 1536 bytes (~1.5 KB)
-#define MAX_STRIP_VERTICES 128 
 
-typedef struct {
-    int16_t x, y, z;
-} StripVertex;
 
 void DrawTriangleStrip(Vector2 *points, int pointCount, Color color){
-    C2D_Prepare();
     if (points == NULL || pointCount < 3) return;
-    if (pointCount > MAX_STRIP_VERTICES) pointCount = MAX_STRIP_VERTICES;
-    static StripVertexInteger *vbo_buffer = NULL;
-    if (vbo_buffer == NULL)
+    u32 c2dColor = C2D_Color32(color.r, color.g, color.b, color.a);
+    const float depth = 0.0f;
+    for (int i = 2; i < pointCount; i++)
     {
-        vbo_buffer = (StripVertexInteger*)linearAlloc(MAX_STRIP_VERTICES * sizeof(StripVertexInteger));
-        if (vbo_buffer == NULL) return;
+        if ((i % 2) == 0)
+        {
+            C2D_DrawTriangle(
+                points[i].x,     points[i].y,     c2dColor,
+                points[i - 2].x, points[i - 2].y, c2dColor,
+                points[i - 1].x, points[i - 1].y, c2dColor,
+                depth
+            );
+        }
+        else
+        {
+            C2D_DrawTriangle(
+                points[i].x,     points[i].y,     c2dColor,
+                points[i - 1].x, points[i - 1].y, c2dColor,
+                points[i - 2].x, points[i - 2].y, c2dColor,
+                depth
+            );
+        }
     }
+}
 
-    for (int i = 0; i < pointCount; i++)
-    {
-        vbo_buffer[i].x = (int16_t)points[i].x;
-        vbo_buffer[i].y = (int16_t)points[i].y;
-        vbo_buffer[i].z = 0;
-    }
-
-    GSPGPU_FlushDataCache(vbo_buffer, pointCount * sizeof(StripVertexInteger));
-    C3D_AttrInfo *attrInfo = C3D_GetAttrInfo();
-    AttrInfo_Init(attrInfo);
-    
-    AttrInfo_AddLoader(attrInfo, 0, GPU_SHORT, 3); 
-    AttrInfo_AddFixed(attrInfo, 1);                
-
-    C3D_FixedAttribSet(1, color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
-    C3D_BufInfo *bufInfo = C3D_GetBufInfo();
-    BufInfo_Init(bufInfo);
-    bufInfo_Add(bufInfo, vbo_buffer, sizeof(StripVertexInteger), 1, 0x0);
-    C3D_DrawArrays(GPU_TRIANGLE_STRIP, 0, pointCount);
+void DrawRectangleV(Vector2 position, Vector2 size, Color color){
+    DrawRectangle((int)position.x, (int)position.y, (int)size.x, (int)size.y, color); //ACCURACY BE DAMNED
 }

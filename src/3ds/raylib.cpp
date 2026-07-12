@@ -82,3 +82,15 @@ Image GenImageGradientRadial(int width, int height, float density, Color inner, 
     image = LoadImage((Global.GameBinaryPath + "/resources/sliderin.png").c_str());
     return image;
 }
+
+// Get a Color struct from hexadecimal value
+Color GetColor(unsigned int hexValue){
+    Color color;
+
+    color.r = (unsigned char)(hexValue >> 24) & 0xFF;
+    color.g = (unsigned char)(hexValue >> 16) & 0xFF;
+    color.b = (unsigned char)(hexValue >> 8) & 0xFF;
+    color.a = (unsigned char)hexValue & 0xFF;
+
+    return color;
+}

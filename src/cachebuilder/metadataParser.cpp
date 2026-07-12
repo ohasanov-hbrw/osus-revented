@@ -7,9 +7,8 @@
 #include <stdio.h> 
 #include <filesystem>
 #include <dirent.h> 
-#ifndef _DIRENT_HAVE_D_TYPE
-    #include <algorithm>
-#endif
+
+#include <algorithm>
 
 #include "globals.hpp"
 
@@ -103,7 +102,7 @@ void addFileToMap(std::string path){
 void listAllMaps() {
     // 1. Loop through each key-value pair in the map
     // 'setid' is the key (int), 'metadataList' is the value (std::vector)
-    for (const auto& [setid, metadataList] : namesOfSets) {
+    /*for (const auto& [setid, metadataList] : namesOfSets) {
         std::cout << "--- Map Set ID: " << setid << " ---" << std::endl;
 
         // 2. Loop through the vector of FileMetadata objects for this specific set
@@ -116,7 +115,7 @@ void listAllMaps() {
                       << "Beatmap ID: " << file.id   << "\n"
                       << "----------------------------------" << std::endl;
         }
-    }
+    }*/
 }
 
 void clearFile(const std::string& filename){
@@ -225,6 +224,7 @@ void writeBeatmapSetFile(const std::string& filename,
 }
 
 void decideNamesForSets(){
+
     decidedNames.clear();
     numberOfMaps.clear();
     std::string dbFile = Global.DatabaseLocation + "/beatmapsets.db";
@@ -253,6 +253,7 @@ void decideNamesForSets(){
         writeBeatmapSetFile(std::filesystem::path(dbFile).string(), setid, title, selection);
         writeBeatmapFile(setid, metadataList);
     }
+    std::cout << "Decided Names" << std::endl;
 }
 
 void clearFileMap(){
