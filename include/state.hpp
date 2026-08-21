@@ -60,6 +60,11 @@ private:
     std::vector<SetFileMetadata> beatmapSets;
     TextBoxSmart leftSideBox;
     std::string leftSideFormatted = "";
+
+
+    bool inBeatmapView = false;                      // are we showing beatmaps of a set?
+    std::vector<FileMetadata> currentBeatmaps;   // beatmaps of the selected set
+
 public:
     PlayMenu();
     std::string lastPos = "";

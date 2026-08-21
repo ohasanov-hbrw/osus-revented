@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+
+
 struct FileMetadata{
     std::string path;
     std::string title;
@@ -12,6 +14,8 @@ struct FileMetadata{
     std::string version;
     int setid;
     int id;
+    std::string bgImage;      // original background filename (relative to beatmap folder)
+    std::string coverFile;    // processed cover filename (e.g., "cover_12345_abc.jpg")
 };
 
 struct SetFileMetadata{
@@ -21,6 +25,7 @@ struct SetFileMetadata{
     std::string creators;
     int setid;
     int number;
+    std::string bgImage;
 };
 
 void buildFileMap(std::string path);
@@ -29,5 +34,9 @@ void clearFileMap();
 void addFileToMap(std::string path);
 void decideNamesForSets();
 std::vector<SetFileMetadata> parseCachedSets(const std::string& db_path);
+std::vector<FileMetadata> parseCachedMaps(const std::string& db_path, int setid);
+std::string extractBackgroundImage(const std::string& osuPath);
 
+void processAllSetImages();
 
+extern std::map<int, std::vector<FileMetadata>> namesOfSets;

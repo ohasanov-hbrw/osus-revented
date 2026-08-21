@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <gamefile.hpp>
+#include <filesystem>
 
 class Parser{
     public:
@@ -14,3 +15,6 @@ class Parser{
         std::vector<std::string> parseSeperatedLists(std::string, char);
         std::string DecimalToBinaryString(int);
 };
+
+
+std::filesystem::path prepare_long_path(const std::string& input_path);

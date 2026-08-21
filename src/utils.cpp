@@ -52,6 +52,9 @@ void MutexLock(int i, int j) {
   case MUSIC_BLOCK:
     //_multithread_mutex_lock(&audioEngineLock);
     break;
+  case LOADER_BLOCK:
+    _multithread_mutex_lock(&backgroundLoaderLock);
+    break;
   default:
     // code block
     break;
@@ -85,6 +88,9 @@ void MutexUnlock(int i, int j) {
     break;
   case MUSIC_BLOCK:
     //_multithread_mutex_unlock(&audioEngineLock);
+    break;
+  case LOADER_BLOCK:
+    _multithread_mutex_unlock(&backgroundLoaderLock);
     break;
   default:
     // code block

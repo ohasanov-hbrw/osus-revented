@@ -834,5 +834,43 @@
    "-D_FILE_OFFSET_BITS=64"
   ],
   "file": "src/utils.cpp"
+ },
+ {
+  "directory": "/home/nyarch/Projects/osus-revented",
+  "arguments": [
+   "x86_64-w64-mingw32-g++",
+   "--static",
+   "-DSUPPORT_DEFAULT_FONT",
+   "-DSUPPORT_MODULE_RTEXT",
+   "-D_BSD_SOURCE",
+   "-DSUPPORT_FILEFORMAT_PNG",
+   "-D_FILE_OFFSET_BITS=64",
+   "-DSUPPORT_FILEFORMAT_BMP",
+   "-DSUPPORT_FILEFORMAT_JPG",
+   "-D_WIN32",
+   "-MMD",
+   "-o",
+   "object/statePlay.o",
+   "-c",
+   "src/statePlay.cpp",
+   "-std=c++20",
+   "-O0",
+   "-g",
+   "-ggdb",
+   "-Wall",
+   "-Wno-write-strings",
+   "-Wno-narrowing",
+   "-Ivendor/raylib/src",
+   "-Iinclude",
+   "-Iinclude/menu_shapes",
+   "-Iinclude/cachebuilder",
+   "-Ivendor/zip/src",
+   "-Iinclude/sound",
+   "-I/usr/x86_64-w64-mingw32/include/SDL2",
+   "-I/usr/include/SDL2",
+   "-D_REENTRANT",
+   "-D_FILE_OFFSET_BITS=64"
+  ],
+  "file": "src/statePlay.cpp"
  }
 ]

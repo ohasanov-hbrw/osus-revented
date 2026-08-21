@@ -20,6 +20,13 @@
     #define GLSL_VERSION            100
 #endif
 
+#ifdef THREEDS_BUILD
+#define COVER_WIDTH  64
+#define COVER_HEIGHT 32   // e.g., 16:9 aspect ratio
+#else
+#define COVER_WIDTH  512
+#define COVER_HEIGHT 256   // e.g., 16:9 aspect ratio
+#endif
 // Settings for an osu game
 struct GameSettings {
     bool useDefaultSkin = false;

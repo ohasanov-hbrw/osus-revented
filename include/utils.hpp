@@ -17,6 +17,7 @@ extern MULTITHREAD_MUTEX accessLock;
 extern MULTITHREAD_MUTEX osuGameLock;
 extern MULTITHREAD_MUTEX wholeRenderLock;
 extern MULTITHREAD_MUTEX audioEngineLock;
+extern MULTITHREAD_MUTEX backgroundLoaderLock;
 
 
 #define SWITCHING_STATE 0
@@ -24,6 +25,7 @@ extern MULTITHREAD_MUTEX audioEngineLock;
 #define OSU_UPDATE 2
 #define RENDER_BLOCK 3
 #define MUSIC_BLOCK 4
+#define LOADER_BLOCK 5
 
 
 extern std::atomic<bool> __mutex_threads_locks[32][32];
@@ -31,7 +33,7 @@ extern std::atomic<bool> __mutex_threads_locks[32][32];
 #define UPDATETHREAD_ID 0
 #define RENDERTHREAD_ID 1
 #define MUSICTHREAD_ID 2
-
+#define LOADERTHREAD_ID  3
 
 
 void InitilizeLocks();

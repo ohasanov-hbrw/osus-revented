@@ -155,8 +155,8 @@ private:
 
                     std::string cleanEllipsis = "";
                     for (size_t i = 0; i < testEllipsis.length(); ++i) {
-                        if (testEllipsis[i] == '\033') {
-                            size_t end = testEllipsis.find('\034', i);
+                        if (testEllipsis[i] == '[') {
+                            size_t end = testEllipsis.find(']', i);
                             if (end != std::string::npos) {
                                 i = end;
                                 continue;
@@ -279,6 +279,7 @@ public:
 
     void init() override;
     void deinit() override;
+    void reinit();
 };
 
 

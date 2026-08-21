@@ -68,6 +68,7 @@ MULTITHREAD_MUTEX osuGameLock;
 MULTITHREAD_MUTEX wholeRenderLock;
 MULTITHREAD_MUTEX audioEngineLock;
 MULTITHREAD_THREAD renderThread;
+MULTITHREAD_MUTEX backgroundLoaderLock;
 
 std::atomic<bool> __mutex_threads_locks[32][32];
 
