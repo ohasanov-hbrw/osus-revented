@@ -245,21 +245,29 @@ void PlayMenu::update() {
       if (!beatmapSets.empty() && selection >= 0 &&
           selection < (int)beatmapSets.size()) {
         int setid = beatmapSets[selection].setid;
-
+        currentBeatmaps.clear();
+        currentBeatmaps = parseCachedMaps(Global.DatabaseLocation, setid);
         // Repopulate the fancy list
-        MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+        std::cout << "stareting clear" << std::endl;
         fancyList->objectNames.clear();
-        for (const auto &bm : namesOfSets[setid]) {
-          // Example format: "Title [Version]"
-          std::cout << bm.title + " [" + bm.version + "]" << std::endl;
-          fancyList->objectNames.push_back(bm.title + " [" + bm.version + "]");
+        //for (const auto &bm : namesOfSets[setid]) {
+        //  // Example format: "Title [Version]"
+        //  std::cout << bm.title + " [" + bm.version + "]" << std::endl;
+        //  fancyList->objectNames.push_back(bm.title + " [" + bm.version + "]");
+        //}
+        std::cout << "stareting population" << std::endl;
+        for (int i = 0; i < currentBeatmaps.size(); i++) {
+          std::cout << currentBeatmaps[i].title + " [" +
+                           currentBeatmaps[i].version + "]"
+                    << std::endl;
+          fancyList->objectNames.push_back(currentBeatmaps[i].version );
         }
+
         fancyList->currentSelection = 0; // reset highlight
         std::cout << "added names\n";
         fancyList->reinit();
         std::cout << "init fancylist\n";
         inBeatmapView = true;
-        MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
       }
     } else {
       // Already in beatmap view → launch the selected beatmap
@@ -269,6 +277,9 @@ void PlayMenu::update() {
         // Start the game with currentBeatmaps[selection]
         Global.selectedPath = currentBeatmaps[selection].path;
         // Use the same state‑switching code as in your original select action
+
+        MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+
         MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
         MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
         MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
@@ -315,6 +326,25 @@ void PlayMenu::update() {
           beatmapSets[selection].artists.c_str(),
           beatmapSets[selection].creators.c_str(),
           beatmapSets[selection].setid);
+      if (newString != leftSideFormatted) {
+        leftSideFormatted = newString;
+        leftSideBox.SetText(leftSideFormatted);
+        /*std::cout << "set new text:\n " << leftSideFormatted << std::endl;
+        if (!newString.empty()) {
+          std::cout << "First byte integer value: " << (int)newString[0] <<
+        std::endl;
+        }*/
+      }
+    }
+    else{
+      std::string newString = TextFormat(
+          "[cCC00AAFF]Version: [r]%s\n[cCC00AAFF]Artist: "
+          "[r]%s\n[cCC00AAFF]Creator: "
+          "[r]%s\n[cCC00AAFF]Title: [r]%s\n[cCC00AA99]SetID: [cFFFFFF99]%d",
+          currentBeatmaps[selection].version.c_str(), currentBeatmaps[selection].artist.c_str(),
+          currentBeatmaps[selection].creator.c_str(),
+          currentBeatmaps[selection].title.c_str(),
+          currentBeatmaps[selection].setid);
       if (newString != leftSideFormatted) {
         leftSideFormatted = newString;
         leftSideBox.SetText(leftSideFormatted);

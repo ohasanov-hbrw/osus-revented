@@ -317,7 +317,65 @@ std::vector<SetFileMetadata> parseCachedSets(const std::string &db_path) {
 }
 
 std::vector<FileMetadata> parseCachedMaps(const std::string& db_path, int setid){
-  
+  std::vector<FileMetadata> result;
+
+    // Build the path to the set directory
+    std::string setDir = db_path + "/" + std::to_string(setid);
+    if (!fs::exists(setDir) || !fs::is_directory(setDir))
+        return result;
+
+    // Iterate over all .db files in the set directory
+    for (const auto& entry : fs::directory_iterator(setDir)) {
+        if (!entry.is_regular_file()) continue;
+        if (entry.path().extension() != ".db") continue;
+
+        std::string filePath = entry.path().string();
+        std::cout << "opening: " << filePath.c_str() << std::endl;
+        FILE* file = fopen(filePath.c_str(), "r");
+        if (!file) continue;
+
+        FileMetadata meta;
+        meta.setid = setid;
+        meta.id = 0;           // will be overwritten
+        meta.bgImage = "";     // not stored in cache (original filename lost)
+        meta.coverFile = "";
+
+        char line[1024];
+        while (fgets(line, sizeof(line), file)) {
+            std::string lineStr(line);
+            // Remove trailing newline characters
+            lineStr.erase(lineStr.find_last_not_of("\r\n") + 1);
+            if (lineStr.empty()) continue;
+
+            size_t colon = lineStr.find(':');
+            if (colon == std::string::npos) continue; // malformed line
+
+            std::string key = lineStr.substr(0, colon);
+            std::string value = lineStr.substr(colon + 1);
+
+            if (key == "Path")         meta.path = value;
+            else if (key == "Title")   meta.title = value;
+            else if (key == "Artist")  meta.artist = value;
+            else if (key == "Creator") meta.creator = value;
+            else if (key == "Version") meta.version = value;
+            else if (key == "BeatmapID") meta.id = std::stoi(value);
+            else if (key == "CoverFile") meta.coverFile = value;
+            // "BeatmapSetID" is ignored because we already know it
+        }
+        fclose(file);
+
+        // Only add if we at least have a valid beatmap ID
+        if (meta.id != 0) {
+            result.push_back(meta);
+        }
+    }
+
+    std::sort(result.begin(), result.end(),
+             [](const FileMetadata& a, const FileMetadata& b) {
+                 return a.id < b.id;
+             });
+    std::cout << "parsed " << result.size() << " maps\n";
+    return result;
 }
 
 std::string extractBackgroundImage(const std::string &osuPath) {
