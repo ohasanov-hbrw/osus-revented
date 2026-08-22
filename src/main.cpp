@@ -399,6 +399,10 @@ int main(){
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "parsing the settings.ini file...\n";
     parseSettings();
 
+    #ifdef MSAA_RENDER
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Using MSAA render\n";
+    #endif
+
     // 1. Create the directory name string
     std::string dir_name = Global.DatabaseLocation;
 

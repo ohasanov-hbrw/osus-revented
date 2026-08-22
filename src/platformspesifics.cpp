@@ -302,7 +302,7 @@ void _os_init_program(bool VSYNC){
         
 
         SDL_Init(SDL_INIT_EVERYTHING);
-        std::cout << SDL_GetError() << std::endl;
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << SDL_GetError() << std::endl;
 
         if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1))
             std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "SDL_GL_MULTISAMPLEBUFFERS returned " << SDL_GetError() << "\n";

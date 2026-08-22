@@ -244,8 +244,8 @@ struct Globals {
     #endif
     #ifndef THREEDS_BUILD
         int mipmaps = 4;
-        float sliderTexSize = 3.0f;
-        int circleSector = 36;
+        float sliderTexSize = 2.0f;
+        int circleSector = 48;
     #endif
     // When using polygonal rendering for the circles, how many sectors to use
     

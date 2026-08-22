@@ -97,7 +97,7 @@ GameFile Parser::parseMetadata(std::string filename) {
     GameFile gameFile;
 	FILE* file = fopen(filename.c_str(), "r");
     if (file == nullptr) {
-		std::cout << "Couldn't open file for parsing, retrying, maybe length? " << filename.size() << std::endl;
+		std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m"<< "Couldn't open file for parsing, retrying, maybe length? " << filename.size() << std::endl;
 		for (int i = 0; i < filename.size(); i++) {
 			if (filename[i] == '/') {
 				filename[i] = '\\';
@@ -107,7 +107,7 @@ GameFile Parser::parseMetadata(std::string filename) {
 		std::cout << filename << std::endl;
 		file = fopen(filename.c_str(), "r");
 		if (file == nullptr) {
-			std::cout << "welp... messy solution didnt work" << std::endl;
+			std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m"<< "welp... messy solution didnt work" << std::endl;
         	return gameFile; // Could not open file
 		}
     }
@@ -226,6 +226,23 @@ GameFile Parser::parse(std::string filename){
 	gameFile.hitObjects.shrink_to_fit();
 	gameFile.hitObjects.reserve(numLines);
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parser reserved " << numLines << " HitObjects based on the number of lines" << std::endl;
+	if(!ifs.is_open()){
+		std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m"<< "Couldn't open file for parsing, retrying, maybe length? " << filename.size() << std::endl;
+		for (int i = 0; i < filename.size(); i++) {
+			if (filename[i] == '/') {
+				filename[i] = '\\';
+			}
+		}
+		filename = prepare_long_path(filename).string();
+		std::cout << filename << std::endl;
+		ifs = std::ifstream(filename);
+		if (!ifs.is_open()) {
+			std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m"<< "welp... messy solution didnt work" << std::endl;
+			return gameFile; // Could not open file
+		}
+	}
+
+
 	if (ifs.is_open()){
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Beatmap file opened\n";
 		while(std::getline(ifs, line)){

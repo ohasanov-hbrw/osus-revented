@@ -2002,8 +2002,10 @@ void GameManager::loadGameTextures(){
 	_gpu_end_drawing();
 
 	followPoint = LoadTexture((Global.GameBinaryPath + "/resources/followpoint.png").c_str());
+
     loadDefaultSkin(Global.selectedPath); // LOADING THE DEFAULT SKIN USING A SEPERATE FUNCTION
     loadGameSkin(Global.selectedPath); // LOADING THE GAME SKIN USING A SEPERATE FUNCTION
+	
     if(!Global.settings.useDefaultSkin){
         loadBeatmapSkin(Global.selectedPath); // LOADING THE BEATMAP SKIN USING A SEPERATE FUNCTION
     }

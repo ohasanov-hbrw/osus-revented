@@ -15,33 +15,137 @@ void MenuElement::update() {}
 
 void MenuElement::render() {}
 
+// void ClickableObject::render() {
+//   if (positions.size() < 2)
+//     ;
+//   else if (positions.size() < 3) {
+//     DrawRectangleV(ScaleCords(positions[0]),
+//                    ScaleCords(positions[1]) - ScaleCords(positions[0]),
+//                    baseColor);
+//
+//   } else {
+//     std::vector<Vector2> temp = positions;
+//     for (int i = 0; i < temp.size(); i++) {
+//       temp[i] = ScaleCords(temp[i]);
+//     }
+//     DrawTriangleStrip(temp.data(), positions.size(), baseColor);
+//   }
+//   if (text != "") {
+//     internalBox.Draw(horizontalAlign, verticalAlign, textColor);
+//   }
+// }
+
 void ClickableObject::render() {
   if (positions.size() < 2)
-    ;
-  else if (positions.size() < 3) {
-    DrawRectangleV(ScaleCords(positions[0]),
-                   ScaleCords(positions[1]) - ScaleCords(positions[0]),
-                   baseColor);
+    return;
 
-  } else {
-    std::vector<Vector2> temp = positions;
-    for (int i = 0; i < temp.size(); i++) {
-      temp[i] = ScaleCords(temp[i]);
-    }
-    DrawTriangleStrip(temp.data(), positions.size(), baseColor);
+  // Scale vertices to screen coordinates
+  std::vector<Vector2> scaled;
+  scaled.reserve(positions.size());
+  for (const auto &p : positions) {
+    scaled.push_back(ScaleCords(p));
   }
-  if (text != "") {
+
+  // Determine fill colour based on state
+  Color fillColor = baseColor;
+  if ((clicked || (Global.Key1D && focused && !focusbreak))) {
+    // Pressed state – darken
+    fillColor = ColorBrightness(baseColor, -0.2f);
+  } else if (focused) {
+    // Hover state – brighten
+    fillColor = ColorBrightness(baseColor, 0.2f);
+  }
+
+  // Draw the shape
+  if (positions.size() == 2) {
+    // Rectangle: top-left = scaled[0], bottom-right = scaled[1]
+    Rectangle rect = {scaled[0].x, scaled[0].y, scaled[1].x - scaled[0].x,
+                      scaled[1].y - scaled[0].y};
+    DrawRectangleRec(rect, fillColor);
+    if (focused) {
+      DrawRectangleLinesEx(rect, 2, WHITE);
+    }
+  } else {
+    // Triangle strip
+    DrawTriangleStrip(scaled.data(), scaled.size(), fillColor);
+    if (focused) {
+      
+      if (boundary.size() > 1) {
+        for (size_t i = 0; i < boundary.size(); ++i) {
+          size_t next = (i + 1) % boundary.size();
+          DrawLineEx(ScaleCords(boundary[i]), ScaleCords(boundary[next]),Scale(2.01f) ,  WHITE);
+          DrawCircle(ScaleCordX(boundary[i].x), ScaleCordY(boundary[i].y), Scale(1.01f), WHITE);
+        }
+      }
+    }
+  }
+
+  // Draw text if present – centered on the shape's bounding rectangle
+  if (!text.empty()) {
+    // Rectangle rect = GetBoundingRect(positions);
+    // internalBox.SetBox(rect);
+    //  Use the alignment you prefer (here we force center)
     internalBox.Draw(horizontalAlign, verticalAlign, textColor);
   }
 }
 
-void ClickableObject::update() {}
+void ClickableObject::update() {
+  if(staticobject)
+    return;
+  bool hover = false;
+  Vector2 mouse = Global.MousePosition; // screen coordinates
 
-void ClickableObject::init() {}
+  // 2. Collision test based on vertex count
+  if (positions.size() >= 3) {
+    // Triangle strip: test each triangle (i, i+1, i+2)
+    for (size_t i = 0; i < positions.size() - 2; ++i) {
+      if (IsPointInTriangle(mouse, positions[i], positions[i + 1],
+                            positions[i + 2])) {
+        hover = true;
+        break;
+      }
+    }
+  } else if (positions.size() == 2) {
+    // Rectangle: top‑left = scaled[0], bottom‑right = scaled[1]
+    Rectangle rect = {positions[0].x, positions[0].y,
+                      positions[1].x - positions[0].x,
+                      positions[1].y - positions[0].y};
+    hover = CheckCollisionPointRec(mouse, rect);
+  }
+  // else: no collision
+
+  // 3. Button state logic (same as before)
+  bool click = Global.MouseInFocus && Global.Key1P;
+
+  if (hover && click) {
+    focused = true;
+    clicked = true;
+    focusbreak = false;
+  } else if (hover) {
+    focused = true;
+    clicked = false;
+  } else {
+    focused = false;
+    clicked = false;
+    focusbreak = true;
+  }
+
+  // Trigger action on release while focused
+  if (hover && !focusbreak && Global.Key1R)
+    action = true;
+  else
+    action = false;
+}
+
+void ClickableObject::init() {
+  boundary = GetTriangleStripBoundary(positions);
+}
 
 void ClickableObject::deinit() {
   positions.clear();
+  boundary.clear();
   positions.shrink_to_fit();
+  boundary.shrink_to_fit();
 }
 
 bool initFunctionRan = false;
@@ -49,10 +153,9 @@ bool initFunctionRan = false;
 void FancyScrollingList::init() {
   numberOfObjects =
       (int)((positions[1].y - positions[0].y) / objectDistance) + 5;
-  std::cout << "nubmer of objects " << numberOfObjects << std::endl;
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "nubmer of objects " << numberOfObjects << std::endl;
   objects.reserve(numberOfObjects);
   for (int i = 0; i < numberOfObjects; i++) {
-    std::cout << "adding obnject " << i << std::endl;
     objects.push_back(std::make_unique<ClickableObject>());
     objects[i].get()->positions.push_back(positions[0] +
                                           (Vector2){0, objectFreeSpace});
@@ -85,10 +188,10 @@ void FancyScrollingList::init() {
   updateTexts = true;
   if (!Global.ScaleUpdated) {
     initFunctionRan = true;
-    std::cout << "calling initial update for list\n";
+    //std::cout << "calling initial update for list\n";
     update();
     initFunctionRan = false;
-    std::cout << "called initial update for list\n";
+    //std::cout << "called initial update for list\n";
   }
   updateTexts = false;
 }
@@ -102,10 +205,10 @@ void FancyScrollingList::reinit() {
   objects.shrink_to_fit();
   numberOfObjects =
       (int)((positions[1].y - positions[0].y) / objectDistance) + 5;
-  std::cout << "nubmer of objects " << numberOfObjects << std::endl;
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "nubmer of objects " << numberOfObjects << std::endl;
   objects.reserve(numberOfObjects);
   for (int i = 0; i < numberOfObjects; i++) {
-    std::cout << "adding obnject " << i << std::endl;
+    //std::cout << "adding obnject " << i << std::endl;
     objects.push_back(std::make_unique<ClickableObject>());
     objects[i].get()->positions.push_back(positions[0] +
                                           (Vector2){0, objectFreeSpace});
@@ -138,10 +241,10 @@ void FancyScrollingList::reinit() {
   updateTexts = true;
   if (!Global.ScaleUpdated) {
     initFunctionRan = true;
-    std::cout << "calling initial update for list\n";
+    //std::cout << "calling initial update for list\n";
     update();
     initFunctionRan = false;
-    std::cout << "called initial update for list\n";
+    //std::cout << "called initial update for list\n";
   }
   updateTexts = false;
 }

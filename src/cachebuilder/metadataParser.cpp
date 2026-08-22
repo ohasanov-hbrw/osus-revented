@@ -126,9 +126,9 @@ void listAllMaps() {
 
 void clearFile(const std::string &filename) {
   FILE *file = fopen(filename.c_str(), "w");
-  std::cout << "clearing: " << filename << std::endl;
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "clearing: " << filename << std::endl;
   if (file == nullptr) {
-    std::cerr << "Error: Could not open file " << filename << " for writing.\n";
+    std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m"<< "Error: Could not open file " << filename << " for writing.\n";
     return;
   }
 
@@ -228,7 +228,7 @@ void decideNamesForSets() {
   processAllSetImages();
   clearFile(std::filesystem::path(dbFile).string());
   for (const auto &[setid, metadataList] : namesOfSets) {
-    std::cout << "--- Map Set ID: " << setid << " ---" << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "--- Map Set ID: " << setid << " ---" << std::endl;
 
     std::map<std::string, int> selection;
     // 2. Loop through the vector of FileMetadata objects for this specific set
@@ -247,14 +247,14 @@ void decideNamesForSets() {
       }
     }
 
-    std::cout << setid << " - Title: " << title
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << setid << " - Title: " << title
               << " - Number of maps:  " << numberOfMaps[setid] << std::endl;
     writeBeatmapSetFile(std::filesystem::path(dbFile).string(), setid, title,
                         selection);
     writeBeatmapFile(setid, metadataList);
   }
 
-  std::cout << "Decided Names" << std::endl;
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Decided Names" << std::endl;
 }
 
 void clearFileMap() {
@@ -330,7 +330,7 @@ std::vector<FileMetadata> parseCachedMaps(const std::string& db_path, int setid)
         if (entry.path().extension() != ".db") continue;
 
         std::string filePath = entry.path().string();
-        std::cout << "opening: " << filePath.c_str() << std::endl;
+        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "opening: " << filePath.c_str() << std::endl;
         FILE* file = fopen(filePath.c_str(), "r");
         if (!file) continue;
 
@@ -374,7 +374,7 @@ std::vector<FileMetadata> parseCachedMaps(const std::string& db_path, int setid)
              [](const FileMetadata& a, const FileMetadata& b) {
                  return a.id < b.id;
              });
-    std::cout << "parsed " << result.size() << " maps\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "parsed " << result.size() << " maps\n";
     return result;
 }
 
@@ -382,7 +382,7 @@ std::string extractBackgroundImage(const std::string &osuPath) {
   FILE *file = fopen(osuPath.c_str(), "r");
   if (!file) {
     std::string filename = osuPath;
-    std::cout << "Couldn't open file for bgImage, retrying, maybe length? "
+    std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m" << "Couldn't open file for bgImage, retrying, maybe length? "
               << filename.size() << std::endl;
     for (int i = 0; i < filename.size(); i++) {
       if (filename[i] == '/') {
@@ -390,7 +390,7 @@ std::string extractBackgroundImage(const std::string &osuPath) {
       }
     }
     filename = prepare_long_path(filename).string();
-    std::cout << filename << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << filename << std::endl;
     file = fopen(filename.c_str(), "r");
     if (file == nullptr) {
       return "";
@@ -463,7 +463,7 @@ void processAllSetImages() {
         file.coverFile = it->second;
         continue;
       }
-      std::cout << "Processing: " << fullBgPath << std::endl;
+      std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Processing: " << fullBgPath << std::endl;
       // Load and process the image
       Image img = LoadImage(fullBgPath.c_str());
       if (img.data == nullptr) {

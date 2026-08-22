@@ -95,13 +95,13 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [ ] Error management
 - [ ] Check-stresstest the zip library
 - [ ] Skin customization with an options menu
-- [ ] Parse beatmaps and cache them
-- [ ] Enable offscreen MSAA for better looking sliders
+- [x] Parse beatmaps and cache them
+- [x] Enable offscreen MSAA for better looking sliders
 - [ ] Add an options menu with the option to select opengl version
 - [ ] Add modifiers like hidden to the game
 - [ ] Add the game mode taiko!
 - [ ] Fix the spinners
-- [ ] Try to get beatmaps from a mirror (https://catboy.best/about)
+- [ ] Try to get beatmaps from a mirror (eg. https://catboy.best/about)
 - [ ] Use the second screen on the 3DS
 - [ ] Dynamic slider resolution with more interpolation to cut down on calculation time
 - [ ] Seperate thread for background loading. Mainly for the new menu implementations

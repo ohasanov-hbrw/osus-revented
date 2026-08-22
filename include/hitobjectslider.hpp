@@ -1,6 +1,12 @@
 #include "hitobjectdefinition.hpp"
 #include "rlgl.h"
 #include <climits>
+
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+#include "msaaRenderTexture.hpp"
+#endif
+
+
 class Slider : public HitObject{
     public:
         Slider(HitObjectData data);
@@ -41,7 +47,11 @@ class Slider : public HitObject{
         bool durationNull = false;
 
     private:
+    #if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+        MSAARenderTexture sliderTexture;
+    #else
         RenderTexture2D sliderTexture; 
+        #endif
         Shader shdrOutline;
 
         double sliderDuration;

@@ -1,1548 +1,2279 @@
-#include <hitobject.hpp>
-#include <cmath>
-#include <algorithm>
 #include "gamemanager.hpp"
 #include "globals.hpp"
 #include "utils.hpp"
-#include <limits>
+#include <algorithm>
+#include <cmath>
+#include <hitobject.hpp>
 #include <iostream>
+#include <limits>
+
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+#include "msaaRenderTexture.hpp"
+#endif
 
 // I... uhhh... MATH
 float interpolate(float *p, float *time, float t) {
-    float L01 = p[0] * (time[1] - t) / (time[1] - time[0]) + p[1] * (t - time[0]) / (time[1] - time[0]);
-    float L12 = p[1] * (time[2] - t) / (time[2] - time[1]) + p[2] * (t - time[1]) / (time[2] - time[1]);
-    float L23 = p[2] * (time[3] - t) / (time[3] - time[2]) + p[3] * (t - time[2]) / (time[3] - time[2]);
-    float L012 = L01 * (time[2] - t) / (time[2] - time[0]) + L12 * (t - time[0]) / (time[2] - time[0]);
-    float L123 = L12 * (time[3] - t) / (time[3] - time[1]) + L23 * (t - time[1]) / (time[3] - time[1]);
-    float C12 = L012 * (time[2] - t) / (time[2] - time[1]) + L123 * (t - time[1]) / (time[2] - time[1]);
-    return C12;
-}   
-
-// I... uhhh... MATH
-std::vector<Vector2> interpolate(std::vector<Vector2> &points, int index, int pointsPerSegment) {
-    std::vector<Vector2> result;
-    float x[4];
-    float y[4];
-    float time[4];
-    for (int i = 0; i < 4; i++) {
-        x[i] = points[index + i].x;
-        y[i] = points[index + i].y;
-        time[i] = i;
-    }
-    float tstart = 1;
-    float tend = 2;
-    float total = 0;
-    for (int i = 1; i < 4; i++) {
-        float dx = x[i] - x[i - 1];
-        float dy = y[i] - y[i - 1];
-        total += std::pow(dx * dx + dy * dy, .25);
-        time[i] = total;
-    }
-    tstart = time[1];
-    tend = time[2];
-    int segments = pointsPerSegment - 1;
-    result.push_back(points[index + 1]);
-    for (int i = 1; i < segments; i++) {
-        float xi = interpolate(x, time, tstart + (i * (tend - tstart)) / segments);
-        float yi = interpolate(y, time, tstart + (i * (tend - tstart)) / segments);
-        result.push_back(Vector2{xi, yi});
-    }
-    result.push_back(points[index + 2]);
-    return result;
+  float L01 = p[0] * (time[1] - t) / (time[1] - time[0]) +
+              p[1] * (t - time[0]) / (time[1] - time[0]);
+  float L12 = p[1] * (time[2] - t) / (time[2] - time[1]) +
+              p[2] * (t - time[1]) / (time[2] - time[1]);
+  float L23 = p[2] * (time[3] - t) / (time[3] - time[2]) +
+              p[3] * (t - time[2]) / (time[3] - time[2]);
+  float L012 = L01 * (time[2] - t) / (time[2] - time[0]) +
+               L12 * (t - time[0]) / (time[2] - time[0]);
+  float L123 = L12 * (time[3] - t) / (time[3] - time[1]) +
+               L23 * (t - time[1]) / (time[3] - time[1]);
+  float C12 = L012 * (time[2] - t) / (time[2] - time[1]) +
+              L123 * (t - time[1]) / (time[2] - time[1]);
+  return C12;
 }
 
 // I... uhhh... MATH
-std::vector<Vector2> interpolate(std::vector<Vector2> &coordinates, float length){
-    std::vector<Vector2> vertices;
-    std::vector<int> pointsPerSegment;
-    for (size_t i = 0; i < coordinates.size(); i++){
-        vertices.push_back(coordinates[i]);
-        if(i > 0)
-            pointsPerSegment.push_back(distance(vertices[i], vertices[i-1]));
-    }
-    float lengthAll = 0;
-    for(size_t i = 0; i < pointsPerSegment.size(); i++) 
-        lengthAll += pointsPerSegment[i];
-    for(size_t i = 0; i < pointsPerSegment.size(); i++)
-        pointsPerSegment[i] *= length/lengthAll;
-    float dx = vertices[1].x - vertices[0].x;
-    float dy = vertices[1].y - vertices[0].y;
-    float x1 = vertices[0].x - dx;
-    float y1 = vertices[0].y - dy;
-    Vector2 start = {x1, y1};
-    int n = vertices.size() - 1;
-    dx = vertices[n].x - vertices[n-1].x;
-    dy = vertices[n].y - vertices[n-1].y;
-    float xn = vertices[n].x + dx;
-    float yn = vertices[n].y + dy;
-    Vector2 end = {xn, yn};
-    vertices.insert(vertices.begin(), start);
-    vertices.push_back(end);
-    std::vector<Vector2> result;
-    for (size_t i = 0; i < vertices.size() - 3; i++) {
-        std::vector<Vector2> points = interpolate(vertices, i, pointsPerSegment[i]);
-        for(size_t i = (result.size() > 0) ? 1 : 0; i < points.size(); i++)
-            result.push_back(points[i]);
-    }
-    return result;
+std::vector<Vector2> interpolate(std::vector<Vector2> &points, int index,
+                                 int pointsPerSegment) {
+  std::vector<Vector2> result;
+  float x[4];
+  float y[4];
+  float time[4];
+  for (int i = 0; i < 4; i++) {
+    x[i] = points[index + i].x;
+    y[i] = points[index + i].y;
+    time[i] = i;
+  }
+  float tstart = 1;
+  float tend = 2;
+  float total = 0;
+  for (int i = 1; i < 4; i++) {
+    float dx = x[i] - x[i - 1];
+    float dy = y[i] - y[i - 1];
+    total += std::pow(dx * dx + dy * dy, .25);
+    time[i] = total;
+  }
+  tstart = time[1];
+  tend = time[2];
+  int segments = pointsPerSegment - 1;
+  result.push_back(points[index + 1]);
+  for (int i = 1; i < segments; i++) {
+    float xi = interpolate(x, time, tstart + (i * (tend - tstart)) / segments);
+    float yi = interpolate(y, time, tstart + (i * (tend - tstart)) / segments);
+    result.push_back(Vector2{xi, yi});
+  }
+  result.push_back(points[index + 2]);
+  return result;
+}
+
+// I... uhhh... MATH
+std::vector<Vector2> interpolate(std::vector<Vector2> &coordinates,
+                                 float length) {
+  std::vector<Vector2> vertices;
+  std::vector<int> pointsPerSegment;
+  for (size_t i = 0; i < coordinates.size(); i++) {
+    vertices.push_back(coordinates[i]);
+    if (i > 0)
+      pointsPerSegment.push_back(distance(vertices[i], vertices[i - 1]));
+  }
+  float lengthAll = 0;
+  for (size_t i = 0; i < pointsPerSegment.size(); i++)
+    lengthAll += pointsPerSegment[i];
+  for (size_t i = 0; i < pointsPerSegment.size(); i++)
+    pointsPerSegment[i] *= length / lengthAll;
+  float dx = vertices[1].x - vertices[0].x;
+  float dy = vertices[1].y - vertices[0].y;
+  float x1 = vertices[0].x - dx;
+  float y1 = vertices[0].y - dy;
+  Vector2 start = {x1, y1};
+  int n = vertices.size() - 1;
+  dx = vertices[n].x - vertices[n - 1].x;
+  dy = vertices[n].y - vertices[n - 1].y;
+  float xn = vertices[n].x + dx;
+  float yn = vertices[n].y + dy;
+  Vector2 end = {xn, yn};
+  vertices.insert(vertices.begin(), start);
+  vertices.push_back(end);
+  std::vector<Vector2> result;
+  for (size_t i = 0; i < vertices.size() - 3; i++) {
+    std::vector<Vector2> points = interpolate(vertices, i, pointsPerSegment[i]);
+    for (size_t i = (result.size() > 0) ? 1 : 0; i < points.size(); i++)
+      result.push_back(points[i]);
+  }
+  return result;
 }
 
 // Based on 4 points, get a catmull rom interpolation
-Vector2 getCatmullPoint(Vector2 &p0, Vector2 &p1, Vector2 &p2, Vector2 &p3, float alpha = 0.5f, float t = 0){
-    float t01 = std::pow(distance(p0, p1), alpha);
-    float t12 = std::pow(distance(p1, p2), alpha);
-    float t23 = std::pow(distance(p2, p3), alpha);
+Vector2 getCatmullPoint(Vector2 &p0, Vector2 &p1, Vector2 &p2, Vector2 &p3,
+                        float alpha = 0.5f, float t = 0) {
+  float t01 = std::pow(distance(p0, p1), alpha);
+  float t12 = std::pow(distance(p1, p2), alpha);
+  float t23 = std::pow(distance(p2, p3), alpha);
 
-    Vector2 m1 = (p2 - p1 + vectorize(t12) * ((p1 - p0) / vectorize(t01) - (p2 - p0) / vectorize((t01 + t12))));
-    Vector2 m2 = (p2 - p1 + vectorize(t12) * ((p3 - p2) / vectorize(t23) - (p3 - p1) / vectorize((t12 + t23))));
+  Vector2 m1 = (p2 - p1 +
+                vectorize(t12) * ((p1 - p0) / vectorize(t01) -
+                                  (p2 - p0) / vectorize((t01 + t12))));
+  Vector2 m2 = (p2 - p1 +
+                vectorize(t12) * ((p3 - p2) / vectorize(t23) -
+                                  (p3 - p1) / vectorize((t12 + t23))));
 
+  catmullRomSegment segment;
+  segment.a = vectorize(2.0f) * (p1 - p2) + m1 + m2;
+  segment.b = vectorize(-3.0f) * (p1 - p2) - m1 - m1 - m2;
+  segment.c = m1;
+  segment.d = p1;
 
-    catmullRomSegment segment;
-    segment.a = vectorize(2.0f) * (p1 - p2) + m1 + m2;
-    segment.b = vectorize(-3.0f) * (p1 - p2) - m1 - m1 - m2;
-    segment.c = m1;
-    segment.d = p1;
-
-    return segment.a * vectorize(t) * vectorize(t) * vectorize(t) + segment.b * vectorize(t) * vectorize(t) + segment.c * vectorize(t) + segment.d;
+  return segment.a * vectorize(t) * vectorize(t) * vectorize(t) +
+         segment.b * vectorize(t) * vectorize(t) + segment.c * vectorize(t) +
+         segment.d;
 }
 
 // Check if circle is going clockwise or counterclockwise
-int orientation(Vector2 &p1, Vector2 &p2, Vector2 &p3){
-    int val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
-    return (val > 0)? false: true;
+int orientation(Vector2 &p1, Vector2 &p2, Vector2 &p3) {
+  int val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
+  return (val > 0) ? false : true;
 }
 
 // Calculate bezier points at a position
-Vector2 getBezierPoint(std::vector<Vector2> &points, int numPoints, float t){
-    Vector2* tmp = new Vector2[numPoints];
-    for(size_t i = 0; i < points.size(); i++){
-        tmp[i] = points[i];
-    }
-    int i = numPoints - 1;
-    while (i > 0) {
-        for (int k = 0; k < i; k++)
-            tmp[k] = Vector2{tmp[k].x + t *(tmp[k+1].x - tmp[k].x),tmp[k].y + t *(tmp[k+1].y - tmp[k].y)};
-        i--;
-    }
-    Vector2 answer = tmp[0];
-    delete[] tmp;
-    return answer;
+Vector2 getBezierPoint(std::vector<Vector2> &points, int numPoints, float t) {
+  Vector2 *tmp = new Vector2[numPoints];
+  for (size_t i = 0; i < points.size(); i++) {
+    tmp[i] = points[i];
+  }
+  int i = numPoints - 1;
+  while (i > 0) {
+    for (int k = 0; k < i; k++)
+      tmp[k] = Vector2{tmp[k].x + t * (tmp[k + 1].x - tmp[k].x),
+                       tmp[k].y + t * (tmp[k + 1].y - tmp[k].y)};
+    i--;
+  }
+  Vector2 answer = tmp[0];
+  delete[] tmp;
+  return answer;
 }
 
 // Gets the center point and the size for the perfect circle sliders
-std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2, Vector2 &p3){
-    int x1 = p1.x;
-    int y1 = p1.y;
-    int x2 = p2.x;
-    int y2 = p2.y;
-    int x3 = p3.x;
-    int y3 = p3.y;
-    int a = x1 * (y2 - y3) - y1 * (x2 - x3) + x2 * y3 - x3 * y2;
-    int b = (x1 * x1 + y1 * y1) * (y3 - y2) + (x2 * x2 + y2 * y2) * (y1 - y3) + (x3 * x3 + y3 * y3) * (y2 - y1);
-    int c = (x1 * x1 + y1 * y1) * (x2 - x3) + (x2 * x2 + y2 * y2) * (x3 - x1) + (x3 * x3 + y3 * y3) * (x1 - x2);
-    float x = (float)-b / (2.0f * (float)a);
-    float y = (float)-c / (2.0f * (float)a);
-    return std::make_pair(Vector2{x,y}, sqrt((x - x1) * (x - x1) + (y - y1) *(y - y1)));
+std::pair<Vector2, int> getPerfectCircle(Vector2 &p1, Vector2 &p2,
+                                         Vector2 &p3) {
+  int x1 = p1.x;
+  int y1 = p1.y;
+  int x2 = p2.x;
+  int y2 = p2.y;
+  int x3 = p3.x;
+  int y3 = p3.y;
+  int a = x1 * (y2 - y3) - y1 * (x2 - x3) + x2 * y3 - x3 * y2;
+  int b = (x1 * x1 + y1 * y1) * (y3 - y2) + (x2 * x2 + y2 * y2) * (y1 - y3) +
+          (x3 * x3 + y3 * y3) * (y2 - y1);
+  int c = (x1 * x1 + y1 * y1) * (x2 - x3) + (x2 * x2 + y2 * y2) * (x3 - x1) +
+          (x3 * x3 + y3 * y3) * (x1 - x2);
+  float x = (float)-b / (2.0f * (float)a);
+  float y = (float)-c / (2.0f * (float)a);
+  return std::make_pair(Vector2{x, y},
+                        sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1)));
 }
 
-// Initilizes a Slider, all the curve stuff and the texture creation happens here
-void Slider::init(){
-    GameManager* gm = GameManager::getInstance();
-    
-    // Get time needed for a slider init
-    double startTime = getTimer();
+// Initilizes a Slider, all the curve stuff and the texture creation happens
+// here
+void Slider::init() {
+  GameManager *gm = GameManager::getInstance();
 
-    // Set variables to initial position as nothing is initialized yet
-    data.textureReady = false;
-    data.textureLoaded = false;
-    bool durationNull = false;
+  // Get time needed for a slider init
+  double startTime = getTimer();
 
-    // Get the number of points on a slider
-    //double templength = data.length;
+  // Set variables to initial position as nothing is initialized yet
+  data.textureReady = false;
+  data.textureLoaded = false;
+  bool durationNull = false;
 
-    // If length is smaller than one, we basically have only one point?
-    if(data.length < 1){
-        data.length = 1;
-        durationNull = true;
+  // Get the number of points on a slider
+  // double templength = data.length;
+
+  // If length is smaller than one, we basically have only one point?
+  if (data.length < 1) {
+    data.length = 1;
+    durationNull = true;
+  }
+
+  // The first defining coordinates are the initial position of the object
+  edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
+
+  // How many points should there be? Maybe there is a way to halve this into
+  // two...
+  // float resolution = data.length;
+  float currentResolution = 0;
+  float lengthScale, totalLength = 0;
+
+  // Add every point to a reserve buffer
+  for (size_t i = 0; i < data.curvePoints.size(); i++)
+    edgePoints.push_back(Vector2{(float)data.curvePoints[i].first,
+                                 (float)data.curvePoints[i].second});
+
+  // This is the buffer for the end reserved answer
+  renderPoints.clear();
+  renderPoints.reserve(data.length + 3);
+
+  // Check if we even have other points to base our slider on
+  if (edgePoints.size() == 1) {
+    // Just spam the result with one singlular point
+    for (int k = 0; k < data.length; k++) {
+      renderPoints.push_back(edgePoints[0]);
     }
+  } else {
+    if (data.curveType == 'L') {
+      extraPosition = data.extraPos;
+      edgePoints[edgePoints.size() - 1] = extraPosition;
+      data.totalLength -= data.lengths[data.lengths.size() - 1];
+      data.lengths[data.lengths.size() - 1] =
+          std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size() - 2].x -
+                                      edgePoints[edgePoints.size() - 1].x),
+                             2) +
+                    std::pow(std::abs(edgePoints[edgePoints.size() - 2].y -
+                                      edgePoints[edgePoints.size() - 1].y),
+                             2));
+      data.totalLength += data.lengths[data.lengths.size() - 1];
+      lengthScale = data.totalLength / data.length;
+      // lengthScale = 1;
+      for (size_t i = 0; i < edgePoints.size() - 1; i++)
+        for (float j = 0; j < data.lengths[i]; j += lengthScale)
+          renderPoints.push_back(Vector2{
+              edgePoints[i].x +
+                  (edgePoints[i + 1].x - edgePoints[i].x) * j / data.lengths[i],
+              edgePoints[i].y + (edgePoints[i + 1].y - edgePoints[i].y) * j /
+                                    data.lengths[i]});
+      renderPoints.push_back(edgePoints[edgePoints.size() - 1]);
+      while (!false) {
+        if (renderPoints.size() <= data.length)
+          break;
+        renderPoints.pop_back();
+      }
+    } else if (data.curveType == 'B') {
+      bool old = false;
+      if (old) {
+        // for the bezier curves we do the calculations in another function
+        std::vector<Vector2> tempEdges;
+        std::vector<Vector2> tempRender;
+        std::vector<float> curveLengths;
+        // float totalCalculatedLength = 0;
+        tempEdges.clear();
+        tempRender.clear();
+        int curveIndex = 0;
+        double currentMax = 0;
 
-    // The first defining coordinates are the initial position of the object
-    edgePoints.push_back(Vector2{(float)data.x, (float)data.y});
+        for (size_t i = 0; i < edgePoints.size(); i++) {
+          tempEdges.push_back(edgePoints[i]);
+          if (i == edgePoints.size() - 1 ||
+              (edgePoints[i].x == edgePoints[i + 1].x &&
+               edgePoints[i].y == edgePoints[i + 1].y)) {
+            std::vector<float> tValues;
+            currentResolution = 0;
+            float tempResolution =
+                data.lengths[curveIndex]; // clip(data.lengths[curveIndex],
+                                          // 0, 20000);
+            tempResolution = std::min(data.lengths[curveIndex], 400.0f);
+            std::vector<Vector2> samples;
+            std::vector<int> indices;
+            std::vector<float> lengths;
+            // if(tempResolution < 3000){
 
-    // How many points should there be? Maybe there is a way to halve this into two...
-    //float resolution = data.length;
-    float currentResolution = 0;
-    float lengthScale, totalLength = 0;
+            if (tempResolution != 0) {
+              samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
+              lengths.push_back(0);
+              // int lastk = 0;
+              for (int k = 1; k < tempResolution; k++) {
+                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(),
+                                                 k / tempResolution));
+                lengths.push_back(distance(samples[samples.size() - 1],
+                                           samples[samples.size() - 2]) +
+                                  lengths[lengths.size() - 1]);
+                // lastk = k;
+              }
 
-    // Add every point to a reserve buffer
-    for(size_t i = 0; i < data.curvePoints.size(); i++)
-        edgePoints.push_back(Vector2{(float)data.curvePoints[i].first, (float)data.curvePoints[i].second});
-    
-    // This is the buffer for the end reserved answer
-    renderPoints.clear();
-    renderPoints.reserve(data.length + 3);
+              samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+              lengths.push_back(distance(samples[samples.size() - 1],
+                                         samples[samples.size() - 2]) +
+                                lengths[lengths.size() - 1]);
 
-    // Check if we even have other points to base our slider on
-    if(edgePoints.size() == 1){
-        // Just spam the result with one singlular point
-        for(int k = 0; k < data.length; k++){
-            renderPoints.push_back(edgePoints[0]);
-        }
-    }
-    else{
-        if(data.curveType == 'L'){
-            extraPosition = data.extraPos;
-            edgePoints[edgePoints.size()-1] = extraPosition;
-            data.totalLength-=data.lengths[data.lengths.size()-1];
-            data.lengths[data.lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
-            data.totalLength+=data.lengths[data.lengths.size()-1];
-            lengthScale = data.totalLength/data.length;
-            //lengthScale = 1;
-            for(size_t i = 0; i < edgePoints.size()-1; i++)
-                for(float j = 0; j < data.lengths[i]; j += lengthScale)
-                    renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
-            renderPoints.push_back(edgePoints[edgePoints.size()-1]);
-            while(!false){
-                if(renderPoints.size() <= data.length)
-                    break;
+              float maxlen = 1;
+              for (int k = 0; k < (int)lengths.size(); k++) {
+                maxlen = std::max(lengths[k], maxlen);
+              }
+              for (int k = 0; k < (int)lengths.size(); k++)
+                lengths[k] /= maxlen;
+
+              tempResolution = data.lengths[curveIndex];
+
+              indices.push_back(0);
+              for (int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++) {
+                float s = (float)k / tempResolution * 2.0f;
+                s = clip(s, 0.0f, 1.0f);
+                int j = Search(&lengths, s, 0, lengths.size() - 1);
+                indices.push_back(j);
+                // std::cout << "s " << s << std::endl;
+              }
+
+              float s = 1.0f;
+              int j = Search(&lengths, s, 0, lengths.size() - 1);
+              if (indices[indices.size() - 1] != j)
+                indices.push_back(j);
+
+              samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+              // lengths.push_back(1);
+              int index = 0;
+              currentMax += data.lengths[curveIndex];
+              // int add = currentMax - renderPoints.size();
+              for (index = 0; index < data.lengths[curveIndex]; index++) {
+                double s = (double)index / (double)data.lengths[curveIndex];
+
+                if (renderPoints.size() > data.length)
+                  break;
+                if (renderPoints.size() > currentMax)
+                  break;
+                currentResolution++;
+                if (currentResolution > data.lengths[curveIndex])
+                  break;
+                int i = (int)(s * (float)indices.size());
+                int t = indices[i];
+                float temporaryLerpPos;
+                if (t >= (int)lengths.size() - 1) {
+                  temporaryLerpPos = 0;
+                } else {
+                  temporaryLerpPos =
+                      (s - lengths[t]) / (lengths[t + 1] - lengths[t]);
+                }
+                // float otherLerp = s * ((float)indices.size()) - (float)i;
+                renderPoints.push_back(
+                    lerp(samples[t], samples[t + 1], temporaryLerpPos));
+              }
+              /*if((i != edgePoints.size()-1 && renderPoints.size() > 1) and
+                 (renderPoints.size() > currentMax)) renderPoints.pop_back();*/
+              // std::cout << renderPoints.size() << " " << currentMax <<
+              // std::endl;
+              if ((i != edgePoints.size() - 1 && renderPoints.size() > 1))
                 renderPoints.pop_back();
+            } else {
+              std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "ya wtf ya \n";
+              renderPoints.push_back(tempEdges[0]);
             }
+            curveIndex++;
+            indices.clear();
+            tempEdges.clear();
+            //}
+            // else{
+            // just fuck it.
+            //}
+            // tempEdges.clear();
+          }
         }
-        else if(data.curveType == 'B'){
-            bool old = false;
-            if(old){
-                //for the bezier curves we do the calculations in another function
-                std::vector<Vector2> tempEdges;
-                std::vector<Vector2> tempRender;
-                std::vector<float> curveLengths;
-                //float totalCalculatedLength = 0;
-                tempEdges.clear();
-                tempRender.clear();
-                int curveIndex = 0;
-                double currentMax = 0;
-
-                for(size_t i = 0; i < edgePoints.size(); i++){
-                    tempEdges.push_back(edgePoints[i]);
-                    if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
-                        std::vector<float> tValues;
-                        currentResolution = 0;
-                        float tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
-                        tempResolution = std::min(data.lengths[curveIndex], 400.0f);
-                        std::vector<Vector2> samples;
-                        std::vector<int> indices;
-                        std::vector<float> lengths;
-                        //if(tempResolution < 3000){
-                        
-                        if(tempResolution != 0){
-                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
-                            lengths.push_back(0);
-                            //int lastk = 0;
-                            for(int k = 1; k < tempResolution; k++){
-                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), k/tempResolution));
-                                lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
-                                //lastk = k;
-                            }
-
-                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                            lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
-
-                            float maxlen = 1;
-                            for(int k = 0; k < (int)lengths.size(); k++){
-                                maxlen = std::max(lengths[k], maxlen);
-                            }
-                            for(int k = 0; k < (int)lengths.size(); k++)
-                                lengths[k] /= maxlen;
-                            
-
-                            tempResolution = data.lengths[curveIndex];
-
-                            indices.push_back(0);
-                            for(int k = 1; k < (tempResolution + 1.0f) / 2.0f; k++){
-                                float s = (float)k / tempResolution * 2.0f;
-                                s = clip(s, 0.0f, 1.0f);
-                                int j = Search(&lengths,s,0,lengths.size()-1);
-                                indices.push_back(j);
-                                //std::cout << "s " << s << std::endl;
-                            }
-
-                            float s = 1.0f;
-                            int j = Search(&lengths,s,0,lengths.size()-1);
-                            if(indices[indices.size() - 1] != j)
-                                indices.push_back(j);
-
-                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                            //lengths.push_back(1);
-                            int index = 0;
-                            currentMax += data.lengths[curveIndex];
-                            //int add = currentMax - renderPoints.size();
-                            for(index = 0; index < data.lengths[curveIndex]; index++){
-                                double s = (double)index / (double)data.lengths[curveIndex];
-                                
-                                if(renderPoints.size() > data.length)
-                                    break;
-                                if(renderPoints.size() > currentMax)
-                                    break;
-                                currentResolution++;
-                                if(currentResolution > data.lengths[curveIndex])
-                                    break;
-                                int i = (int)(s * (float)indices.size());
-                                int t = indices[i];
-                                float temporaryLerpPos;
-                                if(t >= (int)lengths.size() - 1){
-                                    temporaryLerpPos = 0;
-                                }
-                                else{
-                                    temporaryLerpPos = (s - lengths[t]) / (lengths[t + 1] - lengths[t]);
-                                }
-                                //float otherLerp = s * ((float)indices.size()) - (float)i;
-                                renderPoints.push_back(lerp(samples[t], samples[t+1], temporaryLerpPos));
-                            }
-                            /*if((i != edgePoints.size()-1 && renderPoints.size() > 1) and (renderPoints.size() > currentMax))
-                                renderPoints.pop_back();*/
-                            //std::cout << renderPoints.size() << " " << currentMax << std::endl;
-                            if((i != edgePoints.size()-1 && renderPoints.size() > 1))
-                            renderPoints.pop_back();
-                        }
-                        else{
-                            std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" << "ya wtf ya \n";
-                            renderPoints.push_back(tempEdges[0]);
-                        }
-                        curveIndex++;
-                        indices.clear();
-                        tempEdges.clear();
-                        //}
-                        //else{
-                            //just fuck it.
-                        //}
-                        //tempEdges.clear();
-
-                    }
-                }
-                if(renderPoints.size() < data.length){
-                    float angle = atan2(renderPoints[renderPoints.size()-1].y - renderPoints[renderPoints.size()-2].y, renderPoints[renderPoints.size()-1].x - renderPoints[renderPoints.size()-2].x) * 180 / 3.14159265;
-                    float hipotenus = data.length - totalLength;
-                    float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-                    float ydiff = sqrt(hipotenus*hipotenus-xdiff*xdiff);
-                    extraPosition = {renderPoints[renderPoints.size()-1].x + xdiff, renderPoints[renderPoints.size()-1].y - ydiff * (angle/std::abs(angle))};
-                    int lerploc = renderPoints.size() - 1;
-                    int res = 0;
-                    for(float i = 1.0/hipotenus; i <= 1; i += 1.0/hipotenus) {
-                        res++;
-                        if(res > hipotenus) break;
-                        renderPoints.push_back(lerp(renderPoints[lerploc], extraPosition, i));
-                    }
-                }
-                while(!false){
-                    if(renderPoints.size() <= data.length)
-                        break;
-                    renderPoints.pop_back();
-                    //std::cout << data.time << " " << renderPoints.size() << " " << data.length << std::endl;
-                }
-                //std::cout << "Bdata: " << data.length << " calculated: " << renderPoints.size() << std::endl;
-            }
-            else{
-                std::vector<Vector2> tempEdges;
-                std::vector<Vector2> tempRender;
-                std::vector<float> curveLengths;
-                double totalCalculatedLength = 0;
-                tempEdges.clear();
-                tempRender.clear();
-                tempEdges.reserve(edgePoints.size());
-                int curveIndex = 0;
-                //double currentMax = 0;
-                std::vector<Vector2> samples;
-                std::vector<int> indices;
-                std::vector<float> lengths;
-                bool first = true;
-                double tempResolution;
-                for(size_t i = 0; i < edgePoints.size(); i++){
-                    tempEdges.push_back(edgePoints[i]);
-                    if(i == edgePoints.size()-1 || (edgePoints[i].x == edgePoints[i+1].x && edgePoints[i].y == edgePoints[i+1].y)){
-                        tempResolution = data.lengths[curveIndex]; //clip(data.lengths[curveIndex], 0, 20000);
-                        //std::cout << "tempResolution: " << tempResolution << std::endl;
-                        tempResolution = std::min(data.lengths[curveIndex], 400.0f);
-                        if(tempResolution > 0 and tempEdges.size() > 1){
-                            if(first){
-                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 0));
-                                lengths.push_back(0);
-                            }
-                            //int lastk = 0;
-                            int k = 1;
-                            if(!first)
-                                k = 0;
-                            for(; k < tempResolution; k++){
-                                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), ((double)k)/tempResolution));
-                                lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
-                                //lastk = k;
-                            }
-
-                            samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
-                            lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
-                            if(first)
-                                first = false;
-                        }
-                        curveIndex++;
-                        tempEdges.clear();
-                    }
-                }
-
-                totalCalculatedLength = lengths[lengths.size() - 1];
-                tempResolution = data.length;
-                if(totalCalculatedLength < data.length){
-                    float angle = atan2(samples[samples.size()-1].y - samples[samples.size()-2].y, samples[samples.size()-1].x - samples[samples.size()-2].x) * 180 / 3.14159265;
-                    float hipotenus = data.length - totalCalculatedLength;
-                    float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-                    float ydiff = sqrt(std::abs(hipotenus*hipotenus-xdiff*xdiff));
-                    int ything = 1;
-                    if(angle < 0.0f){
-                        ything = -1;
-                    }
-                    else if(angle == 0.0f){
-                        ything = 0;
-                    }
-
-                    Vector2 extraPosition = {samples[samples.size()-1].x + xdiff, samples[samples.size()-1].y - ydiff * (float)ything};
-                    samples.push_back(extraPosition);
-                    lengths.push_back(distance(samples[samples.size() - 1], samples[samples.size() - 2]) + lengths[lengths.size() - 1]);
-                }
-                renderPoints.clear();
-                renderPoints.reserve(data.length + 3);
-                int SampleIndex = 1;
-
-                for(int index = 0; index <= data.length; index++){
-                    while(index > lengths[SampleIndex]){
-                        if(SampleIndex == (int)lengths.size() - 1)  
-                            break;
-                        else{
-                            SampleIndex++;
-                        }
-                    }
-                    double lerpPos = (index - lengths[SampleIndex - 1]) / (lengths[SampleIndex] - lengths[SampleIndex - 1]);
-                    renderPoints.push_back(lerp(samples[SampleIndex], samples[SampleIndex - 1], lerpPos));
-                }
-            }   
+        if (renderPoints.size() < data.length) {
+          float angle = atan2(renderPoints[renderPoints.size() - 1].y -
+                                  renderPoints[renderPoints.size() - 2].y,
+                              renderPoints[renderPoints.size() - 1].x -
+                                  renderPoints[renderPoints.size() - 2].x) *
+                        180 / 3.14159265;
+          float hipotenus = data.length - totalLength;
+          float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+          float ydiff = sqrt(hipotenus * hipotenus - xdiff * xdiff);
+          extraPosition = {renderPoints[renderPoints.size() - 1].x + xdiff,
+                           renderPoints[renderPoints.size() - 1].y -
+                               ydiff * (angle / std::abs(angle))};
+          int lerploc = renderPoints.size() - 1;
+          int res = 0;
+          for (float i = 1.0 / hipotenus; i <= 1; i += 1.0 / hipotenus) {
+            res++;
+            if (res > hipotenus)
+              break;
+            renderPoints.push_back(
+                lerp(renderPoints[lerploc], extraPosition, i));
+          }
         }
-        else if(data.curveType == 'P'){
-            std::pair<Vector2, float> circleData = getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
-            float inf = std::numeric_limits<float>::infinity();
-            if(circleData.first.x == -inf or circleData.first.x == inf or circleData.first.y == -inf or circleData.first.y == inf){
-                extraPosition = data.extraPos;
-                edgePoints[edgePoints.size()-1] = extraPosition;
-                data.totalLength-=data.lengths[data.lengths.size()-1];
-                data.lengths[data.lengths.size()-1] = std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size()-2].x - edgePoints[edgePoints.size()-1].x),2)+std::pow(std::abs(edgePoints[edgePoints.size()-2].y - edgePoints[edgePoints.size()-1].y),2));
-                data.totalLength+=data.lengths[data.lengths.size()-1];
-
-                lengthScale = data.totalLength/data.length;
-
-                for(size_t i = 0; i < edgePoints.size()-1; i++)
-                    for(float j = 0; j < data.lengths[i]; j += lengthScale)
-                        renderPoints.push_back(Vector2{edgePoints[i].x + (edgePoints[i+1].x - edgePoints[i].x)*j/data.lengths[i], edgePoints[i].y + (edgePoints[i+1].y - edgePoints[i].y)*j/data.lengths[i]});
-                renderPoints.push_back(edgePoints[edgePoints.size()-1]);
-                while(!false){
-                    if(renderPoints.size() <= data.length) break;
-                    renderPoints.pop_back();
-                }
-            }
-            else{
-                Vector2 center = circleData.first;
-                int radius = circleData.second;
-                float degree1 = atan2(edgePoints[0].y - center.y , edgePoints[0].x - center.x) * RAD2DEG;
-                float degree2 = atan2(edgePoints[1].y - center.y , edgePoints[1].x - center.x) * RAD2DEG;
-                float degree3 = atan2(edgePoints[2].y - center.y , edgePoints[2].x - center.x) * RAD2DEG;
-                degree1 = degree1 < 0 ? degree1 + 360 : degree1;
-                degree2 = degree2 < 0 ? degree2 + 360 : degree2;
-                degree3 = degree3 < 0 ? degree3 + 360 : degree3;
-                bool clockwise = !orientation(edgePoints[0], edgePoints[1], edgePoints[2]);
-                float angle = (((data.length * 360) / radius ) / 3.14159265 ) / 2;
-                int a = 0;
-                if(clockwise){
-                    degree1 = degree1 < degree3 ? degree1 + 360 : degree1;
-                    degree2 = degree2 < degree3 ? degree2 + 360 : degree2;
-                    for(float i = degree1; i > degree1 - angle; i-=angle/data.length){
-                        if(a > data.length){
-                            renderPoints.pop_back();
-                            break;
-                        }
-                        Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
-                        renderPoints.push_back(tempPoint);
-                        a++;
-                    }
-                }
-                else{
-                    degree2 = degree2 < degree1 ? degree2 + 360 : degree2;
-                    degree3 = degree3 < degree1 ? degree3 + 360 : degree3;
-                    for(float i = degree1; i < degree1 + angle; i+=angle/data.length){
-                        if(a > data.length){
-                            renderPoints.pop_back();
-                            break;
-                        }
-                        Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius, center.y + sin(i / RAD2DEG) * radius};
-                        renderPoints.push_back(tempPoint);
-                        a++;
-                    }
-                    //std::reverse(renderPoints.begin(), renderPoints.end());
-                }
-                while(renderPoints.size() > data.length){
-                    renderPoints.pop_back();
-                }
-                //std::cout << "Pdata: " << data.length << " size: " << renderPoints.size() << std::endl;
-                
-            }
-            
-        }
-        else if(data.curveType == 'C'){
-            renderPoints = interpolate(edgePoints, data.length);
-            while(!false){
-                if(renderPoints.size() <= data.length) break;
-                renderPoints.pop_back();
-            }
-        }
-        else{
-            std::__throw_invalid_argument("Invalid Slider type!");
-        }
-
-    }
-    for(size_t i = 0; i < renderPoints.size(); i++){ //Global.sliderMinimumX
-        if(renderPoints[i].x < Global.sliderMinimumX){
-            renderPoints[i].x = Global.sliderMinimumX;
-        }
-        if(renderPoints[i].y < Global.sliderMinimumY){
-            renderPoints[i].y = Global.sliderMinimumY;
-        }
-        if(renderPoints[i].x > Global.sliderMaximumX){
-            renderPoints[i].x = Global.sliderMaximumX;
-        }
-        if(renderPoints[i].y > Global.sliderMaximumY){
-            renderPoints[i].y = Global.sliderMaximumY;
-        }
-        minX = std::min(minX, renderPoints[i].x);
-        minY = std::min(minY, renderPoints[i].y);
-        maxX = std::max(maxX, renderPoints[i].x);
-        maxY = std::max(maxY, renderPoints[i].y);
-        
-    }
-    //std::cout << "slider:" << data.time << " minX:" << minX << " minY:" << minY << " maxX:" << maxX << " maxY:" << maxY << "\n";
-    ticks = 0;
-    sliderDuration = (double)(data.length/100) * (double)(data.timing.beatLength) / (double)((double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride);
-    if(durationNull){
-        sliderDuration = 1.0;
-    }
-    currentDuration = 0.0f;
-    while(true){
-        currentDuration += (double)data.timing.beatLength / (double)gm->slidertickrate;
-        if(AreSame((double)currentDuration, (double)sliderDuration) || (double)currentDuration > (double)sliderDuration)
+        while (!false) {
+          if (renderPoints.size() <= data.length)
             break;
-        else{
-            ticks++;
+          renderPoints.pop_back();
+          // std::cout << data.time << " " << renderPoints.size() << " " <<
+          // data.length << std::endl;
         }
-    }
-    //ticks = (int)((sliderDuration - 1) / ((double)data.timing.beatLength / (double)gm->slidertickrate));
-    if(ticks < 0)
-        ticks = 0;
-    std::vector<int> indices;
-    if(true || data.timing.renderTicks){
-        for(int i = 1; i <= ticks; i++){
-            double absolutePosition = ((double)(i) * (double)((double)data.timing.beatLength / (double)gm->slidertickrate));
-            bool add = true;
-            if(AreSame((double)absolutePosition, (double)sliderDuration))
-                add = false;
-            absolutePosition = ((double)absolutePosition) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
-            absolutePosition  *= (double)100;
-            if(add)
-                indices.push_back((int)absolutePosition);
-        }
-    }
-    ticks = indices.size();
-    for(int i = 0; i < data.slides; i++){
-        if(i % 2 == 0){
-            reverseclicked.push_back(-1);
-            for(int j = 0; j < (int)indices.size(); j++){
-                tickPositions.push_back((int)indices[j] + (int)((double)i * data.length));
-                tickclicked.push_back(-1);
+        // std::cout << "Bdata: " << data.length << " calculated: " <<
+        // renderPoints.size() << std::endl;
+      } else {
+        std::vector<Vector2> tempEdges;
+        std::vector<Vector2> tempRender;
+        std::vector<float> curveLengths;
+        double totalCalculatedLength = 0;
+        tempEdges.clear();
+        tempRender.clear();
+        tempEdges.reserve(edgePoints.size());
+        int curveIndex = 0;
+        // double currentMax = 0;
+        std::vector<Vector2> samples;
+        std::vector<int> indices;
+        std::vector<float> lengths;
+        bool first = true;
+        double tempResolution;
+        for (size_t i = 0; i < edgePoints.size(); i++) {
+          tempEdges.push_back(edgePoints[i]);
+          if (i == edgePoints.size() - 1 ||
+              (edgePoints[i].x == edgePoints[i + 1].x &&
+               edgePoints[i].y == edgePoints[i + 1].y)) {
+            tempResolution =
+                data.lengths[curveIndex]; // clip(data.lengths[curveIndex],
+                                          // 0, 20000);
+            // std::cout << "tempResolution: " << tempResolution << std::endl;
+            tempResolution = std::min(data.lengths[curveIndex], 400.0f);
+            if (tempResolution > 0 and tempEdges.size() > 1) {
+              if (first) {
+                samples.push_back(
+                    getBezierPoint(tempEdges, tempEdges.size(), 0));
+                lengths.push_back(0);
+              }
+              // int lastk = 0;
+              int k = 1;
+              if (!first)
+                k = 0;
+              for (; k < tempResolution; k++) {
+                samples.push_back(getBezierPoint(tempEdges, tempEdges.size(),
+                                                 ((double)k) / tempResolution));
+                lengths.push_back(distance(samples[samples.size() - 1],
+                                           samples[samples.size() - 2]) +
+                                  lengths[lengths.size() - 1]);
+                // lastk = k;
+              }
+
+              samples.push_back(getBezierPoint(tempEdges, tempEdges.size(), 1));
+              lengths.push_back(distance(samples[samples.size() - 1],
+                                         samples[samples.size() - 2]) +
+                                lengths[lengths.size() - 1]);
+              if (first)
+                first = false;
             }
+            curveIndex++;
+            tempEdges.clear();
+          }
         }
-        else{
-            reverseclicked.push_back(-1);
-            for(int j = indices.size() - 1; j >= 0; j--){
-                tickPositions.push_back((data.length - (int)indices[j]) + (int)((double)i * data.length));
-                tickclicked.push_back(-1);
+
+        totalCalculatedLength = lengths[lengths.size() - 1];
+        tempResolution = data.length;
+        if (totalCalculatedLength < data.length) {
+          float angle = atan2(samples[samples.size() - 1].y -
+                                  samples[samples.size() - 2].y,
+                              samples[samples.size() - 1].x -
+                                  samples[samples.size() - 2].x) *
+                        180 / 3.14159265;
+          float hipotenus = data.length - totalCalculatedLength;
+          float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+          float ydiff = sqrt(std::abs(hipotenus * hipotenus - xdiff * xdiff));
+          int ything = 1;
+          if (angle < 0.0f) {
+            ything = -1;
+          } else if (angle == 0.0f) {
+            ything = 0;
+          }
+
+          Vector2 extraPosition = {samples[samples.size() - 1].x + xdiff,
+                                   samples[samples.size() - 1].y -
+                                       ydiff * (float)ything};
+          samples.push_back(extraPosition);
+          lengths.push_back(distance(samples[samples.size() - 1],
+                                     samples[samples.size() - 2]) +
+                            lengths[lengths.size() - 1]);
+        }
+        renderPoints.clear();
+        renderPoints.reserve(data.length + 3);
+        int SampleIndex = 1;
+
+        for (int index = 0; index <= data.length; index++) {
+          while (index > lengths[SampleIndex]) {
+            if (SampleIndex == (int)lengths.size() - 1)
+              break;
+            else {
+              SampleIndex++;
             }
+          }
+          double lerpPos = (index - lengths[SampleIndex - 1]) /
+                           (lengths[SampleIndex] - lengths[SampleIndex - 1]);
+          renderPoints.push_back(
+              lerp(samples[SampleIndex], samples[SampleIndex - 1], lerpPos));
         }
+      }
+    } else if (data.curveType == 'P') {
+      std::pair<Vector2, float> circleData =
+          getPerfectCircle(edgePoints[0], edgePoints[1], edgePoints[2]);
+      float inf = std::numeric_limits<float>::infinity();
+      if (circleData.first.x == -inf or circleData.first.x == inf or
+          circleData.first.y == -inf or circleData.first.y == inf) {
+        extraPosition = data.extraPos;
+        edgePoints[edgePoints.size() - 1] = extraPosition;
+        data.totalLength -= data.lengths[data.lengths.size() - 1];
+        data.lengths[data.lengths.size() - 1] =
+            std::sqrt(std::pow(std::abs(edgePoints[edgePoints.size() - 2].x -
+                                        edgePoints[edgePoints.size() - 1].x),
+                               2) +
+                      std::pow(std::abs(edgePoints[edgePoints.size() - 2].y -
+                                        edgePoints[edgePoints.size() - 1].y),
+                               2));
+        data.totalLength += data.lengths[data.lengths.size() - 1];
+
+        lengthScale = data.totalLength / data.length;
+
+        for (size_t i = 0; i < edgePoints.size() - 1; i++)
+          for (float j = 0; j < data.lengths[i]; j += lengthScale)
+            renderPoints.push_back(Vector2{
+                edgePoints[i].x + (edgePoints[i + 1].x - edgePoints[i].x) * j /
+                                      data.lengths[i],
+                edgePoints[i].y + (edgePoints[i + 1].y - edgePoints[i].y) * j /
+                                      data.lengths[i]});
+        renderPoints.push_back(edgePoints[edgePoints.size() - 1]);
+        while (!false) {
+          if (renderPoints.size() <= data.length)
+            break;
+          renderPoints.pop_back();
+        }
+      } else {
+        Vector2 center = circleData.first;
+        int radius = circleData.second;
+        float degree1 =
+            atan2(edgePoints[0].y - center.y, edgePoints[0].x - center.x) *
+            RAD2DEG;
+        float degree2 =
+            atan2(edgePoints[1].y - center.y, edgePoints[1].x - center.x) *
+            RAD2DEG;
+        float degree3 =
+            atan2(edgePoints[2].y - center.y, edgePoints[2].x - center.x) *
+            RAD2DEG;
+        degree1 = degree1 < 0 ? degree1 + 360 : degree1;
+        degree2 = degree2 < 0 ? degree2 + 360 : degree2;
+        degree3 = degree3 < 0 ? degree3 + 360 : degree3;
+        bool clockwise =
+            !orientation(edgePoints[0], edgePoints[1], edgePoints[2]);
+        float angle = (((data.length * 360) / radius) / 3.14159265) / 2;
+        int a = 0;
+        if (clockwise) {
+          degree1 = degree1 < degree3 ? degree1 + 360 : degree1;
+          degree2 = degree2 < degree3 ? degree2 + 360 : degree2;
+          for (float i = degree1; i > degree1 - angle;
+               i -= angle / data.length) {
+            if (a > data.length) {
+              renderPoints.pop_back();
+              break;
+            }
+            Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius,
+                                        center.y + sin(i / RAD2DEG) * radius};
+            renderPoints.push_back(tempPoint);
+            a++;
+          }
+        } else {
+          degree2 = degree2 < degree1 ? degree2 + 360 : degree2;
+          degree3 = degree3 < degree1 ? degree3 + 360 : degree3;
+          for (float i = degree1; i < degree1 + angle;
+               i += angle / data.length) {
+            if (a > data.length) {
+              renderPoints.pop_back();
+              break;
+            }
+            Vector2 tempPoint = Vector2{center.x + cos(i / RAD2DEG) * radius,
+                                        center.y + sin(i / RAD2DEG) * radius};
+            renderPoints.push_back(tempPoint);
+            a++;
+          }
+          // std::reverse(renderPoints.begin(), renderPoints.end());
+        }
+        while (renderPoints.size() > data.length) {
+          renderPoints.pop_back();
+        }
+        // std::cout << "Pdata: " << data.length << " size: " <<
+        // renderPoints.size() << std::endl;
+      }
+
+    } else if (data.curveType == 'C') {
+      renderPoints = interpolate(edgePoints, data.length);
+      while (!false) {
+        if (renderPoints.size() <= data.length)
+          break;
+        renderPoints.pop_back();
+      }
+    } else {
+      std::__throw_invalid_argument("Invalid Slider type!");
     }
-    reverseclicked.pop_back();
-    //data.length = templength;
-    //double operationTime = getTimer() - startTime;
-    //std::cout << "Init slider at time " << data.time << " with the size of " << maxX-minX << " and " << maxY-minY << " in " << operationTime << " miliseconds" << "\n";
-    last = 0;
-    data.textureReady = true;
-    if(data.slides % 2 == 0){
-        data.ex = data.x;
-        data.ey = data.y;
+  }
+  for (size_t i = 0; i < renderPoints.size(); i++) { // Global.sliderMinimumX
+    if (renderPoints[i].x < Global.sliderMinimumX) {
+      renderPoints[i].x = Global.sliderMinimumX;
     }
-    else{
-        data.ex = renderPoints[renderPoints.size() - 1].x;
-        data.ey = renderPoints[renderPoints.size() - 1].y;
+    if (renderPoints[i].y < Global.sliderMinimumY) {
+      renderPoints[i].y = Global.sliderMinimumY;
     }
-    
+    if (renderPoints[i].x > Global.sliderMaximumX) {
+      renderPoints[i].x = Global.sliderMaximumX;
+    }
+    if (renderPoints[i].y > Global.sliderMaximumY) {
+      renderPoints[i].y = Global.sliderMaximumY;
+    }
+    minX = std::min(minX, renderPoints[i].x);
+    minY = std::min(minY, renderPoints[i].y);
+    maxX = std::max(maxX, renderPoints[i].x);
+    maxY = std::max(maxY, renderPoints[i].y);
+  }
+  // std::cout << "slider:" << data.time << " minX:" << minX << " minY:" << minY
+  // << " maxX:" << maxX << " maxY:" << maxY << "\n";
+  ticks = 0;
+  sliderDuration = (double)(data.length / 100) *
+                   (double)(data.timing.beatLength) /
+                   (double)((double)gm->sliderSpeed *
+                            (double)data.timing.sliderSpeedOverride);
+  if (durationNull) {
+    sliderDuration = 1.0;
+  }
+  currentDuration = 0.0f;
+  while (true) {
+    currentDuration +=
+        (double)data.timing.beatLength / (double)gm->slidertickrate;
+    if (AreSame((double)currentDuration, (double)sliderDuration) ||
+        (double)currentDuration > (double)sliderDuration)
+      break;
+    else {
+      ticks++;
+    }
+  }
+  // ticks = (int)((sliderDuration - 1) / ((double)data.timing.beatLength /
+  // (double)gm->slidertickrate));
+  if (ticks < 0)
+    ticks = 0;
+  std::vector<int> indices;
+  if (true || data.timing.renderTicks) {
+    for (int i = 1; i <= ticks; i++) {
+      double absolutePosition =
+          ((double)(i) * (double)((double)data.timing.beatLength /
+                                  (double)gm->slidertickrate));
+      bool add = true;
+      if (AreSame((double)absolutePosition, (double)sliderDuration))
+        add = false;
+      absolutePosition =
+          ((double)absolutePosition) / ((double)data.timing.beatLength) *
+          (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
+      absolutePosition *= (double)100;
+      if (add)
+        indices.push_back((int)absolutePosition);
+    }
+  }
+  ticks = indices.size();
+  for (int i = 0; i < data.slides; i++) {
+    if (i % 2 == 0) {
+      reverseclicked.push_back(-1);
+      for (int j = 0; j < (int)indices.size(); j++) {
+        tickPositions.push_back((int)indices[j] +
+                                (int)((double)i * data.length));
+        tickclicked.push_back(-1);
+      }
+    } else {
+      reverseclicked.push_back(-1);
+      for (int j = indices.size() - 1; j >= 0; j--) {
+        tickPositions.push_back((data.length - (int)indices[j]) +
+                                (int)((double)i * data.length));
+        tickclicked.push_back(-1);
+      }
+    }
+  }
+  reverseclicked.pop_back();
+  // data.length = templength;
+  // double operationTime = getTimer() - startTime;
+  // std::cout << "Init slider at time " << data.time << " with the size of " <<
+  // maxX-minX << " and " << maxY-minY << " in " << operationTime << "
+  // miliseconds" << "\n";
+  last = 0;
+  data.textureReady = true;
+  if (data.slides % 2 == 0) {
+    data.ex = data.x;
+    data.ey = data.y;
+  } else {
+    data.ex = renderPoints[renderPoints.size() - 1].x;
+    data.ey = renderPoints[renderPoints.size() - 1].y;
+  }
 }
 
-void Slider::update(){
-    GameManager* gm = GameManager::getInstance();
-    
-    position = ((double)gm->currentTime * (double)(1000) - (double)data.time) / ((double)data.timing.beatLength) * (double)gm->sliderSpeed * (double)data.timing.sliderSpeedOverride;
-    
-    if(data.timing.beatLength < 0.1)
-        position = 0;
+void Slider::update() {
+  GameManager *gm = GameManager::getInstance();
 
-    int volume = data.volume;
-    if(volume == 0){
-        data.volume = gm->currentTimingSettings.volume;
-        volume = data.volume;
-    }
+  position = ((double)gm->currentTime * (double)(1000) - (double)data.time) /
+             ((double)data.timing.beatLength) * (double)gm->sliderSpeed *
+             (double)data.timing.sliderSpeedOverride;
 
-    position *= (double)100;
-    curRepeat = std::max(0,(int)(position / data.length));
-    if(data.timing.beatLength < 0.1)
-        curRepeat = 0;
-    if((int)(std::max((double)0, position) + data.length) < (int)(data.length*data.slides)){
-        repeat = true;
-    }
-    else{
-        repeat = false;
-    }
-    if((int)(std::max((double)0, position) + 2*data.length) < (int)(data.length*data.slides)){
-        repeat2 = true;
-    }
-    else{
-        repeat2 = false;
-    }
+  if (data.timing.beatLength < 0.1)
+    position = 0;
 
-    time = position;
+  int volume = data.volume;
+  if (volume == 0) {
+    data.volume = gm->currentTimingSettings.volume;
+    volume = data.volume;
+  }
 
-    double absolutePosition = position;
-    while(absolutePosition > (double)data.length){
-        absolutePosition -= (double)data.length;
+  position *= (double)100;
+  curRepeat = std::max(0, (int)(position / data.length));
+  if (data.timing.beatLength < 0.1)
+    curRepeat = 0;
+  if ((int)(std::max((double)0, position) + data.length) <
+      (int)(data.length * data.slides)) {
+    repeat = true;
+  } else {
+    repeat = false;
+  }
+  if ((int)(std::max((double)0, position) + 2 * data.length) <
+      (int)(data.length * data.slides)) {
+    repeat2 = true;
+  } else {
+    repeat2 = false;
+  }
+
+  time = position;
+
+  double absolutePosition = position;
+  while (absolutePosition > (double)data.length) {
+    absolutePosition -= (double)data.length;
+  }
+
+  if (gm->currentTime * 1000.0f - data.time > 0) {
+    if (data.timing.beatLength > 0.1) {
+      if ((int)((gm->currentTime * 1000.0f - data.time) /
+                ((data.length / 100) * (data.timing.beatLength) /
+                 (gm->sliderSpeed * data.timing.sliderSpeedOverride))) %
+              2 ==
+          1)
+        position = (double)data.length - (absolutePosition + 1.0f);
+      else
+        position = absolutePosition + 1.0f;
     }
-    
-    if(gm->currentTime*1000.0f - data.time > 0){
-        if(data.timing.beatLength > 0.1){
-            if ((int)((gm->currentTime*1000.0f - data.time) /((data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed* data.timing.sliderSpeedOverride))) % 2 == 1)
-                position = (double)data.length - (absolutePosition + 1.0f); 
-            else
-                position = absolutePosition + 1.0f; 
+  }
+  position = std::max((double)0, position);
+  if (is_hit_at_first ||
+      gm->currentTime * 1000.0f > data.time + gm->gameFile.p50Final)
+    state = false;
+  if (!state and !is_hit_at_first) {
+    if (gm->clickCombo > 30) {
+      SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+      PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+    }
+    gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
+    gm->clickCombo = 0;
+  }
+  calPos = position;
+  calPos = std::min(calPos, static_cast<int>(renderPoints.size() - 1));
+  /*if(data.length == 7105)
+      std::cout << renderPoints[calPos].x << " " << renderPoints[calPos].y <<
+     "\n";*/
+  if (Global.useAuto and (gm->currentTime * 1000.0f - data.time > 0 or !state))
+    Global.AutoMousePosition = renderPoints[calPos];
+
+  if ((gm->currentTime * 1000.0f - data.time > 0 or !state)) {
+    if (CheckCollisionPointCircle(
+            Global.MousePosition,
+            Vector2{renderPoints[calPos].x, renderPoints[calPos].y},
+            gm->circlesize))
+      inSlider = true;
+    else
+      inSlider = false;
+  } else {
+    inSlider = false;
+  }
+
+  // DEBUG
+
+  bool debugf = IsKeyDown(Global.AUTO_KEY);
+  if (debugf) {
+    inSlider = true;
+  }
+
+  if (data.timing.beatLength < 0.1)
+    inSlider = true;
+  if (data.timing.beatLength < 0.1)
+    is_hit_at_end = true;
+  float templength = (data.length / 100) * (data.timing.beatLength) /
+                     (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
+                     data.slides;
+
+  // templength = std::ceil(templength);
+
+  if (gm->currentTime * 1000.0f >
+      data.time + templength - (36 - (18 * (templength <= 72.0f)))) {
+    if (inSlider && (Global.Key1D || Global.Key2D || debugf)) {
+      is_hit_at_end = true;
+    }
+  }
+
+  if ((gm->currentTime * 1000.0f - data.time > 0 or !state) and
+      renderPoints.size() > 0) {
+    // int ticksrendered = 0;
+    bool debugf = IsKeyDown(Global.AUTO_KEY);
+    for (int i = 0; i < (int)tickPositions.size(); i++) {
+      if (tickPositions[i] <= (int)time && (int)time > 0) {
+        if (tickclicked[i] == -1) {
+          if ((inSlider && (Global.Key1D || Global.Key2D)) || debugf) {
+            tickclicked[i] = 1;
+            ticknumber++;
+            gm->clickCombo++;
+            playtick = true;
+          } else {
+            tickclicked[i] = 0;
+            if (gm->clickCombo > 30) {
+              SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+              PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+            }
+            gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
+            gm->clickCombo = 0;
+          }
         }
+      }
     }
-    position = std::max((double)0,position);
-    if (is_hit_at_first || gm->currentTime*1000.0f > data.time + gm->gameFile.p50Final)
-        state = false;
-    if(!state and !is_hit_at_first){
-        if(gm->clickCombo > 30){
-            SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
-            PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+  }
+
+  if (playtick) {
+
+    int defaultSampleSetForObject = 0;
+    if (gm->currentTimingSettings.sampleSet == 1)
+      defaultSampleSetForObject = 0;
+    else if (gm->currentTimingSettings.sampleSet == 2)
+      defaultSampleSetForObject = 1;
+    else if (gm->currentTimingSettings.sampleSet == 3)
+      defaultSampleSetForObject = 2;
+    else
+      defaultSampleSetForObject = gm->defaultSampleSet;
+
+    int NormalSetForObject = 0;
+
+    if (data.normalSet == 1)
+      NormalSetForObject = 0;
+    else if (data.normalSet == 2)
+      NormalSetForObject = 1;
+    else if (data.normalSet == 3)
+      NormalSetForObject = 2;
+    else
+      NormalSetForObject = defaultSampleSetForObject;
+
+    std::string NormalFileName;
+
+    if (NormalSetForObject == 0)
+      NormalFileName = "normal-slidertick";
+    else if (NormalSetForObject == 1)
+      NormalFileName = "soft-slidertick";
+    else
+      NormalFileName = "drum-slidertick";
+    SetSoundPan(&gm->SoundFilesAll.data[NormalFileName],
+                1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
+    SetSoundVolume(&gm->SoundFilesAll.data[NormalFileName],
+                   ((float)volume / 100.0f) * Global.hitVolume);
+    PlaySound(&gm->SoundFilesAll.data[NormalFileName]);
+
+    playtick = false;
+  }
+
+  if (durationNull or
+      gm->currentTime * 1000.0f >
+          data.time + (data.length / 100) * (data.timing.beatLength) /
+                          (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
+                          data.slides) {
+
+    // std::cout << "Slides: " << data.slides << " TickCount: " << ticks << "
+    // SliderDuration: " << sliderDuration << " Beatlength: " <<
+    // data.timing.beatLength << std::endl; std::cout << "Killed slider at time
+    // " << data.time << "\n";
+    data.time = gm->currentTime * 1000.0f;
+    data.point = 0;
+    // gm->clickCombo = 0;
+    // std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first
+    // << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << "
+    // Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first +
+    // reversenumber + ticknumber) / (float)(tickclicked.size() +
+    // reverseclicked.size() + 2)) * 100.0f<< std::endl;
+
+    if (durationNull or
+        (data.length / 100) * (data.timing.beatLength) /
+                (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
+                data.slides <=
+            36.0f) {
+      if (is_hit_at_first) {
+        data.point = 3;
+        gm->score +=
+            300 +
+            (300 *
+             (std::max(gm->clickCombo - 1, 0) * gm->difficultyMultiplier * 1) /
+             25);
+        gm->clickCombo++;
+        gm->hit300s++;
+      } else {
+        data.point = 0;
+        if (gm->clickCombo > 30) {
+          SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+          PlaySound(&gm->SoundFilesAll.data["combobreak"]);
         }
         gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
         gm->clickCombo = 0;
-    }
-    calPos = position;
-    calPos = std::min(calPos, static_cast<int>(renderPoints.size()-1));
-    /*if(data.length == 7105)
-        std::cout << renderPoints[calPos].x << " " << renderPoints[calPos].y << "\n";*/
-    if(Global.useAuto and (gm->currentTime*1000.0f - data.time > 0 or !state))
-        Global.AutoMousePosition = renderPoints[calPos];
-
-    if((gm->currentTime*1000.0f - data.time > 0 or !state)){
-        if(CheckCollisionPointCircle(Global.MousePosition,Vector2{renderPoints[calPos].x,renderPoints[calPos].y}, gm->circlesize))
-            inSlider = true;
-        else
-            inSlider = false;
-    }
-    else{
-        inSlider = false;
-    }
-
-    //DEBUG
-
-    
-    bool debugf = IsKeyDown(Global.AUTO_KEY);
-    if(debugf){
-        inSlider = true;
-    }
-
-    if(data.timing.beatLength < 0.1)
-        inSlider = true;
-    if(data.timing.beatLength < 0.1)
-        is_hit_at_end = true;
-    float templength = (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides;
-
-    //templength = std::ceil(templength);
-
-    if(gm->currentTime*1000.0f > data.time + templength - (36 - (18 * (templength <= 72.0f)))){
-        if(inSlider && (Global.Key1D || Global.Key2D || debugf)){
-            is_hit_at_end = true;
-        }
-    }
-
-    if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
-        //int ticksrendered = 0;
-        bool debugf = IsKeyDown(Global.AUTO_KEY);
-        for(int i = 0; i < (int)tickPositions.size(); i++){
-            if(tickPositions[i] <= (int)time && (int) time > 0){
-                if(tickclicked[i] == -1){
-                    if((inSlider && (Global.Key1D || Global.Key2D)) || debugf){
-                        tickclicked[i] = 1;
-                        ticknumber++;
-                        gm->clickCombo++;
-                        playtick = true;
-                    }
-                    else{
-                        tickclicked[i] = 0;
-                        if(gm->clickCombo > 30){
-							SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
-							PlaySound(&gm->SoundFilesAll.data["combobreak"]);
-						}
-                        gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
-                        gm->clickCombo = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    if(playtick){
-
-        int defaultSampleSetForObject = 0;
-        if(gm->currentTimingSettings.sampleSet == 1)
-            defaultSampleSetForObject = 0;
-        else if(gm->currentTimingSettings.sampleSet == 2)
-            defaultSampleSetForObject = 1;
-        else if(gm->currentTimingSettings.sampleSet == 3)
-            defaultSampleSetForObject = 2;
-        else
-            defaultSampleSetForObject = gm->defaultSampleSet;
-
-        int NormalSetForObject = 0;
-
-		if(data.normalSet == 1)
-			NormalSetForObject = 0;
-		else if(data.normalSet == 2)
-			NormalSetForObject = 1;
-		else if(data.normalSet == 3)
-			NormalSetForObject = 2;
-		else
-			NormalSetForObject = defaultSampleSetForObject;
-
-        std::string NormalFileName;
-
-        if(NormalSetForObject == 0)
-            NormalFileName = "normal-slidertick";
-        else if(NormalSetForObject == 1)
-            NormalFileName = "soft-slidertick";
-        else
-            NormalFileName = "drum-slidertick";
-        SetSoundPan(&gm->SoundFilesAll.data[NormalFileName], 1 - (clip(renderPoints[calPos].x / 640.0, 0, 1)));
-        SetSoundVolume(&gm->SoundFilesAll.data[NormalFileName], ((float)volume/100.0f) * Global.hitVolume);
-        PlaySound(&gm->SoundFilesAll.data[NormalFileName]);
-
-        
-        playtick = false;
-    }
-
-
-
-    if(durationNull or gm->currentTime*1000.0f > data.time + (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides){
-        
-        //std::cout << "Slides: " << data.slides << " TickCount: " << ticks << " SliderDuration: " << sliderDuration << " Beatlength: " << data.timing.beatLength << std::endl;
-        //std::cout << "Killed slider at time " << data.time << "\n";
-        data.time = gm->currentTime*1000.0f;
+      }
+    } else {
+      float succ = ((float)(is_hit_at_end + is_hit_at_first + reversenumber +
+                            ticknumber) /
+                    (float)(tickclicked.size() + reverseclicked.size() + 2)) *
+                   100.0f;
+      if (AreSame(succ, 0))
         data.point = 0;
-        //gm->clickCombo = 0;
-        //std::cout << "Ticks: " << ticknumber << " Hit first:" << is_hit_at_first << " Hit end:" << is_hit_at_end << " Reverse:" << reversenumber << " Percentage: %" <<  ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f<< std::endl;
-
-        if(durationNull or (data.length/100) * (data.timing.beatLength) / (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides <= 36.0f){
-            if(is_hit_at_first){
-                data.point = 3;
-                gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-                gm->clickCombo++;
-                gm->hit300s++;
-            }
-            else{
-                data.point = 0;
-                if(gm->clickCombo > 30){
-                    SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
-                    PlaySound(&gm->SoundFilesAll.data["combobreak"]);
-                }
-                gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
-                gm->clickCombo = 0;
-            }
+      if (succ > 0.0f)
+        data.point = 1;
+      if (succ >= 50.0f)
+        data.point = 2;
+      if (AreSame(succ, 100.0f))
+        data.point = 3;
+      if (data.point == 0) {
+        if (gm->clickCombo > 30) {
+          SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+          PlaySound(&gm->SoundFilesAll.data["combobreak"]);
         }
-        else{
-            float succ = ((float)(is_hit_at_end + is_hit_at_first + reversenumber + ticknumber) / (float)(tickclicked.size() + reverseclicked.size() + 2)) * 100.0f;
-            if(AreSame(succ,0))
-                data.point = 0;
-            if(succ > 0.0f)
-                data.point = 1;
-            if(succ >= 50.0f)
-                data.point = 2;
-            if(AreSame(succ,100.0f))
-                data.point = 3;
-            if(data.point == 0){
-                if(gm->clickCombo > 30){
-                    SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
-                    PlaySound(&gm->SoundFilesAll.data["combobreak"]);
-                }
-                gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
-                gm->clickCombo = 0;
-                gm->hit0s++;
-            }
-            else if(data.point == 1){
-                gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-                gm->clickCombo++;
-                gm->hit50s++;
-            }
-            else if(data.point == 2){
-                gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-                gm->clickCombo++;
-                gm->hit100s++;
-            }
-            else if(data.point == 3){
-                gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-                gm->clickCombo++;
-                gm->hit300s++;
-            }
-        }
-
-        bool debugf = IsKeyDown(Global.AUTO_KEY);
-        if(is_hit_at_end || debugf){
-            std::vector<std::string> sounds = getAudioFilenames(gm->currentTimingSettings.sampleSet, gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet, data.edgeSets[data.edgeSets.size() - 1].first, data.edgeSets[data.edgeSets.size() - 1].second, data.edgeSounds[data.edgeSounds.size() - 1], data.hindex, data.filename);
-            //std::cout << gm->currentTimingSettings.sampleSet << "  -  " << gm->currentTimingSettings.sampleIndex << "  -  " << gm->defaultSampleSet << "  -  " << data.edgeSets[data.edgeSets.size() - 1].first << "  -  " << data.edgeSets[data.edgeSets.size() - 1].second << "  -  " << data.edgeSounds[data.edgeSounds.size() - 1] << "  -  " << data.hindex << " - end at " << gm->currentTime*1000.0f << std::endl;
-            
-            for(int i = 0; i < (int)sounds.size(); i+=2){
-                if(gm->SoundFilesAll.data.count(sounds[i]) == 1 and gm->SoundFilesAll.loaded[sounds[i]].value){
-                    SetSoundPan(&gm->SoundFilesAll.data[sounds[i]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                    SetSoundVolume(&gm->SoundFilesAll.data[sounds[i]], ((float)volume/100.0f) * Global.hitVolume);
-                    PlaySound(&gm->SoundFilesAll.data[sounds[i]]);
-                    //std::cout << sounds[0] << " played \n";
-                }
-                else if(gm->SoundFilesAll.data.count(sounds[i+1]) == 1 and gm->SoundFilesAll.loaded[sounds[i+1]].value){
-                    SetSoundPan(&gm->SoundFilesAll.data[sounds[i+1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                    SetSoundVolume(&gm->SoundFilesAll.data[sounds[i+1]], ((float)volume/100.0f) * Global.hitVolume);
-                    PlaySound(&gm->SoundFilesAll.data[sounds[i+1]]);
-                    //std::cout << sounds[1] << " played \n";
-                }
-            }
-        }
-        lastPosition = renderPoints[calPos];
-        Global.AutoMousePositionStart = renderPoints[calPos];
-		Global.AutoMouseStartTime = gm->currentTime*1000.0f;
-
-        data.destruct = true;
+        gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
+        gm->clickCombo = 0;
+        gm->hit0s++;
+      } else if (data.point == 1) {
+        gm->score +=
+            50 +
+            (50 *
+             (std::max(gm->clickCombo - 1, 0) * gm->difficultyMultiplier * 1) /
+             25);
+        gm->clickCombo++;
+        gm->hit50s++;
+      } else if (data.point == 2) {
+        gm->score +=
+            100 +
+            (100 *
+             (std::max(gm->clickCombo - 1, 0) * gm->difficultyMultiplier * 1) /
+             25);
+        gm->clickCombo++;
+        gm->hit100s++;
+      } else if (data.point == 3) {
+        gm->score +=
+            300 +
+            (300 *
+             (std::max(gm->clickCombo - 1, 0) * gm->difficultyMultiplier * 1) /
+             25);
+        gm->clickCombo++;
+        gm->hit300s++;
+      }
     }
-    else{
-        if(curRepeat > 0){
-            if(reverseclicked[curRepeat-1] == -1){
-                if(inSlider || debugf){
-                    reverseclicked[curRepeat-1] = 1;
-                    reversenumber++;
-                    gm->clickCombo++;
-                    std::vector<std::string> sounds = getAudioFilenames(gm->currentTimingSettings.sampleSet, gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet, data.edgeSets[curRepeat].first, data.edgeSets[curRepeat].second, data.edgeSounds[curRepeat], data.hindex, data.filename);
-                    //std::cout << gm->currentTimingSettings.sampleSet << " " << gm->currentTimingSettings.sampleIndex << " " << gm->defaultSampleSet << std::endl;
-                    for(int i = 0; i < (int)sounds.size(); i+=2){
-                        if(gm->SoundFilesAll.data.count(sounds[i]) == 1 and gm->SoundFilesAll.loaded[sounds[i]].value){
-                            SetSoundPan(&gm->SoundFilesAll.data[sounds[i]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                            SetSoundVolume(&gm->SoundFilesAll.data[sounds[i]], ((float)volume/100.0f) * Global.hitVolume);
-                            PlaySound(&gm->SoundFilesAll.data[sounds[i]]);
-                            //std::cout << sounds[0] << " played \n";
-                        }
-                        else if(gm->SoundFilesAll.data.count(sounds[i+1]) == 1 and gm->SoundFilesAll.loaded[sounds[i+1]].value){
-                            SetSoundPan(&gm->SoundFilesAll.data[sounds[i+1]], 1-clip(renderPoints[calPos].x / 640.0, 0, 1));
-                            SetSoundVolume(&gm->SoundFilesAll.data[sounds[i+1]], ((float)volume/100.0f) * Global.hitVolume);
-                            PlaySound(&gm->SoundFilesAll.data[sounds[i+1]]);
-                            //std::cout << sounds[1] << " played \n";
-                        }
-                    }
-                }
-                else{
-                    reverseclicked[curRepeat-1] = 0;
-                    if(gm->clickCombo > 30){
-                        SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
-                        PlaySound(&gm->SoundFilesAll.data["combobreak"]);
-                    }
-                    gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
-                    gm->clickCombo = 0;
-                }
-            }
+
+    bool debugf = IsKeyDown(Global.AUTO_KEY);
+    if (is_hit_at_end || debugf) {
+      std::vector<std::string> sounds = getAudioFilenames(
+          gm->currentTimingSettings.sampleSet,
+          gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet,
+          data.edgeSets[data.edgeSets.size() - 1].first,
+          data.edgeSets[data.edgeSets.size() - 1].second,
+          data.edgeSounds[data.edgeSounds.size() - 1], data.hindex,
+          data.filename);
+      // std::cout << gm->currentTimingSettings.sampleSet << "  -  " <<
+      // gm->currentTimingSettings.sampleIndex << "  -  " <<
+      // gm->defaultSampleSet << "  -  " << data.edgeSets[data.edgeSets.size() -
+      // 1].first << "  -  " << data.edgeSets[data.edgeSets.size() - 1].second
+      // << "  -  " << data.edgeSounds[data.edgeSounds.size() - 1] << "  -  " <<
+      // data.hindex << " - end at " << gm->currentTime*1000.0f << std::endl;
+
+      for (int i = 0; i < (int)sounds.size(); i += 2) {
+        if (gm->SoundFilesAll.data.count(sounds[i]) == 1 and
+            gm->SoundFilesAll.loaded[sounds[i]].value) {
+          SetSoundPan(&gm->SoundFilesAll.data[sounds[i]],
+                      1 - clip(renderPoints[calPos].x / 640.0, 0, 1));
+          SetSoundVolume(&gm->SoundFilesAll.data[sounds[i]],
+                         ((float)volume / 100.0f) * Global.hitVolume);
+          PlaySound(&gm->SoundFilesAll.data[sounds[i]]);
+          // std::cout << sounds[0] << " played \n";
+        } else if (gm->SoundFilesAll.data.count(sounds[i + 1]) == 1 and
+                   gm->SoundFilesAll.loaded[sounds[i + 1]].value) {
+          SetSoundPan(&gm->SoundFilesAll.data[sounds[i + 1]],
+                      1 - clip(renderPoints[calPos].x / 640.0, 0, 1));
+          SetSoundVolume(&gm->SoundFilesAll.data[sounds[i + 1]],
+                         ((float)volume / 100.0f) * Global.hitVolume);
+          PlaySound(&gm->SoundFilesAll.data[sounds[i + 1]]);
+          // std::cout << sounds[1] << " played \n";
         }
+      }
     }
+    lastPosition = renderPoints[calPos];
+    Global.AutoMousePositionStart = renderPoints[calPos];
+    Global.AutoMouseStartTime = gm->currentTime * 1000.0f;
+
+    data.destruct = true;
+  } else {
+    if (curRepeat > 0) {
+      if (reverseclicked[curRepeat - 1] == -1) {
+        if (inSlider || debugf) {
+          reverseclicked[curRepeat - 1] = 1;
+          reversenumber++;
+          gm->clickCombo++;
+          std::vector<std::string> sounds = getAudioFilenames(
+              gm->currentTimingSettings.sampleSet,
+              gm->currentTimingSettings.sampleIndex, gm->defaultSampleSet,
+              data.edgeSets[curRepeat].first, data.edgeSets[curRepeat].second,
+              data.edgeSounds[curRepeat], data.hindex, data.filename);
+          // std::cout << gm->currentTimingSettings.sampleSet << " " <<
+          // gm->currentTimingSettings.sampleIndex << " " <<
+          // gm->defaultSampleSet << std::endl;
+          for (int i = 0; i < (int)sounds.size(); i += 2) {
+            if (gm->SoundFilesAll.data.count(sounds[i]) == 1 and
+                gm->SoundFilesAll.loaded[sounds[i]].value) {
+              SetSoundPan(&gm->SoundFilesAll.data[sounds[i]],
+                          1 - clip(renderPoints[calPos].x / 640.0, 0, 1));
+              SetSoundVolume(&gm->SoundFilesAll.data[sounds[i]],
+                             ((float)volume / 100.0f) * Global.hitVolume);
+              PlaySound(&gm->SoundFilesAll.data[sounds[i]]);
+              // std::cout << sounds[0] << " played \n";
+            } else if (gm->SoundFilesAll.data.count(sounds[i + 1]) == 1 and
+                       gm->SoundFilesAll.loaded[sounds[i + 1]].value) {
+              SetSoundPan(&gm->SoundFilesAll.data[sounds[i + 1]],
+                          1 - clip(renderPoints[calPos].x / 640.0, 0, 1));
+              SetSoundVolume(&gm->SoundFilesAll.data[sounds[i + 1]],
+                             ((float)volume / 100.0f) * Global.hitVolume);
+              PlaySound(&gm->SoundFilesAll.data[sounds[i + 1]]);
+              // std::cout << sounds[1] << " played \n";
+            }
+          }
+        } else {
+          reverseclicked[curRepeat - 1] = 0;
+          if (gm->clickCombo > 30) {
+            SetSoundVolume(&gm->SoundFilesAll.data["combobreak"], 1.0f);
+            PlaySound(&gm->SoundFilesAll.data["combobreak"]);
+          }
+          gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
+          gm->clickCombo = 0;
+        }
+      }
+    }
+  }
 }
 
-void Slider::render(){
-    bool legacyRender = Global.legacyRender;
+void Slider::render() {
+  bool legacyRender = Global.legacyRender;
 
-    
+  if (!legacyRender) {
+    Global.sliderTexSize = 1.0;
+  }
+  GameManager *gm = GameManager::getInstance();
+  // bool changeTex = false;
 
-    if(!legacyRender){
-        Global.sliderTexSize = 1.0;
+  if (data.textureReady == true and data.textureLoaded == false) {
+
+    if (legacyRender) {
+      texSizeXoffset = std::max(
+          0.0f, (((std::max(maxX - minX, 1.0f) + (float)gm->circlesize) + 8) *
+                 Global.sliderTexSize) -
+                    511.5f);
+      texSizeYoffset = std::max(
+          0.0f, (((std::max(maxY - minY, 1.0f) + (float)gm->circlesize) + 8) *
+                 Global.sliderTexSize) -
+                    255.5f);
+      texSizeXoffset = 0;
+      texSizeYoffset = 0;
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+      sliderTexture = LoadMSAARenderTexture(
+          (int)(((std::max(maxX - minX, 1.0f) + (float)gm->circlesize) + 16) *
+                    Global.sliderTexSize -
+                texSizeXoffset),
+          (int)(((std::max(maxY - minY, 1.0f) + (float)gm->circlesize) + 16) *
+                    Global.sliderTexSize -
+                texSizeYoffset), 4);
+#else
+      sliderTexture = LoadRenderTexture(
+          (int)(((std::max(maxX - minX, 1.0f) + (float)gm->circlesize) + 16) *
+                    Global.sliderTexSize -
+                texSizeXoffset),
+          (int)(((std::max(maxY - minY, 1.0f) + (float)gm->circlesize) + 16) *
+                    Global.sliderTexSize -
+                texSizeYoffset));
+#endif
+      if (Global.mipmaps > 1) {
+
+        sliderTextureReadyForMipmaps = 1;
+      }
+
+      std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
+                << "loaded legacy texture with length " << renderPoints.size()
+                << std::endl;
+    } else
+
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+      sliderTexture = LoadMSAARenderTexture(
+          (int)(((std::max(maxX - minX, 1.0f) + (float)gm->circlesize) + 16)),
+          (int)(((std::max(maxY - minY, 1.0f) + (float)gm->circlesize) + 16)), 4);
+#else
+      sliderTexture = LoadRenderTexture(
+          (int)(((std::max(maxX - minX, 1.0f) + (float)gm->circlesize) + 16)),
+          (int)(((std::max(maxY - minY, 1.0f) + (float)gm->circlesize) + 16)));
+#endif
+
+// rlFramebufferAttach(sliderTexture.id, sliderTexture.depth.id,
+// RL_ATTACHMENT_STENCIL, RL_ATTACHMENT_TEXTURE2D, 0);
+// SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+    if (sliderTexture.valid) {
+      BeginMSAARenderTexture(sliderTexture);
+#else
+    if (sliderTexture.texture.id != 0) {
+
+      BeginTextureMode(&sliderTexture);
+#endif
+      // rlClearScreenBuffers();
+      // BeginBlendMode(BLEND_ALPHA_PREMUL);
+      // if(legacyRender){
+      //     rlEnableDepthTest();
+      //     rlCustomDepthFunc(false);
+      //     rlEnableDepthMask();
+      //     rlClearDepth(0.0f);
+      //     rlDisableDepthTest();
+      // }
+      rlEnableDepthTest();
+      ClearBackground({0, 0, 0, 0});
+      if (legacyRender) {
+        rlEnableDepthMask();
+        rlClearScreenBuffers();
+      }
+      // EndBlendMode();
+      rlDisableDepthTest();
+
+      // changeTex = true;
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+      EndMSAARenderTexture(sliderTexture);
+      // SetTextureFilter(&sliderTexture.resolve.texture,
+      // TEXTURE_FILTER_BILINEAR);
+      Texture2D tex;
+      tex.id = sliderTexture.resolveTexture;
+      tex.width = sliderTexture.width;
+      tex.height = sliderTexture.height;
+      tex.mipmaps = 1;
+      tex.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+      SetTextureFilter(&tex, TEXTURE_FILTER_BILINEAR);
+#else
+      EndTextureMode();
+      SetTextureFilter(&sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
+#endif
     }
-    GameManager* gm = GameManager::getInstance();
-    //bool changeTex = false;
-    
-    if(data.textureReady == true and data.textureLoaded == false){
-        
-        if(legacyRender){
-            texSizeXoffset = std::max(0.0f, (((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+8)*Global.sliderTexSize) - 511.5f);
-            texSizeYoffset = std::max(0.0f, (((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+8)*Global.sliderTexSize) - 255.5f);
-            texSizeXoffset = 0;
-            texSizeYoffset = 0;
+  }
 
-            if(Global.mipmaps > 1){
-                //sliderTexture = LoadRenderTextureMipmapped((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
-                //                              (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset), Global.mipmaps);
-                sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
-                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset));
-                sliderTextureReadyForMipmaps = 1;
-            }
-            else
-                sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeXoffset),
-                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)*Global.sliderTexSize - texSizeYoffset));
-            std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded legacy texture with length " << renderPoints.size()<< std::endl;
-        }
-        else
-            sliderTexture = LoadRenderTexture((int)(((std::max(maxX-minX, 1.0f)+(float)gm->circlesize)+16)),
-                                          (int)(((std::max(maxY-minY, 1.0f)+(float)gm->circlesize)+16)));
-        //rlFramebufferAttach(sliderTexture.id, sliderTexture.depth.id, RL_ATTACHMENT_STENCIL, RL_ATTACHMENT_TEXTURE2D, 0);
-        //SetTextureFilter(sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
-        if(sliderTexture.texture.id != 0){
-            BeginTextureMode(&sliderTexture);
-            
-            //rlClearScreenBuffers();
-            //BeginBlendMode(BLEND_ALPHA_PREMUL);
-            //if(legacyRender){
-            //    rlEnableDepthTest(); 
-            //    rlCustomDepthFunc(false);
-            //    rlEnableDepthMask();
-            //    rlClearDepth(0.0f);
-            //    rlDisableDepthTest();
-            //}
-            rlEnableDepthTest(); 
-            ClearBackground({0,0,0,0});
-            if(legacyRender){
-                rlEnableDepthMask();
-                rlClearScreenBuffers();
-            }
-            //EndBlendMode();
-            rlDisableDepthTest();
-            EndTextureMode();
-            //changeTex = true;
+  float approachScale =
+      3.5 * easeInOutCubic((1 - (gm->currentTime * 1000.0f - data.time +
+                                 gm->gameFile.preempt) /
+                                    gm->gameFile.preempt)) +
+      1;
+  if (approachScale <= 1)
+    approachScale = 1;
+  float clampedFade =
+      clip(((gm->currentTime * 1000.0f - data.time + gm->gameFile.preempt) /
+            gm->gameFile.fade_in) /
+               1.0f,
+           0, 1.0f);
+  float clampedBigFade =
+      clip(((gm->currentTime * 1000.0f - data.time + gm->gameFile.preempt) /
+            gm->gameFile.fade_in) /
+               1.0f,
+           0, 100.0f);
+  Color renderColor;
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+  data.textureLoaded =
+      sliderTexture.valid; // IsRenderTextureReady(&sliderTexture.resolve);
+#else
 
-            SetTextureFilter(&sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
-        }
+  data.textureLoaded = IsRenderTextureReady(&sliderTexture);
+#endif
+
+  rlDisableDepthTest();
+  // rlCustomDepthFunc(true);
+  int maxDrawAtTime = 10;
+  int drawn = 0;
+  // if(last < renderPoints.size() - 1)
+  //     last++;
+  if (data.textureLoaded and data.textureReady) {
+    legacyRender = Global.legacyRender;
+    int GMSkip = gm->skip;
+    if (last + GMSkip >= (int)renderPoints.size()) {
+      GMSkip = gm->smallskip;
     }
+    if (legacyRender) {
+      bool polygonalRender = Global.polygonalRendering;
+      // polygonalRender = false; //DrawTexxtureExDepth is not supported on PC
+      if (polygonalRender) {
+        if (clampedBigFade <= 0.7f and (int) renderPoints.size() > 0 and
+            last <= (int)renderPoints.size() - 1) {
+// std::cout << "starting rendering of polygonal legacyrenderer" <<
+// std::endl;
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+          BeginMSAARenderTexture(sliderTexture);
+#else
+          BeginTextureMode(&sliderTexture);
+#endif
+          rlEnableDepthTest();
 
+          bool draw = true;
+          if (renderPoints.size() > 0) {
+            // std::cout << "in renderer" << std::endl;
+            BeginBlendMode(BLEND_ALPHA_PREMUL);
 
-    float approachScale = 3.5*easeInOutCubic((1-(gm->currentTime*1000.0f - data.time + gm->gameFile.preempt)/gm->gameFile.preempt))+1;
-    if (approachScale <= 1)
-        approachScale = 1;
-    float clampedFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.0f, 0, 1.0f);
-    float clampedBigFade = clip(((gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in) / 1.0f, 0, 100.0f);
-    Color renderColor;
-    data.textureLoaded = IsRenderTextureReady(&sliderTexture);
-    rlDisableDepthTest();
-    //rlCustomDepthFunc(true);
-    int maxDrawAtTime = 10;
-    int drawn = 0;
-    //if(last < renderPoints.size() - 1)
-    //    last++;
-    if(data.textureLoaded and data.textureReady){
-        legacyRender = Global.legacyRender;
-        int GMSkip = gm->skip;
-        if(last + GMSkip >= (int)renderPoints.size()){
-            GMSkip = gm->smallskip;
-        }
-        if(legacyRender){   
-            bool polygonalRender = Global.polygonalRendering; 
-            //polygonalRender = false; //DrawTexxtureExDepth is not supported on PC
-            if(polygonalRender){
-                if(clampedBigFade <= 0.7f and (int)renderPoints.size() > 0 and last <= (int)renderPoints.size() - 1){
-                    //std::cout << "starting rendering of polygonal legacyrenderer" << std::endl;
-                    BeginTextureMode(&sliderTexture);
-                    rlEnableDepthTest(); 
-                    
-                    bool draw = true;
-                    if(renderPoints.size() > 0){
-                        //std::cout << "in renderer" << std::endl;
-                        BeginBlendMode(BLEND_ALPHA_PREMUL);
+            int lastDrawnOuterBorder = last;
+            int lastDrawnInnerCircle = last;
 
-                        int lastDrawnOuterBorder = last;
-                        int lastDrawnInnerCircle = last;
+            for (int i = last;
+                 i <
+                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
+                          (float)(renderPoints.size()));
+                 i += GMSkip) {
+              draw = false;
+              if (i < (int)renderPoints.size() and
+                  renderPoints[i].x > Global.sliderMinimumX and
+                  renderPoints[i].x < Global.sliderMaximumX and
+                  renderPoints[i].y > Global.sliderMinimumY and
+                  renderPoints[i].y < Global.sliderMaximumY) {
 
-                        for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=GMSkip){
-                            draw = false;
-                            if(i < (int)renderPoints.size() and renderPoints[i].x > Global.sliderMinimumX and renderPoints[i].x < Global.sliderMaximumX and renderPoints[i].y > Global.sliderMinimumY and renderPoints[i].y < Global.sliderMaximumY){
-                                
-                                if(true){                                                                                                                                   //(((renderPoints[i].y+4 * Global.sliderTexSize/*-minY - texSizeYoffset*/ + gm->circlesize/2.0f) * Global.sliderTexSize))
-                                    Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (sliderTexture.texture.height - ((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                    DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.98)  * Global.sliderTexSize, Global.circleSector,DEPTH_MULT * 0.9f, {255, 255, 255, 255});
-                                    last = std::max(i + gm->smallskip, 0);
-                                    if(last >= (int)renderPoints.size() - 1){
-                                        last = renderPoints.size();
-                                    }
-                                    if(last >= (int)renderPoints.size()){
-                                        Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (sliderTexture.texture.height - ((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                        DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.98)  * Global.sliderTexSize, Global.circleSector, DEPTH_MULT * 0.5f, {255, 255, 255, 255});
-                                    }
-                                }
-                            }
-                        }
+                if (true) { //(((renderPoints[i].y+4 *
+                            // Global.sliderTexSize/*-minY - texSizeYoffset*/ +
+                            // gm->circlesize/2.0f) * Global.sliderTexSize))
+                  Vector2 centerCoord = {
+                      (renderPoints[i].x + 4 * Global.sliderTexSize - minX -
+                       texSizeXoffset + gm->circlesize / 2.0f) *
+                          Global.sliderTexSize,
+                      (
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+                          sliderTexture.height -
+#else
+                          sliderTexture.texture.height -
+#endif
 
-                        //std::cout << data.colour[0] << " " << data.colour[1] << " " << data.colour[2] << std::endl;
-                        //std::cout << "first pass done" << std::endl;
-                        
-                        rlSetBlendFactorsSeparate(RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_MIN, RL_MIN);
-                        rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
-                        
-                        for(int i = lastDrawnOuterBorder; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=GMSkip){
-                            draw = false;
-                            if(i < (int)renderPoints.size() and renderPoints[i].x > Global.sliderMinimumX and renderPoints[i].x < Global.sliderMaximumX and renderPoints[i].y > Global.sliderMinimumY and renderPoints[i].y < Global.sliderMaximumY){
-                                if(true){
-                                    Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (sliderTexture.texture.height - ((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                    
-                                    Color color = Color{(unsigned char)((float)data.colour[0]*0.5f),(unsigned char)((float)data.colour[1]*0.5f),(unsigned char)((float)data.colour[2]*0.5f)};
-                                    DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.85)  * Global.sliderTexSize, Global.circleSector, DEPTH_MULT * 0.4f, Fade(color, 0.4f));//{2, 0, 4, 128});
-                                    lastDrawnOuterBorder = std::max(i + gm->smallskip, 0);
-                                    if(lastDrawnOuterBorder >= (int)renderPoints.size() - 1){
-                                        lastDrawnOuterBorder = renderPoints.size();
-                                    }
-                                    if(last >= (int)renderPoints.size()){
-                                        Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (sliderTexture.texture.height - ((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                        DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.85)  * Global.sliderTexSize, Global.circleSector, DEPTH_MULT * 0.4f, Fade(color, 0.4f));//{2, 0, 4, 128});
-                                    }
-                                }
-                            }
-                        }
-                        
-                        //std::cout << "second pass done" << std::endl;
-
-                        rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MAX, RL_MAX);
-                        rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
-
-                        for(int i = lastDrawnInnerCircle; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=GMSkip){
-                            draw = false;
-                            if(i < (int)renderPoints.size() and renderPoints[i].x > Global.sliderMinimumX and renderPoints[i].x < Global.sliderMaximumX and renderPoints[i].y > Global.sliderMinimumY and renderPoints[i].y < Global.sliderMaximumY){
-                                if(true){
-                                    Color color = Color{(unsigned char)((float)data.colour[0]*0.7f),(unsigned char)((float)data.colour[1]*0.7f),(unsigned char)((float)data.colour[2]*0.7f)};
-
-                                    Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (sliderTexture.texture.height - ((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                    DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.76)  * Global.sliderTexSize, Global.circleSector, DEPTH_MULT * 0.3f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
-                                    lastDrawnInnerCircle = std::max(i + gm->smallskip, 0);
-                                    if(lastDrawnInnerCircle >= (int)renderPoints.size() - 1){
-                                        lastDrawnInnerCircle = renderPoints.size();
-                                    }
-                                    if(last >= (int)renderPoints.size()){
-                                        
-                                        Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (sliderTexture.texture.height - ((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                        DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.76)  * Global.sliderTexSize, Global.circleSector, DEPTH_MULT * 0.3f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
-                                    }
-                                }
-                            }
-                        }
-                        //std::cout << "third pass done" << std::endl;
-                        if(draw && sliderTextureReadyForMipmaps == 1){
-                            sliderTextureReadyForMipmaps = 2;
-                        }
-                        EndBlendMode();
-                        
-                    }
-                    rlDisableDepthTest();
-                    EndTextureMode();
-                    if(sliderTextureReadyForMipmaps == 2){
-                        //GenTextureMipmaps(&sliderTexture.texture);
-                        sliderTextureReadyForMipmaps = 3;
-                    }
+                          ((renderPoints[i].y + 4 * Global.sliderTexSize -
+                            minY - texSizeYoffset + gm->circlesize / 2.0f) *
+                           Global.sliderTexSize))};
+                  DrawCircleWithDepth(centerCoord,
+                                      ((gm->circlesize / 2.0f) * 0.98) *
+                                          Global.sliderTexSize,
+                                      Global.circleSector, DEPTH_MULT * 0.9f,
+                                      {255, 255, 255, 255});
+                  last = std::max(i + gm->smallskip, 0);
+                  if (last >= (int)renderPoints.size() - 1) {
+                    last = renderPoints.size();
+                  }
+                  if (last >= (int)renderPoints.size()) {
+                    Vector2 centerCoord = {
+                        (renderPoints[renderPoints.size() - 1].x +
+                         4 * Global.sliderTexSize - minX - texSizeXoffset +
+                         gm->circlesize / 2.0f) *
+                            Global.sliderTexSize,
+                        (
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+                            sliderTexture.height -
+#else
+                            sliderTexture.texture.height -
+#endif
+                            ((renderPoints[renderPoints.size() - 1].y +
+                              4 * Global.sliderTexSize - minY - texSizeYoffset +
+                              gm->circlesize / 2.0f) *
+                             Global.sliderTexSize))};
+                    DrawCircleWithDepth(centerCoord,
+                                        ((gm->circlesize / 2.0f) * 0.98) *
+                                            Global.sliderTexSize,
+                                        Global.circleSector, DEPTH_MULT * 0.5f,
+                                        {255, 255, 255, 255});
+                  }
                 }
-                //rlDisableDepthTest();
-                EndBlendMode();
-                //EndShaderMode();
-                //float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
-                //float outlineColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };     // Normalized RED color 
-                //float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height};
-                //int transparency = GetShaderLocation(Global.shdrTest, "transparency");
-                //SetShaderValue(Global.shdrTest, transparency, &clampedFade, SHADER_UNIFORM_FLOAT);
-
-
-                //BeginShaderMode(Global.shdrTest);
-
-                float sliderOpacity = easeInOutCubic(clampedFade) * 0.7;
-                //std::cout << "drawslider\n";
-                //SetTextureFilter(&sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
-                DrawTextureSlider(&sliderTexture.texture, minX + texSizeXoffset, minY + texSizeYoffset, Fade(WHITE,sliderOpacity), gm->circlesize);
-                //EndShaderMode();
-                //Vector2 tempPos2 = renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size()))];
-                //DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y, gm->circlesize/gm->sliderin.width, RED);
+              }
             }
-            else{
-                //if(true && (last < renderPoints.size() and renderPoints.size() > 0 and last != renderPoints.size() - 1)){
-                if((int)renderPoints.size() > 0 and last <= (int)renderPoints.size() - 1){
-                    BeginTextureMode(&sliderTexture);
-                    //rlEnableDepthTest2(); //RL_BLEND_ADD_COLORS
-                    //rlDisableDepthTest();
-                    //rlSetBlendFactorsSeparate(RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_BLEND_ADD_COLORS, RL_BLEND_ADD_COLORS);
-                    rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MAX, RL_MAX);
-                    //BeginBlendMode(BLEND_ALPHA_PREMUL);
-                    //bool draw = true;
-                    rlEnableDepthTest(); 
-                    //rlDisableDepthTest();
-                    if(renderPoints.size() > 0){
-                        int lastDrawnOuterBorder = last;
-                        drawn = 0;
-                        for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=GMSkip){
-                            //draw = false;
-                            drawn++;
-                            if(drawn > maxDrawAtTime){
-                                drawn = 0;
-                                break;
-                            }
-                            //if(lastDrawnOuterBorder == renderPoints.size() - 1){
-                            //    lastDrawnOuterBorder = renderPoints.size();
-                            //}
-                            //lastDrawnOuterBorder = std::max(i, 0);
 
-                            if(i < (int)renderPoints.size() and renderPoints[i].x > Global.sliderMinimumX and renderPoints[i].x < Global.sliderMaximumX and renderPoints[i].y > Global.sliderMinimumY and renderPoints[i].y < Global.sliderMaximumY){
-                                if(true){
-                                    Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset+ gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                    //DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.98)  * Global.sliderTexSize, Global.circleSector, 0.2f, {255, 255, 255, 255});
-                                    DrawTextureExDepth(&gm->sliderOuterBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize, WHITE);
-                                    last = std::max(i + gm->smallskip, 0);
-                                    if(last >= (int)renderPoints.size() - 1){
-                                        last = renderPoints.size();
-                                    }
-                                    if(last >= (int)renderPoints.size()){
-                                        Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset+ gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                        //DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.98)  * Global.sliderTexSize, Global.circleSector, 0.2f, {255, 255, 255, 255});
-                                        DrawTextureExDepth(&gm->sliderOuterBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize, WHITE);
-                                    }
-                                }
-                            }
-                        }
-                        //rlEnableDepthTest(); 
-                        rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MIN, RL_MIN);
-                        //rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
-                        //rlEnableDepthTest(); 
-                        drawn = 0;
-                        for(int i = lastDrawnOuterBorder; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=GMSkip){
-                            //draw = false;
-                            drawn++;
-                            if(drawn > maxDrawAtTime){
-                                drawn = 0;
-                                break;
-                            }
-                            if(i < (int)renderPoints.size() and renderPoints[i].x > Global.sliderMinimumX and renderPoints[i].x < Global.sliderMaximumX and renderPoints[i].y > Global.sliderMinimumY and renderPoints[i].y < Global.sliderMaximumY){
-                                if(true){
-                                    Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                    Color color = Color{(unsigned char)((float)data.colour[0]*0.5f),(unsigned char)((float)data.colour[1]*0.5f),(unsigned char)((float)data.colour[2]*0.5f)};
-                                    Color color3 = Color{((unsigned char)((float)data.colour[0]*0.5f) + 255) / 2,((unsigned char)((float)data.colour[1]*0.5f) + 255) / 2,((unsigned char)((float)data.colour[2]*0.5f) + 255) / 2};
-                                    DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color3, 0.7f));
-                                    DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.75)  * Global.sliderTexSize, Global.circleSector*2, 0.3f, Fade(color, 0.4f));
-                                    
-                                    //DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(WHITE, 1), Fade(color, 0.4f));
-                                    //DrawTextureExDepth(&gm->sliderInnerBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize * 0.85f, Fade(WHITE, 1.0f));
-                                    //DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.9)  * Global.sliderTexSize, Global.circleSector, 0.5f, Fade(Color{255,255,255}, 0.2f), Fade(Color{255,255,255}, 0.0f));//{2, 0, 4, 128});
-                                    //lastDrawnOuterBorder = std::max(i, 0);
-                                    //if(lastDrawnOuterBorder == renderPoints.size() - 1){
-                                    //    lastDrawnOuterBorder = renderPoints.size();
-                                    //}
-                                    if(last >= (int)renderPoints.size()){
-                                        Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                        //DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color, 0.4f));
-                                        DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(color3, 0.7f));
-                                        DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) * 0.75)  * Global.sliderTexSize, Global.circleSector*2, 0.3f, Fade(color, 0.4f));
-                                        //DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize, Global.circleSector*2, 0.2f, Fade(WHITE, 1), Fade(color, 0.4f));
-                                        //DrawTextureExDepth(&gm->sliderInnerBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize * 0.85f, Fade(WHITE, 1.0f));
-                                        //DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.9)  * Global.sliderTexSize, Global.circleSector, 0.5f, Fade(Color{255,255,255}, 0.2f), Fade(Color{255,255,255}, 0.0f));//{2, 0, 4, 128});
-                                    }
-                                }
-                            }
-                        }
-                        //rlEnableDepthTest();
-                        //rlEnableDepthTest(); 
-                        rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MAX, RL_MAX);
-                        //rlEnableDepthTest(); 
-                        drawn = 0;
-                        for(int i = lastDrawnOuterBorder; i < std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size())); i+=GMSkip){
-                            //draw = false;
-                            
-                            drawn++;
-                            if(drawn > maxDrawAtTime){
-                                drawn = 0;
-                                break;
-                            }
-                            if(lastDrawnOuterBorder >= (int)renderPoints.size() - 1){
-                                lastDrawnOuterBorder = renderPoints.size();
-                            }
-                            lastDrawnOuterBorder = std::max(i + gm->smallskip, 0);
-                            if(i < (int)renderPoints.size() and renderPoints[i].x > Global.sliderMinimumX and renderPoints[i].x < Global.sliderMaximumX and renderPoints[i].y > Global.sliderMinimumY and renderPoints[i].y < Global.sliderMaximumY){
-                                if(true){
-                                    Vector2 centerCoord = {(renderPoints[i].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[i].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                    Color color = Color{(unsigned char)((float)data.colour[0]*0.6f),(unsigned char)((float)data.colour[1]*0.6f),(unsigned char)((float)data.colour[2]*0.6f)};
-                                    //DrawTextureExDepth(&gm->sliderInnerBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize * 0.85f, WHITE);
-                                    DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.73)  * Global.sliderTexSize, Global.circleSector, 0.4f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
-                                    if(last >= (int)renderPoints.size()){
-                                        Vector2 centerCoord = {(renderPoints[renderPoints.size()-1].x+4 * Global.sliderTexSize-minX - texSizeXoffset + gm->circlesize/2.0f) * Global.sliderTexSize, (((renderPoints[renderPoints.size()-1].y+4 * Global.sliderTexSize-minY - texSizeYoffset + gm->circlesize/2.0f) * Global.sliderTexSize))};
-                                        
-                                        //DrawTextureExDepth(&gm->sliderInnerBall.texture, Vector2{centerCoord.x - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f, centerCoord.y - gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f}, 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize * 0.85f, WHITE);
-                                        DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f) * 0.73)  * Global.sliderTexSize, Global.circleSector, 0.4f, Fade(color, 0.7f), Fade(color, 0.3f));//{2, 0, 4, 128});
-                                    }
-                                }
-                            }
-                        }
-                        //rlDisableDepthTest();
-                        EndBlendMode();
-                        rlDisableDepthTest();
-                        
-                    }
-                    rlDisableDepthTest();
-                    EndBlendMode();
-                    EndTextureMode();
-                    
+            // std::cout << data.colour[0] << " " << data.colour[1] << " " <<
+            // data.colour[2] << std::endl; std::cout << "first pass done" <<
+            // std::endl;
+
+            rlSetBlendFactorsSeparate(RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA,
+                                      RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA,
+                                      RL_MIN, RL_MIN);
+            rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
+
+            for (int i = lastDrawnOuterBorder;
+                 i <
+                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
+                          (float)(renderPoints.size()));
+                 i += GMSkip) {
+              draw = false;
+              if (i < (int)renderPoints.size() and
+                  renderPoints[i].x > Global.sliderMinimumX and
+                  renderPoints[i].x < Global.sliderMaximumX and
+                  renderPoints[i].y > Global.sliderMinimumY and
+                  renderPoints[i].y < Global.sliderMaximumY) {
+                if (true) {
+                  Vector2 centerCoord = {
+                      (renderPoints[i].x + 4 * Global.sliderTexSize - minX -
+                       texSizeXoffset + gm->circlesize / 2.0f) *
+                          Global.sliderTexSize,
+                      (
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+                          sliderTexture.height -
+#else
+                          sliderTexture.texture.height -
+#endif
+                          ((renderPoints[i].y + 4 * Global.sliderTexSize -
+                            minY - texSizeYoffset + gm->circlesize / 2.0f) *
+                           Global.sliderTexSize))};
+
+                  Color color =
+                      Color{(unsigned char)((float)data.colour[0] * 0.5f),
+                            (unsigned char)((float)data.colour[1] * 0.5f),
+                            (unsigned char)((float)data.colour[2] * 0.5f)};
+                  DrawCircleWithDepth(centerCoord,
+                                      ((gm->circlesize / 2.0f) * 0.85) *
+                                          Global.sliderTexSize,
+                                      Global.circleSector, DEPTH_MULT * 0.4f,
+                                      Fade(color, 0.4f)); //{2, 0, 4, 128});
+                  lastDrawnOuterBorder = std::max(i + gm->smallskip, 0);
+                  if (lastDrawnOuterBorder >= (int)renderPoints.size() - 1) {
+                    lastDrawnOuterBorder = renderPoints.size();
+                  }
+                  if (last >= (int)renderPoints.size()) {
+                    Vector2 centerCoord = {
+                        (renderPoints[renderPoints.size() - 1].x +
+                         4 * Global.sliderTexSize - minX - texSizeXoffset +
+                         gm->circlesize / 2.0f) *
+                            Global.sliderTexSize,
+                        (
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+                            sliderTexture.height -
+#else
+                            sliderTexture.texture.height -
+#endif
+                            ((renderPoints[renderPoints.size() - 1].y +
+                              4 * Global.sliderTexSize - minY - texSizeYoffset +
+                              gm->circlesize / 2.0f) *
+                             Global.sliderTexSize))};
+                    DrawCircleWithDepth(centerCoord,
+                                        ((gm->circlesize / 2.0f) * 0.85) *
+                                            Global.sliderTexSize,
+                                        Global.circleSector, DEPTH_MULT * 0.4f,
+                                        Fade(color, 0.4f)); //{2, 0, 4, 128});
+                  }
                 }
-                
-
-
-                EndBlendMode();
-                //EndShaderMode();
-                //float outlineSize = ((17.5f * Global.sliderTexSize) * gm->circlesize/gm->sliderin.width);
-                //float outlineColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };     // Normalized RED color 
-                //float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height};
-                //int transparency = GetShaderLocation(Global.shdrTest, "transparency");
-                //SetShaderValue(Global.shdrTest, transparency, &clampedFade, SHADER_UNIFORM_FLOAT);
-
-
-                //BeginShaderMode(Global.shdrTest);
-
-                float sliderOpacity = easeInOutCubic(clampedFade) * 0.7;
-                //std::cout << "drawslider\n";
-                DrawTextureSlider(&sliderTexture.texture, minX + texSizeXoffset, minY + texSizeYoffset, Fade(WHITE,sliderOpacity), gm->circlesize);
-                //EndShaderMode();
-                //Vector2 tempPos2 = renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade * 2.0f)), (float)(renderPoints.size()))];
-                //DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y, gm->circlesize/gm->sliderin.width, RED);
+              }
             }
-        }
-        else{
-            if(clampedBigFade <= 0.7f and renderPoints.size() > 0 and last <= (int)renderPoints.size() - 1){
-                
-                BeginTextureMode(&sliderTexture);
-                //BeginBlendMode(BLEND_ALPHA_PREMUL);
-                //bool draw = true;
-                if((int)renderPoints.size() > 0){
-                    for(int i = last; i < std::min(((float)renderPoints.size() * (clampedFade * 2.5f)), (float)(renderPoints.size())); i+=GMSkip){
-                        //draw = false;
-                        if(i < (int)renderPoints.size() and renderPoints[i].x > Global.sliderMinimumX and renderPoints[i].x < Global.sliderMaximumX and renderPoints[i].y > Global.sliderMinimumY and renderPoints[i].y < Global.sliderMaximumY){
-                            rlSetBlendFactorsSeparate(RL_ONE, RL_ONE_MINUS_SRC_ALPHA, RL_ONE, RL_ONE_MINUS_SRC_ALPHA, RL_MAX, RL_MAX);
-                            rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
-                            DrawTextureEx(&gm->sliderout, {(renderPoints[i].x+4*Global.sliderTexSize-minX)*Global.sliderTexSize,
-                            (sliderTexture.texture.height - (renderPoints[i].y+4*Global.sliderTexSize-minY+(float)gm->sliderout.width*(gm->circlesize/gm->sliderout.width))*Global.sliderTexSize)},0,(gm->circlesize/gm->sliderout.width)*Global.sliderTexSize,WHITE);
-                            last = std::max(i + gm->smallskip, 0);
-                            if(last >= (int)renderPoints.size() - 1){
-                                last = renderPoints.size();
-                            }
-                        }
-                        
-                    }
+
+            // std::cout << "second pass done" << std::endl;
+
+            rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MAX,
+                                      RL_MAX);
+            rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
+
+            for (int i = lastDrawnInnerCircle;
+                 i <
+                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
+                          (float)(renderPoints.size()));
+                 i += GMSkip) {
+              draw = false;
+              if (i < (int)renderPoints.size() and
+                  renderPoints[i].x > Global.sliderMinimumX and
+                  renderPoints[i].x < Global.sliderMaximumX and
+                  renderPoints[i].y > Global.sliderMinimumY and
+                  renderPoints[i].y < Global.sliderMaximumY) {
+                if (true) {
+                  Color color =
+                      Color{(unsigned char)((float)data.colour[0] * 0.7f),
+                            (unsigned char)((float)data.colour[1] * 0.7f),
+                            (unsigned char)((float)data.colour[2] * 0.7f)};
+
+                  Vector2 centerCoord = {
+                      (renderPoints[i].x + 4 * Global.sliderTexSize - minX -
+                       texSizeXoffset + gm->circlesize / 2.0f) *
+                          Global.sliderTexSize,
+                      (
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+                          sliderTexture.height -
+#else
+                          sliderTexture.texture.height -
+#endif
+
+                          ((renderPoints[i].y + 4 * Global.sliderTexSize -
+                            minY - texSizeYoffset + gm->circlesize / 2.0f) *
+                           Global.sliderTexSize))};
+                  DrawCircleWithDepthGrad(
+                      centerCoord,
+                      ((gm->circlesize / 2.0f) * 0.76) * Global.sliderTexSize,
+                      Global.circleSector, DEPTH_MULT * 0.3f, Fade(color, 0.7f),
+                      Fade(color, 0.3f)); //{2, 0, 4, 128});
+                  lastDrawnInnerCircle = std::max(i + gm->smallskip, 0);
+                  if (lastDrawnInnerCircle >= (int)renderPoints.size() - 1) {
+                    lastDrawnInnerCircle = renderPoints.size();
+                  }
+                  if (last >= (int)renderPoints.size()) {
+
+                    Vector2 centerCoord = {
+                        (renderPoints[renderPoints.size() - 1].x +
+                         4 * Global.sliderTexSize - minX - texSizeXoffset +
+                         gm->circlesize / 2.0f) *
+                            Global.sliderTexSize,
+                        (
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+                            sliderTexture.height -
+#else
+                            sliderTexture.texture.height -
+#endif
+                            ((renderPoints[renderPoints.size() - 1].y +
+                              4 * Global.sliderTexSize - minY - texSizeYoffset +
+                              gm->circlesize / 2.0f) *
+                             Global.sliderTexSize))};
+                    DrawCircleWithDepthGrad(
+                        centerCoord,
+                        ((gm->circlesize / 2.0f) * 0.76) * Global.sliderTexSize,
+                        Global.circleSector, DEPTH_MULT * 0.3f,
+                        Fade(color, 0.7f),
+                        Fade(color, 0.3f)); //{2, 0, 4, 128});
+                  }
                 }
-                EndTextureMode();
+              }
+            }
+            // std::cout << "third pass done" << std::endl;
+            if (draw && sliderTextureReadyForMipmaps == 1) {
+              sliderTextureReadyForMipmaps = 2;
             }
             EndBlendMode();
-            
-            
-            float sliderOpacity = easeInOutCubic(clampedFade);
-            int transparency = GetShaderLocation(Global.shdrTest, "transparency");
-            SetShaderValue(Global.shdrTest, transparency, &sliderOpacity, SHADER_UNIFORM_FLOAT);
-            BeginShaderMode(Global.shdrTest);
-            DrawTextureSlider(&sliderTexture.texture, minX, minY, Fade(WHITE,1), gm->circlesize);
-            EndShaderMode();
+          }
+          rlDisableDepthTest();
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+          EndMSAARenderTexture(sliderTexture);
+#else
+          EndTextureMode();
+#endif
+          if (sliderTextureReadyForMipmaps == 2) {
+            // GenTextureMipmaps(&sliderTexture.texture);
+            sliderTextureReadyForMipmaps = 3;
+          }
         }
-        
-    }
-    rlDisableDepthTest();
-    
-    //std::cout << "done with slider render stuff?" << std::endl;
-    clampedFade = clip(clampedFade, 0.0f, 1.0f);
-    clampedFade = easeInOutCubic(clampedFade);
+        // rlDisableDepthTest();
+        EndBlendMode();
+        // EndShaderMode();
+        // float outlineSize = ((17.5f * Global.sliderTexSize) *
+        // gm->circlesize/gm->sliderin.width); float outlineColor[4] =
+        // { 1.0f, 1.0f, 1.0f, 1.0f };     // Normalized RED color float
+        // textureSize[2] = { (float)sliderTexture.texture.width,
+        // (float)sliderTexture.texture.height}; int transparency =
+        // GetShaderLocation(Global.shdrTest, "transparency");
+        // SetShaderValue(Global.shdrTest, transparency, &clampedFade,
+        // SHADER_UNIFORM_FLOAT);
 
-    int index = 0;
-    int topla = 1;
-    float angle = 0;
-    if(curRepeat%2 == 0){
-        index = renderPoints.size()-1;
-        topla = -2;
+        // BeginShaderMode(Global.shdrTest);
+
+        float sliderOpacity = easeInOutCubic(clampedFade) * 0.7;
+// std::cout << "drawslider\n";
+// SetTextureFilter(&sliderTexture.texture, TEXTURE_FILTER_BILINEAR);
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+        Texture2D tex;
+        tex.id = sliderTexture.resolveTexture;
+        tex.width = sliderTexture.width;
+        tex.height = sliderTexture.height;
+        tex.mipmaps = 1;
+        tex.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+        SetTextureFilter(&tex, TEXTURE_FILTER_BILINEAR);
+        DrawTextureSlider(&tex, minX + texSizeXoffset, minY + texSizeYoffset,
+                          Fade(WHITE, sliderOpacity), gm->circlesize);
+#else
+        DrawTextureSlider(&sliderTexture.texture, minX + texSizeXoffset,
+                          minY + texSizeYoffset, Fade(WHITE, sliderOpacity),
+                          gm->circlesize);
+#endif
+        // EndShaderMode();
+        // Vector2 tempPos2 =
+        // renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade
+        // * 2.0f)), (float)(renderPoints.size()))];
+        // DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y,
+        // gm->circlesize/gm->sliderin.width, RED);
+      } else {
+        // if(true && (last < renderPoints.size() and renderPoints.size() > 0
+        // and last != renderPoints.size() - 1)){
+        if ((int)renderPoints.size() > 0 and
+            last <= (int)renderPoints.size() - 1) {
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+          BeginMSAARenderTexture(sliderTexture);
+#else
+          BeginTextureMode(&sliderTexture);
+#endif
+          // rlEnableDepthTest2(); //RL_BLEND_ADD_COLORS
+          // rlDisableDepthTest();
+          // rlSetBlendFactorsSeparate(RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA,
+          // RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_BLEND_ADD_COLORS,
+          // RL_BLEND_ADD_COLORS);
+          rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MAX,
+                                    RL_MAX);
+          // BeginBlendMode(BLEND_ALPHA_PREMUL);
+          // bool draw = true;
+          rlEnableDepthTest();
+          // rlDisableDepthTest();
+          if (renderPoints.size() > 0) {
+            int lastDrawnOuterBorder = last;
+            drawn = 0;
+            for (int i = last;
+                 i <
+                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
+                          (float)(renderPoints.size()));
+                 i += GMSkip) {
+              // draw = false;
+              drawn++;
+              if (drawn > maxDrawAtTime) {
+                drawn = 0;
+                break;
+              }
+              // if(lastDrawnOuterBorder == renderPoints.size() - 1){
+              //     lastDrawnOuterBorder = renderPoints.size();
+              // }
+              // lastDrawnOuterBorder = std::max(i, 0);
+
+              if (i < (int)renderPoints.size() and
+                  renderPoints[i].x > Global.sliderMinimumX and
+                  renderPoints[i].x < Global.sliderMaximumX and
+                  renderPoints[i].y > Global.sliderMinimumY and
+                  renderPoints[i].y < Global.sliderMaximumY) {
+                if (true) {
+                  Vector2 centerCoord = {
+                      (renderPoints[i].x + 4 * Global.sliderTexSize - minX -
+                       texSizeXoffset + gm->circlesize / 2.0f) *
+                          Global.sliderTexSize,
+                      (((renderPoints[i].y + 4 * Global.sliderTexSize - minY -
+                         texSizeYoffset + gm->circlesize / 2.0f) *
+                        Global.sliderTexSize))};
+                  // DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) *
+                  // 0.98)  * Global.sliderTexSize, Global.circleSector, 0.2f,
+                  // {255, 255, 255, 255});
+                  DrawTextureExDepth(
+                      &gm->sliderOuterBall.texture,
+                      Vector2{centerCoord.x -
+                                  gm->circlesize / 2.0f * Global.sliderTexSize,
+                              centerCoord.y -
+                                  gm->circlesize / 2.0f * Global.sliderTexSize},
+                      0.1f, gm->circlesize / 64.0f * Global.sliderTexSize,
+                      WHITE);
+                  last = std::max(i + gm->smallskip, 0);
+                  if (last >= (int)renderPoints.size() - 1) {
+                    last = renderPoints.size();
+                  }
+                  if (last >= (int)renderPoints.size()) {
+                    Vector2 centerCoord = {
+                        (renderPoints[renderPoints.size() - 1].x +
+                         4 * Global.sliderTexSize - minX - texSizeXoffset +
+                         gm->circlesize / 2.0f) *
+                            Global.sliderTexSize,
+                        (((renderPoints[renderPoints.size() - 1].y +
+                           4 * Global.sliderTexSize - minY - texSizeYoffset +
+                           gm->circlesize / 2.0f) *
+                          Global.sliderTexSize))};
+                    // DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) *
+                    // 0.98)  * Global.sliderTexSize, Global.circleSector, 0.2f,
+                    // {255, 255, 255, 255});
+                    DrawTextureExDepth(
+                        &gm->sliderOuterBall.texture,
+                        Vector2{centerCoord.x - gm->circlesize / 2.0f *
+                                                    Global.sliderTexSize,
+                                centerCoord.y - gm->circlesize / 2.0f *
+                                                    Global.sliderTexSize},
+                        0.1f, gm->circlesize / 64.0f * Global.sliderTexSize,
+                        WHITE);
+                  }
+                }
+              }
+            }
+            // rlEnableDepthTest();
+            rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MIN,
+                                      RL_MIN);
+            // rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
+            // rlEnableDepthTest();
+            drawn = 0;
+            for (int i = lastDrawnOuterBorder;
+                 i <
+                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
+                          (float)(renderPoints.size()));
+                 i += GMSkip) {
+              // draw = false;
+              drawn++;
+              if (drawn > maxDrawAtTime) {
+                drawn = 0;
+                break;
+              }
+              if (i < (int)renderPoints.size() and
+                  renderPoints[i].x > Global.sliderMinimumX and
+                  renderPoints[i].x < Global.sliderMaximumX and
+                  renderPoints[i].y > Global.sliderMinimumY and
+                  renderPoints[i].y < Global.sliderMaximumY) {
+                if (true) {
+                  Vector2 centerCoord = {
+                      (renderPoints[i].x + 4 * Global.sliderTexSize - minX -
+                       texSizeXoffset + gm->circlesize / 2.0f) *
+                          Global.sliderTexSize,
+                      (((renderPoints[i].y + 4 * Global.sliderTexSize - minY -
+                         texSizeYoffset + gm->circlesize / 2.0f) *
+                        Global.sliderTexSize))};
+                  Color color =
+                      Color{(unsigned char)((float)data.colour[0] * 0.5f),
+                            (unsigned char)((float)data.colour[1] * 0.5f),
+                            (unsigned char)((float)data.colour[2] * 0.5f)};
+                  Color color3 = Color{
+                      ((unsigned char)((float)data.colour[0] * 0.5f) + 255) / 2,
+                      ((unsigned char)((float)data.colour[1] * 0.5f) + 255) / 2,
+                      ((unsigned char)((float)data.colour[2] * 0.5f) + 255) /
+                          2};
+                  DrawCircleWithDepth(
+                      centerCoord,
+                      ((gm->circlesize / 2.0f) * 0.78) * Global.sliderTexSize,
+                      Global.circleSector * 2, 0.2f, Fade(color3, 0.7f));
+                  DrawCircleWithDepth(
+                      centerCoord,
+                      ((gm->circlesize / 2.0f) * 0.75) * Global.sliderTexSize,
+                      Global.circleSector * 2, 0.3f, Fade(color, 0.4f));
+
+                  // DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f)
+                  // * 0.78)  * Global.sliderTexSize, Global.circleSector*2,
+                  // 0.2f, Fade(WHITE, 1), Fade(color, 0.4f));
+                  // DrawTextureExDepth(&gm->sliderInnerBall.texture,
+                  // Vector2{centerCoord.x - gm->circlesize / 2.0f *
+                  // Global.sliderTexSize * 0.85f, centerCoord.y -
+                  // gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f},
+                  // 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize *
+                  // 0.85f, Fade(WHITE, 1.0f));
+                  // DrawCircleWithDepthGrad(centerCoord, ((gm->circlesize/2.0f)
+                  // * 0.9)  * Global.sliderTexSize, Global.circleSector, 0.5f,
+                  // Fade(Color{255,255,255}, 0.2f), Fade(Color{255,255,255},
+                  // 0.0f));//{2, 0, 4, 128}); lastDrawnOuterBorder =
+                  // std::max(i, 0); if(lastDrawnOuterBorder ==
+                  // renderPoints.size() - 1){
+                  //     lastDrawnOuterBorder = renderPoints.size();
+                  // }
+                  if (last >= (int)renderPoints.size()) {
+                    Vector2 centerCoord = {
+                        (renderPoints[renderPoints.size() - 1].x +
+                         4 * Global.sliderTexSize - minX - texSizeXoffset +
+                         gm->circlesize / 2.0f) *
+                            Global.sliderTexSize,
+                        (((renderPoints[renderPoints.size() - 1].y +
+                           4 * Global.sliderTexSize - minY - texSizeYoffset +
+                           gm->circlesize / 2.0f) *
+                          Global.sliderTexSize))};
+                    // DrawCircleWithDepth(centerCoord, ((gm->circlesize/2.0f) *
+                    // 0.78)  * Global.sliderTexSize, Global.circleSector*2,
+                    // 0.2f, Fade(color, 0.4f));
+                    DrawCircleWithDepth(
+                        centerCoord,
+                        ((gm->circlesize / 2.0f) * 0.78) * Global.sliderTexSize,
+                        Global.circleSector * 2, 0.2f, Fade(color3, 0.7f));
+                    DrawCircleWithDepth(
+                        centerCoord,
+                        ((gm->circlesize / 2.0f) * 0.75) * Global.sliderTexSize,
+                        Global.circleSector * 2, 0.3f, Fade(color, 0.4f));
+                    // DrawCircleWithDepthGrad(centerCoord,
+                    // ((gm->circlesize/2.0f) * 0.78)  * Global.sliderTexSize,
+                    // Global.circleSector*2, 0.2f, Fade(WHITE, 1), Fade(color,
+                    // 0.4f)); DrawTextureExDepth(&gm->sliderInnerBall.texture,
+                    // Vector2{centerCoord.x - gm->circlesize / 2.0f *
+                    // Global.sliderTexSize * 0.85f, centerCoord.y -
+                    // gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f},
+                    // 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize *
+                    // 0.85f, Fade(WHITE, 1.0f));
+                    // DrawCircleWithDepthGrad(centerCoord,
+                    // ((gm->circlesize/2.0f) * 0.9)  * Global.sliderTexSize,
+                    // Global.circleSector, 0.5f, Fade(Color{255,255,255},
+                    // 0.2f), Fade(Color{255,255,255}, 0.0f));//{2, 0, 4, 128});
+                  }
+                }
+              }
+            }
+            // rlEnableDepthTest();
+            // rlEnableDepthTest();
+            rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MAX,
+                                      RL_MAX);
+            // rlEnableDepthTest();
+            drawn = 0;
+            for (int i = lastDrawnOuterBorder;
+                 i <
+                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
+                          (float)(renderPoints.size()));
+                 i += GMSkip) {
+              // draw = false;
+
+              drawn++;
+              if (drawn > maxDrawAtTime) {
+                drawn = 0;
+                break;
+              }
+              if (lastDrawnOuterBorder >= (int)renderPoints.size() - 1) {
+                lastDrawnOuterBorder = renderPoints.size();
+              }
+              lastDrawnOuterBorder = std::max(i + gm->smallskip, 0);
+              if (i < (int)renderPoints.size() and
+                  renderPoints[i].x > Global.sliderMinimumX and
+                  renderPoints[i].x < Global.sliderMaximumX and
+                  renderPoints[i].y > Global.sliderMinimumY and
+                  renderPoints[i].y < Global.sliderMaximumY) {
+                if (true) {
+                  Vector2 centerCoord = {
+                      (renderPoints[i].x + 4 * Global.sliderTexSize - minX -
+                       texSizeXoffset + gm->circlesize / 2.0f) *
+                          Global.sliderTexSize,
+                      (((renderPoints[i].y + 4 * Global.sliderTexSize - minY -
+                         texSizeYoffset + gm->circlesize / 2.0f) *
+                        Global.sliderTexSize))};
+                  Color color =
+                      Color{(unsigned char)((float)data.colour[0] * 0.6f),
+                            (unsigned char)((float)data.colour[1] * 0.6f),
+                            (unsigned char)((float)data.colour[2] * 0.6f)};
+                  // DrawTextureExDepth(&gm->sliderInnerBall.texture,
+                  // Vector2{centerCoord.x - gm->circlesize / 2.0f *
+                  // Global.sliderTexSize * 0.85f, centerCoord.y -
+                  // gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f},
+                  // 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize *
+                  // 0.85f, WHITE);
+                  DrawCircleWithDepthGrad(
+                      centerCoord,
+                      ((gm->circlesize / 2.0f) * 0.73) * Global.sliderTexSize,
+                      Global.circleSector, 0.4f, Fade(color, 0.7f),
+                      Fade(color, 0.3f)); //{2, 0, 4, 128});
+                  if (last >= (int)renderPoints.size()) {
+                    Vector2 centerCoord = {
+                        (renderPoints[renderPoints.size() - 1].x +
+                         4 * Global.sliderTexSize - minX - texSizeXoffset +
+                         gm->circlesize / 2.0f) *
+                            Global.sliderTexSize,
+                        (((renderPoints[renderPoints.size() - 1].y +
+                           4 * Global.sliderTexSize - minY - texSizeYoffset +
+                           gm->circlesize / 2.0f) *
+                          Global.sliderTexSize))};
+
+                    // DrawTextureExDepth(&gm->sliderInnerBall.texture,
+                    // Vector2{centerCoord.x - gm->circlesize / 2.0f *
+                    // Global.sliderTexSize * 0.85f, centerCoord.y -
+                    // gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f},
+                    // 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize *
+                    // 0.85f, WHITE);
+                    DrawCircleWithDepthGrad(
+                        centerCoord,
+                        ((gm->circlesize / 2.0f) * 0.73) * Global.sliderTexSize,
+                        Global.circleSector, 0.4f, Fade(color, 0.7f),
+                        Fade(color, 0.3f)); //{2, 0, 4, 128});
+                  }
+                }
+              }
+            }
+            // rlDisableDepthTest();
+            EndBlendMode();
+            rlDisableDepthTest();
+          }
+          rlDisableDepthTest();
+          EndBlendMode();
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+          EndMSAARenderTexture(sliderTexture);
+#else
+          EndTextureMode();
+#endif
+        }
+
+        EndBlendMode();
+        // EndShaderMode();
+        // float outlineSize = ((17.5f * Global.sliderTexSize) *
+        // gm->circlesize/gm->sliderin.width); float outlineColor[4] =
+        // { 1.0f, 1.0f, 1.0f, 1.0f };     // Normalized RED color float
+        // textureSize[2] = { (float)sliderTexture.texture.width,
+        // (float)sliderTexture.texture.height}; int transparency =
+        // GetShaderLocation(Global.shdrTest, "transparency");
+        // SetShaderValue(Global.shdrTest, transparency, &clampedFade,
+        // SHADER_UNIFORM_FLOAT);
+
+        // BeginShaderMode(Global.shdrTest);
+
+        float sliderOpacity = easeInOutCubic(clampedFade) * 0.7;
+// std::cout << "drawslider\n";
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+        Texture2D tex;
+        tex.id = sliderTexture.resolveTexture;
+        tex.width = sliderTexture.width;
+        tex.height = sliderTexture.height;
+        tex.mipmaps = 1;
+        tex.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+        SetTextureFilter(&tex, TEXTURE_FILTER_BILINEAR);
+        DrawTextureSlider(&tex, minX + texSizeXoffset, minY + texSizeYoffset,
+                          Fade(WHITE, sliderOpacity), gm->circlesize);
+#else
+        DrawTextureSlider(&sliderTexture.texture, minX + texSizeXoffset,
+                          minY + texSizeYoffset, Fade(WHITE, sliderOpacity),
+                          gm->circlesize);
+#endif
+        // EndShaderMode();
+        // Vector2 tempPos2 =
+        // renderPoints[(int)std::min(((float)renderPoints.size() * (clampedFade
+        // * 2.0f)), (float)(renderPoints.size()))];
+        // DrawTextureCenter(gm->sliderin, tempPos.x, tempPos.y,
+        // gm->circlesize/gm->sliderin.width, RED);
+      }
+    } else {
+      if (clampedBigFade <= 0.7f and renderPoints.size() > 0 and
+          last <= (int)renderPoints.size() - 1) {
+
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+        BeginMSAARenderTexture(sliderTexture);
+#else
+        BeginTextureMode(&sliderTexture);
+#endif
+        // BeginBlendMode(BLEND_ALPHA_PREMUL);
+        // bool draw = true;
+        if ((int)renderPoints.size() > 0) {
+          for (int i = last;
+               i < std::min(((float)renderPoints.size() * (clampedFade * 2.5f)),
+                            (float)(renderPoints.size()));
+               i += GMSkip) {
+            // draw = false;
+            if (i < (int)renderPoints.size() and
+                renderPoints[i].x > Global.sliderMinimumX and
+                renderPoints[i].x < Global.sliderMaximumX and
+                renderPoints[i].y > Global.sliderMinimumY and
+                renderPoints[i].y < Global.sliderMaximumY) {
+              rlSetBlendFactorsSeparate(RL_ONE, RL_ONE_MINUS_SRC_ALPHA, RL_ONE,
+                                        RL_ONE_MINUS_SRC_ALPHA, RL_MAX, RL_MAX);
+              rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
+              DrawTextureEx(
+                  &gm->sliderout,
+                  {(renderPoints[i].x + 4 * Global.sliderTexSize - minX) *
+                       Global.sliderTexSize,
+                   (
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+                       sliderTexture.height -
+#else
+                       sliderTexture.texture.height -
+#endif
+                       (renderPoints[i].y + 4 * Global.sliderTexSize - minY +
+                        (float)gm->sliderout.width *
+                            (gm->circlesize / gm->sliderout.width)) *
+                           Global.sliderTexSize)},
+                  0,
+                  (gm->circlesize / gm->sliderout.width) * Global.sliderTexSize,
+                  WHITE);
+              last = std::max(i + gm->smallskip, 0);
+              if (last >= (int)renderPoints.size() - 1) {
+                last = renderPoints.size();
+              }
+            }
+          }
+        }
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+        EndMSAARenderTexture(sliderTexture);
+#else
+        EndTextureMode();
+#endif
+      }
+      EndBlendMode();
+
+      float sliderOpacity = easeInOutCubic(clampedFade);
+      int transparency = GetShaderLocation(Global.shdrTest, "transparency");
+      SetShaderValue(Global.shdrTest, transparency, &sliderOpacity,
+                     SHADER_UNIFORM_FLOAT);
+      BeginShaderMode(Global.shdrTest);
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+      Texture2D tex;
+      tex.id = sliderTexture.resolveTexture;
+      tex.width = sliderTexture.width;
+      tex.height = sliderTexture.height;
+      tex.mipmaps = 1;
+      tex.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+      SetTextureFilter(&tex, TEXTURE_FILTER_BILINEAR);
+      DrawTextureSlider(&tex, minX, minY, Fade(WHITE, 1), gm->circlesize);
+#else
+      DrawTextureSlider(&sliderTexture.texture, minX, minY, Fade(WHITE, 1),
+                        gm->circlesize);
+#endif
+      EndShaderMode();
     }
-    if(renderPoints.size() > 2){
-        angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
-        angle = angle * 180 / PI + 180;
-    }
-    if(repeat && !(clampedBigFade < 0.7f))
-        DrawTextureRotate(&gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/128.0f), angle, Fade(WHITE, clampedFade));
-    
-    index = renderPoints.size()-1;
+  }
+  rlDisableDepthTest();
+
+  // std::cout << "done with slider render stuff?" << std::endl;
+  clampedFade = clip(clampedFade, 0.0f, 1.0f);
+  clampedFade = easeInOutCubic(clampedFade);
+
+  int index = 0;
+  int topla = 1;
+  float angle = 0;
+  if (curRepeat % 2 == 0) {
+    index = renderPoints.size() - 1;
     topla = -2;
-    angle = 0;
-    if(curRepeat%2 == 0){
-        index = 0; 
-        topla = 2; 
-    }
-    if(renderPoints.size() > 2){
-        angle = atan2(renderPoints[index].y- renderPoints[index+topla].y, renderPoints[index].x - renderPoints[index+topla].x);
-        angle = angle * 180 / PI + 180;
-    }
-    if(data.colour.size() > 2)
-        renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade);
-    else
-        renderColor =  Fade(Color{255,255,255}, clampedFade);
-    if(repeat2 && position > 0 && !(clampedBigFade < 0.7f))
-        DrawTextureRotate(&gm->reverseArrow, renderPoints[index].x, renderPoints[index].y, (gm->circlesize/128.0f), angle, Fade(WHITE, clampedFade));
+  }
+  if (renderPoints.size() > 2) {
+    angle = atan2(renderPoints[index].y - renderPoints[index + topla].y,
+                  renderPoints[index].x - renderPoints[index + topla].x);
+    angle = angle * 180 / PI + 180;
+  }
+  if (repeat && !(clampedBigFade < 0.7f))
+    DrawTextureRotate(&gm->reverseArrow, renderPoints[index].x,
+                      renderPoints[index].y, (gm->circlesize / 128.0f), angle,
+                      Fade(WHITE, clampedFade));
 
-    if((gm->currentTime*1000.0f - data.time > 0 or !state) and renderPoints.size() > 0){
-        if(calPos == 0){
-            angle = atan2(renderPoints[calPos].y- renderPoints[calPos+1].y, renderPoints[calPos].x - renderPoints[calPos+1].x);
-            angle = angle * 180 / PI + 180; 
+  index = renderPoints.size() - 1;
+  topla = -2;
+  angle = 0;
+  if (curRepeat % 2 == 0) {
+    index = 0;
+    topla = 2;
+  }
+  if (renderPoints.size() > 2) {
+    angle = atan2(renderPoints[index].y - renderPoints[index + topla].y,
+                  renderPoints[index].x - renderPoints[index + topla].x);
+    angle = angle * 180 / PI + 180;
+  }
+  if (data.colour.size() > 2)
+    renderColor =
+        Fade(Color{(unsigned char)data.colour[0], (unsigned char)data.colour[1],
+                   (unsigned char)data.colour[2]},
+             clampedFade);
+  else
+    renderColor = Fade(Color{255, 255, 255}, clampedFade);
+  if (repeat2 && position > 0 && !(clampedBigFade < 0.7f))
+    DrawTextureRotate(&gm->reverseArrow, renderPoints[index].x,
+                      renderPoints[index].y, (gm->circlesize / 128.0f), angle,
+                      Fade(WHITE, clampedFade));
+
+  if ((gm->currentTime * 1000.0f - data.time > 0 or !state) and
+      renderPoints.size() > 0) {
+    if (calPos == 0) {
+      angle = atan2(renderPoints[calPos].y - renderPoints[calPos + 1].y,
+                    renderPoints[calPos].x - renderPoints[calPos + 1].x);
+      angle = angle * 180 / PI + 180;
+    } else {
+      angle = atan2(renderPoints[calPos].y - renderPoints[calPos - 1].y,
+                    renderPoints[calPos].x - renderPoints[calPos - 1].x);
+      angle = angle * 180 / PI;
+    }
+    if (curRepeat % 2 == 0)
+      angle += 180;
+    int ticksrendered = 0;
+
+    bool debugf = IsKeyDown(Global.AUTO_KEY);
+    if (debugf)
+      inSlider = true;
+
+    for (int i = 0; i < (int)tickPositions.size(); i++) {
+      if (tickPositions[i] > (int)time && (int)time > 0 && ticksrendered < 10) {
+        double absolutePosition = tickPositions[i];
+        int k = 0;
+        while (absolutePosition > (double)data.length) {
+          absolutePosition -= (double)data.length;
+          k++;
         }
-        else{
-            angle = atan2(renderPoints[calPos].y- renderPoints[calPos-1].y, renderPoints[calPos].x - renderPoints[calPos-1].x);
-            angle = angle * 180 / PI; 
+        if (k % 2 == 1) {
+          absolutePosition = data.length - absolutePosition;
         }
-        if(curRepeat%2 == 0)
-            angle+=180;
-        int ticksrendered = 0;
-
-        bool debugf = IsKeyDown(Global.AUTO_KEY);
-        if(debugf)
-            inSlider = true;
-
-        for(int i = 0; i < (int)tickPositions.size(); i++){
-            if(tickPositions[i] > (int)time && (int) time > 0 && ticksrendered < 10){
-                double absolutePosition = tickPositions[i];
-                int k = 0;
-                while(absolutePosition > (double)data.length){
-                    absolutePosition -= (double)data.length;
-                    k++;
-                }
-                if(k % 2 == 1){
-                    absolutePosition = data.length - absolutePosition;
-                }
-                absolutePosition = std::max((double)0,absolutePosition);
-                absolutePosition = std::min((int)absolutePosition, static_cast<int>(renderPoints.size()-1));
-                Vector2 pos = renderPoints[(int)absolutePosition];
-                DrawTextureCenter(&gm->sliderscorepoint, pos.x, pos.y, (gm->circlesize/gm->sliderscorepoint.width)/3.5f , Fade(WHITE,clip((((10 - (float)ticksrendered) / 10)),0,1)));
-                ticksrendered++;
-            }
-        }
-        Vector2 texturePositionSmooth;
-        if(position > calPos){
-            if(calPos + 1 < (int)renderPoints.size()){
-                texturePositionSmooth = lerp(renderPoints[calPos], renderPoints[calPos + 1], position - (double)calPos);
-            }
-            else{
-                texturePositionSmooth = renderPoints[calPos];
-            }
-        }
-        else{
-            if(calPos - 1 >= 0){
-                texturePositionSmooth = lerp(renderPoints[calPos], renderPoints[calPos - 1], (double)calPos - position);
-            }
-            else{
-                texturePositionSmooth = renderPoints[calPos];
-            }
-        }
-
-        DrawTextureRotate(&gm->sliderb, texturePositionSmooth.x, texturePositionSmooth.y, (gm->circlesize/gm->sliderb.width) * 1.3f, angle, Fade(renderColor,clampedFade));
-        if(inSlider)
-            DrawTextureRotate(&gm->sliderfollow, texturePositionSmooth.x, texturePositionSmooth.y, (gm->circlesize/gm->sliderfollow.width)*2.0f , angle, Fade(WHITE,clampedFade));
+        absolutePosition = std::max((double)0, absolutePosition);
+        absolutePosition = std::min((int)absolutePosition,
+                                    static_cast<int>(renderPoints.size() - 1));
+        Vector2 pos = renderPoints[(int)absolutePosition];
+        DrawTextureCenter(
+            &gm->sliderscorepoint, pos.x, pos.y,
+            (gm->circlesize / gm->sliderscorepoint.width) / 3.5f,
+            Fade(WHITE, clip((((10 - (float)ticksrendered) / 10)), 0, 1)));
+        ticksrendered++;
+      }
+    }
+    Vector2 texturePositionSmooth;
+    if (position > calPos) {
+      if (calPos + 1 < (int)renderPoints.size()) {
+        texturePositionSmooth =
+            lerp(renderPoints[calPos], renderPoints[calPos + 1],
+                 position - (double)calPos);
+      } else {
+        texturePositionSmooth = renderPoints[calPos];
+      }
+    } else {
+      if (calPos - 1 >= 0) {
+        texturePositionSmooth =
+            lerp(renderPoints[calPos], renderPoints[calPos - 1],
+                 (double)calPos - position);
+      } else {
+        texturePositionSmooth = renderPoints[calPos];
+      }
     }
 
-    clampedFade = (gm->currentTime*1000.0f - data.time  + gm->gameFile.preempt) / gm->gameFile.fade_in;
-    clampedFade = clip(clampedFade, 0.0f, 1.0f);
-    clampedFade = easeInOutCubic(clampedFade);
+    DrawTextureRotate(&gm->sliderb, texturePositionSmooth.x,
+                      texturePositionSmooth.y,
+                      (gm->circlesize / gm->sliderb.width) * 1.3f, angle,
+                      Fade(renderColor, clampedFade));
+    if (inSlider)
+      DrawTextureRotate(&gm->sliderfollow, texturePositionSmooth.x,
+                        texturePositionSmooth.y,
+                        (gm->circlesize / gm->sliderfollow.width) * 2.0f, angle,
+                        Fade(WHITE, clampedFade));
+  }
 
-    approachScale *= 1.2f;
+  clampedFade = (gm->currentTime * 1000.0f - data.time + gm->gameFile.preempt) /
+                gm->gameFile.fade_in;
+  clampedFade = clip(clampedFade, 0.0f, 1.0f);
+  clampedFade = easeInOutCubic(clampedFade);
 
-    if(state){
-        DrawTextureCenter(&gm->hitCircle, data.x, data.y, gm->circlesize/(float)gm->hitCircle.width, renderColor);
-        DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/(float)Global.textureSize.comboNumber, Fade(WHITE,clampedFade));
-        DrawTextureCenter(&gm->hitCircleOverlay, data.x, data.y, gm->circlesize/(float)gm->hitCircleOverlay.width , Fade(WHITE,clampedFade));
-        DrawTextureCenter(&gm->approachCircle, data.x, data.y, approachScale*(gm->circlesize/(float)gm->approachCircle.width) , renderColor);
-   
-    }
-    else if(data.time+gm->gameFile.fade_in/1.0f > gm->currentTime*1000.0f){
-        float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
-        float clampedFade2 = (gm->gameFile.fade_in/4.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/4.0f);
+  approachScale *= 1.2f;
 
-        clampedFade = clip(clampedFade, 0.0f, 1.0f);
-        clampedFade = easeInOutCubic(clampedFade);
+  if (state) {
+    DrawTextureCenter(&gm->hitCircle, data.x, data.y,
+                      gm->circlesize / (float)gm->hitCircle.width, renderColor);
+    DrawCNumbersCenter(data.comboNumber, data.x, data.y,
+                       gm->circlesize / (float)Global.textureSize.comboNumber,
+                       Fade(WHITE, clampedFade));
+    DrawTextureCenter(&gm->hitCircleOverlay, data.x, data.y,
+                      gm->circlesize / (float)gm->hitCircleOverlay.width,
+                      Fade(WHITE, clampedFade));
+    DrawTextureCenter(&gm->approachCircle, data.x, data.y,
+                      approachScale *
+                          (gm->circlesize / (float)gm->approachCircle.width),
+                      renderColor);
 
-        clampedFade2 = clip(clampedFade2, 0.0f, 1.0f);
-        clampedFade2 = easeInOutCubic(clampedFade2);
-
-        float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
-        scale = clip(scale,1,2);
-        scale -= 1.0;
-        scale = easeOutQuad(scale);
-        scale = scale * 0.4f;
-        scale += 1.0f;
-        
-        Color renderColor;
-        if(data.colour.size() > 2)
-            renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
-        else
-            renderColor =  Fade(Color{255,255,255}, clampedFade2);
-        DrawTextureCenter(&gm->hitCircle, data.x, data.y, clip(scale,1,2)*gm->circlesize/(float)gm->hitCircle.width , renderColor);
-        DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/(float)Global.textureSize.comboNumber, Fade(WHITE,clampedFade2));
-        DrawTextureCenter(&gm->hitCircleOverlay, data.x, data.y, clip(scale,1,2)*gm->circlesize/(float)gm->hitCircleOverlay.width , Fade(WHITE,clampedFade2));
-    }
-    /*if(changeTex == true)
-        data.textureLoaded = true;*/
-}
-
-void Slider::dead_render(){
-    bool legacyRender = Global.legacyRender;
-
-    if(!legacyRender){
-        Global.sliderTexSize = 1.0;
-    }
-    
-    GameManager* gm = GameManager::getInstance();
-    float clampedFade = (gm->gameFile.fade_in/1.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/1.0f);
-    float clampedFade2 = (gm->gameFile.fade_in/2.0f + data.time - gm->currentTime*1000.0f) / (gm->gameFile.fade_in/2.0f);
-    
+  } else if (data.time + gm->gameFile.fade_in / 1.0f >
+             gm->currentTime * 1000.0f) {
+    float clampedFade =
+        (gm->gameFile.fade_in / 1.0f + data.time - gm->currentTime * 1000.0f) /
+        (gm->gameFile.fade_in / 1.0f);
+    float clampedFade2 =
+        (gm->gameFile.fade_in / 4.0f + data.time - gm->currentTime * 1000.0f) /
+        (gm->gameFile.fade_in / 4.0f);
 
     clampedFade = clip(clampedFade, 0.0f, 1.0f);
     clampedFade = easeInOutCubic(clampedFade);
 
     clampedFade2 = clip(clampedFade2, 0.0f, 1.0f);
     clampedFade2 = easeInOutCubic(clampedFade2);
-    clampedFade2 = clampedFade2 * 0.7;
-    
-    if(data.textureReady and data.textureLoaded){
-        Global.sliderTexNeedDeleting = true;
-        float outlineSize = 4.0 * gm->circlesize/gm->sliderin.width;
-        float outlineColor[4] = { 1.0f, 1.0f, 1.0f, clampedFade2 };     // Normalized RED color 
-        float textureSize[2] = { (float)sliderTexture.texture.width, (float)sliderTexture.texture.height };
-        
-        // Get shader locations
-        /*int outlineSizeLoc = GetShaderLocation(Global.shdrOutline, "outlineSize");
-        int outlineColorLoc = GetShaderLocation(Global.shdrOutline, "outlineColor");
-        int textureSizeLoc = GetShaderLocation(Global.shdrOutline, "textureSize");
-        int transparency = GetShaderLocation(Global.shdrOutline, "transparency");
-        
-        // Set shader values (they can be changed later)
-        SetShaderValue(Global.shdrOutline, outlineSizeLoc, &outlineSize, SHADER_UNIFORM_FLOAT);
-        SetShaderValue(Global.shdrOutline, outlineColorLoc, outlineColor, SHADER_UNIFORM_VEC4);
-        SetShaderValue(Global.shdrOutline, textureSizeLoc, textureSize, SHADER_UNIFORM_VEC2);
-        SetShaderValue(Global.shdrOutline, transparency, &clampedFade2, SHADER_UNIFORM_FLOAT);
+
+    float scale =
+        (gm->currentTime * 1000.0f + gm->gameFile.fade_in / 2.0f - data.time) /
+        (gm->gameFile.fade_in / 2.0f);
+    scale = clip(scale, 1, 2);
+    scale -= 1.0;
+    scale = easeOutQuad(scale);
+    scale = scale * 0.4f;
+    scale += 1.0f;
+
+    Color renderColor;
+    if (data.colour.size() > 2)
+      renderColor = Fade(Color{(unsigned char)data.colour[0],
+                               (unsigned char)data.colour[1],
+                               (unsigned char)data.colour[2]},
+                         clampedFade2);
+    else
+      renderColor = Fade(Color{255, 255, 255}, clampedFade2);
+    DrawTextureCenter(&gm->hitCircle, data.x, data.y,
+                      clip(scale, 1, 2) * gm->circlesize /
+                          (float)gm->hitCircle.width,
+                      renderColor);
+    DrawCNumbersCenter(data.comboNumber, data.x, data.y,
+                       gm->circlesize / (float)Global.textureSize.comboNumber,
+                       Fade(WHITE, clampedFade2));
+    DrawTextureCenter(&gm->hitCircleOverlay, data.x, data.y,
+                      clip(scale, 1, 2) * gm->circlesize /
+                          (float)gm->hitCircleOverlay.width,
+                      Fade(WHITE, clampedFade2));
+  }
+  /*if(changeTex == true)
+      data.textureLoaded = true;*/
+}
+
+void Slider::dead_render() {
+  bool legacyRender = Global.legacyRender;
+
+  if (!legacyRender) {
+    Global.sliderTexSize = 1.0;
+  }
+
+  GameManager *gm = GameManager::getInstance();
+  float clampedFade =
+      (gm->gameFile.fade_in / 1.0f + data.time - gm->currentTime * 1000.0f) /
+      (gm->gameFile.fade_in / 1.0f);
+  float clampedFade2 =
+      (gm->gameFile.fade_in / 2.0f + data.time - gm->currentTime * 1000.0f) /
+      (gm->gameFile.fade_in / 2.0f);
+
+  clampedFade = clip(clampedFade, 0.0f, 1.0f);
+  clampedFade = easeInOutCubic(clampedFade);
+
+  clampedFade2 = clip(clampedFade2, 0.0f, 1.0f);
+  clampedFade2 = easeInOutCubic(clampedFade2);
+  clampedFade2 = clampedFade2 * 0.7;
+
+  if (data.textureReady and data.textureLoaded) {
+    Global.sliderTexNeedDeleting = true;
+    float outlineSize = 4.0 * gm->circlesize / gm->sliderin.width;
+    float outlineColor[4] = {1.0f, 1.0f, 1.0f,
+                             clampedFade2}; // Normalized RED color
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+    float textureSize[2] = {(float)sliderTexture.width,
+                            (float)sliderTexture.height};
+#else
+    float textureSize[2] = {(float)sliderTexture.texture.width,
+                            (float)sliderTexture.texture.height};
+#endif
+
+    // Get shader locations
+    /*int outlineSizeLoc = GetShaderLocation(Global.shdrOutline, "outlineSize");
+    int outlineColorLoc = GetShaderLocation(Global.shdrOutline, "outlineColor");
+    int textureSizeLoc = GetShaderLocation(Global.shdrOutline, "textureSize");
+    int transparency = GetShaderLocation(Global.shdrOutline, "transparency");
+
+    // Set shader values (they can be changed later)
+    SetShaderValue(Global.shdrOutline, outlineSizeLoc, &outlineSize,
+    SHADER_UNIFORM_FLOAT); SetShaderValue(Global.shdrOutline, outlineColorLoc,
+    outlineColor, SHADER_UNIFORM_VEC4); SetShaderValue(Global.shdrOutline,
+    textureSizeLoc, textureSize, SHADER_UNIFORM_VEC2);
+    SetShaderValue(Global.shdrOutline, transparency, &clampedFade2,
+    SHADER_UNIFORM_FLOAT);
 
 
-        BeginShaderMode(Global.shdrOutline);*/
+    BeginShaderMode(Global.shdrOutline);*/
 
-        if(!legacyRender){
-            int transparency = GetShaderLocation(Global.shdrTest, "transparency");
-            SetShaderValue(Global.shdrTest, transparency, &clampedFade2, SHADER_UNIFORM_FLOAT);
-            BeginShaderMode(Global.shdrTest);
-            DrawTextureSlider(&sliderTexture.texture, minX, minY, Fade(WHITE,1), gm->circlesize);
-            EndShaderMode();
-        }
-        else{
-            DrawTextureSlider(&sliderTexture.texture, minX + texSizeXoffset, minY + texSizeYoffset, Fade(WHITE,clampedFade2), gm->circlesize);
-        }
-        
-
-
-        float scale = (gm->currentTime*1000.0f + gm->gameFile.fade_in/2.0f - data.time) / (gm->gameFile.fade_in/2.0f);
-        scale = clip(scale,1,2);
-        scale -= 1.0;
-        scale = easeInOutCubic(scale);
-        scale += 1.0;
-
-        Color renderColor;
-        float x = lastPosition.x;
-        float y = lastPosition.y;
-        if(data.colour.size() > 2)
-            renderColor =  Fade(Color{(unsigned char)data.colour[0],(unsigned char)data.colour[1],(unsigned char)data.colour[2]}, clampedFade2);
-        else
-            renderColor =  Fade(Color{255,255,255}, clampedFade2);
-        //DrawTextureCenter(gm->hitCircle, x, y, /*clip(scale/1.5f,1,2)**/gm->circlesize/gm->hitCircle.width , renderColor);
-        //DrawCNumbersCenter(data.comboNumber, data.x, data.y, gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f), Fade(WHITE,clampedFade2));
-        //DrawTextureRotate(gm->sliderb, x, y, (gm->circlesize/gm->sliderb.width)*(gm->sliderb.width/128.0f), angle, Fade(renderColor,clampedFade));
-        /*DrawTextureCenter(gm->hitCircleOverlay, x, y, clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f) , Fade(WHITE,clampedFade2));
-        if(data.point != 0)
-            DrawTextureCenter(gm->selectCircle, x, y, scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f) , renderColor);*/
-        if(is_hit_at_end){
-            
-            if(inSlider){
-                DrawTextureRotate(&gm->sliderfollow, renderPoints[position].x, renderPoints[position].y, (clip(clampedFade,0.7,2))*(gm->circlesize/gm->sliderfollow.width)*2.0f , 0, Fade(WHITE,clampedFade2));
-                //DrawTextureCenter(gm->hitCircle, x, y, /*clip(scale/1.5f,1,2)**/gm->circlesize/gm->hitCircle.width , renderColor);
-                //DrawTextureCenter(gm->sliderb, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->sliderb.width) * 1.3f, Fade(renderColor,clampedFade));
-            }
-        }
-
-        if(data.point == 0)
-            DrawTextureCenter(&gm->hit0, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit0.width)*0.5f , Fade(WHITE,clampedFade));
-        else if(data.point == 1)
-            DrawTextureCenter(&gm->hit50, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit50.width)*0.5f , Fade(WHITE,clampedFade));
-        else if(data.point == 2)
-            DrawTextureCenter(&gm->hit100, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit100.width)*0.5f , Fade(WHITE,clampedFade));
-        else if(data.point == 3 && Global.textureSize.render300)
-            DrawTextureCenter(&gm->hit300, renderPoints[position].x, renderPoints[position].y, (gm->circlesize/gm->hit300.width)*0.5f , Fade(WHITE,clampedFade));
+    if (!legacyRender) {
+      int transparency = GetShaderLocation(Global.shdrTest, "transparency");
+      SetShaderValue(Global.shdrTest, transparency, &clampedFade2,
+                     SHADER_UNIFORM_FLOAT);
+      BeginShaderMode(Global.shdrTest);
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+      Texture2D tex;
+      tex.id = sliderTexture.resolveTexture;
+      tex.width = sliderTexture.width;
+      tex.height = sliderTexture.height;
+      tex.mipmaps = 1;
+      tex.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+      SetTextureFilter(&tex, TEXTURE_FILTER_BILINEAR);
+      DrawTextureSlider(&tex, minX, minY, Fade(WHITE, 1), gm->circlesize);
+#else
+      DrawTextureSlider(&sliderTexture.texture, minX, minY, Fade(WHITE, 1),
+                        gm->circlesize);
+#endif
+      EndShaderMode();
+    } else {
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+      Texture2D tex;
+      tex.id = sliderTexture.resolveTexture;
+      tex.width = sliderTexture.width;
+      tex.height = sliderTexture.height;
+      tex.mipmaps = 1;
+      tex.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+      SetTextureFilter(&tex, TEXTURE_FILTER_BILINEAR);
+      DrawTextureSlider(&tex, minX + texSizeXoffset, minY + texSizeYoffset,
+                        Fade(WHITE, clampedFade2), gm->circlesize);
+#else
+      DrawTextureSlider(&sliderTexture.texture, minX + texSizeXoffset,
+                        minY + texSizeYoffset, Fade(WHITE, clampedFade2),
+                        gm->circlesize);
+#endif
     }
-}
 
-void Slider::unloadTextures(){
-    if(readyToDelete){
-        if(IsRenderTextureReady(&sliderTexture)){
-            UnloadRenderTexture(&sliderTexture);
-            //std::cout << "UnloadingSliderTexture\n";
-            readyToDelete = false;
-        }
-        data.textureReady = false;
+    float scale =
+        (gm->currentTime * 1000.0f + gm->gameFile.fade_in / 2.0f - data.time) /
+        (gm->gameFile.fade_in / 2.0f);
+    scale = clip(scale, 1, 2);
+    scale -= 1.0;
+    scale = easeInOutCubic(scale);
+    scale += 1.0;
+
+    Color renderColor;
+    float x = lastPosition.x;
+    float y = lastPosition.y;
+    if (data.colour.size() > 2)
+      renderColor = Fade(Color{(unsigned char)data.colour[0],
+                               (unsigned char)data.colour[1],
+                               (unsigned char)data.colour[2]},
+                         clampedFade2);
+    else
+      renderColor = Fade(Color{255, 255, 255}, clampedFade2);
+    // DrawTextureCenter(gm->hitCircle, x, y,
+    // /*clip(scale/1.5f,1,2)**/gm->circlesize/gm->hitCircle.width ,
+    // renderColor); DrawCNumbersCenter(data.comboNumber, data.x, data.y,
+    // gm->circlesize/gm->hitCircle.width*(gm->hitCircle.width/128.0f),
+    // Fade(WHITE,clampedFade2)); DrawTextureRotate(gm->sliderb, x, y,
+    // (gm->circlesize/gm->sliderb.width)*(gm->sliderb.width/128.0f), angle,
+    // Fade(renderColor,clampedFade));
+    /*DrawTextureCenter(gm->hitCircleOverlay, x, y,
+    clip(scale/1.5f,1,2)*gm->circlesize/gm->hitCircleOverlay.width*(gm->approachCircle.width/128.0f)
+    , Fade(WHITE,clampedFade2)); if(data.point != 0)
+        DrawTextureCenter(gm->selectCircle, x, y,
+    scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f)
+    , renderColor);*/
+    if (is_hit_at_end) {
+
+      if (inSlider) {
+        DrawTextureRotate(&gm->sliderfollow, renderPoints[position].x,
+                          renderPoints[position].y,
+                          (clip(clampedFade, 0.7, 2)) *
+                              (gm->circlesize / gm->sliderfollow.width) * 2.0f,
+                          0, Fade(WHITE, clampedFade2));
+        // DrawTextureCenter(gm->hitCircle, x, y,
+        // /*clip(scale/1.5f,1,2)**/gm->circlesize/gm->hitCircle.width ,
+        // renderColor); DrawTextureCenter(gm->sliderb,
+        // renderPoints[position].x, renderPoints[position].y,
+        // (gm->circlesize/gm->sliderb.width) * 1.3f,
+        // Fade(renderColor,clampedFade));
+      }
     }
+
+    if (data.point == 0)
+      DrawTextureCenter(
+          &gm->hit0, renderPoints[position].x, renderPoints[position].y,
+          (gm->circlesize / gm->hit0.width) * 0.5f, Fade(WHITE, clampedFade));
+    else if (data.point == 1)
+      DrawTextureCenter(
+          &gm->hit50, renderPoints[position].x, renderPoints[position].y,
+          (gm->circlesize / gm->hit50.width) * 0.5f, Fade(WHITE, clampedFade));
+    else if (data.point == 2)
+      DrawTextureCenter(
+          &gm->hit100, renderPoints[position].x, renderPoints[position].y,
+          (gm->circlesize / gm->hit100.width) * 0.5f, Fade(WHITE, clampedFade));
+    else if (data.point == 3 && Global.textureSize.render300)
+      DrawTextureCenter(
+          &gm->hit300, renderPoints[position].x, renderPoints[position].y,
+          (gm->circlesize / gm->hit300.width) * 0.5f, Fade(WHITE, clampedFade));
+  }
 }
 
-void Slider::dead_update(){
-    GameManager* gm = GameManager::getInstance();
-    if (data.time+gm->gameFile.fade_in/1.0f < gm->currentTime*1000.0f){
-        readyToDelete = true;
-        if(!data.textureReady){
-            deinit();
-            data.expired = true;
-        }
+void Slider::unloadTextures() {
+  if (readyToDelete) {
+#if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
+    if (sliderTexture.valid) {
+      UnloadMSAARenderTexture(sliderTexture);
+      // std::cout << "UnloadingSliderTexture\n";
+      readyToDelete = false;
     }
+#else
+    if (IsRenderTextureReady(&sliderTexture)) {
+      UnloadRenderTexture(&sliderTexture);
+      // std::cout << "UnloadingSliderTexture\n";
+      readyToDelete = false;
+    }
+#endif
+    data.textureReady = false;
+  }
 }
 
-Slider::Slider(HitObjectData data){
-    this->data = data;
-    //init();
+void Slider::dead_update() {
+  GameManager *gm = GameManager::getInstance();
+  if (data.time + gm->gameFile.fade_in / 1.0f < gm->currentTime * 1000.0f) {
+    readyToDelete = true;
+    if (!data.textureReady) {
+      deinit();
+      data.expired = true;
+    }
+  }
 }
 
-void Slider::deinit(){
-    data.curvePoints.clear();
-    data.edgeSounds.clear();
-    data.edgeSets.clear();
-    data.filename = "";
-    data.colour.clear();
-    data.lengths.clear();
+Slider::Slider(HitObjectData data) {
+  this->data = data;
+  // init();
+}
 
-    data.curvePoints.shrink_to_fit();
-    data.edgeSounds.shrink_to_fit();
-    data.edgeSets.shrink_to_fit();
-    data.colour.shrink_to_fit();
-    data.lengths.shrink_to_fit();
+void Slider::deinit() {
+  data.curvePoints.clear();
+  data.edgeSounds.clear();
+  data.edgeSets.clear();
+  data.filename = "";
+  data.colour.clear();
+  data.lengths.clear();
 
-    renderPoints.clear();
-    edgePoints.clear();
-    tickPositions.clear();
-    tickclicked.clear();
-    reverseclicked.clear();
+  data.curvePoints.shrink_to_fit();
+  data.edgeSounds.shrink_to_fit();
+  data.edgeSets.shrink_to_fit();
+  data.colour.shrink_to_fit();
+  data.lengths.shrink_to_fit();
 
-    renderPoints.shrink_to_fit();
-    edgePoints.shrink_to_fit();
-    tickPositions.shrink_to_fit();
-    tickclicked.shrink_to_fit();
-    reverseclicked.shrink_to_fit();
+  renderPoints.clear();
+  edgePoints.clear();
+  tickPositions.clear();
+  tickclicked.clear();
+  reverseclicked.clear();
+
+  renderPoints.shrink_to_fit();
+  edgePoints.shrink_to_fit();
+  tickPositions.shrink_to_fit();
+  tickclicked.shrink_to_fit();
+  reverseclicked.shrink_to_fit();
 }
