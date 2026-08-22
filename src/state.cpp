@@ -1149,7 +1149,7 @@ void ResultsMenu::textureOps() {}
 
 void ResultsMenu::drawAccuracyGraph(Rectangle area) {
     if (accuracies.size() < 2) {
-        DrawText("Not enough data", area.x, area.y, 20, GRAY);
+        DrawTextEx(&Global.DefaultFont,"Not enough data", {area.x, area.y}, Scale(20), Scale(0.5), GRAY);
         return;
     }
 
@@ -1168,8 +1168,8 @@ void ResultsMenu::drawAccuracyGraph(Rectangle area) {
     // Draw grid lines at 25%, 50%, 75%, 100%
     for (int i = 0; i <= 4; i++) {
         float y = area.y + padding + graphHeight - (i * graphHeight / 4.0f);
-        DrawLine(area.x + padding, y, area.x + padding + graphWidth, y, Fade(LIGHTGRAY, 0.5f));
-        DrawText(TextFormat("%d%%", i*25), area.x + 2, y - 8, 12, GRAY);
+        DrawLineEx({area.x + padding, y}, {area.x + padding + graphWidth, y}, Scale(1.5), Fade(LIGHTGRAY, 0.5f));
+        DrawTextEx(&Global.DefaultFont, TextFormat("%d%%", i*25), {area.x + 2, y - 8}, Scale(12), Scale(0.5), GRAY);
     }
 
     // Draw the curve
@@ -1180,12 +1180,12 @@ void ResultsMenu::drawAccuracyGraph(Rectangle area) {
         float y1 = area.y + padding + graphHeight - (accuracies[i] - minAcc) / (maxAcc - minAcc) * graphHeight;
         float x2 = area.x + padding + (i+1) * stepX;
         float y2 = area.y + padding + graphHeight - (accuracies[i+1] - minAcc) / (maxAcc - minAcc) * graphHeight;
-        DrawLineEx({x1, y1}, {x2, y2}, 2.5f, GREEN);
+        DrawLineEx({x1, y1}, {x2, y2}, Scale(2.5f), GREEN);
     }
 
     // Draw a horizontal line at 100% (if you want)
-    float y100 = area.y + padding;  // top of graph (since 100% is max)
-    DrawLine(area.x + padding, y100, area.x + padding + graphWidth, y100, Fade(GREEN, 0.3f));
+    //float y100 = area.y + padding;  // top of graph (since 100% is max)
+    //DrawLineEx({area.x + padding, y100}, {area.x + padding + graphWidth}, y100, Fade(GREEN, 0.3f));
 }
 
 WipMenu2::WipMenu2() {}

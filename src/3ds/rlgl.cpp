@@ -1683,3 +1683,62 @@ void DrawTriangleStrip(Vector2 *points, int pointCount, Color color){
 void DrawRectangleV(Vector2 position, Vector2 size, Color color){
     DrawRectangle((int)position.x, (int)position.y, (int)size.x, (int)size.y, color); //ACCURACY BE DAMNED
 }
+
+
+void ImageCrop(Image *image, Rectangle crop)
+{
+    // Security check to avoid program crash
+    if ((image->data == NULL) || (image->width == 0) || (image->height == 0)) return;
+
+    // Security checks to validate crop rectangle
+    if (crop.x < 0) { crop.width += crop.x; crop.x = 0; }
+    if (crop.y < 0) { crop.height += crop.y; crop.y = 0; }
+    if ((crop.x + crop.width) > image->width) crop.width = image->width - crop.x;
+    if ((crop.y + crop.height) > image->height) crop.height = image->height - crop.y;
+    if ((crop.x > image->width) || (crop.y > image->height))
+    {
+        printf("\e[1;38;5;220m[WARN] \e[38;5;236mIMAGE: Failed to crop, rectangle out of bounds");
+        return;
+    }
+
+    if (image->mipmaps > 1) printf("\e[1;38;5;220m[WARN] \e[38;5;236mImage manipulation only applied to base mipmap level");
+    if (image->format >= PIXELFORMAT_COMPRESSED_DXT1_RGB) printf("\e[1;38;5;220m[WARN] \e[38;5;236mImage manipulation not supported for compressed formats");
+    else
+    {
+        int bytesPerPixel = GetPixelDataSize(1, 1, image->format);
+
+        unsigned char *croppedData = (unsigned char *)RL_MALLOC((int)(crop.width*crop.height)*bytesPerPixel);
+
+        // OPTION 1: Move cropped data line-by-line
+        for (int y = (int)crop.y, offsetSize = 0; y < (int)(crop.y + crop.height); y++)
+        {
+            memcpy(croppedData + offsetSize, ((unsigned char *)image->data) + (y*image->width + (int)crop.x)*bytesPerPixel, (int)crop.width*bytesPerPixel);
+            offsetSize += ((int)crop.width*bytesPerPixel);
+        }
+
+        /*
+        // OPTION 2: Move cropped data pixel-by-pixel or byte-by-byte
+        for (int y = (int)crop.y; y < (int)(crop.y + crop.height); y++)
+        {
+            for (int x = (int)crop.x; x < (int)(crop.x + crop.width); x++)
+            {
+                //memcpy(croppedData + ((y - (int)crop.y)*(int)crop.width + (x - (int)crop.x))*bytesPerPixel, ((unsigned char *)image->data) + (y*image->width + x)*bytesPerPixel, bytesPerPixel);
+                for (int i = 0; i < bytesPerPixel; i++) croppedData[((y - (int)crop.y)*(int)crop.width + (x - (int)crop.x))*bytesPerPixel + i] = ((unsigned char *)image->data)[(y*image->width + x)*bytesPerPixel + i];
+            }
+        }
+        */
+
+        free(image->data);
+        image->data = croppedData;
+        image->width = (int)crop.width;
+        image->height = (int)crop.height;
+    }
+}
+
+
+bool ExportImage(Image image, const char *fileName)
+{
+    int success = 0;
+    //need to implement!
+    return success;
+}

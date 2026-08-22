@@ -170,3 +170,7 @@ void DrawTriangleStrip(Vector2 *points, int pointCount, Color color);           
 void DrawRectangleV(Vector2 position, Vector2 size, Color color);                                  // Draw a color-filled rectangle (Vector version)
 
 void DrawTextCodepoint(Font *font, int codepoint, Vector2 position, float fontSize, Color tint); // Draw one character (codepoint)
+
+void ImageCrop(Image *image, Rectangle crop);
+
+bool ExportImage(Image image, const char *fileName);
