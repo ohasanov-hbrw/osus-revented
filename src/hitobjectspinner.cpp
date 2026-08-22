@@ -88,6 +88,7 @@ void Spinner::update(){
             gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
             gm->clickCombo++;
             gm->hit300s++;
+            gm->objectPoints.push_back(OSU_300);
         }
         else{
             if(totalAngle > neededAngle){
@@ -95,24 +96,28 @@ void Spinner::update(){
                 gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
                 gm->clickCombo++;
                 gm->hit300s++;
+                gm->objectPoints.push_back(OSU_300);
             }
             else if(totalAngle >= neededAngle - 360){
                 data.point = 2;
                 gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
                 gm->clickCombo++;
                 gm->hit100s++;
+                gm->objectPoints.push_back(OSU_100);
             }
             else if(totalAngle >= neededAngle / 4.0f){
                 gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
                 gm->clickCombo++;
                 data.point = 1;
                 gm->hit50s++;
+                gm->objectPoints.push_back(OSU_50);
             }
             else{
                 data.point = 0;
                 gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
                 gm->clickCombo = 0;
                 gm->hit0s++;
+                gm->objectPoints.push_back(OSU_0);
             }
         }
         //gm->destroyHitObject(data.index);

@@ -893,6 +893,7 @@ void Slider::update() {
              25);
         gm->clickCombo++;
         gm->hit300s++;
+        gm->objectPoints.push_back(OSU_300);
       } else {
         data.point = 0;
         if (gm->clickCombo > 30) {
@@ -923,6 +924,7 @@ void Slider::update() {
         gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
         gm->clickCombo = 0;
         gm->hit0s++;
+        gm->objectPoints.push_back(OSU_0);
       } else if (data.point == 1) {
         gm->score +=
             50 +
@@ -931,6 +933,7 @@ void Slider::update() {
              25);
         gm->clickCombo++;
         gm->hit50s++;
+        gm->objectPoints.push_back(OSU_50);
       } else if (data.point == 2) {
         gm->score +=
             100 +
@@ -939,6 +942,7 @@ void Slider::update() {
              25);
         gm->clickCombo++;
         gm->hit100s++;
+        gm->objectPoints.push_back(OSU_100);
       } else if (data.point == 3) {
         gm->score +=
             300 +
@@ -947,6 +951,7 @@ void Slider::update() {
              25);
         gm->clickCombo++;
         gm->hit300s++;
+        gm->objectPoints.push_back(OSU_300);
       }
     }
 

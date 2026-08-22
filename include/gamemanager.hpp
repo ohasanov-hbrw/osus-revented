@@ -2,6 +2,7 @@
 #include "parser.hpp"
 #include <raylib.h>
 #include "linkedListImpl.hpp"
+#include "time_util.hpp"
 #include <deque>
 
 struct dbool
@@ -18,6 +19,17 @@ struct Background {
     std::map<std::string, Texture2D> data;
 	std::map<std::string, Vector2> pos;
 	std::map<std::string, dbool> loaded;
+};
+
+//enum OSU_OBJECT_TYPE {
+//	
+//};
+
+enum OSU_POINTS_ENUM {
+	OSU_300 = 3,
+	OSU_100 = 2,
+	OSU_50 = 1,
+	OSU_0 = 0
 };
 
 class GameManager{
@@ -54,6 +66,7 @@ class GameManager{
 		std::vector<FollowPoint> followLines;
 		std::vector<HitObject*> dead_objects;
 		std::deque<timingSettings> timingSettingsForHitObject;
+		std::vector<int8_t> objectPoints;
 
 		HitSound SoundFilesAll;
 		

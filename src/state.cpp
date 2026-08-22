@@ -118,7 +118,7 @@ void StartMenu::update() {
     animationStartTime = getGlobalTimer();
     animation = 1;
     animationDone = false;
-    animationMs = 0; //200
+    animationMs = 0; // 200
     return;
   }
 }
@@ -1023,6 +1023,85 @@ void ResultsMenu::init() {
   // accuracy = std::ceil(accuracy * 100.0) / 100.0;
   hit0.text = "Accuracy: " + std::to_string(accuracy) + "%";
   hit0.init();
+
+  accuracies.clear();
+  accuracies.shrink_to_fit();
+  GameManager *gm = GameManager::getInstance();
+  std::vector<float> local;
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "gm->objectPoints.size(): " << gm->objectPoints.size() << "\n";
+  for (size_t i = 0; i < gm->objectPoints.size(); i++) {
+    int start = std::max(0, (int)i - 10 + 1);
+    int sum300 = 0, sum100 = 0, sum50 = 0, sum0 = 0;
+    for (int j = start; j <= i; ++j) {
+      if (gm->objectPoints[j] == OSU_300)
+        sum300++;
+      else if (gm->objectPoints[j] == OSU_100)
+        sum100++;
+      else if (gm->objectPoints[j] == OSU_50)
+        sum50++;
+      else
+        sum0++;
+    }
+    int total = sum300 + sum100 + sum50 + sum0;
+    if (total == 0) {
+      local.push_back(0);
+      continue;
+    }
+    float weighted = 300.0f * sum300 + 100.0f * sum100 + 50.0f * sum50;
+    float maxPossible = 300.0f * total;
+    local.push_back((weighted / maxPossible) * 100.0f);
+  }
+
+  const int maxPoints = 240;
+  if (local.size() > maxPoints){
+
+    accuracies.reserve(maxPoints);
+
+    // Bucket size
+    int bucketSize = (local.size() - 2) / (maxPoints - 2);
+    if (bucketSize < 1) bucketSize = 1;
+
+    // Always include first and last point
+    accuracies.push_back(local[0]);
+
+    for (int i = 1; i < maxPoints - 1; i++) {
+        int start = (i - 1) * bucketSize + 1;
+        int end = i * bucketSize;
+        if (end > local.size() - 2) end = local.size() - 2;
+
+        // Find the point in this bucket that forms the largest triangle with the previous point and the next bucket's average
+        float avgX = (start + end) / 2.0f;
+        float avgY = 0.0f;
+        for (int j = start; j <= end; j++) {
+            avgY += local[j];
+        }
+        avgY /= (end - start + 1);
+
+        // Find point with largest area
+        float maxArea = -1.0f;
+        int selected = start;
+        for (int j = start; j <= end; j++) {
+            // Area of triangle (prev, current, next_bucket_avg)
+            float area = std::abs((accuracies.back() - avgY) * (j - avgX) - (accuracies.back() - local[j]) * (start - avgX)) / 2.0f;
+            if (area > maxArea) {
+                maxArea = area;
+                selected = j;
+            }
+        }
+        accuracies.push_back(local[selected]);
+    }
+    accuracies.push_back(local.back());
+  }
+  else{
+    accuracies.reserve(local.size());
+    for (int i = 0; i < local.size(); i++) {
+      accuracies.push_back(local[i]);
+    }
+  }
+
+  local.clear();
+  local.shrink_to_fit();
+
   Global.NeedForBackgroundClear = true;
   Global.useAuto = false;
   Global.LastFrameTime = getTimer();
@@ -1037,6 +1116,7 @@ void ResultsMenu::render() {
   hit100.render();
   hit50.render();
   hit0.render();
+  drawAccuracyGraph(ScaleRect({320-100, 280, 200, 100}));
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
   // Global.mutex.unlock();
 }
@@ -1057,10 +1137,56 @@ void ResultsMenu::update() {
 }
 void ResultsMenu::unload() {
   initializationStage = STATE_UNINITIALIZED;
+  GameManager *gm = GameManager::getInstance();
+  gm->objectPoints.clear();
+  gm->objectPoints.shrink_to_fit();
+  accuracies.clear();
+  accuracies.shrink_to_fit();
   // MutexLock(SWITCHING_STATE);
   // MutexUnlock(SWITCHING_STATE);
 }
 void ResultsMenu::textureOps() {}
+
+void ResultsMenu::drawAccuracyGraph(Rectangle area) {
+    if (accuracies.size() < 2) {
+        DrawText("Not enough data", area.x, area.y, 20, GRAY);
+        return;
+    }
+
+    // Graph padding
+    float padding = 10.0f;
+    float graphWidth = area.width - 2 * padding;
+    float graphHeight = area.height - 2 * padding;
+
+    // Draw background and axes
+    DrawRectangleRec(area, DARKGRAY);
+    DrawRectangleLinesEx(area, 1, LIGHTGRAY);
+
+    // Find min/max (y: 0..100)
+    float minAcc = 0.0f, maxAcc = 100.0f;
+
+    // Draw grid lines at 25%, 50%, 75%, 100%
+    for (int i = 0; i <= 4; i++) {
+        float y = area.y + padding + graphHeight - (i * graphHeight / 4.0f);
+        DrawLine(area.x + padding, y, area.x + padding + graphWidth, y, Fade(LIGHTGRAY, 0.5f));
+        DrawText(TextFormat("%d%%", i*25), area.x + 2, y - 8, 12, GRAY);
+    }
+
+    // Draw the curve
+    int n = accuracies.size();
+    float stepX = graphWidth / (n - 1);
+    for (int i = 0; i < n - 1; i++) {
+        float x1 = area.x + padding + i * stepX;
+        float y1 = area.y + padding + graphHeight - (accuracies[i] - minAcc) / (maxAcc - minAcc) * graphHeight;
+        float x2 = area.x + padding + (i+1) * stepX;
+        float y2 = area.y + padding + graphHeight - (accuracies[i+1] - minAcc) / (maxAcc - minAcc) * graphHeight;
+        DrawLineEx({x1, y1}, {x2, y2}, 2.5f, GREEN);
+    }
+
+    // Draw a horizontal line at 100% (if you want)
+    float y100 = area.y + padding;  // top of graph (since 100% is max)
+    DrawLine(area.x + padding, y100, area.x + padding + graphWidth, y100, Fade(GREEN, 0.3f));
+}
 
 WipMenu2::WipMenu2() {}
 
@@ -1096,8 +1222,6 @@ void WipMenu2::init() {
   canRemoveStuff = false;
   initializationStage = STATE_INITIALIZED;
 }
-
-
 
 void WipMenu2::update() {
   if (initializationStage != STATE_INITIALIZED)

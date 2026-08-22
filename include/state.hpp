@@ -93,6 +93,8 @@ public:
     void update() override;
     void unload() override;
     void textureOps() override;
+    void drawAccuracyGraph(Rectangle area);
+    std::vector<float> accuracies;
 };
 
 

@@ -253,6 +253,7 @@ void GameManager::update(){
 				if (CheckCollisionPointCircle(Global.MousePosition,Vector2{static_cast<float>(hitObject->data.x),(float)hitObject->data.y}, circlesize/2.0f)){
 					if(std::abs(currentTime*1000.0f - hitObject->data.time) > gameFile.p50Final + Global.extraJudgementTime/2.0f){
 						hitObject->data.point = 0;
+						objectPoints.push_back(OSU_0);
 						if(clickCombo > 30){
 							SetSoundVolume(&SoundFilesAll.data["combobreak"], 1.0f);
 							PlaySound(&SoundFilesAll.data["combobreak"]);
@@ -265,7 +266,8 @@ void GameManager::update(){
 					}
 					else if(std::abs(currentTime*1000.0f - hitObject->data.time) > gameFile.p100Final + Global.extraJudgementTime/2.0f){
 						hitObject->data.point = 1;
-						score+= 50 + (50 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						score += 50 + (50 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						objectPoints.push_back(OSU_50);
 						clickCombo++;
 						hit50s++;
 						Global.errorDiv++;
@@ -276,7 +278,8 @@ void GameManager::update(){
 					}
 					else if(std::abs(currentTime*1000.0f - hitObject->data.time) > gameFile.p300Final + Global.extraJudgementTime/2.0f){
 						hitObject->data.point = 2;
-						score+= 100 + (100 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						score += 100 + (100 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						objectPoints.push_back(OSU_100);
 						clickCombo++;
 						hit100s++;
 						Global.errorDiv++;
@@ -287,7 +290,8 @@ void GameManager::update(){
 					}
 					else{
 						hitObject->data.point = 3;
-						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						score += 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						objectPoints.push_back(OSU_300);
 						clickCombo++;
 						hit300s++;
 						Global.errorDiv++;
@@ -400,7 +404,8 @@ void GameManager::update(){
 					if (hitObject->data.type != 2){
 						//Global.MousePosition = {objects[i]->data.x, objects[i]->data.y};
 						hitObject->data.point = 3;
-						score+= 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						score += 300 + (300 * (std::max(clickCombo-1,0) * difficultyMultiplier * 1)/25);
+						objectPoints.push_back(OSU_300);
 						clickCombo++;
 						hit300s++;
 						int volume = hitObject->data.volume;
@@ -1210,7 +1215,8 @@ void GameManager::loadBeatmapSound(std::string filename){
 void GameManager::loadGame(std::string filename){
 	//create a parser and parse the file
 	currentBackgroundTexture = "";
-
+	objectPoints.clear();
+	objectPoints.shrink_to_fit();
 
 	//clear linked lists, WARNING, WILL MEMORY LEAK!
 	deadObjectsLinkedList.init();

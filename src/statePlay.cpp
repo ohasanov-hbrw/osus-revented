@@ -186,6 +186,14 @@ void PlayMenu::render() {
   close.render();
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
+  float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+  float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+  float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+  float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
+
+
+  DrawRectangleLinesEx(ScaleRect({ rightMostX - 317.5, 240 - 85 / 2.0, 340,85}), Scale(4), {0xAA, 0x00, 0xAA, 192});
+
   // MutexUnlock(ACCESSING_OBJECTS);
   // MutexUnlock(SWITCHING_STATE);
   // Global.mutex.unlock();
