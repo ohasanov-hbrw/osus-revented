@@ -167,7 +167,7 @@ void FancyScrollingList::init() {
                                  : "Error, object: " + std::to_string(i);
     objects[i].get()->internalBox.SetText(objects[i].get()->text);
     objects[i].get()->internalBox.SetFontSize(textSize);
-    objects[i].get()->internalBox.SetSpacing(1);
+    objects[i].get()->internalBox.SetSpacing(2);
     objects[i].get()->internalBox.SetWrapWords(false);
     objects[i].get()->textRect = Rectangle{
         objects[i].get()->positions[0].x + textSpacing,
@@ -220,7 +220,7 @@ void FancyScrollingList::reinit() {
                                  : "Error, object: " + std::to_string(i);
     objects[i].get()->internalBox.SetText(objects[i].get()->text);
     objects[i].get()->internalBox.SetFontSize(textSize);
-    objects[i].get()->internalBox.SetSpacing(1);
+    objects[i].get()->internalBox.SetSpacing(2);
     objects[i].get()->internalBox.SetWrapWords(false);
     objects[i].get()->textRect = Rectangle{
         objects[i].get()->positions[0].x + textSpacing,

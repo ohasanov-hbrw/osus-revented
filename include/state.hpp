@@ -47,6 +47,7 @@ private:
     Button select;
     Button back;
     Button close;
+    Button options;
     TextBox bg;
     TextBox path;
     TextBox description;
@@ -61,7 +62,7 @@ private:
     TextBoxSmart leftSideBox;
     std::string leftSideFormatted = "";
     int lastSelection = 0;
-
+    bool showOptions = false;
     bool inBeatmapView = false;                      // are we showing beatmaps of a set?
     std::vector<FileMetadata> currentBeatmaps;   // beatmaps of the selected set
 

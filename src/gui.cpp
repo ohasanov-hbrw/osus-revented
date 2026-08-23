@@ -320,8 +320,8 @@ Switch::Switch(Vector2 position, Vector2 size, Color color, Color altcolor, Colo
 
 
 void Switch::render() {
-    Rectangle Left = GetRaylibOriginR({position.x - size.x/4.0f, position.y, size.x/2.0f, size.y});
-    Rectangle Right = GetRaylibOriginR({position.x + size.x/4.0f, position.y, size.x/2.0f, size.y});
+    Rectangle Left = GetRaylibOriginR({position.x - size.x/4.0f + 1, position.y, size.x/2.0f - 2, size.y - 4});
+    Rectangle Right = GetRaylibOriginR({position.x + size.x/4.0f - 1, position.y, size.x/2.0f - 2, size.y - 4});
     if(this->state){
         DrawRectangleRec(ScaleRect(Left), this->altcolor);
         DrawRectangleRec(ScaleRect(Right), this->switchcolor);

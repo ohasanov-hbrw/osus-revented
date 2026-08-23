@@ -24,6 +24,14 @@
 
 #include "cachebuilder/metadataParser.hpp" // for namesOfSets
 
+enum PLAYMENU_ELEMENTS{
+  SCROLLER = 0,
+  BOTTOM_CARD = 1,
+  TOP_CARD = 2,
+  SELECT_BUTTON = 3,
+  BACK_BUTTON = 4
+};
+
 PlayMenu::PlayMenu() {
   float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
   float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
@@ -39,19 +47,35 @@ PlayMenu::PlayMenu() {
   back = Button({395, 360}, {120, 40}, {255, 135, 198, 255}, "Back", WHITE, 20);
   select =
       Button({520, 360}, {120, 40}, {255, 135, 198, 255}, "Select", BLACK, 20);
-  close = Button({leftMostX + 15, bottomMostY - 15}, {20, 20}, {0xAA, 0x00, 0xAA, 192}, "x", BLACK, 20); //Button({70, 110}, {20, 20}, {0xAA, 0x00, 0xAA, 192}, "x", BLACK, 20); //{0xAA, 0x00, 0xAA, 192}
-  skin = Switch({310, 350}, {40, 20}, RED, GREEN, {255, 135, 198, 255}, BLACK);
-  sound = Switch({310, 370}, {40, 20}, RED, GREEN, {255, 135, 198, 255}, BLACK);
-  usedskin = TextBox({180, 350}, {190, 20}, {240, 98, 161, 255},
-                     "Use default skin", WHITE, 20, 50);
-  usedsound = TextBox({180, 370}, {190, 20}, {240, 98, 161, 255},
-                      "Use default sound", WHITE, 20, 50);
+  close = Button({leftMostX + 15, bottomMostY - 15}, {20, 20},
+                 {0xAA, 0x00, 0xAA, 192}, "x", BLACK,
+                 20); // Button({70, 110}, {20, 20}, {0xAA, 0x00, 0xAA, 192},
+                      // "x", BLACK, 20); //{0xAA, 0x00, 0xAA, 192}
+  options = Button({leftMostX + 75, bottomMostY - 15}, {90, 20},
+                   {0xAA, 0x00, 0xAA, 192}, "Options", BLACK,
+                   20); // Button({70, 110}, {20, 20}, {0xAA, 0x00, 0xAA, 192},
+                        // "x", BLACK, 20); //{0xAA, 0x00, 0xAA, 192}
+  skin = Switch({leftMostX + 220, bottomMostY - 40}, {40, 20}, RED, GREEN,
+                {32, 24, 32, 192}, BLACK);
+  sound = Switch({leftMostX + 220, bottomMostY - 60}, {40, 20}, RED, GREEN,
+                 {32, 24, 32, 192}, BLACK);
+  usedskin = TextBox({leftMostX + 100, bottomMostY - 40}, {200, 20},
+                     {32, 24, 32, 192}, "Default skin", WHITE, 20, 50);
+  usedsound = TextBox({leftMostX + 100, bottomMostY - 60}, {200, 20},
+                      {32, 24, 32, 192}, "Default sound", WHITE, 20, 50);
+
+  skin.position = {leftMostX + 220, bottomMostY - 40};
+  sound.position = {leftMostX + 220, bottomMostY - 60};
+  usedskin.position = {leftMostX + 100, bottomMostY - 40};
+  usedsound.position = {leftMostX + 100, bottomMostY - 60};
+  options.position = {leftMostX + 75, bottomMostY - 15};
   skin.state = Global.settings.useDefaultSkin;
   sound.state = Global.settings.useDefaultSounds;
+  showOptions = false;
 }
 
 void PlayMenu::init() {
-  lastSelection=0;
+  lastSelection = 0;
   // MutexLock(SWITCHING_STATE);
   // std::cout << "loading the playmenu/n";
   Global.NeedForBackgroundClear = true;
@@ -65,8 +89,8 @@ void PlayMenu::init() {
                             BLACK, 20, 20, 65);
 
   menu.elements.push_back(std::make_unique<FancyScrollingList>());
-  menu.elements[0].get()->baseColor = {64, 48, 64, 192};
-  menu.elements[0].get()->textColor = WHITE;
+  menu.elements[SCROLLER].get()->baseColor = {64, 48, 64, 192};
+  menu.elements[SCROLLER].get()->textColor = WHITE;
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[1].get()->baseColor = {64, 48, 64, 192};
   menu.elements.push_back(std::make_unique<ClickableObject>());
@@ -76,9 +100,6 @@ void PlayMenu::init() {
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[4].get()->baseColor = {0xAA, 0x00, 0xAA, 192}; // CC00AAFF
 
-  // std::cout << menu.elements[0]->baseColor.r << " " <<
-  // menu.elements[0]->baseColor.g << " " << menu.elements[0]->baseColor.b <<
-  // std::endl;
 
   float spacingWidth = 160;
   float spacingWidthTop = 240;
@@ -131,8 +152,8 @@ void PlayMenu::init() {
       Rectangle{rightMostX - 220, bottomMostY - 10 - 40, 105, 40};
   menu.elements[4].get()->internalBox.SetBox(menu.elements[4].get()->textRect);
 
-  menu.elements[0].get()->positions.push_back({rightMostX - 310, topMostY});
-  menu.elements[0].get()->positions.push_back({rightMostX, bottomMostY});
+  menu.elements[SCROLLER].get()->positions.push_back({rightMostX - 310, topMostY});
+  menu.elements[SCROLLER].get()->positions.push_back({rightMostX, bottomMostY});
 
   inBeatmapView = false;
   currentBeatmaps.clear();
@@ -145,15 +166,12 @@ void PlayMenu::init() {
   menu.init();
   leftSideBox.SetText(leftSideFormatted);
   leftSideBox.SetFontSize(30.05);
-  leftSideBox.SetSpacing(1);
+  leftSideBox.SetSpacing(2);
   leftSideBox.SetWrapWords(true);
   leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40,
                                  (rightMostX - 330) - (leftMostX + 20),
                                  (bottomMostY - topMostY) - 80});
-  // std::cout << menu.elements.size() << " " <<
-  // menu.elements[0]->positions.size() << std::endl;
   initializationStage = STATE_INITIALIZED;
-  // MutexUnlock(SWITCHING_STATE);
 }
 void PlayMenu::render() {
   if (initializationStage != STATE_INITIALIZED)
@@ -162,27 +180,27 @@ void PlayMenu::render() {
   // MutexLock(SWITCHING_STATE);
   // MutexLock(ACCESSING_OBJECTS);
   MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
-  //bg.render();
-  //description.render();
-  //back.render();
-  //select.render();
-  //dir_list.render();
-  //close.render();
-  //skin.render();
-  //sound.render();
-  //usedskin.render();
-  //usedsound.render();
-  //name.render();
+  // bg.render();
+  // description.render();
+  // back.render();
+  // select.render();
+  // dir_list.render();
+  // close.render();
+
+  // name.render();
   menu.render();
 
   int selection = dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
                       ->currentSelection;
-  // DrawTextEx(&Global.DefaultFont, TextFormat("Selection: %d Graphical: %.0f",
-  // selection,
-  // dynamic_cast<FancyScrollingList*>(menu.elements[0].get())->graphicalObjectOffset),
-  // {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(25))},
-  // Scale(20.05), Scale(2), BLUE);
   leftSideBox.Draw(HAlign::Left, VAlign::Top, WHITE);
+  if (showOptions) {
+    skin.render();
+    sound.render();
+    usedskin.render();
+    usedsound.render();
+  }
+
+  options.render();
   close.render();
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
@@ -191,12 +209,8 @@ void PlayMenu::render() {
   float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
   float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
 
-
-  DrawRectangleLinesEx(ScaleRect({ rightMostX - 317.5, 240 - 85 / 2.0, 340,85}), Scale(4), {0xAA, 0x00, 0xAA, 192});
-
-  // MutexUnlock(ACCESSING_OBJECTS);
-  // MutexUnlock(SWITCHING_STATE);
-  // Global.mutex.unlock();
+  DrawRectangleLinesEx(ScaleRect({rightMostX - 317.5, 240 - 85 / 2.0, 340, 85}),
+                       Scale(4), {0xAA, 0x00, 0xAA, 192});
 }
 void PlayMenu::update() {
   // MutexLock(SWITCHING_STATE);
@@ -209,17 +223,18 @@ void PlayMenu::update() {
 
   MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
   Global.enableMouse = true;
-  dir_list.update();
-  select.update();
-  back.update();
+  // dir_list.update();
+  // select.update();
+  // back.update();
   close.update();
-  skin.update();
-  sound.update();
-  /*if(lastIndex != dir_list.selectedindex){
-      name.text = dir_list.objects[dir_list.selectedindex].text;
-      name.update();
-      lastIndex = dir_list.selectedindex;
-  }*/
+  if (showOptions) {
+    skin.update();
+    sound.update();
+  }
+  options.update();
+  if (options.action)
+    showOptions = !showOptions;
+
   if (skin.state != Global.settings.useDefaultSkin)
     Global.settings.useDefaultSkin = skin.state;
 
@@ -252,8 +267,8 @@ void PlayMenu::update() {
     float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
     float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
 
-    menu.elements[0].get()->positions[0] = {rightMostX - 310, topMostY};
-    menu.elements[0].get()->positions[1] = {rightMostX, bottomMostY};
+    menu.elements[SCROLLER].get()->positions[0] = {rightMostX - 310, topMostY};
+    menu.elements[SCROLLER].get()->positions[1] = {rightMostX, bottomMostY};
 
     leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40,
                                    (rightMostX - 330) - (leftMostX + 20),
@@ -267,15 +282,15 @@ void PlayMenu::update() {
     menu.elements[4].get()->internalBox.SetBox(
         menu.elements[4].get()->textRect);
     close.position = {leftMostX + 15, bottomMostY - 15};
+    skin.position = {leftMostX + 220, bottomMostY - 40};
+    sound.position = {leftMostX + 220, bottomMostY - 60};
+    usedskin.position = {leftMostX + 100, bottomMostY - 40};
+    usedsound.position = {leftMostX + 100, bottomMostY - 60};
+    options.position = {leftMostX + 75, bottomMostY - 15};
   }
 
   dynamic_cast<FancyScrollingList *>(menu.elements[0].get())->frameChange +=
       (Global.Wheel);
-
-  // dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTextBox =
-  // Global.Wheel != 0 ? true : false;
-  // dynamic_cast<FancyScrollingList*>(menu.elements[4].get())->updateTexts =
-  // Global.Wheel != 0 ? true : false;
   menu.update();
 
   auto *fancyList = dynamic_cast<FancyScrollingList *>(menu.elements[0].get());
@@ -292,27 +307,24 @@ void PlayMenu::update() {
         currentBeatmaps.clear();
         currentBeatmaps = parseCachedMaps(Global.DatabaseLocation, setid);
         // Repopulate the fancy list
-        //std::cout << "stareting clear" << std::endl;
+        // std::cout << "stareting clear" << std::endl;
         fancyList->objectNames.clear();
-        //std::cout << "stareting population" << std::endl;
+        // std::cout << "stareting population" << std::endl;
         for (int i = 0; i < currentBeatmaps.size(); i++) {
-          std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << currentBeatmaps[i].title + " [" +
+          std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
+                    << currentBeatmaps[i].title + " [" +
                            currentBeatmaps[i].version + "]"
                     << std::endl;
           fancyList->objectNames.push_back(currentBeatmaps[i].version);
         }
 
         fancyList->reinit();
-      //fancyList->objectOffsetFull = 0;
-      //fancyList->graphicalObjectOffsetFull = 0;
-      //fancyList->currentSelection = 0;
-      //fancyList->objectOffset = 0;
-      fancyList->updateTexts = true;
-      fancyList->updateTextBox = true;
-      fancyList->update();
-        //std::cout << "init fancylist\n";
+        fancyList->updateTexts = true;
+        fancyList->updateTextBox = true;
+        fancyList->update();
         inBeatmapView = true;
-        auto *selectBtn = dynamic_cast<ClickableObject *>(menu.elements[3].get());
+        auto *selectBtn =
+            dynamic_cast<ClickableObject *>(menu.elements[3].get());
         selectBtn->text = "Play";
         selectBtn->internalBox.SetText("Play");
       }
@@ -348,12 +360,12 @@ void PlayMenu::update() {
       for (const auto &set : beatmapSets) {
         fancyList->objectNames.push_back(set.title);
       }
-      //fancyList->currentSelection = lastSelection;
+      // fancyList->currentSelection = lastSelection;
       fancyList->reinit();
       fancyList->objectOffsetFull = lastSelection;
       fancyList->graphicalObjectOffsetFull = lastSelection;
-      //fancyList->graphicalObjectOffsetFull = 0;
-      //fancyList->currentSelection = -fancyList->objectOffsetFull;
+      // fancyList->graphicalObjectOffsetFull = 0;
+      // fancyList->currentSelection = -fancyList->objectOffsetFull;
       fancyList->graphicalObjectOffset = 0;
       fancyList->updateTexts = true;
       fancyList->updateTextBox = true;
@@ -371,26 +383,32 @@ void PlayMenu::update() {
 
     if (!inBeatmapView) {
       std::string newString = TextFormat(
-          "[cCC00AAFF]Title: [r]%s\n[cCC00AAFF]Maps: "
+          "[cCC00AAFF]Title: [r]%s\n\n[cCC00AAFF]Maps: "
           "[r]%d\n[cCC00AAFF]Artists: "
-          "[r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: [cFFFFFF99]%d\n[cCC00AA99]GraphicalOffset: [cFFFFFF99]%f\n[cCC00AA99]GraphicalOffsetFull: [cFFFFFF99]%f",
+          "[r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: [cFFFFFF99]%d",
+          //"\n[cCC00AA99]GraphicalOffset: "
+          //"[cFFFFFF99]%f\n[cCC00AA99]GraphicalOffsetFull: [cFFFFFF99]%f",
           beatmapSets[selection].title.c_str(), beatmapSets[selection].number,
           beatmapSets[selection].artists.c_str(),
-          beatmapSets[selection].creators.c_str(),
-          beatmapSets[selection].setid, dynamic_cast<FancyScrollingList *>(menu.elements[0].get())->graphicalObjectOffset, dynamic_cast<FancyScrollingList *>(menu.elements[0].get())->graphicalObjectOffsetFull);
+          beatmapSets[selection].creators.c_str(), beatmapSets[selection].setid
+          // ,dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
+          //     ->graphicalObjectOffset,
+          // dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
+          //     ->graphicalObjectOffsetFull
+      );
       if (newString != leftSideFormatted) {
         leftSideFormatted = newString;
         leftSideBox.SetText(leftSideFormatted);
       }
     } else {
       std::string newString = TextFormat(
-          "[cCC00AAFF]Version: [r]%s\n[cCC00AAFF]Artist: "
-          "[r]%s\n[cCC00AAFF]Creator: "
-          "[r]%s\n[cCC00AAFF]Title: [r]%s\n[cCC00AA99]ID: [cFFFFFF99]%d",
+          "[cCC00AAFF]Version: [r]%s\n\n[cCC00AAFF]Creator: "
+          "[r]%s\n[cCC00AAFF]Title: "
+          "[r]%s\n[cCC00AAFF]Artist: [r]%s\n[cCC00AA99]ID: [cFFFFFF99]%d",
           currentBeatmaps[selection].version.c_str(),
-          currentBeatmaps[selection].artist.c_str(),
           currentBeatmaps[selection].creator.c_str(),
           currentBeatmaps[selection].title.c_str(),
+          currentBeatmaps[selection].artist.c_str(),
           currentBeatmaps[selection].id);
       if (newString != leftSideFormatted) {
         leftSideFormatted = newString;
@@ -414,51 +432,54 @@ void PlayMenu::update() {
     return;
   }
 
-  //if (select.action or dir_list.action) {
-  //  if (dir_list.objects.size() > 0 and
-  //      dir_list.objects[dir_list.selectedindex].text.size() > 0) {
-  //    if (dir_list.objects[dir_list.selectedindex]
-  //            .text[dir_list.objects[dir_list.selectedindex].text.size() - 1] ==
-  //        '/') {
-  //      MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //      dir_list.objects[dir_list.selectedindex].text.pop_back();
-  //      if (Global.Path.size() == 1)
-  //        Global.Path.pop_back();
-  //      Global.Path += '/' + dir_list.objects[dir_list.selectedindex].text;
-  //      lastPos = dir_list.objects[dir_list.selectedindex].text;
-  //      auto dir = ls(".osu");
-  //      dir_list =
-  //          SelectableList(dir_list.position, dir_list.size, dir_list.color,
-  //                         dir, dir_list.textcolor, dir_list.textsize,
-  //                         dir_list.objectsize, dir_list.maxlength);
-  //      dir_list.init();
-  //      lastIndex = -3;
-  //      MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //    } else {
-  //      MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
-  //      MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
-  //      MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //      Global.selectedPath =
-  //          Global.Path + '/' + dir_list.objects[dir_list.selectedindex].text;
-  //      Global.CurrentLocation = "beatmaps/" + lastPos + "/";
-  //      Global.CurrentState->unload();
-  //      Global.CurrentState.reset(new Game());
-  //      Global.CurrentState->init();
-  //      MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //      MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
-  //      MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
-  //    }
-  //  }
-  //} else if (back.action) {
-  //  MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //  Global.Path = Global.BeatmapLocation;
-  //  auto dir = ls(".osu");
-  //  dir_list = SelectableList(dir_list.position, dir_list.size, dir_list.color,
-  //                            dir, dir_list.textcolor, dir_list.textsize,
-  //                            dir_list.objectsize, dir_list.maxlength);
-  //  dir_list.init();
-  //  MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //}
+  // if (select.action or dir_list.action) {
+  //   if (dir_list.objects.size() > 0 and
+  //       dir_list.objects[dir_list.selectedindex].text.size() > 0) {
+  //     if (dir_list.objects[dir_list.selectedindex]
+  //             .text[dir_list.objects[dir_list.selectedindex].text.size() - 1]
+  //             ==
+  //         '/') {
+  //       MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+  //       dir_list.objects[dir_list.selectedindex].text.pop_back();
+  //       if (Global.Path.size() == 1)
+  //         Global.Path.pop_back();
+  //       Global.Path += '/' + dir_list.objects[dir_list.selectedindex].text;
+  //       lastPos = dir_list.objects[dir_list.selectedindex].text;
+  //       auto dir = ls(".osu");
+  //       dir_list =
+  //           SelectableList(dir_list.position, dir_list.size, dir_list.color,
+  //                          dir, dir_list.textcolor, dir_list.textsize,
+  //                          dir_list.objectsize, dir_list.maxlength);
+  //       dir_list.init();
+  //       lastIndex = -3;
+  //       MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+  //     } else {
+  //       MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+  //       MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
+  //       MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+  //       Global.selectedPath =
+  //           Global.Path + '/' +
+  //           dir_list.objects[dir_list.selectedindex].text;
+  //       Global.CurrentLocation = "beatmaps/" + lastPos + "/";
+  //       Global.CurrentState->unload();
+  //       Global.CurrentState.reset(new Game());
+  //       Global.CurrentState->init();
+  //       MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+  //       MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+  //       MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
+  //     }
+  //   }
+  // } else if (back.action) {
+  //   MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+  //   Global.Path = Global.BeatmapLocation;
+  //   auto dir = ls(".osu");
+  //   dir_list = SelectableList(dir_list.position, dir_list.size,
+  //   dir_list.color,
+  //                             dir, dir_list.textcolor, dir_list.textsize,
+  //                             dir_list.objectsize, dir_list.maxlength);
+  //   dir_list.init();
+  //   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+  // }
   //// MutexUnlock(ACCESSING_OBJECTS);
   //// MutexUnlock(SWITCHING_STATE);
 }
@@ -469,7 +490,5 @@ void PlayMenu::unload() {
   leftSideFormatted.clear();
   inBeatmapView = false;
   currentBeatmaps.clear();
-  // MutexLock(SWITCHING_STATE);
-  // MutexUnlock(SWITCHING_STATE);
 }
 void PlayMenu::textureOps() {}

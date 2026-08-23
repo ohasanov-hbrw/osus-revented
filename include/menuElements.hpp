@@ -74,7 +74,7 @@ public:
         if (hAlign != HAlign::Left) {
           Vector2 textSize =
               MeasureTextEx(&font, m_cachedLines[i].c_str(),
-                            (float)Scale(m_fontSize), (float)Scale(m_spacing));
+                            (float)Scale(m_fontSize), (float)Scale(m_spacing) * m_fontSize / 20.f);
           if (hAlign == HAlign::Center) {
             xPos = ScaleRect(m_box).x +
                    (ScaleRect(m_box).width - textSize.x) / 2.0f;
@@ -84,7 +84,7 @@ public:
         }
 
         DrawTextStyled(&font, m_cachedLines[i].c_str(), Vector2{xPos, currentY},
-                       (float)Scale(m_fontSize), (float)Scale(m_spacing),
+                       (float)Scale(m_fontSize), (float)Scale(m_spacing) * m_fontSize / 20.f,
                        color);
       }
     }
@@ -157,7 +157,7 @@ private:
 
         Vector2 size =
             MeasureTextEx(&font, cleanLine.c_str(), (float)Scale(m_fontSize),
-                          (float)Scale(m_spacing));
+                          (float)Scale(m_spacing) * m_fontSize / 20.f);
 
         if (size.x > ScaleRect(m_box).width)
           break;
@@ -199,7 +199,7 @@ private:
 
           Vector2 size =
               MeasureTextEx(&font, cleanEllipsis.c_str(),
-                            (float)Scale(m_fontSize), (float)Scale(m_spacing));
+                            (float)Scale(m_fontSize), (float)Scale(m_spacing) * m_fontSize / 20.f);
           if (size.x <= ScaleRect(m_box).width) {
             m_cachedLines.push_back(testEllipsis);
             break;
