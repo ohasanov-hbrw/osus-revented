@@ -69,12 +69,14 @@ void ClickableObject::render() {
     // Triangle strip
     DrawTriangleStrip(scaled.data(), scaled.size(), fillColor);
     if (focused) {
-      
+
       if (boundary.size() > 1) {
         for (size_t i = 0; i < boundary.size(); ++i) {
           size_t next = (i + 1) % boundary.size();
-          DrawLineEx(ScaleCords(boundary[i]), ScaleCords(boundary[next]),Scale(2.01f) ,  WHITE);
-          DrawCircle(ScaleCordX(boundary[i].x), ScaleCordY(boundary[i].y), Scale(1.01f), WHITE);
+          DrawLineEx(ScaleCords(boundary[i]), ScaleCords(boundary[next]),
+                     Scale(2.01f), WHITE);
+          DrawCircle(ScaleCordX(boundary[i].x), ScaleCordY(boundary[i].y),
+                     Scale(1.01f), WHITE);
         }
       }
     }
@@ -90,7 +92,7 @@ void ClickableObject::render() {
 }
 
 void ClickableObject::update() {
-  if(staticobject)
+  if (staticobject)
     return;
   bool hover = false;
   Vector2 mouse = Global.MousePosition; // screen coordinates
@@ -137,9 +139,7 @@ void ClickableObject::update() {
     action = false;
 }
 
-void ClickableObject::init() {
-  boundary = GetTriangleStripBoundary(positions);
-}
+void ClickableObject::init() { boundary = GetTriangleStripBoundary(positions); }
 
 void ClickableObject::deinit() {
   positions.clear();
@@ -153,7 +153,8 @@ bool initFunctionRan = false;
 void FancyScrollingList::init() {
   numberOfObjects =
       (int)((positions[1].y - positions[0].y) / objectDistance) + 5;
-  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "nubmer of objects " << numberOfObjects << std::endl;
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "nubmer of objects "
+            << numberOfObjects << std::endl;
   objects.reserve(numberOfObjects);
   for (int i = 0; i < numberOfObjects; i++) {
     objects.push_back(std::make_unique<ClickableObject>());
@@ -188,10 +189,10 @@ void FancyScrollingList::init() {
   updateTexts = true;
   if (!Global.ScaleUpdated) {
     initFunctionRan = true;
-    //std::cout << "calling initial update for list\n";
+    // std::cout << "calling initial update for list\n";
     update();
     initFunctionRan = false;
-    //std::cout << "called initial update for list\n";
+    // std::cout << "called initial update for list\n";
   }
   updateTexts = false;
 }
@@ -205,10 +206,11 @@ void FancyScrollingList::reinit() {
   objects.shrink_to_fit();
   numberOfObjects =
       (int)((positions[1].y - positions[0].y) / objectDistance) + 5;
-  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "nubmer of objects " << numberOfObjects << std::endl;
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "nubmer of objects "
+            << numberOfObjects << std::endl;
   objects.reserve(numberOfObjects);
   for (int i = 0; i < numberOfObjects; i++) {
-    //std::cout << "adding obnject " << i << std::endl;
+    // std::cout << "adding obnject " << i << std::endl;
     objects.push_back(std::make_unique<ClickableObject>());
     objects[i].get()->positions.push_back(positions[0] +
                                           (Vector2){0, objectFreeSpace});
@@ -241,10 +243,10 @@ void FancyScrollingList::reinit() {
   updateTexts = true;
   if (!Global.ScaleUpdated) {
     initFunctionRan = true;
-    //std::cout << "calling initial update for list\n";
+    // std::cout << "calling initial update for list\n";
     update();
     initFunctionRan = false;
-    //std::cout << "called initial update for list\n";
+    // std::cout << "called initial update for list\n";
   }
   updateTexts = false;
 }
@@ -394,12 +396,16 @@ void FancyScrollingList::update() {
     if (updateTexts) {
       objects[i].get()->text =
           objectNames.size() > 0
-              ? objectNames[std::max(0, i - graphicalObjectOffsetFull) %
-                            objectNames.size()]
+              ? 
+              //"ID: " +
+              //      std::to_string(std::max(0, i - (int)objects.size() / 2- graphicalObjectOffsetFull) %
+              //                     objectNames.size()) + " " +
+                    objectNames[std::max(0, i - (int)objects.size() / 2- graphicalObjectOffsetFull) %
+                                objectNames.size()]
               : "Error, object: " + std::to_string(i - (int)objects.size() / 2 -
                                                    graphicalObjectOffsetFull);
       objects[i].get()->internalBox.SetText(objects[i].get()->text);
-    }
+    } 
     if (updateTextBox) {
       objects[i].get()->textRect =
           Rectangle{objects[i].get()->positions[0].x + textSpacing,

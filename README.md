@@ -93,7 +93,7 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [ ] Debug some memory problems 
 - [ ] Menu rewrite
 - [ ] Error management
-- [ ] Check-stresstest the zip library
+- [x] Check-stresstest the zip library
 - [ ] Skin customization with an options menu
 - [x] Parse beatmaps and cache them
 - [x] Enable offscreen MSAA for better looking sliders
@@ -105,6 +105,12 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [ ] Use the second screen on the 3DS
 - [ ] Dynamic slider resolution with more interpolation to cut down on calculation time
 - [ ] Seperate thread for background loading. Mainly for the new menu implementations
+- [ ] Images on the beatmap selection
+- [ ] Redo fancy textbox
+- [ ] Add ranking to the resultsmenu
+- [ ] Stacked objects should be offset from another
+- [ ] Add animated combo counter
+- [ ] Add the flakes~
 
 
 

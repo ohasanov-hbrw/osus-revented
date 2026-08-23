@@ -379,28 +379,30 @@ void PlayMenu::update() {
   int selection = dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
                       ->currentSelection;
   if (!beatmapSets.empty()) {
-    selection %= beatmapSets.size();
+    
 
     if (!inBeatmapView) {
+      selection %= beatmapSets.size();
       std::string newString = TextFormat(
           "[cCC00AAFF]Title: [r]%s\n\n[cCC00AAFF]Maps: "
           "[r]%d\n[cCC00AAFF]Artists: "
-          "[r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: [cFFFFFF99]%d",
-          //"\n[cCC00AA99]GraphicalOffset: "
-          //"[cFFFFFF99]%f\n[cCC00AA99]GraphicalOffsetFull: [cFFFFFF99]%f",
+          "[r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: [cFFFFFF99]%d" //,
+          "\n[cCC00AA99]CurrentSelection: "
+          "[cFFFFFF99]%d\n[cCC00AA99]GraphicalOffsetFull: [cFFFFFF99]%f",
           beatmapSets[selection].title.c_str(), beatmapSets[selection].number,
           beatmapSets[selection].artists.c_str(),
           beatmapSets[selection].creators.c_str(), beatmapSets[selection].setid
-          // ,dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
-          //     ->graphicalObjectOffset,
-          // dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
-          //     ->graphicalObjectOffsetFull
+          ,dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
+              ->currentSelection,
+          dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
+              ->graphicalObjectOffsetFull
       );
       if (newString != leftSideFormatted) {
         leftSideFormatted = newString;
         leftSideBox.SetText(leftSideFormatted);
       }
     } else {
+      selection %= currentBeatmaps.size();
       std::string newString = TextFormat(
           "[cCC00AAFF]Version: [r]%s\n\n[cCC00AAFF]Creator: "
           "[r]%s\n[cCC00AAFF]Title: "
