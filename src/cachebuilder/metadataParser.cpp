@@ -379,6 +379,9 @@ std::vector<FileMetadata> parseCachedMaps(const std::string& db_path, int setid)
 }
 
 std::string extractBackgroundImage(const std::string &osuPath) {
+  #ifdef THREEDS_BUILD
+  return "";
+  #endif
   FILE *file = fopen(osuPath.c_str(), "r");
   if (!file) {
     std::string filename = osuPath;
@@ -435,6 +438,9 @@ std::string extractBackgroundImage(const std::string &osuPath) {
 }
 
 void processAllSetImages() {
+  #ifdef THREEDS_BUILD
+  return;
+  #endif
   for (auto &[setid, metadataList] : namesOfSets) {
     // Map: full path of original background -> processed cover filename
     std::unordered_map<std::string, std::string> bgToCover;

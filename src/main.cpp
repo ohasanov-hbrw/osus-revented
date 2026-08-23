@@ -215,11 +215,11 @@ void RenderLoop(void *){
     // 3DS doesn't support some fancy filters
     // TODO: Make some filter and graphics settings configurable (OGL1.1 - OGL2.2 differences)
     #ifdef THREEDS_BUILD
-        SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_POINT);
+        SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_BILINEAR);
     #endif
     #ifndef THREEDS_BUILD
         //GenTextureMipmaps(&Global.DefaultFont.texture);
-        SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_ANISOTROPIC_16X);
+        SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_ANISOTROPIC_16X); //TEXTURE_FILTER_ANISOTROPIC_16X
     #endif
 
     SetTextureFilter(&Global.cursor, TEXTURE_FILTER_BILINEAR);
