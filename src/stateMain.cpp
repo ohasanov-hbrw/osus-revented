@@ -331,6 +331,8 @@ void MainMenu::update() {
 
   if(wip.action){
     Global.doingTimeConsumingOp = true;
+    // IMMEDIATELY SEGFAULTS THE SYSTEM ON 3DS????
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     buildFileMap(Global.BeatmapLocation);
     listAllMaps();
     #ifdef THREEDS_BUILD
@@ -344,6 +346,7 @@ void MainMenu::update() {
     decideNamesForSets();
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Decided Names" << std::endl;
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Done rebuilding database" << std::endl;
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     Global.doingTimeConsumingOp = 0;
   }
 
@@ -486,7 +489,7 @@ void MainMenu::update() {
     animation = -2;
     animationDone = false;
     return;
-  } else if (wip2.action) {
+  } else if (false && wip2.action) {
     MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
     MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
     Global.CurrentState->unload();

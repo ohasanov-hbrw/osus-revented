@@ -1,89 +1,110 @@
 #include "cachebuilder/metadataParser.hpp"
 #include "utils.hpp"
+#include <algorithm>
 #include <dirent.h>
-#include <filesystem>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <stdio.h>
 #include <string>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <unordered_map>
 #include <vector>
-
-#include <algorithm>
 
 #include "globals.hpp"
 
-#include <functional>
-#include <unordered_map>
-
-namespace fs = std::filesystem;
-
+// Global storage (unchanged)
 std::map<int, std::vector<FileMetadata>> namesOfSets;
 std::map<int, std::string> decidedNames;
 std::map<int, int> numberOfMaps;
 
-void buildFileMap(std::string path) {
-  for (int i = 0; i < path.size(); i++) {
-    if (path[i] == '\\') {
-      path[i] = '/';
-    }
-  }
+// Helper: check if a directory exists
+static bool dirExists(const std::string &path) {
+  struct stat st;
+  return stat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
+}
 
-  if (!path.empty() && path.back() == '/') {
-    path.pop_back();
+// Helper: create a directory (ignores errors if it already exists)
+static void createDir(const std::string &path) {
+#ifdef THREEDS_BUILD
+  mkdir(path.c_str(), 0755);
+#else
+  mkdir(path.c_str());
+#endif
+}
+
+// Helper: check if a file exists
+static bool fileExists(const std::string &path) {
+  struct stat st;
+  return stat(path.c_str(), &st) == 0 && S_ISREG(st.st_mode);
+}
+
+// Helper: normalize slashes (replace '\' with '/')
+static void normalizePath(std::string &path) {
+  for (char &c : path) {
+    if (c == '\\')
+      c = '/';
   }
-  std::vector<std::string> text;
-  text.clear();
+}
+
+// ------------------------------------------------------------------
+// buildFileMap – iterative DFS using an explicit stack
+void buildFileMap(std::string root) {
+  normalizePath(root);
+  // Remove trailing slash if any
+  if (!root.empty() && root.back() == '/')
+    root.pop_back();
+
+  std::vector<std::string> stack;
+  stack.push_back(root);
+
+  while (!stack.empty()) {
+    std::string currentDir = stack.back();
+    stack.pop_back();
+
+    DIR *dr = opendir(currentDir.c_str());
+    if (!dr) {
+      std::cerr << "Could not open directory: " << currentDir << std::endl;
+      continue;
+    }
+
+    struct dirent *de;
+    while ((de = readdir(dr)) != nullptr) {
+      std::string filename = de->d_name;
+      if (filename[0] == '.')
+        continue; // skip hidden
+
+      std::string combinedPath = currentDir + "/" + filename;
+      normalizePath(combinedPath);
 
 #ifdef _DIRENT_HAVE_D_TYPE
-  struct dirent *de;
-
-  DIR *dr = opendir(path.c_str());
-
-  if (dr == NULL) { // opendir returns NULL if couldn't open directory {
-    printf("Could not open current directory");
-  } else {
-    while ((de = readdir(dr)) != NULL) {
-      std::string filename = de->d_name;
-      std::string combinedPath = path + "/" + filename;
-      if (filename[0] != '.') {
-        if (de->d_type == DT_DIR) {
-          buildFileMap(combinedPath);
-        } else if (IsFileExtension(filename.c_str(), ".osu")) {
-          text.push_back(filename);
+      if (de->d_type == DT_DIR) {
+        stack.push_back(combinedPath); // push subdir for later
+      } else if (de->d_type == DT_REG &&
+                 IsFileExtension(filename.c_str(), ".osu")) {
+        addFileToMap(combinedPath);
+      }
+#else
+      // Fallback: use stat to determine type
+      struct stat st;
+      if (stat(combinedPath.c_str(), &st) == 0) {
+        if (S_ISDIR(st.st_mode)) {
+          stack.push_back(combinedPath);
+        } else if (S_ISREG(st.st_mode) && combinedPath.size() >= 4 &&
+                   combinedPath.compare(combinedPath.size() - 4, 4, ".osu") ==
+                       0) {
           addFileToMap(combinedPath);
         }
       }
+#endif
     }
-
     closedir(dr);
-    free(de);
-    std::sort(text.begin(), text.end());
   }
-#endif
-#ifndef _DIRENT_HAVE_D_TYPE
-  for (const auto &entry : fs::directory_iterator(path)) {
-    std::string filename = entry.path().filename().string();
-    std::string filepath = entry.path().string();
-    for (int i = 0; i < filepath.size(); i++) {
-      if (filepath[i] == '\\') {
-        filepath[i] = '/';
-      }
-    }
-    fs::directory_entry isDirectory(entry.path());
-    if (filename[0] != '.') {
-      if (isDirectory.is_directory()) {
-        buildFileMap(filepath);
-      } else if (entry.path().extension() == ".osu") {
-        text.push_back(filename);
-        addFileToMap(filepath);
-      }
-    }
-  }
-  std::sort(text.begin(), text.end());
-#endif
-  return;
 }
 
+// ------------------------------------------------------------------
+// addFileToMap – unchanged, but uses normalizePath already done
 void addFileToMap(std::string path) {
   std::vector<std::string> output = ParseNameFile(path);
   if (output.empty() || output.size() < 6)
@@ -100,9 +121,37 @@ void addFileToMap(std::string path) {
       .setid = std::stoi(output[4]),
       .id = std::stoi(output[5]),
       .bgImage = bgImage,
-      .coverFile = "" // will be filled later
+      .coverFile = " " // will be filled later
   };
   namesOfSets[temp.setid].push_back(temp);
+}
+
+// ------------------------------------------------------------------
+// writeBeatmapFile – uses POSIX mkdir and fopen
+void writeBeatmapFile(int setid,
+                      const std::vector<FileMetadata> &metadataList) {
+  std::string dir_name = Global.DatabaseLocation + "/" + std::to_string(setid);
+  normalizePath(dir_name);
+  if (!dirExists(dir_name))
+    createDir(dir_name);
+
+  for (const auto &file_info : metadataList) {
+    std::string file_path =
+        dir_name + "/" + std::to_string(file_info.id) + ".db";
+    FILE *file = fopen(file_path.c_str(), "w");
+    if (!file)
+      continue;
+
+    fprintf(file, "Path:%s\n", file_info.path.c_str());
+    fprintf(file, "Title:%s\n", file_info.title.c_str());
+    fprintf(file, "Artist:%s\n", file_info.artist.c_str());
+    fprintf(file, "Creator:%s\n", file_info.creator.c_str());
+    fprintf(file, "Version:%s\n", file_info.version.c_str());
+    fprintf(file, "BeatmapID:%d\n", file_info.id);
+    fprintf(file, "BeatmapSetID:%d\n", setid);
+    fprintf(file, "CoverFile:%s\n", file_info.coverFile.c_str());
+    fclose(file);
+  }
 }
 
 void listAllMaps() {
@@ -124,139 +173,110 @@ void listAllMaps() {
   }*/
 }
 
-void clearFile(const std::string &filename) {
-  FILE *file = fopen(filename.c_str(), "w");
-  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "clearing: " << filename << std::endl;
-  if (file == nullptr) {
-    std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m"<< "Error: Could not open file " << filename << " for writing.\n";
-    return;
-  }
-
-  fclose(file);
-}
-
-void writeBeatmapFile(int setid,
-                      const std::vector<FileMetadata> &metadataList) {
-  std::string dir_name = Global.DatabaseLocation + "/" + std::to_string(setid);
-  if (!fs::exists(dir_name))
-    fs::create_directory(dir_name);
-
-  for (const auto &file_info : metadataList) {
-    std::string file_path =
-        dir_name + "/" + std::to_string(file_info.id) + ".db";
-    FILE *file = fopen(file_path.c_str(), "w");
-    if (!file)
-      continue;
-
-    fprintf(file, "Path:%s\n", file_info.path.c_str());
-    fprintf(file, "Title:%s\n", file_info.title.c_str());
-    fprintf(file, "Artist:%s\n", file_info.artist.c_str());
-    fprintf(file, "Creator:%s\n", file_info.creator.c_str());
-    fprintf(file, "Version:%s\n", file_info.version.c_str());
-    fprintf(file, "BeatmapID:%d\n", file_info.id);
-    fprintf(file, "BeatmapSetID:%d\n", setid);
-    fprintf(file, "CoverFile:%s\n", file_info.coverFile.c_str()); // new line
-    fclose(file);
-  }
-}
-
+// ------------------------------------------------------------------
+// writeBeatmapSetFile – appends to beatmapsets.db
 void writeBeatmapSetFile(const std::string &filename, int beatmap_set_id,
                          const std::string &title,
                          const std::map<std::string, int> &selection) {
-
-  // Opening with "w" clears the file contents automatically before writing
   FILE *file = fopen(filename.c_str(), "a");
-
-  if (file == nullptr) {
-    std::cerr << "Error: Could not open file " << filename << " for writing.\n";
+  if (!file) {
+    std::cerr << "Error: Could not open " << filename << " for appending.\n";
     return;
   }
 
-  // 1. Write the Header ID and Title
   fprintf(file, "[%d]\n", beatmap_set_id);
   fprintf(file, "Title:%s\n", title.c_str());
 
-  // 2. Build the Maps and IDs lists from your map
-  std::string ids_list = "";
-
-  for (int i = 0; i < namesOfSets[beatmap_set_id].size(); i++) {
-    if (!ids_list.empty()) {
+  // Build IDs list
+  std::string ids_list;
+  for (size_t i = 0; i < namesOfSets[beatmap_set_id].size(); ++i) {
+    if (!ids_list.empty())
       ids_list += ",";
-    }
     ids_list += std::to_string(namesOfSets[beatmap_set_id][i].id);
   }
 
-  std::string artists_list = "";
-
-  for (int i = 0; i < namesOfSets[beatmap_set_id].size(); i++) {
-    if (artists_list.find(namesOfSets[beatmap_set_id][i].artist) ==
-        std::string::npos) {
-      if (!artists_list.empty()) {
+  // Build Artists list (unique)
+  std::string artists_list;
+  for (const auto &file : namesOfSets[beatmap_set_id]) {
+    if (artists_list.find(file.artist) == std::string::npos) {
+      if (!artists_list.empty())
         artists_list += ", ";
-      }
-      artists_list += namesOfSets[beatmap_set_id][i].artist;
+      artists_list += file.artist;
     }
   }
 
-  std::string creators_list = "";
-
-  for (int i = 0; i < namesOfSets[beatmap_set_id].size(); i++) {
-    if (creators_list.find(namesOfSets[beatmap_set_id][i].creator) ==
-        std::string::npos) {
-      if (!creators_list.empty()) {
+  // Build Creators list (unique)
+  std::string creators_list;
+  for (const auto &file : namesOfSets[beatmap_set_id]) {
+    if (creators_list.find(file.creator) == std::string::npos) {
+      if (!creators_list.empty())
         creators_list += ", ";
-      }
-      creators_list += namesOfSets[beatmap_set_id][i].creator;
+      creators_list += file.creator;
     }
   }
 
-  // 3. Write them to the file structure
-  // fprintf(file, "Maps: %s\n", maps_list.c_str());
   fprintf(file, "Maps:%d\n", numberOfMaps[beatmap_set_id]);
   fprintf(file, "IDs:%s\n", ids_list.c_str());
   fprintf(file, "Artists:%s\n", artists_list.c_str());
   fprintf(file, "Creators:%s\n\n", creators_list.c_str());
-  // Always close your file pointers!
+
   fclose(file);
 }
 
+// ------------------------------------------------------------------
+// decideNamesForSets – now clears each set after writing to save memory
 void decideNamesForSets() {
-
   decidedNames.clear();
   numberOfMaps.clear();
   std::string dbFile = Global.DatabaseLocation + "/beatmapsets.db";
+  normalizePath(dbFile);
+
+  // Process all cover images (on 3DS this just sets coverFile to " ")
   processAllSetImages();
-  clearFile(std::filesystem::path(dbFile).string());
-  for (const auto &[setid, metadataList] : namesOfSets) {
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "--- Map Set ID: " << setid << " ---" << std::endl;
+
+  // Clear the beatmapsets.db file
+  FILE *f = fopen(dbFile.c_str(), "w");
+  if (f)
+    fclose(f);
+
+  for (auto &[setid, metadataList] : namesOfSets) {
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m--- Map Set ID: " << setid
+              << " ---" << std::endl;
 
     std::map<std::string, int> selection;
-    // 2. Loop through the vector of FileMetadata objects for this specific set
+    numberOfMaps[setid] = 0;
     for (const auto &file : metadataList) {
       selection[file.title]++;
       numberOfMaps[setid]++;
     }
+
     std::string title = "error";
-    if (!selection.empty()) {
-      int max_value = -1;
-      for (const auto &[key, value] : selection) {
-        if (value > max_value) {
-          max_value = value;
-          title = key;
-        }
+    int max_value = -1;
+    for (const auto &[key, value] : selection) {
+      if (value > max_value) {
+        max_value = value;
+        title = key;
       }
     }
 
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << setid << " - Title: " << title
-              << " - Number of maps:  " << numberOfMaps[setid] << std::endl;
-    writeBeatmapSetFile(std::filesystem::path(dbFile).string(), setid, title,
-                        selection);
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << setid
+              << " - Title: " << title
+              << " - Number of maps: " << numberOfMaps[setid] << std::endl;
+
+    writeBeatmapSetFile(dbFile, setid, title, selection);
     writeBeatmapFile(setid, metadataList);
+
+    // Free this set's metadata to reduce memory
+    metadataList.clear();
   }
 
-  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Decided Names" << std::endl;
+  // Optionally clear the main map too
+  namesOfSets.clear();
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236mDecided Names" << std::endl;
 }
 
+// ------------------------------------------------------------------
+// clearFileMap – already okay
 void clearFileMap() {
   for (auto &pair : namesOfSets) {
     pair.second.clear();
@@ -264,11 +284,12 @@ void clearFileMap() {
   namesOfSets.clear();
 }
 
+// ------------------------------------------------------------------
+// parseCachedSets – unchanged (uses fopen)
 std::vector<SetFileMetadata> parseCachedSets(const std::string &db_path) {
   std::vector<SetFileMetadata> metadata_list;
-  // Open the text file using standard C fopen
   FILE *file = fopen(db_path.c_str(), "r");
-  if (file == nullptr) {
+  if (!file) {
     std::cerr << "Error: Could not open database file: " << db_path << "\n";
     return metadata_list;
   }
@@ -276,128 +297,139 @@ std::vector<SetFileMetadata> parseCachedSets(const std::string &db_path) {
   char line[1024];
   SetFileMetadata current_meta;
   bool processing_entry = false;
-  while (fgets(line, sizeof(line), file) != nullptr) {
+  while (fgets(line, sizeof(line), file)) {
     std::string line_str(line);
-
-    // Strip trailing newlines safely
     while (!line_str.empty() &&
-           (line_str.back() == '\n' || line_str.back() == '\r')) {
+           (line_str.back() == '\n' || line_str.back() == '\r'))
       line_str.pop_back();
-    }
-
     if (line_str.empty())
       continue;
+
     if (line_str.front() == '[' && line_str.find(']') != std::string::npos) {
-      if (processing_entry) {
+      if (processing_entry)
         metadata_list.push_back(current_meta);
-      }
       current_meta = SetFileMetadata();
       processing_entry = true;
-      size_t close_bracket = line_str.find(']');
-      std::string id_str = line_str.substr(1, close_bracket - 1);
-      current_meta.setid = std::stoi(id_str);
-    }
-    // 2. Parse out the Title
-    else if (line_str.rfind("Title:", 0) == 0) {
+      size_t close = line_str.find(']');
+      current_meta.setid = std::stoi(line_str.substr(1, close - 1));
+    } else if (line_str.rfind("Title:", 0) == 0) {
       current_meta.title = line_str.substr(6);
     } else if (line_str.rfind("Maps:", 0) == 0) {
-      std::string number_raw = line_str.substr(5);
-      current_meta.number = std::stoi(number_raw);
+      current_meta.number = std::stoi(line_str.substr(5));
     } else if (line_str.rfind("Artists:", 0) == 0) {
       current_meta.artists = line_str.substr(8);
     } else if (line_str.rfind("Creators:", 0) == 0) {
       current_meta.creators = line_str.substr(9);
     }
   }
-  if (processing_entry) {
+  if (processing_entry)
     metadata_list.push_back(current_meta);
-  }
   fclose(file);
   return metadata_list;
 }
 
-std::vector<FileMetadata> parseCachedMaps(const std::string& db_path, int setid){
+// ------------------------------------------------------------------
+// parseCachedMaps – rewritten with POSIX directory iteration
+std::vector<FileMetadata> parseCachedMaps(const std::string &db_path,
+                                          int setid) {
   std::vector<FileMetadata> result;
+  std::string setDir = db_path + "/" + std::to_string(setid);
+  normalizePath(setDir);
 
-    // Build the path to the set directory
-    std::string setDir = db_path + "/" + std::to_string(setid);
-    if (!fs::exists(setDir) || !fs::is_directory(setDir))
-        return result;
-
-    // Iterate over all .db files in the set directory
-    for (const auto& entry : fs::directory_iterator(setDir)) {
-        if (!entry.is_regular_file()) continue;
-        if (entry.path().extension() != ".db") continue;
-
-        std::string filePath = entry.path().string();
-        std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "opening: " << filePath.c_str() << std::endl;
-        FILE* file = fopen(filePath.c_str(), "r");
-        if (!file) continue;
-
-        FileMetadata meta;
-        meta.setid = setid;
-        meta.id = 0;           // will be overwritten
-        meta.bgImage = "";     // not stored in cache (original filename lost)
-        meta.coverFile = "";
-
-        char line[1024];
-        while (fgets(line, sizeof(line), file)) {
-            std::string lineStr(line);
-            // Remove trailing newline characters
-            lineStr.erase(lineStr.find_last_not_of("\r\n") + 1);
-            if (lineStr.empty()) continue;
-
-            size_t colon = lineStr.find(':');
-            if (colon == std::string::npos) continue; // malformed line
-
-            std::string key = lineStr.substr(0, colon);
-            std::string value = lineStr.substr(colon + 1);
-
-            if (key == "Path")         meta.path = value;
-            else if (key == "Title")   meta.title = value;
-            else if (key == "Artist")  meta.artist = value;
-            else if (key == "Creator") meta.creator = value;
-            else if (key == "Version") meta.version = value;
-            else if (key == "BeatmapID") meta.id = std::stoi(value);
-            else if (key == "CoverFile") meta.coverFile = value;
-            // "BeatmapSetID" is ignored because we already know it
-        }
-        fclose(file);
-
-        // Only add if we at least have a valid beatmap ID
-        if (meta.id != 0) {
-            result.push_back(meta);
-        }
-    }
-
-    std::sort(result.begin(), result.end(),
-             [](const FileMetadata& a, const FileMetadata& b) {
-                 return a.id < b.id;
-             });
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "parsed " << result.size() << " maps\n";
+  DIR *dir = opendir(setDir.c_str());
+  if (!dir)
     return result;
+
+  struct dirent *entry;
+  while ((entry = readdir(dir)) != nullptr) {
+    std::string name = entry->d_name;
+    if (name[0] == '.')
+      continue;
+    std::string filePath = setDir + "/" + name;
+    normalizePath(filePath);
+
+    // Check extension .db
+    if (name.size() < 3 || name.compare(name.size() - 3, 3, ".db") != 0)
+      continue;
+
+    // Ensure it's a regular file
+    struct stat st;
+    if (stat(filePath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
+      continue;
+
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236mopening: " << filePath
+              << std::endl;
+    FILE *file = fopen(filePath.c_str(), "r");
+    if (!file)
+      continue;
+
+    FileMetadata meta;
+    meta.setid = setid;
+    meta.id = 0;
+    meta.bgImage = "";
+    meta.coverFile = "";
+
+    char line[1024];
+    while (fgets(line, sizeof(line), file)) {
+      std::string lineStr(line);
+      lineStr.erase(lineStr.find_last_not_of("\r\n") + 1);
+      if (lineStr.empty())
+        continue;
+
+      size_t colon = lineStr.find(':');
+      if (colon == std::string::npos)
+        continue;
+
+      std::string key = lineStr.substr(0, colon);
+      std::string value = lineStr.substr(colon + 1);
+
+      if (key == "Path")
+        meta.path = value;
+      else if (key == "Title")
+        meta.title = value;
+      else if (key == "Artist")
+        meta.artist = value;
+      else if (key == "Creator")
+        meta.creator = value;
+      else if (key == "Version")
+        meta.version = value;
+      else if (key == "BeatmapID")
+        meta.id = std::stoi(value);
+      else if (key == "CoverFile")
+        meta.coverFile = value;
+    }
+    fclose(file);
+
+    if (meta.id != 0)
+      result.push_back(meta);
+  }
+  closedir(dir);
+
+  std::sort(
+      result.begin(), result.end(),
+      [](const FileMetadata &a, const FileMetadata &b) { return a.id < b.id; });
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236mparsed " << result.size()
+            << " maps\n";
+  return result;
 }
 
+// ------------------------------------------------------------------
+// extractBackgroundImage – unchanged (only uses FILE*)
 std::string extractBackgroundImage(const std::string &osuPath) {
-  #ifdef THREEDS_BUILD
+#ifdef THREEDS_BUILD
   return "";
-  #endif
+#else
   FILE *file = fopen(osuPath.c_str(), "r");
   if (!file) {
-    std::string filename = osuPath;
-    std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m" << "Couldn't open file for bgImage, retrying, maybe length? "
-              << filename.size() << std::endl;
-    for (int i = 0; i < filename.size(); i++) {
-      if (filename[i] == '/') {
-        filename[i] = '\\';
-      }
-    }
-    filename = prepare_long_path(filename).string();
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << filename << std::endl;
-    file = fopen(filename.c_str(), "r");
-    if (file == nullptr) {
+    // Retry with backslashes (Windows fallback)
+    std::string altPath = osuPath;
+    for (char &c : altPath)
+      if (c == '/')
+        c = '\\';
+    altPath = prepare_long_path(altPath).string();
+    file = fopen(altPath.c_str(), "r");
+    if (!file)
       return "";
-    }
   }
 
   char line[1024];
@@ -406,87 +438,90 @@ std::string extractBackgroundImage(const std::string &osuPath) {
 
   while (fgets(line, sizeof(line), file)) {
     std::string lineStr(line);
-    lineStr.erase(lineStr.find_last_not_of("\r\n") + 1); // trim newline
+    lineStr.erase(lineStr.find_last_not_of("\r\n") + 1);
 
     if (lineStr == "[Events]") {
       inEvents = true;
       continue;
     }
     if (inEvents && lineStr.rfind("//", 0) == 0)
-      continue; // skip comments
+      continue;
     if (inEvents && !lineStr.empty()) {
-      // Look for a quoted string
       size_t first = lineStr.find('"');
       if (first != std::string::npos) {
         size_t second = lineStr.find('"', first + 1);
         if (second != std::string::npos) {
           bgFile = lineStr.substr(first + 1, second - first - 1);
-          // Stop after finding the first background image
           break;
         }
       }
-      // Stop if we hit another section header
       if (lineStr.front() == '[' && lineStr != "[Events]")
         break;
     }
-    // Stop if we left the [Events] section
     if (inEvents && lineStr.front() == '[' && lineStr != "[Events]")
       break;
   }
   fclose(file);
   return bgFile;
+#endif
 }
 
+// ------------------------------------------------------------------
+// processAllSetImages – fixed for 3DS and uses POSIX file checks
 void processAllSetImages() {
-  #ifdef THREEDS_BUILD
-  return;
-  #endif
+#ifdef THREEDS_BUILD
+  // No image processing on 3DS – just set coverFile to " "
   for (auto &[setid, metadataList] : namesOfSets) {
-    // Map: full path of original background -> processed cover filename
+    for (auto &file : metadataList) {
+      file.coverFile = " ";
+    }
+  }
+  return;
+#else
+  for (auto &[setid, metadataList] : namesOfSets) {
     std::unordered_map<std::string, std::string> bgToCover;
-    // We'll generate unique filenames for each distinct background
     int coverIndex = 0;
 
     for (auto &file : metadataList) {
       if (file.bgImage.empty())
         continue;
 
-      // Build the absolute path to the original image
-      std::string beatmapDir = fs::path(file.path).parent_path().string();
-      // Normalize slashes
-      std::replace(beatmapDir.begin(), beatmapDir.end(), '\\', '/');
-      std::string fullBgPath = beatmapDir + "/" + file.bgImage;
-      // Normalize slashes
-      // std::replace(fullBgPath.begin(), fullBgPath.end(), '\\', '/');
+      std::string beatmapDir = file.path;
+      size_t lastSlash = beatmapDir.find_last_of("/\\");
+      if (lastSlash != std::string::npos)
+        beatmapDir = beatmapDir.substr(0, lastSlash);
+      normalizePath(beatmapDir);
 
-      if (!fs::exists(fullBgPath))
+      std::string fullBgPath = beatmapDir + "/" + file.bgImage;
+      normalizePath(fullBgPath);
+
+      if (!fileExists(fullBgPath))
         continue;
 
-      // Check if we already processed this exact image path
       auto it = bgToCover.find(fullBgPath);
       if (it != bgToCover.end()) {
-        // Reuse the existing cover filename
         file.coverFile = it->second;
         continue;
       }
-      std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Processing: " << fullBgPath << std::endl;
-      // Load and process the image
+
+      std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236mProcessing: " << fullBgPath
+                << std::endl;
+
+      // Load and process image (raylib)
       Image img = LoadImage(fullBgPath.c_str());
       if (img.data == nullptr) {
         std::cerr << "Failed to load image: " << fullBgPath << std::endl;
         continue;
       }
+
       float targetAspect = (float)COVER_WIDTH / COVER_HEIGHT;
       float imageAspect = (float)img.width / img.height;
-
       Rectangle cropRect;
       if (imageAspect > targetAspect) {
-        // Image is wider – crop horizontal sides
         int cropWidth = (int)(img.height * targetAspect);
         cropRect = {(float)(img.width - cropWidth) / 2.0f, 0.0f,
                     (float)cropWidth, (float)img.height};
       } else {
-        // Image is taller – crop vertical sides
         int cropHeight = (int)(img.width / targetAspect);
         cropRect = {0.0f, (float)(img.height - cropHeight) / 2.0f,
                     (float)img.width, (float)cropHeight};
@@ -494,24 +529,20 @@ void processAllSetImages() {
       ImageCrop(&img, cropRect);
       ImageResize(&img, COVER_WIDTH, COVER_HEIGHT);
 
-      // Generate a unique filename for this cover
-      // Use setid + an index (or a hash of the path to avoid collisions)
       std::string coverName = "cover_" + std::to_string(setid) + "_" +
                               std::to_string(coverIndex++) + ".bmp";
-
-      // Save to the set directory
       std::string setDir =
           Global.DatabaseLocation + "/" + std::to_string(setid);
-      if (!fs::exists(setDir))
-        fs::create_directory(setDir);
+      normalizePath(setDir);
+      if (!dirExists(setDir))
+        createDir(setDir);
       std::string outPath = setDir + "/" + coverName;
-      ExportImage(img, outPath.c_str()); // fallback to BMP/PNG
-
+      ExportImage(img, outPath.c_str());
       UnloadImage(&img);
 
-      // Store mapping and assign to current beatmap
       bgToCover[fullBgPath] = coverName;
       file.coverFile = coverName;
     }
   }
+#endif
 }

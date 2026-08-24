@@ -2906,6 +2906,7 @@ static bool InitGraphicsDevice(int width, int height)
     if (!CORE.Window.handle)
     {
         SDL_Quit();
+        printf(SDL_GetError());
         TRACELOG(LOG_WARNING, "SDL: Failed to initialize Window");
         return false;
     }

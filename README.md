@@ -113,6 +113,7 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [ ] Add the flakes~
 
 
+running on WSLg may need `SDL_VIDEODRIVER=wayland ./linuxmakefast.sh`
 
 
 
