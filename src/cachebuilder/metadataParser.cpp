@@ -1,10 +1,12 @@
 #include "cachebuilder/metadataParser.hpp"
+#include "time_util.hpp"
 #include "utils.hpp"
 #include <algorithm>
 #include <dirent.h>
 #include <functional>
 #include <iostream>
 #include <map>
+#include <stack>
 #include <stdio.h>
 #include <string>
 #include <sys/stat.h>
@@ -30,7 +32,11 @@ static void createDir(const std::string &path) {
 #ifdef THREEDS_BUILD
   mkdir(path.c_str(), 0755);
 #else
+#ifdef __linux__
+  mkdir(path.c_str(), 0755);
+  #else
   mkdir(path.c_str());
+  #endif
 #endif
 }
 
@@ -48,64 +54,86 @@ static void normalizePath(std::string &path) {
   }
 }
 
-// ------------------------------------------------------------------
-// buildFileMap – iterative DFS using an explicit stack
+struct DirState {
+    std::string path;
+    std::vector<std::string> entries;  // names of files/subdirs (excluding hidden)
+    size_t index;
+};
+
 void buildFileMap(std::string root) {
-  normalizePath(root);
-  // Remove trailing slash if any
-  if (!root.empty() && root.back() == '/')
-    root.pop_back();
+    normalizePath(root);
+    if (!root.empty() && root.back() == '/')
+        root.pop_back();
 
-  std::vector<std::string> stack;
-  stack.push_back(root);
+    std::cout << "\e[1;35m[DATABASE] \e[38;5;236mStarting search at " << root << std::endl;
+    //SleepInMs(30);
 
-  while (!stack.empty()) {
-    std::string currentDir = stack.back();
-    stack.pop_back();
-
-    DIR *dr = opendir(currentDir.c_str());
-    if (!dr) {
-      std::cerr << "Could not open directory: " << currentDir << std::endl;
-      continue;
-    }
-
-    struct dirent *de;
-    while ((de = readdir(dr)) != nullptr) {
-      std::string filename = de->d_name;
-      if (filename[0] == '.')
-        continue; // skip hidden
-
-      std::string combinedPath = currentDir + "/" + filename;
-      normalizePath(combinedPath);
-
-#ifdef _DIRENT_HAVE_D_TYPE
-      if (de->d_type == DT_DIR) {
-        stack.push_back(combinedPath); // push subdir for later
-      } else if (de->d_type == DT_REG &&
-                 IsFileExtension(filename.c_str(), ".osu")) {
-        addFileToMap(combinedPath);
-      }
-#else
-      // Fallback: use stat to determine type
-      struct stat st;
-      if (stat(combinedPath.c_str(), &st) == 0) {
-        if (S_ISDIR(st.st_mode)) {
-          stack.push_back(combinedPath);
-        } else if (S_ISREG(st.st_mode) && combinedPath.size() >= 4 &&
-                   combinedPath.compare(combinedPath.size() - 4, 4, ".osu") ==
-                       0) {
-          addFileToMap(combinedPath);
+    // --- Helper to read directory entries (skip hidden) ---
+    auto readEntries = [](const std::string& dirPath) -> std::vector<std::string> {
+        std::vector<std::string> result;
+        DIR* dir = opendir(dirPath.c_str());
+        if (!dir) return result;
+        struct dirent* de;
+        while ((de = readdir(dir)) != nullptr) {
+            std::string name = de->d_name;
+            if (name[0] != '.')   // skip hidden and "."/".."
+                result.push_back(name);
         }
-      }
-#endif
+        closedir(dir);
+        return result;
+    };
+
+    // --- Initialise stack with root ---
+    std::stack<DirState> stack;
+    stack.push({root, readEntries(root), 0});
+
+    std::cout << "\e[1;35m[DATABASE] \e[38;5;236mPushed root to stack" << std::endl;
+    //SleepInMs(30);
+    while (!stack.empty()) {
+        DirState& state = stack.top();
+
+        if (state.index < state.entries.size()) {
+            std::string entryName = state.entries[state.index];
+            std::string fullPath = state.path + "/" + entryName;
+            normalizePath(fullPath);
+
+            // Determine type using stat()
+            struct stat st;
+            if (stat(fullPath.c_str(), &st) == 0) {
+                if (S_ISDIR(st.st_mode)) {
+                    // --- It's a directory: push new frame after incrementing index ---
+                    state.index++;  // remember to skip this directory when we return
+                    DirState newState;
+                    newState.path = fullPath;
+                    newState.entries = readEntries(fullPath);
+                    newState.index = 0;
+                    stack.push(std::move(newState));
+                    std::cout << "\e[1;35m[DATABASE] \e[38;5;236mPushed " << fullPath << " to stack, size:" << stack.size() << std::endl;
+                    //SleepInMs(30);
+                    continue;  // process the new directory now
+                }
+                else if (S_ISREG(st.st_mode) && IsFileExtension(entryName.c_str(), ".osu")) {
+                    // --- Beatmap file ---
+                    std::cout << "\e[1;35m[DATABASE] \e[38;5;236mAdding " << fullPath << " to map" << std::endl;
+                    //SleepInMs(30);
+                    addFileToMap(fullPath);
+                }
+                // else: other file types are ignored
+            }
+            // If stat failed, we skip this entry (e.g., broken symlink)
+            state.index++;   // move to next entry
+        } else {
+            // --- Finished all entries in current directory ---
+            stack.pop();
+        }
     }
-    closedir(dr);
-  }
 }
 
 // ------------------------------------------------------------------
 // addFileToMap – unchanged, but uses normalizePath already done
 void addFileToMap(std::string path) {
+  std::cout << "\e[1;35m[DATABASE] \e[38;5;236maddFileToMap " << path << std::endl;
+  //SleepInMs(30);
   std::vector<std::string> output = ParseNameFile(path);
   if (output.empty() || output.size() < 6)
     return;
@@ -118,8 +146,8 @@ void addFileToMap(std::string path) {
       .artist = output[1],
       .creator = output[2],
       .version = output[3],
-      .setid = std::stoi(output[4]),
-      .id = std::stoi(output[5]),
+      .setid = std::strtol(output[4].c_str(), nullptr, 10),
+      .id = std::strtol(output[5].c_str(), nullptr, 10),
       .bgImage = bgImage,
       .coverFile = " " // will be filled later
   };
@@ -130,6 +158,8 @@ void addFileToMap(std::string path) {
 // writeBeatmapFile – uses POSIX mkdir and fopen
 void writeBeatmapFile(int setid,
                       const std::vector<FileMetadata> &metadataList) {
+  std::cout << "\e[1;35m[DATABASE] \e[38;5;236mwriteBeatmapFile " << setid << std::endl;
+  //SleepInMs(30);
   std::string dir_name = Global.DatabaseLocation + "/" + std::to_string(setid);
   normalizePath(dir_name);
   if (!dirExists(dir_name))
@@ -178,26 +208,39 @@ void listAllMaps() {
 void writeBeatmapSetFile(const std::string &filename, int beatmap_set_id,
                          const std::string &title,
                          const std::map<std::string, int> &selection) {
+  std::cout << "\e[1;35m[DATABASE] \e[38;5;236mwriteBeatmapSetFile " << filename << std::endl;
+  //SleepInMs(30);
   FILE *file = fopen(filename.c_str(), "a");
   if (!file) {
     std::cerr << "Error: Could not open " << filename << " for appending.\n";
     return;
   }
 
+  auto it = namesOfSets.find(beatmap_set_id);
+  if (it == namesOfSets.end()){
+    fclose(file);
+    return;
+  }
+  const auto& metadataListObj = it->second;
+
+
   fprintf(file, "[%d]\n", beatmap_set_id);
   fprintf(file, "Title:%s\n", title.c_str());
 
+
+  
+
   // Build IDs list
   std::string ids_list;
-  for (size_t i = 0; i < namesOfSets[beatmap_set_id].size(); ++i) {
+  for (size_t i = 0; i < metadataListObj.size(); ++i) {
     if (!ids_list.empty())
       ids_list += ",";
-    ids_list += std::to_string(namesOfSets[beatmap_set_id][i].id);
+    ids_list += std::to_string(metadataListObj[i].id);
   }
 
   // Build Artists list (unique)
   std::string artists_list;
-  for (const auto &file : namesOfSets[beatmap_set_id]) {
+  for (const auto &file : metadataListObj) {
     if (artists_list.find(file.artist) == std::string::npos) {
       if (!artists_list.empty())
         artists_list += ", ";
@@ -207,7 +250,7 @@ void writeBeatmapSetFile(const std::string &filename, int beatmap_set_id,
 
   // Build Creators list (unique)
   std::string creators_list;
-  for (const auto &file : namesOfSets[beatmap_set_id]) {
+  for (const auto &file : metadataListObj) {
     if (creators_list.find(file.creator) == std::string::npos) {
       if (!creators_list.empty())
         creators_list += ", ";
@@ -215,7 +258,14 @@ void writeBeatmapSetFile(const std::string &filename, int beatmap_set_id,
     }
   }
 
-  fprintf(file, "Maps:%d\n", numberOfMaps[beatmap_set_id]);
+  auto nit = numberOfMaps.find(beatmap_set_id);
+  if (nit == numberOfMaps.end()){
+    fclose(file);
+    return;
+  }
+  const auto& numObj = nit->second;
+
+  fprintf(file, "Maps:%d\n", numObj);
   fprintf(file, "IDs:%s\n", ids_list.c_str());
   fprintf(file, "Artists:%s\n", artists_list.c_str());
   fprintf(file, "Creators:%s\n\n", creators_list.c_str());
@@ -226,6 +276,8 @@ void writeBeatmapSetFile(const std::string &filename, int beatmap_set_id,
 // ------------------------------------------------------------------
 // decideNamesForSets – now clears each set after writing to save memory
 void decideNamesForSets() {
+  std::cout << "\e[1;35m[DATABASE] \e[38;5;236mdecideNamesForSets " << std::endl;
+  //SleepInMs(30);
   decidedNames.clear();
   numberOfMaps.clear();
   std::string dbFile = Global.DatabaseLocation + "/beatmapsets.db";
@@ -277,11 +329,17 @@ void decideNamesForSets() {
 
 // ------------------------------------------------------------------
 // clearFileMap – already okay
+
 void clearFileMap() {
   for (auto &pair : namesOfSets) {
     pair.second.clear();
   }
   namesOfSets.clear();
+  for (auto &pair : decidedNames) {
+    pair.second.clear();
+  }
+  decidedNames.clear();
+  numberOfMaps.clear();
 }
 
 // ------------------------------------------------------------------

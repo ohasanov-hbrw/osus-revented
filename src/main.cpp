@@ -51,6 +51,9 @@
 #define OPACITY_VARIATION_BACKGROUND_TRIS 40
 #define SPEED_BACKGROUND_TRIS 10
 
+
+//#include <sanitizer/lsan_interface.h>
+
 Vector2 **backgroundTriangles;
 Color *backgroundTriangleColors;
 Vector2 *backgroundTriangleVelocity;
@@ -172,6 +175,10 @@ void RenderLoop(void *){
     Global.shdrOutline = LoadShader(0, TextFormat((Global.GameBinaryPath + "/resources/shaders/glsl%i/outline.fs").c_str(), 100));
     Global.shdrTest = LoadShader(TextFormat((Global.GameBinaryPath + "/resources/shaders/glsl%i/mcosu.vsh").c_str(), 330), TextFormat((Global.GameBinaryPath + "/resources/shaders/glsl%i/mcosu.fsh").c_str(), 330));
     
+
+    
+
+
     // Loading textures for the custom cursors.
     // The game crashes here if you have no skins, which duh, you SHOULD
     std::string lastPath = Global.Path;
@@ -364,8 +371,12 @@ void RenderLoop(void *){
     free(backgroundTriangleColors);
     free(backgroundTriangleVelocity);
 
+
+    UnloadShader(Global.shdrOutline);
+    UnloadShader(Global.shdrTest);
     // Deinitialize GPU
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Trying to exit the rendering thread\n";
+    //unloads cursor and logo
     _gpu_exit_render_thread();
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Finalized the renderthread\n";
 	return;
@@ -513,6 +524,8 @@ int main(){
             avgHZq.pop();
         }
         avgHZ = avgHZqueueSUM / (double)(avgHZq.size());
+
+        //__lsan_do_recoverable_leak_check();
     }
     
     // Signal the end of program

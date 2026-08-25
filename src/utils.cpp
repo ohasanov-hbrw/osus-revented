@@ -823,7 +823,10 @@ void DrawTextStyled(Font *font, const char *text, Vector2 position,
   // - Define background color:      [bRRGGBBAA]
   // - Reset formating:              [r]
   // Example: [bAA00AAFF][cFF0000FF]red text on gray background[r] normal text
-
+  #ifdef THREEDS_BUILD
+  position.x = (int)position.x;
+  position.y = (int)position.y;
+  #endif
   if (font->texture.id == 0)
     *font = GetFontDefault();
 

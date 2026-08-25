@@ -1,7 +1,11 @@
-CC = g++ -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT 
+CC = g++ -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -DSUPPORT_DEFAULT_FONT -DSUPPORT_MODULE_RTEXT
 cflags = -std=c++20 -O0 -g -ggdb -Wall -Wno-write-strings -Wno-narrowing
+#cflags = -std=c++20 -fsanitize=address -g -O1 -fno-omit-frame-pointer -Wall -Wno-write-strings -Wno-narrowing
+
 cflags += -Ivendor/raylib/src -Iinclude -Iinclude/menu_shapes -Iinclude/cachebuilder -Iinclude/msaa -Ivendor/zip/src -Iinclude/sound  -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DMSAA_RENDER -D_MSAA_RENDER
-ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl -lSDL2main -lSDL2 -lpthread 
+
+ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl -lSDL2main -lSDL2 -lpthread
+#ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl -lSDL2main -lSDL2 -lpthread -fsanitize=address
 name = osus 
 
 

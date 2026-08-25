@@ -165,7 +165,7 @@ void PlayMenu::init() {
   }
   menu.init();
   leftSideBox.SetText(leftSideFormatted);
-  leftSideBox.SetFontSize(30.05);
+  leftSideBox.SetFontSize(30.08f);
   leftSideBox.SetSpacing(2);
   leftSideBox.SetWrapWords(true);
   leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40,

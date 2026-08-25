@@ -59,7 +59,7 @@ void GameManager::update(){
 	// Current implementation of the backgrounds
 	int eventSize = gameFile.events.size();
 	for(int i = eventSize-1; i >= 0; i--){
-		if(gameFile.events[i].startTime <= currentTime*1000.0f){
+		if(gameFile.events[i].startTime <= currentTime*1000.0f || gameFile.events[i].eventType != 0){ // skip videos bruh
 			if(gameFile.events[i].eventType == 0){
 				currentBackgroundTexture = gameFile.events[i].filename;
 			}

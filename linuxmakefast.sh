@@ -1,1 +1,1 @@
-make run -j3 --makefile=MakefilePC
+make run -j3 --makefile=MakefilePC CFLAGS+="-DLINUX"

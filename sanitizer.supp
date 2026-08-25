@@ -1,0 +1,5 @@
+leak:libpango
+leak:libfontconfig
+leak:libdecor
+leak:libSDL3
+leak:<unknown module>

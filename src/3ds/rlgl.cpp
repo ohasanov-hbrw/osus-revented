@@ -1585,6 +1585,10 @@ Shader LoadShader(const char *vsFileName, const char *fsFileName){
     Shader shader = { 0 };
     return shader;
 }
+
+void UnloadShader(Shader shader){
+    return;
+}
 int GetShaderLocation(Shader shader, const char *uniformName){
     return 0;
 }

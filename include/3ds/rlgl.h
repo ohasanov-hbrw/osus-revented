@@ -144,6 +144,7 @@ void DrawTextureRotate(Texture2D *tex, float x, float y, float s, float r, Color
 
 //NO SHADER SUPPORT
 Shader LoadShader(const char *vsFileName, const char *fsFileName);
+void UnloadShader(Shader shader);
 int GetShaderLocation(Shader shader, const char *uniformName);
 void SetShaderValue(Shader shader, int locIndex, const void *value, int uniformType);
 void BeginShaderMode(Shader shader);
