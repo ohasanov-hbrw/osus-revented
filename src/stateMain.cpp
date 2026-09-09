@@ -360,7 +360,7 @@ void MainMenu::update() {
     // Global.CurrentState->init();
     MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     std::string temp = Global.Path;
-    Global.Path = Global.GameBinaryPath + "/database";
+    Global.Path = Global.DatabaseLocation;
 
     struct dirent *de;
     DIR *dr = opendir(Global.Path.c_str());
@@ -437,7 +437,7 @@ void MainMenu::update() {
             GameAuthor = geym.configMetadata["Artist"];
           }
 
-          std::string filename = Global.GameBinaryPath + "/database/" +
+          std::string filename = Global.DatabaseLocation + "/" +
                                  GameTitle + " {" + GameSetId + "}.db";
           bool firstLine = !checkIfExists((filename).c_str());
           FILE *pFile;
@@ -462,12 +462,12 @@ void MainMenu::update() {
       }
     }
 
-    Global.Path = Global.GameBinaryPath + "/database";
+    Global.Path = Global.DatabaseLocation;
 
     std::vector<std::string> files;
     files = ls(".db");
     std::sort(files.begin(), files.end(), strcasecmp2);
-    std::string filename = Global.GameBinaryPath + "/database/mainFolder.db";
+    std::string filename = Global.DatabaseLocation + "/" + "mainFolder.db";
     FILE *pFile;
     pFile = fopen((filename).c_str(), "a");
     if (pFile != NULL) {

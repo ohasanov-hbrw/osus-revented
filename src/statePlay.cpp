@@ -7,6 +7,7 @@
 #include "rlgl.h"
 #include "settingsParser.hpp"
 #include "state.hpp"
+#include "time_util.hpp"
 #include "utils.hpp"
 #include "zip.h"
 #include <algorithm>
@@ -24,7 +25,9 @@
 
 #include "cachebuilder/metadataParser.hpp" // for namesOfSets
 
-enum PLAYMENU_ELEMENTS{
+PlayMenu *PlayMenu::instance = nullptr;
+
+enum PLAYMENU_ELEMENTS {
   SCROLLER = 0,
   BOTTOM_CARD = 1,
   TOP_CARD = 2,
@@ -75,6 +78,7 @@ PlayMenu::PlayMenu() {
 }
 
 void PlayMenu::init() {
+
   lastSelection = 0;
   // MutexLock(SWITCHING_STATE);
   // std::cout << "loading the playmenu/n";
@@ -89,7 +93,7 @@ void PlayMenu::init() {
                             BLACK, 20, 20, 65);
 
   menu.elements.push_back(std::make_unique<FancyScrollingList>());
-  menu.elements[SCROLLER].get()->baseColor = {64, 48, 64, 192};
+  menu.elements[SCROLLER].get()->baseColor = {32, 24, 32, 128};
   menu.elements[SCROLLER].get()->textColor = WHITE;
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[1].get()->baseColor = {64, 48, 64, 192};
@@ -99,7 +103,6 @@ void PlayMenu::init() {
   menu.elements[3].get()->baseColor = {0xAA, 0x00, 0xAA, 192};
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[4].get()->baseColor = {0xAA, 0x00, 0xAA, 192}; // CC00AAFF
-
 
   float spacingWidth = 160;
   float spacingWidthTop = 240;
@@ -152,7 +155,8 @@ void PlayMenu::init() {
       Rectangle{rightMostX - 220, bottomMostY - 10 - 40, 105, 40};
   menu.elements[4].get()->internalBox.SetBox(menu.elements[4].get()->textRect);
 
-  menu.elements[SCROLLER].get()->positions.push_back({rightMostX - 310, topMostY});
+  menu.elements[SCROLLER].get()->positions.push_back(
+      {rightMostX - 310, topMostY});
   menu.elements[SCROLLER].get()->positions.push_back({rightMostX, bottomMostY});
 
   inBeatmapView = false;
@@ -171,14 +175,20 @@ void PlayMenu::init() {
   leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40,
                                  (rightMostX - 330) - (leftMostX + 20),
                                  (bottomMostY - topMostY) - 80});
+  loadLoaderThread();
   initializationStage = STATE_INITIALIZED;
 }
+
 void PlayMenu::render() {
   if (initializationStage != STATE_INITIALIZED)
     return;
   // Global.mutex.lock();
   // MutexLock(SWITCHING_STATE);
   // MutexLock(ACCESSING_OBJECTS);
+  float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+  float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+  float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+  float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
   MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
   // bg.render();
   // description.render();
@@ -188,6 +198,120 @@ void PlayMenu::render() {
   // close.render();
 
   // name.render();
+
+  float screenW = rightMostX - leftMostX;
+  float screenH = bottomMostY - topMostY;
+
+  auto *fancyList =
+      dynamic_cast<FancyScrollingList *>(menu.elements[SCROLLER].get());
+
+  int selectionCurrent = fancyList ? fancyList->currentSelection : 0;
+  if (!inBeatmapView && !beatmapSets.empty() && selectionCurrent >= 0 &&
+      selectionCurrent < (int)beatmapSets.size()) {
+    int selectedSid = beatmapSets[selectionCurrent % beatmapSets.size()].setid;
+    for (auto &slot : icons) {
+      if (slot.setid.load() == selectedSid &&
+          slot.state.load() == TEX_STATE_READY) {
+        float screenAspect = screenW / screenH;
+        float texW = (float)slot.texture.width;
+        float texH = (float)slot.texture.height;
+        float texAspect = texW / texH;
+        Rectangle srcRect;
+        if (texAspect > screenAspect) {
+          float cropW = texH * screenAspect;
+          float cropX = (texW - cropW) / 2.0f;
+          srcRect = {cropX, 0.0f, cropW, texH};
+        } else {
+          float cropH = texW / screenAspect;
+          float cropY = (texH - cropH) / 2.0f;
+          srcRect = {0.0f, cropY, texW, cropH};
+        }
+        Rectangle destRect = ScaleRect({leftMostX, topMostY, screenW, screenH});
+        DrawTexturePro(&slot.texture, srcRect, destRect, {0.0f, 0.0f}, 0.0f,
+                       Color{64, 64, 64, 128});
+        break;
+      }
+    }
+  } else if (inBeatmapView) {
+    int selection = fancyList->currentSelection;
+    if (!currentBeatmaps.empty() && selection >= 0 &&
+        selection < (int)currentBeatmaps.size()) {
+      int sid = currentBeatmaps[selection].setid;
+      for (auto &slot : icons) {
+        if (slot.setid.load() == sid && slot.state.load() == TEX_STATE_READY) {
+          float screenAspect = screenW / screenH;
+          float texW = (float)slot.texture.width;
+          float texH = (float)slot.texture.height;
+          float texAspect = texW / texH;
+          Rectangle srcRect;
+          if (texAspect > screenAspect) {
+            float cropW = texH * screenAspect;
+            float cropX = (texW - cropW) / 2.0f;
+            srcRect = {cropX, 0.0f, cropW, texH};
+          } else {
+            float cropH = texW / screenAspect;
+            float cropY = (texH - cropH) / 2.0f;
+            srcRect = {0.0f, cropY, texW, cropH};
+          }
+          Rectangle destRect =
+              ScaleRect({leftMostX, topMostY, screenW, screenH});
+          DrawTexturePro(&slot.texture, srcRect, destRect, {0.0f, 0.0f}, 0.0f,
+                         Color{64, 64, 64, 128});
+          break;
+        }
+      }
+    }
+  }
+
+  if (!inBeatmapView && fancyList && !beatmapSets.empty()) {
+    for (size_t i = 0; i < fancyList->objects.size(); ++i) {
+      int itemIdx = (int)i - (int)fancyList->objects.size() / 2 -
+                    fancyList->graphicalObjectOffsetFull;
+
+      if (itemIdx < 0 || itemIdx >= (int)beatmapSets.size())
+        continue;
+
+      const auto &obj = fancyList->objects[i];
+
+      // Skip off-screen items
+      if (obj->positions[1].y <= fancyList->positions[0].y ||
+          obj->positions[0].y >= fancyList->positions[1].y)
+        continue;
+
+      int sid = beatmapSets[itemIdx].setid;
+
+      for (auto &slot : icons) {
+        if (slot.setid.load() == sid && slot.state.load() == TEX_STATE_READY) {
+          float cardX = obj->positions[0].x;
+          float cardY = obj->positions[0].y;
+          float cardW = obj->positions[1].x - obj->positions[0].x;
+          float cardH = obj->positions[1].y - obj->positions[0].y;
+          Rectangle destRect = ScaleRect({cardX, cardY, cardW, cardH});
+          float cardAspect = cardW / cardH;
+          float texAspect =
+              (float)slot.texture.width / (float)slot.texture.height;
+
+          Rectangle srcRect;
+          if (texAspect > cardAspect) {
+            float srcW = slot.texture.height * cardAspect;
+            float srcX = (slot.texture.width - srcW) / 2.0f;
+            srcRect = {srcX, 0.0f, srcW, (float)slot.texture.height};
+          } else {
+            float srcH = slot.texture.width / cardAspect;
+            float srcY = (slot.texture.height - srcH) / 2.0f;
+            srcRect = {0.0f, srcY, (float)slot.texture.width, srcH};
+          }
+          Color tint = WHITE;
+          tint.a = obj->baseColor.a;
+
+          DrawTexturePro(&slot.texture, srcRect, destRect, {0.0f, 0.0f}, 0.0f,
+                         tint);
+          break;
+        }
+      }
+    }
+  }
+
   menu.render();
 
   int selection = dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
@@ -203,11 +327,6 @@ void PlayMenu::render() {
   options.render();
   close.render();
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
-
-  float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
-  float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
-  float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
-  float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
 
   DrawRectangleLinesEx(ScaleRect({rightMostX - 317.5, 240 - 85 / 2.0, 340, 85}),
                        Scale(4), {0xAA, 0x00, 0xAA, 192});
@@ -287,15 +406,28 @@ void PlayMenu::update() {
     usedskin.position = {leftMostX + 100, bottomMostY - 40};
     usedsound.position = {leftMostX + 100, bottomMostY - 60};
     options.position = {leftMostX + 75, bottomMostY - 15};
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+    unloadLoaderThread(false);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
   }
 
   dynamic_cast<FancyScrollingList *>(menu.elements[0].get())->frameChange +=
       (Global.Wheel);
   menu.update();
 
+  if (icons.size() == 0) {
+    std::cout << "trying to reload loaderthread" << std::endl;
+    loadLoaderThread();
+  }
+
   auto *fancyList = dynamic_cast<FancyScrollingList *>(menu.elements[0].get());
 
   if (dynamic_cast<ClickableObject *>(menu.elements[3].get())->action) {
+
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+    unloadLoaderThread(false);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+
     dynamic_cast<ClickableObject *>(menu.elements[3].get())->action = false;
     if (!inBeatmapView) {
       // Switch from set view to beatmap view
@@ -352,6 +484,10 @@ void PlayMenu::update() {
     }
   }
   if (dynamic_cast<ClickableObject *>(menu.elements[4].get())->action) {
+    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+    unloadLoaderThread(false);
+    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+
     dynamic_cast<ClickableObject *>(menu.elements[4].get())->action = false;
     if (inBeatmapView) {
       inBeatmapView = false;
@@ -379,24 +515,18 @@ void PlayMenu::update() {
   int selection = dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
                       ->currentSelection;
   if (!beatmapSets.empty()) {
-    
-
     if (!inBeatmapView) {
       selection %= beatmapSets.size();
       std::string newString = TextFormat(
           "[cCC00AAFF]Title: [r]%s\n\n[cCC00AAFF]Maps: "
           "[r]%d\n[cCC00AAFF]Artists: "
-          "[r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: [cFFFFFF99]%d" //,
-          "\n[cCC00AA99]CurrentSelection: "
-          "[cFFFFFF99]%d\n[cCC00AA99]GraphicalOffsetFull: [cFFFFFF99]%f",
+          "[r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: "
+          "[cFFFFFF99]%d" //,
+          ,
           beatmapSets[selection].title.c_str(), beatmapSets[selection].number,
           beatmapSets[selection].artists.c_str(),
-          beatmapSets[selection].creators.c_str(), beatmapSets[selection].setid
-          ,dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
-              ->currentSelection,
-          dynamic_cast<FancyScrollingList *>(menu.elements[0].get())
-              ->graphicalObjectOffsetFull
-      );
+          beatmapSets[selection].creators.c_str(),
+          beatmapSets[selection].setid);
       if (newString != leftSideFormatted) {
         leftSideFormatted = newString;
         leftSideBox.SetText(leftSideFormatted);
@@ -433,6 +563,97 @@ void PlayMenu::update() {
     MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
     return;
   }
+
+  if (inBeatmapView) {
+    int selection = fancyList->currentSelection;
+    if (!currentBeatmaps.empty() && selection >= 0 &&
+        selection < (int)currentBeatmaps.size()) {
+      int sid = currentBeatmaps[selection].setid;
+      bool alreadyAssigned = false;
+      for (const auto &slot : icons) {
+        if (slot.setid.load() == sid && slot.state.load() != TEX_STATE_FREE) {
+          alreadyAssigned = true;
+          break;
+        }
+      }
+      if (!alreadyAssigned) {
+        for (auto &slot : icons) {
+          if (slot.state.load() == TEX_STATE_FREE) {
+            slot.setid.store(sid);
+            slot.state.store(TEX_STATE_NEEDS_DISK_LOAD);
+            break;
+          }
+        }
+      }
+    }
+    for (auto &slot : icons) {
+      if (slot.state.load() == TEX_STATE_DISK_LOADED ||
+          slot.state.load() == TEX_STATE_NEEDS_UNLOAD)
+        textureOpsDone.store(false);
+    }
+    return;
+  }
+  if (!fancyList || beatmapSets.empty())
+    return;
+
+  int totalSets = beatmapSets.size();
+  int numSlots = fancyList->objects.size();
+
+  int minVisibleIdx = -numSlots / 2 - fancyList->graphicalObjectOffsetFull - 1;
+  int maxVisibleIdx = numSlots / 2 - fancyList->graphicalObjectOffsetFull + 1;
+
+  std::unordered_set<int> visibleSetIds;
+  for (int itemIdx = maxVisibleIdx; itemIdx >= minVisibleIdx; itemIdx--) {
+    if (itemIdx >= 0 && itemIdx < totalSets) {
+      visibleSetIds.insert(beatmapSets[itemIdx].setid);
+    }
+  }
+
+  // 1. Mark out-of-view textures for GPU unload
+  for (auto &slot : icons) {
+    int sid = slot.setid.load();
+    int st = slot.state.load();
+
+    if (st != TEX_STATE_FREE && sid != -1) {
+      if (visibleSetIds.find(sid) == visibleSetIds.end()) {
+        if (st == TEX_STATE_READY) {
+          slot.state.store(TEX_STATE_NEEDS_UNLOAD);
+        } else if (st == TEX_STATE_NEEDS_DISK_LOAD) {
+          slot.state.store(TEX_STATE_FREE);
+          slot.setid.store(-1);
+        }
+      }
+    }
+  }
+
+  // 2. Assign missing visible setIDs to free slots
+  for (int sid : visibleSetIds) {
+    bool alreadyAssigned = false;
+    for (const auto &slot : icons) {
+      if (slot.setid.load() == sid && slot.state.load() != TEX_STATE_FREE) {
+        alreadyAssigned = true;
+        break;
+      }
+    }
+
+    if (!alreadyAssigned) {
+      for (auto &slot : icons) {
+        if (slot.state.load() == TEX_STATE_FREE) {
+          slot.setid.store(sid);
+          slot.state.store(TEX_STATE_NEEDS_DISK_LOAD);
+          break;
+        }
+      }
+    }
+  }
+
+  for (auto &slot : icons) {
+    if (slot.state.load() == TEX_STATE_DISK_LOADED ||
+        slot.state.load() == TEX_STATE_NEEDS_UNLOAD)
+      textureOpsDone.store(false);
+  }
+
+  // Signal render thread that ops are pending
 
   // if (select.action or dir_list.action) {
   //   if (dir_list.objects.size() > 0 and
@@ -485,12 +706,155 @@ void PlayMenu::update() {
   //// MutexUnlock(ACCESSING_OBJECTS);
   //// MutexUnlock(SWITCHING_STATE);
 }
+
+static int currentTexNumber = 0;
+static int currentImgNumber = 0;
+
 void PlayMenu::unload() {
   initializationStage = STATE_UNINITIALIZED;
+
+  unloadLoaderThread(true);
+
+  instance = nullptr;
+
   menu.deinit();
   beatmapSets.clear();
   leftSideFormatted.clear();
   inBeatmapView = false;
   currentBeatmaps.clear();
 }
-void PlayMenu::textureOps() {}
+
+// only this function can convert images to textures
+void PlayMenu::textureOps() {
+  if (textureOpsDone)
+    return;
+
+  for (auto &slot : icons) {
+    int st = slot.state.load();
+
+    // Upload decoded CPU image to GPU VRAM
+    if (st == TEX_STATE_DISK_LOADED) {
+      currentTexNumber++;
+      std::cout << currentTexNumber << " " << slot.setid.load()
+                << " loaded a tex\n";
+
+      slot.texture = LoadTextureFromImage(&slot.image);
+      currentImgNumber--;
+      std::cout << "image: " << currentImgNumber << std::endl;
+      UnloadImage(&slot.image);
+      SetTextureFilter(&slot.texture, TEXTURE_FILTER_BILINEAR);
+      slot.state.store(TEX_STATE_READY);
+    }
+    // Free VRAM when scrolled out of view
+    else if (st == TEX_STATE_NEEDS_UNLOAD) {
+      currentTexNumber--;
+      std::cout << currentTexNumber << " " << slot.setid.load()
+                << " unloaded a tex\n";
+      slot.state.store(TEX_STATE_FREE);
+      UnloadTexture(&slot.texture);
+      slot.setid.store(-1);
+    }
+  }
+
+  textureOpsDone.store(true);
+}
+
+void PlayMenu::workerThreadEntryPoint(void *arg) {
+  if (instance) {
+    instance->workerThreadImpl();
+  }
+}
+
+void PlayMenu::workerThreadImpl() {
+  while (!loaderShouldStop.load()) {
+    bool worked = false;
+
+    for (auto &slot : icons) {
+      if (slot.state.load() == TEX_STATE_NEEDS_DISK_LOAD) {
+        int sid = slot.setid.load();
+        std::string path = Global.DatabaseLocation + "/" + std::to_string(sid) + "/cover_" +
+                           std::to_string(sid) + "_0.bmp";
+
+        if (FileExists(path.c_str())) {
+          slot.image = LoadImage(path.c_str());
+          currentImgNumber++;
+          std::cout << "image: " << currentImgNumber << std::endl;
+          slot.state.store(TEX_STATE_DISK_LOADED);
+
+        } else {
+          slot.state.store(TEX_STATE_FREE);
+          slot.setid.store(-1);
+        }
+        worked = true;
+        break;
+      }
+    }
+
+    if (worked) {
+      textureOpsDone.store(false);
+    }
+
+    if (!worked) {
+      SleepInMs(16);
+    }
+  }
+}
+
+void PlayMenu::unloadLoaderThread(bool lockedMutexes) {
+  if (!loaderLoaded)
+    return;
+
+  loaderShouldStop.store(true);
+  _multithread_join_thread(&backgroundLoader);
+  _multithread_free_thread(&backgroundLoader);
+  for (auto &slot : icons) {
+    if (slot.state.load() == TEX_STATE_READY) {
+      slot.state.store(TEX_STATE_NEEDS_UNLOAD);
+    }
+    if (slot.state.load() == TEX_STATE_DISK_LOADED) {
+      slot.state.store(TEX_STATE_FREE);
+      currentImgNumber--;
+      std::cout << "image: " << currentImgNumber << std::endl;
+      UnloadImage(&slot.image);
+    }
+  }
+  if (lockedMutexes) {
+    MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+    MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
+  }
+  textureOpsDone.store(false);
+  while (!textureOpsDone.load()) {
+    std::cout << "waiting for textureops\n";
+    SleepInMs(lockedMutexes ? 50 : 1);
+  }
+  if (lockedMutexes) {
+    MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+    MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
+    icons.clear();
+  } else {
+    MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+    icons.clear();
+    MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
+  }
+  loaderLoaded = false;
+}
+
+void PlayMenu::loadLoaderThread() {
+  if (loaderLoaded)
+    return;
+  instance = this;
+  loaderShouldStop.store(false);
+  textureOpsDone.store(true);
+  auto *fancyList =
+      dynamic_cast<FancyScrollingList *>(menu.elements[SCROLLER].get());
+  int numSlots = fancyList ? fancyList->objects.size() : 12;
+  std::cout << "allocated place for " << numSlots << " objects" << std::endl;
+  icons.resize(numSlots + 2);
+  for (auto &slot : icons) {
+    slot.state.store(TEX_STATE_FREE);
+    slot.setid.store(-1);
+  }
+  loaderLoaded = true;
+  backgroundLoader =
+      _multithread_thread_create(&PlayMenu::workerThreadEntryPoint);
+}

@@ -18,3 +18,4 @@ bool IsFileExtension(const char *fileName, const char *ext);
 Image GenImageGradientRadial(int width, int height, float density, Color inner, Color outer);
 
 Color GetColor(unsigned int hexValue);                                // Get Color structure from hexadecimal value
+bool FileExists(const char *fileName);

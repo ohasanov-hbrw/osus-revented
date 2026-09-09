@@ -31,8 +31,48 @@ void MutexLock(int i, int j) {
   if (i < 0)
     i = 0;
   if (__mutex_threads_locks[i][j]) {
-    std::cout << "\e[38;5;196m[CRIT] " << "Thread " << j << " tried to relock "
-              << i << std::endl;
+    std::cout << "\e[38;5;196m[CRIT] " << "Thread ";
+    switch(j){
+      case UPDATETHREAD_ID:
+        std::cout << "UPDATE_THREAD";
+        break;
+      case MUSICTHREAD_ID:
+        std::cout << "MUSIC_THREAD";
+        break;
+      case RENDERTHREAD_ID:
+        std::cout << "RENDER_THREAD";
+        break;
+      default:
+        std::cout << j;
+    }
+    std::cout << " tried to relock ";
+
+    switch(i){
+      case RENDER_BLOCK:
+        std::cout << "RENDER_BLOCK" << std::endl;
+        break;
+      case ACCESSING_OBJECTS:
+        std::cout << "ACCESSING_OBJECTS" << std::endl;
+        break;
+      case SWITCHING_STATE:
+        std::cout << "SWITCHING_STATE" << std::endl;
+        break;
+      case LOADER_BLOCK:
+        std::cout << "LOADER_BLOCK" << std::endl;
+        break;
+      case OSU_UPDATE:
+        std::cout << "OSU_UPDATE" << std::endl;
+        break;
+      case MUSIC_BLOCK:
+        std::cout << "MUSIC_BLOCK" << std::endl;
+        break;
+
+      default:
+        std::cout << i << std::endl;
+    }
+    
+
+    
     return;
   }
   __mutex_threads_locks[i][j] = true;
@@ -68,8 +108,45 @@ void MutexUnlock(int i, int j) {
   if (i < 0)
     i = 0;
   if (!__mutex_threads_locks[i][j]) {
-    std::cout << "\e[38;5;196m[CRIT] " << "Thread " << j
-              << " tried to reunlock " << i << std::endl;
+    std::cout << "\e[38;5;196m[CRIT] " << "Thread ";
+    switch(j){
+      case UPDATETHREAD_ID:
+        std::cout << "UPDATE_THREAD";
+        break;
+      case MUSICTHREAD_ID:
+        std::cout << "MUSIC_THREAD";
+        break;
+      case RENDERTHREAD_ID:
+        std::cout << "RENDER_THREAD";
+        break;
+      default:
+        std::cout << j;
+    }
+    std::cout << " tried to reunlock ";
+
+    switch(i){
+      case RENDER_BLOCK:
+        std::cout << "RENDER_BLOCK" << std::endl;
+        break;
+      case ACCESSING_OBJECTS:
+        std::cout << "ACCESSING_OBJECTS" << std::endl;
+        break;
+      case SWITCHING_STATE:
+        std::cout << "SWITCHING_STATE" << std::endl;
+        break;
+      case LOADER_BLOCK:
+        std::cout << "LOADER_BLOCK" << std::endl;
+        break;
+      case OSU_UPDATE:
+        std::cout << "OSU_UPDATE" << std::endl;
+        break;
+      case MUSIC_BLOCK:
+        std::cout << "MUSIC_BLOCK" << std::endl;
+        break;
+
+      default:
+        std::cout << i << std::endl;
+    }
     return;
   }
   __mutex_threads_locks[i][j] = false;

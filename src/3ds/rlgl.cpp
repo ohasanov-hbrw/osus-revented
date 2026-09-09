@@ -7,6 +7,9 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "external/stb_image_resize.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "external/stb_image_write.h"
+
 u32 GetNextPowerOf2(u32 v){
     u32 result = 1;
     while(true){
@@ -525,12 +528,30 @@ void ImageCrop(Image *image, Rectangle crop)
 }
 
 
-bool ExportImage(Image image, const char *fileName)
-{
-    printf("\e[1;38;5;236m[INFO] \e[38;5;236mIMAGE: Image Export!\n");
+bool ExportImage(Image image, const char *fileName){
+    if (!image.data || image.width <= 0 || image.height <= 0 || !fileName) return false;
+
+    int channels = 0;
+    if (image.format == PIXELFORMAT_UNCOMPRESSED_R8G8B8A8) channels = 4;
+    else if (image.format == PIXELFORMAT_UNCOMPRESSED_R8G8B8) channels = 3;
+    else if (image.format == PIXELFORMAT_UNCOMPRESSED_GRAYSCALE) channels = 1;
+    else return false; // Non-standard format requires conversion
+
+    const char *ext = strrchr(fileName, '.');
+    if (!ext) return false;
+
     int success = 0;
-    //need to implement!
-    return success;
+    int stride = image.width * channels;
+
+    if (strcasecmp(ext, ".png") == 0) {
+        success = stbi_write_png(fileName, image.width, image.height, channels, image.data, stride);
+    } else if (strcasecmp(ext, ".bmp") == 0) {
+        success = stbi_write_bmp(fileName, image.width, image.height, channels, image.data);
+    } else if (strcasecmp(ext, ".jpg") == 0 || strcasecmp(ext, ".jpeg") == 0) {
+        success = stbi_write_jpg(fileName, image.width, image.height, channels, image.data, 90);
+    }
+
+    return success != 0;
 }
 
 

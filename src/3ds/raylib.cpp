@@ -94,3 +94,17 @@ Color GetColor(unsigned int hexValue){
 
     return color;
 }
+
+bool FileExists(const char *fileName)
+{
+    bool result = false;
+
+    if (access(fileName, F_OK) != -1) result = true;
+
+    // NOTE: Alternatively, stat() can be used instead of access()
+    //#include <sys/stat.h>
+    //struct stat statbuf;
+    //if (stat(filename, &statbuf) == 0) result = true;
+
+    return result;
+}
