@@ -52,8 +52,13 @@ struct DirState {
 };
 
 // Configurable threshold for RAM management
+#ifdef THREEDS_BUILD
 constexpr size_t BATCH_SET_LIMIT = 5;
 constexpr size_t BATCH_MAP_LIMIT = 50;
+#else
+constexpr size_t BATCH_SET_LIMIT = 20;
+constexpr size_t BATCH_MAP_LIMIT = 200;
+#endif
 
 // Helper: Updates an entry in beatmapsets.db or appends it if new
 void updateOrAppendSetInDb(const std::string &dbFile, int setid,
@@ -443,12 +448,19 @@ std::string extractBackgroundImage(const std::string &osuPath) {
 
   while (fgets(line, sizeof(line), file)) {
     std::string lineStr(line);
-    lineStr.erase(lineStr.find_last_not_of("\r\n") + 1);
+
+    // Trim trailing whitespace / newlines
+    size_t last = lineStr.find_last_not_of("\r\n\t ");
+    if (last != std::string::npos)
+      lineStr.erase(last + 1);
+    else
+      lineStr.clear();
 
     if (lineStr == "[Events]") {
       inEvents = true;
       continue;
     }
+
     if (inEvents && lineStr.rfind("//", 0) == 0)
       continue;
 
@@ -462,25 +474,33 @@ std::string extractBackgroundImage(const std::string &osuPath) {
         if (second != std::string::npos) {
           std::string candidate = lineStr.substr(first + 1, second - first - 1);
 
-          // Convert to lowercase for checking
+          // 1. Trim leading spaces from candidate
+          size_t start = candidate.find_first_not_of(" \t");
+          if (start != std::string::npos) {
+            candidate = candidate.substr(start);
+          } else {
+            candidate.clear(); // Entirely spaces
+          }
+
+          if (candidate.empty())
+            continue;
+
+          // 2. Convert to lowercase for extension check
           std::string lower = candidate;
           for (char &c : lower)
-            c = std::tolower((unsigned char)c);
+            c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 
-          bool isVideo = lower.rfind(".mp4") != std::string::npos ||
-                         lower.rfind(".avi") != std::string::npos ||
-                         lower.rfind(".flv") != std::string::npos ||
-                         lower.rfind(".mkv") != std::string::npos ||
-                         lower.rfind(".mov") != std::string::npos ||
-                         lower.rfind(".wmv") != std::string::npos ||
-                         lower.rfind(".m4v") != std::string::npos ||
-                         lower.rfind(".MP4") != std::string::npos ||
-                         lower.rfind(".AVI") != std::string::npos ||
-                         lower.rfind(".FLV") != std::string::npos ||
-                         lower.rfind(".MKV") != std::string::npos ||
-                         lower.rfind(".MOV") != std::string::npos ||
-                         lower.rfind(".WMV") != std::string::npos ||
-                         lower.rfind(".M4V") != std::string::npos;
+          // Check if it ends with a video extension
+          bool isVideo = false;
+          static const std::string videoExts[] = {".mp4", ".avi", ".flv", ".mkv",
+                                                  ".mov", ".wmv", ".m4v"};
+          for (const auto &ext : videoExts) {
+            if (lower.size() >= ext.size() &&
+                lower.compare(lower.size() - ext.size(), ext.size(), ext) == 0) {
+              isVideo = true;
+              break;
+            }
+          }
 
           if (!isVideo) {
             bgFile = candidate;
@@ -490,6 +510,7 @@ std::string extractBackgroundImage(const std::string &osuPath) {
       }
     }
   }
+
   fclose(file);
   return bgFile;
 }

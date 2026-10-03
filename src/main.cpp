@@ -222,7 +222,7 @@ void RenderLoop(void *){
     // 3DS doesn't support some fancy filters
     // TODO: Make some filter and graphics settings configurable (OGL1.1 - OGL2.2 differences)
     #ifdef THREEDS_BUILD
-        SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_BILINEAR);
+        SetTextureFilter(&Global.DefaultFont.texture, TEXTURE_FILTER_POINT);
     #endif
     #ifndef THREEDS_BUILD
         //GenTextureMipmaps(&Global.DefaultFont.texture);
@@ -532,7 +532,7 @@ int main(){
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "exiting...\n";
     
     // Make sure that the gpu has done drawing whatever it had in its buffer... if a frame is taking more than half a second we have other problems...
-    SleepInMs(500); 
+    SleepInMs(200); 
 
     // Get control of the situation
     

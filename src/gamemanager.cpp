@@ -1755,6 +1755,12 @@ void GameManager::loadGame(std::string filename){
 	Global.Path.pop_back();
 	backgroundMusic = LoadMusicStream((Global.Path + '/' + gameFile.configGeneral["AudioFilename"]).c_str());
 
+	if(!backgroundMusic.frameCount){
+		std::string uppercasename = gameFile.configGeneral["AudioFilename"];
+		for (auto & c: uppercasename) c = toupper(c);
+		backgroundMusic = LoadMusicStream((Global.Path + '/' + uppercasename).c_str());
+	}
+
 
 	difficultyMultiplier = (((hpdrainrate + std::stof(gameFile.configDifficulty["CircleSize"]) + overalldifficulty) + clip((float)gameFile.hitObjects.size() / GetMusicTimeLength(&backgroundMusic) * 8.f, 0.f, 16.f)) / 38.f * 5.f);
 	
@@ -1788,6 +1794,9 @@ void GameManager::loadGame(std::string filename){
 
 void GameManager::unloadGame(){
 	//std::cout << "UnloadingGame" << std::endl;
+	Global.scoreSetId = std::stoi(gameFile.configMetadata["BeatmapSetID"]);
+    Global.scoreBeatmapId = std::stoi(gameFile.configMetadata["BeatmapID"]);
+    Global.scoreScore = score;
 	currentComboIndex = 0;
 	
 	SleepInMs(20);
@@ -2049,6 +2058,12 @@ void GameManager::loadGameTextures(){
 	std::vector<std::string> files3 = ls(".jpeg");
 	files.insert(files.end(), files2.begin(), files2.end());
 	files.insert(files.end(), files3.begin(), files3.end());
+	files2 = ls(".JPG");
+	files3 = ls(".JPEG");
+	files.insert(files.end(), files2.begin(), files2.end());
+	files.insert(files.end(), files3.begin(), files3.end());
+	files2 = ls(".PNG");
+	files.insert(files.end(), files2.begin(), files2.end());
 
 	for(int i = 0; i < (int)gameFile.events.size(); i++){
 		if(gameFile.events[i].eventType == 0){
@@ -2061,15 +2076,25 @@ void GameManager::loadGameTextures(){
 	}
 	
 
-	/*std::cout << "Found this many files: " << files.size() << std::endl;
+	std::cout << "Found this many files: " << files.size() << std::endl;
 	for(int i = 0; i < files.size(); i++){
 		std::cout << files[i] << std::endl;
-	}*/
+	}
 
 	for(int i = 0; i < files.size(); i++){
 		for(int j = 0; j < (int)gameFile.events.size(); j++){
 			if(gameFile.events[j].eventType == 0){
 				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "attempting to load a background\n";
+
+				size_t start = gameFile.events[j].filename.find_first_not_of(" \t\r\n");
+				if (start != std::string::npos) {
+					gameFile.events[j].filename.erase(0, start);
+				} else {
+					gameFile.events[j].filename.clear(); // String contained only spaces
+				}
+
+
+
 				int t = gameFile.events[j].filename.size() - 1;
 				while(gameFile.events[j].filename[t] == ' ' and t >= 0){
 					gameFile.events[j].filename.pop_back();
@@ -2080,7 +2105,10 @@ void GameManager::loadGameTextures(){
 					gameFile.events[j].filename.erase(gameFile.events[j].filename.begin());
 				}
 				//std::cout << "finding function returned: " << files[i].rfind(gameFile.events[j].filename, 0) << " for: " << gameFile.events[j].filename << " and " << files[i] << std::endl;
-				if(files[i].rfind(gameFile.events[j].filename, 0) == 0){
+
+				std::string uppercasename = gameFile.events[j].filename;
+				for (auto & c: uppercasename) c = toupper(c);
+				if(files[i].rfind(gameFile.events[j].filename, 0) == 0 || files[i].rfind(uppercasename, 0) == 0){
 					//std::cout << "WHAT DA HEEEEEEEEEELLLLLLLLLLLLL" << std::endl;
 					Image image = LoadImage((Global.Path + files[i]).c_str());
 					//ImageColorBrightness(&image, -128);

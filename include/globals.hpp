@@ -21,8 +21,8 @@
 #endif
 
 #ifdef THREEDS_BUILD
-#define COVER_WIDTH  64
-#define COVER_HEIGHT 32   // e.g., 16:9 aspect ratio
+#define COVER_WIDTH  128
+#define COVER_HEIGHT 64   // e.g., 16:9 aspect ratio
 #else
 #define COVER_WIDTH  512
 #define COVER_HEIGHT 256   // e.g., 16:9 aspect ratio
@@ -166,6 +166,7 @@ struct Globals {
         std::string CurrentLocation = "sdmc:/3ds";
         std::string RemoveToRelative = "sdmc:/3ds";
         std::string DatabaseLocation = "sdmc:/3ds/database";
+        std::string ScoreLocation = "sdmc:/3ds/scores";
     #endif
     #ifndef THREEDS_BUILD
         std::string Path = std::filesystem::current_path().string();
@@ -175,6 +176,7 @@ struct Globals {
         std::string CurrentLocation = std::filesystem::current_path().string();
         std::string RemoveToRelative = std::filesystem::current_path().string();
         std::string DatabaseLocation = std::filesystem::current_path().string() + "/database";
+        std::string ScoreLocation = std::filesystem::current_path().string() + "/scores";
     #endif
     // 3DS Spesific music state
     std::vector<Sound *> soundAtChannel;
@@ -248,7 +250,9 @@ struct Globals {
         int circleSector = 48;
     #endif
     // When using polygonal rendering for the circles, how many sectors to use
-    
+    int scoreSetId;
+    int scoreBeatmapId;
+    long long int scoreScore;
     // Number of lines in a document and number of them the parser parsed, this is a debug thing
     int numberLines = -1;
     int parsedLines = -1;

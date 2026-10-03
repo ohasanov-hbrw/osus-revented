@@ -5,6 +5,7 @@ object
 beatmaps
 resources
 database
+scores
 .vscode
 .cache
 

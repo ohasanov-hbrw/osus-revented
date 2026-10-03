@@ -53,4 +53,11 @@ void normalizePath(std::string &path);
 bool fileExists(const std::string &path);
 extern std::atomic<int> numBeatmapsFound;
 
+bool dirExists(const std::string &path);
+void createDir(const std::string &path);
+
+bool fileExists(const std::string &path);
+
+void normalizePath(std::string &path);
+
 extern std::unordered_map<int, std::vector<FileMetadata>> namesOfSets;

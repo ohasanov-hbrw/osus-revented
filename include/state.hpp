@@ -70,7 +70,8 @@ private:
     TEX_STATE_NEEDS_DISK_LOAD = 1,
     TEX_STATE_DISK_LOADED = 2,
     TEX_STATE_READY = 3,
-    TEX_STATE_NEEDS_UNLOAD = 4
+    TEX_STATE_NEEDS_UNLOAD = 4,
+    TEX_NOT_FOUND = 5
   };
 
   struct LoadedTexture {
@@ -89,6 +90,13 @@ private:
       state.store(other.state.load());
       setid.store(other.setid.load());
       opacity = other.opacity;
+
+      // Reset source
+      other.texture = {};
+      other.image = {};
+      other.state.store(TEX_STATE_FREE);
+      other.setid.store(-1);
+      other.opacity = 0.0f;
     }
 
     // Move assignment
@@ -99,6 +107,13 @@ private:
         state.store(other.state.load());
         setid.store(other.setid.load());
         opacity = other.opacity;
+
+        // Reset source
+        other.texture = {};
+        other.image = {};
+        other.state.store(TEX_STATE_FREE);
+        other.setid.store(-1);
+        other.opacity = 0.0f;
       }
       return *this;
     }
@@ -118,7 +133,9 @@ private:
   void workerThreadImpl();
   bool loaderLoaded = false;
   void unloadLoaderThread(bool lockedMutexes);
+  void unloadLoaderThread(bool lockedMutexes, int setid);
   void loadLoaderThread();
+  int lastselectionoficon = -1;
 
 public:
   PlayMenu();
@@ -129,7 +146,6 @@ public:
   void update() override;
   void unload() override;
   void textureOps() override;
-  
 };
 
 class ResultsMenu : public State {
@@ -142,6 +158,24 @@ private:
   TextBox hit50;
   TextBox hit0;
   TextBox accuracy;
+  Texture2D symbol;
+  enum TextureState {
+    TEX_LOAD = 0,
+    TEX_LOADED = 1,
+    TEX_FREE = 2,
+    TEX_FREED = 3,
+    TEX_FAIL
+  };
+  enum RANK {
+    RANK_A = 0,
+    RANK_B = 1,
+    RANK_C = 2,
+    RANK_D = 3,
+    RANK_S,
+    RANK_SS
+  };
+  int rank = RANK_D;
+  std::atomic<int> textureOpsState;
 
 public:
   ResultsMenu();

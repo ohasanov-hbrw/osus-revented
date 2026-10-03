@@ -415,7 +415,7 @@ void PlayMenu::update() {
       (Global.Wheel);
   menu.update();
 
-  if (icons.size() == 0) {
+  if (!loaderLoaded) {
     std::cout << "trying to reload loaderthread" << std::endl;
     loadLoaderThread();
   }
@@ -423,10 +423,6 @@ void PlayMenu::update() {
   auto *fancyList = dynamic_cast<FancyScrollingList *>(menu.elements[0].get());
 
   if (dynamic_cast<ClickableObject *>(menu.elements[3].get())->action) {
-
-    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-    unloadLoaderThread(false);
-    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
     dynamic_cast<ClickableObject *>(menu.elements[3].get())->action = false;
     if (!inBeatmapView) {
@@ -436,6 +432,9 @@ void PlayMenu::update() {
       if (!beatmapSets.empty() && selection >= 0 &&
           selection < (int)beatmapSets.size()) {
         int setid = beatmapSets[selection].setid;
+        MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+        unloadLoaderThread(false, setid);
+        MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
         currentBeatmaps.clear();
         currentBeatmaps = parseCachedMaps(Global.DatabaseLocation, setid);
         // Repopulate the fancy list
@@ -464,6 +463,9 @@ void PlayMenu::update() {
       int selection = fancyList->currentSelection;
       if (!currentBeatmaps.empty() && selection >= 0 &&
           selection < (int)currentBeatmaps.size()) {
+        MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+        unloadLoaderThread(false);
+        MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
         Global.selectedPath = currentBeatmaps[selection].path;
         MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
@@ -484,12 +486,18 @@ void PlayMenu::update() {
     }
   }
   if (dynamic_cast<ClickableObject *>(menu.elements[4].get())->action) {
-    MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-    unloadLoaderThread(false);
-    MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
     dynamic_cast<ClickableObject *>(menu.elements[4].get())->action = false;
     if (inBeatmapView) {
+      MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
+      int selection = fancyList->currentSelection;
+      if (!currentBeatmaps.empty() && selection >= 0 &&
+          selection < (int)currentBeatmaps.size()) {
+        unloadLoaderThread(false, currentBeatmaps[selection].setid);
+      } else {
+        unloadLoaderThread(false);
+      }
+      MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
       inBeatmapView = false;
       currentBeatmaps.clear();
       fancyList->objectNames.clear();
@@ -578,7 +586,7 @@ void PlayMenu::update() {
       }
       if (!alreadyAssigned) {
         for (auto &slot : icons) {
-          if (slot.state.load() == TEX_STATE_FREE) {
+          if (slot.state.load() == TEX_STATE_FREE || slot.state.load() == TEX_NOT_FOUND) {
             slot.setid.store(sid);
             slot.state.store(TEX_STATE_NEEDS_DISK_LOAD);
             break;
@@ -599,9 +607,10 @@ void PlayMenu::update() {
   int totalSets = beatmapSets.size();
   int numSlots = fancyList->objects.size();
 
-  int minVisibleIdx = -numSlots / 2 - fancyList->graphicalObjectOffsetFull - 1;
-  int maxVisibleIdx = numSlots / 2 - fancyList->graphicalObjectOffsetFull + 1;
+  int minVisibleIdx = -numSlots / 2 + fancyList->currentSelection;
+  int maxVisibleIdx = numSlots / 2 + fancyList->currentSelection;
 
+  //std::cout << minVisibleIdx << " " << maxVisibleIdx << std::endl;
   std::unordered_set<int> visibleSetIds;
   for (int itemIdx = maxVisibleIdx; itemIdx >= minVisibleIdx; itemIdx--) {
     if (itemIdx >= 0 && itemIdx < totalSets) {
@@ -618,10 +627,10 @@ void PlayMenu::update() {
       if (visibleSetIds.find(sid) == visibleSetIds.end()) {
         if (st == TEX_STATE_READY) {
           slot.state.store(TEX_STATE_NEEDS_UNLOAD);
-        } else if (st == TEX_STATE_NEEDS_DISK_LOAD) {
+        } /*else if (st == TEX_STATE_NEEDS_DISK_LOAD) {
           slot.state.store(TEX_STATE_FREE);
           slot.setid.store(-1);
-        }
+        }*/
       }
     }
   }
@@ -638,7 +647,7 @@ void PlayMenu::update() {
 
     if (!alreadyAssigned) {
       for (auto &slot : icons) {
-        if (slot.state.load() == TEX_STATE_FREE) {
+        if (slot.state.load() == TEX_STATE_FREE && slot.setid.load() == -1) {
           slot.setid.store(sid);
           slot.state.store(TEX_STATE_NEEDS_DISK_LOAD);
           break;
@@ -652,59 +661,6 @@ void PlayMenu::update() {
         slot.state.load() == TEX_STATE_NEEDS_UNLOAD)
       textureOpsDone.store(false);
   }
-
-  // Signal render thread that ops are pending
-
-  // if (select.action or dir_list.action) {
-  //   if (dir_list.objects.size() > 0 and
-  //       dir_list.objects[dir_list.selectedindex].text.size() > 0) {
-  //     if (dir_list.objects[dir_list.selectedindex]
-  //             .text[dir_list.objects[dir_list.selectedindex].text.size() - 1]
-  //             ==
-  //         '/') {
-  //       MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //       dir_list.objects[dir_list.selectedindex].text.pop_back();
-  //       if (Global.Path.size() == 1)
-  //         Global.Path.pop_back();
-  //       Global.Path += '/' + dir_list.objects[dir_list.selectedindex].text;
-  //       lastPos = dir_list.objects[dir_list.selectedindex].text;
-  //       auto dir = ls(".osu");
-  //       dir_list =
-  //           SelectableList(dir_list.position, dir_list.size, dir_list.color,
-  //                          dir, dir_list.textcolor, dir_list.textsize,
-  //                          dir_list.objectsize, dir_list.maxlength);
-  //       dir_list.init();
-  //       lastIndex = -3;
-  //       MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //     } else {
-  //       MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
-  //       MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
-  //       MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //       Global.selectedPath =
-  //           Global.Path + '/' +
-  //           dir_list.objects[dir_list.selectedindex].text;
-  //       Global.CurrentLocation = "beatmaps/" + lastPos + "/";
-  //       Global.CurrentState->unload();
-  //       Global.CurrentState.reset(new Game());
-  //       Global.CurrentState->init();
-  //       MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //       MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
-  //       MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
-  //     }
-  //   }
-  // } else if (back.action) {
-  //   MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  //   Global.Path = Global.BeatmapLocation;
-  //   auto dir = ls(".osu");
-  //   dir_list = SelectableList(dir_list.position, dir_list.size,
-  //   dir_list.color,
-  //                             dir, dir_list.textcolor, dir_list.textsize,
-  //                             dir_list.objectsize, dir_list.maxlength);
-  //   dir_list.init();
-  //   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-  // }
-  //// MutexUnlock(ACCESSING_OBJECTS);
-  //// MutexUnlock(SWITCHING_STATE);
 }
 
 static int currentTexNumber = 0;
@@ -726,7 +682,7 @@ void PlayMenu::unload() {
 
 // only this function can convert images to textures
 void PlayMenu::textureOps() {
-  if (textureOpsDone)
+  if (textureOpsDone.load())
     return;
 
   for (auto &slot : icons) {
@@ -772,20 +728,21 @@ void PlayMenu::workerThreadImpl() {
     for (auto &slot : icons) {
       if (slot.state.load() == TEX_STATE_NEEDS_DISK_LOAD) {
         int sid = slot.setid.load();
-        std::string path = Global.DatabaseLocation + "/" + std::to_string(sid) + "/cover_" +
-                           std::to_string(sid) + "_0.bmp";
+        std::string path = Global.DatabaseLocation + "/" + std::to_string(sid) +
+                           "/cover_" + std::to_string(sid) + "_0.bmp";
 
         if (FileExists(path.c_str())) {
           slot.image = LoadImage(path.c_str());
           currentImgNumber++;
           std::cout << "image: " << currentImgNumber << std::endl;
           slot.state.store(TEX_STATE_DISK_LOADED);
+          worked = true;
 
         } else {
-          slot.state.store(TEX_STATE_FREE);
-          slot.setid.store(-1);
+          slot.state.store(TEX_NOT_FOUND);
+          //slot.setid.store(-1);
         }
-        worked = true;
+        
         break;
       }
     }
@@ -803,7 +760,7 @@ void PlayMenu::workerThreadImpl() {
 void PlayMenu::unloadLoaderThread(bool lockedMutexes) {
   if (!loaderLoaded)
     return;
-
+  lastselectionoficon = -1;
   loaderShouldStop.store(true);
   _multithread_join_thread(&backgroundLoader);
   _multithread_free_thread(&backgroundLoader);
@@ -839,21 +796,84 @@ void PlayMenu::unloadLoaderThread(bool lockedMutexes) {
   loaderLoaded = false;
 }
 
+void PlayMenu::unloadLoaderThread(bool lockedMutexes, int setid) {
+  if (!loaderLoaded)
+    return;
+  lastselectionoficon = -1;
+  loaderShouldStop.store(true);
+  _multithread_join_thread(&backgroundLoader);
+  _multithread_free_thread(&backgroundLoader);
+  for (auto &slot : icons) {
+    if (slot.setid.load() != setid) {
+      if (slot.state.load() == TEX_STATE_READY) {
+        slot.state.store(TEX_STATE_NEEDS_UNLOAD);
+      }
+      if (slot.state.load() == TEX_STATE_DISK_LOADED) {
+        slot.state.store(TEX_STATE_FREE);
+        currentImgNumber--;
+        std::cout << "image: " << currentImgNumber << std::endl;
+        UnloadImage(&slot.image);
+      }
+    } else {
+      std::cout << "not deleting image " << setid << std::endl;
+    }
+  }
+  if (lockedMutexes) {
+    MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
+    MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
+  }
+  textureOpsDone.store(false);
+  while (!textureOpsDone.load()) {
+    std::cout << "waiting for textureops\n";
+    SleepInMs(lockedMutexes ? 50 : 1);
+  }
+  if (lockedMutexes) {
+    MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+    MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
+    for (auto it = icons.begin(); it != icons.end();) {
+      if (it->setid.load() != setid) {
+        it = icons.erase(it); // Returns iterator to next valid element
+      } else {
+        ++it;
+      }
+    }
+  } else {
+    MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
+    for (auto it = icons.begin(); it != icons.end();) {
+      if (it->setid.load() != setid) {
+        it = icons.erase(it); // Returns iterator to next valid element
+      } else {
+        ++it;
+      }
+    }
+    MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
+  }
+  loaderLoaded = false;
+}
+
 void PlayMenu::loadLoaderThread() {
   if (loaderLoaded)
     return;
   instance = this;
   loaderShouldStop.store(false);
   textureOpsDone.store(true);
+
   auto *fancyList =
       dynamic_cast<FancyScrollingList *>(menu.elements[SCROLLER].get());
-  int numSlots = fancyList ? fancyList->objects.size() : 12;
-  std::cout << "allocated place for " << numSlots << " objects" << std::endl;
-  icons.resize(numSlots + 2);
-  for (auto &slot : icons) {
-    slot.state.store(TEX_STATE_FREE);
-    slot.setid.store(-1);
+  size_t requiredSlots = (fancyList ? fancyList->objects.size() : 12) + 2;
+
+  // Only expand capacity, don't shrink and lose preserved elements
+  if (icons.size() < requiredSlots) {
+    icons.resize(requiredSlots);
   }
+
+  // Only initialize unassigned / free slots
+  for (auto &slot : icons) {
+    if (slot.setid.load() == -1) {
+      slot.state.store(TEX_STATE_FREE);
+    }
+  }
+  lastselectionoficon = -1;
   loaderLoaded = true;
   backgroundLoader =
       _multithread_thread_create(&PlayMenu::workerThreadEntryPoint);
