@@ -104,10 +104,10 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [ ] Try to get beatmaps from a mirror (eg. https://catboy.best/about)
 - [ ] Use the second screen on the 3DS
 - [ ] Dynamic slider resolution with more interpolation to cut down on calculation time
-- [ ] Seperate thread for background loading. Mainly for the new menu implementations
-- [ ] Images on the beatmap selection
+- [x] Seperate thread for background loading. Mainly for the new menu implementations
+- [x] Images on the beatmap selection
 - [ ] Redo fancy textbox
-- [ ] Add ranking to the resultsmenu
+- [x] Add ranking to the resultsmenu
 - [ ] Stacked objects should be offset from another
 - [ ] Add animated combo counter
 - [ ] Add the flakes~

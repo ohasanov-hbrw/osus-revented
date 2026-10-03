@@ -411,7 +411,7 @@ typedef struct Music {
     bool paused = false;
     bool ended = false;
     bool loaded = false;
-   
+    int frameCount;
     
 } Music;
 

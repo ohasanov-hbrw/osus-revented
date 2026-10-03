@@ -58,6 +58,12 @@ void DrawCircle(float x, float y, float radius, Color color){
 	//may need to add a queue for this (3ds magick circle bad) also check depth
 }
 
+void DrawCircleV(Vector2 Coords, float radius, Color color){
+    //C2D_DrawCircleSolid(x, y, 0.0f, radius, C2D_Color32(color.r, color.g, color.b, color.a));
+    DrawCircleWithDepth(Coords, radius, 16, 0,color);
+    C2D_Flush();  //test
+}
+
 void DrawLineEx(Vector2 start, Vector2 stop, float size, Color color){
 	C2D_DrawLine(start.x, start.y, C2D_Color32(color.r, color.g, color.b, color.a), stop.x, stop.y, C2D_Color32(color.r, color.g, color.b, color.a), size, 0.0f);
 	C2D_Flush();  //test

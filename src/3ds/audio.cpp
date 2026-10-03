@@ -392,6 +392,7 @@ Music LoadMusicStream(const char *filename){
         return music;
     }
 
+    music.frameCount = 0;
     FILE* file;
     file = fopen(filename,"r");
     
@@ -475,6 +476,7 @@ Music LoadMusicStream(const char *filename){
         music.sampleRate = music.decoder->info.hz;
         music.channels = music.decoder->info.channels;
         music.loaded = true;
+        music.frameCount = 1; // debug
         Global.MusicLoaded = true;
     }
     else{
@@ -510,6 +512,7 @@ Music LoadMusicStream(const char *filename){
             music.channels = 2;
         music.loaded = true;
         Global.MusicLoaded = true;
+        music.frameCount = 1; // debug
 
     }
 
@@ -633,6 +636,7 @@ void UnloadMusicStream(Music *music){
             linearFree(music->fileBuffer);
             music->memory = false;
         }
+        music->frameCount = 0;
         return;
     }
 

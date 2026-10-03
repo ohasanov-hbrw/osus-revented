@@ -75,6 +75,7 @@ int GetPixelDataSize(int width, int height, int format);
 GPU_TEXCOLOR raylibPixel2citroPixel(int format);
 
 void DrawCircle(float x, float y, float radius, Color color);
+void DrawCircleV(Vector2 Coords, float radius, Color color);
 
 void DrawLineEx(Vector2 start, Vector2 stop, float size, Color color);
 
