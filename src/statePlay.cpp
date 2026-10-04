@@ -475,6 +475,8 @@ void PlayMenu::update() {
         Global.CurrentLocation =
             "beatmaps/" + std::to_string(currentBeatmaps[selection].setid) +
             "/";
+        Global.scoreSetId = currentBeatmaps[selection].setid;
+        Global.scoreBeatmapId = currentBeatmaps[selection].id;
         Global.CurrentState->unload();
         Global.CurrentState.reset(new Game());
         Global.CurrentState->init();

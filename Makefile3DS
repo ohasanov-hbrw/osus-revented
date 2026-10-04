@@ -61,6 +61,16 @@ CFLAGS	:=	-Og -g -ggdb -w -mword-relocations -Wno-psabi \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__ -D__arm__ -D_DIRENT_HAVE_D_TYPE -DTHREEDS_BUILD -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPORT_FILEFORMAT_JPG -Ivendor/zip/src -Iinclude -Iinclude/3ds -Iinclude/3ds/AudioDecoders -Iinclude/external -I$$DEVKITPRO/portlibs/3ds/include -I$$DEVKITPRO/portlibs/3ds/include/opus -D_REENTRANT
+SQLITE_FLAGS = -O2 \
+               -DHAVE_MMAP=0 \
+               -DSQLITE_MAX_MMAP_SIZE=0 \
+               -DSQLITE_OMIT_WAL=1 \
+			   -DHAVE_FCHOWN=0 \
+               -DHAVE_GETEUID=0 \
+               -DSQLITE_OMIT_LOAD_EXTENSION \
+               -DSQLITE_OMIT_DEPRECATED \
+               -DSQLITE_OMIT_AUTOINCREMENT
+CFLAGS += $(SQLITE_FLAGS)
 
 CXXFLAGS	:= $(CFLAGS) -std=c++20
 

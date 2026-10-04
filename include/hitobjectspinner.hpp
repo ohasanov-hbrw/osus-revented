@@ -18,6 +18,8 @@ class Spinner : public HitObject{
         float addedAngle = 0;
         int startRotation = 0;
         int rotation = 0;
+        int rotationsCompleted = 0;
+        bool isSpinning = false;
         
         int extra = 1;
         

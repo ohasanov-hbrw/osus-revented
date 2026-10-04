@@ -2,16 +2,36 @@ CC = g++ -D_BSD_SOURCE -DSUPPORT_FILEFORMAT_PNG -DSUPPORT_FILEFORMAT_BMP -DSUPPO
 #cflags = -std=c++20 -O0 -g -ggdb -Wall -Wno-write-strings -Wno-narrowing
 #cflags = -std=c++20 -fsanitize=address -g -O1 -fno-omit-frame-pointer -Wall -Wno-write-strings -Wno-narrowing
 cflags = -std=c++20 -O2 -Wall -Wno-write-strings -Wno-narrowing
-cflags += -Ivendor/raylib/src -Iinclude -Iinclude/menu_shapes -Iinclude/cachebuilder -Iinclude/msaa -Ivendor/zip/src -Iinclude/sound  -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DMSAA_RENDER -D_MSAA_RENDER
+cflags += -Ivendor/raylib/src -Iinclude -Iinclude/menu_shapes -Iinclude/cachebuilder -Iinclude/msaa -Ivendor/zip/src -Iinclude/sound -Iinclude/external  -I/usr/x86_64-w64-mingw32/include/SDL2 -I/usr/include/SDL2 -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DMSAA_RENDER -D_MSAA_RENDER
 
 ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl -lSDL2main -lSDL2 -lpthread
 #ldflags += -lstdc++ -Lvendor/raylib/src -lraylib -Lvendor/zip/build -lzip -lpthread -ldl -lSDL2main -lSDL2 -lpthread -fsanitize=address
 name = osus 
 
 
+
 sources = $(shell find src -name "*.cpp" -not -path "src/3ds/*" -not -path "src/external/*")
 objects = $(patsubst src/%.cpp, object/%.o, $(sources))
+
+cflags += -Isrc/external
+CC_C = gcc
+SQLITE_FLAGS = -O2 \
+               -DSQLITE_OMIT_LOAD_EXTENSION \
+               -DSQLITE_OMIT_DEPRECATED \
+               -DSQLITE_OMIT_AUTOINCREMENT
+
+# 3. Add sqlite object to your objects list
+objects += object/external/sqlite3.o
+
+# 4. Explicit rule to compile sqlite3.c with gcc (C compiler)
+object/external/sqlite3.o: src/external/sqlite3.c
+	@mkdir -p $(dir $@)
+	$(CC_C) $(SQLITE_FLAGS) -Isrc/external -c $< -o $@
+
+
+
 deps = $(objects:.o=.d)
+
 
 -include $(deps)
 .PHONY: all clean

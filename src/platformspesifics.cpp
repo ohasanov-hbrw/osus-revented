@@ -96,7 +96,7 @@ bool _music_check_if_ended(Music *music) {
   return music->ended;
 #endif
 #ifndef THREEDS_BUILD
-  return (GetMusicTimeLength(music) - GetMusicTimePlayed(music) < 0.05f);
+  return (GetMusicTimeLength(music) - GetMusicTimePlayed(music) < 0.03f);
 #endif
 }
 

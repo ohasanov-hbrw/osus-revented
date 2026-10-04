@@ -21,20 +21,17 @@
 #include <memory>
 #include <ostream>
 
-#include "menu_shapes/shapes.hpp"
 #include "cachebuilder/metadataParser.hpp"
+#include "menu_shapes/shapes.hpp"
 
-
-void saveScore(int setid, int beatmapid, int score, int maxCombo,
-               int hit300, int hit100, int hit50, int hit0,
-               float accuracy, int rank) {
+void saveScore(int setid, int beatmapid, int score, int maxCombo, int hit300,
+               int hit100, int hit50, int hit0, float accuracy, int rank) {
   if (!dirExists(Global.ScoreLocation)) {
     createDir(Global.ScoreLocation);
   }
 
-  std::string folderPath = Global.ScoreLocation + "/" + 
-                           std::to_string(setid) + "-" + 
-                           std::to_string(beatmapid) + "-score";
+  std::string folderPath = Global.ScoreLocation + "/" + std::to_string(setid) +
+                           "-" + std::to_string(beatmapid) + "-score";
   normalizePath(folderPath);
 
   if (!dirExists(folderPath)) {
@@ -49,9 +46,17 @@ void saveScore(int setid, int beatmapid, int score, int maxCombo,
     while ((entry = readdir(dir)) != nullptr) {
       std::string name = entry->d_name;
       if (name.size() > 3 && name.compare(name.size() - 3, 3, ".db") == 0) {
-        try {
-          indices.push_back(std::stoi(name.substr(0, name.size() - 3)));
-        } catch (...) {}
+        std::string stem = name.substr(0, name.size() - 3);
+
+        if (!stem.empty()) {
+          char *endPtr = nullptr;
+          long val = std::strtol(stem.c_str(), &endPtr, 10);
+
+          // Ensure the entire stem was successfully parsed as a valid integer
+          if (endPtr != stem.c_str() && *endPtr == '\0') {
+            indices.push_back(static_cast<int>(val));
+          }
+        }
       }
     }
     closedir(dir);
@@ -76,9 +81,12 @@ void saveScore(int setid, int beatmapid, int score, int maxCombo,
   normalizePath(filePath);
 
   FILE *f = fopen(filePath.c_str(), "w");
-  if (!f) return;
+  if (!f)
+    return;
 
-  fprintf(f, "Score:%d\nMaxCombo:%d\n300s:%d\n100s:%d\n50s:%d\n0s:%d\nAccuracy:%.2f\nRank:%d\n",
+  fprintf(f,
+          "Score:%d\nMaxCombo:%d\n300s:%d\n100s:%d\n50s:%d\n0s:%d\nAccuracy:%."
+          "2f\nRank:%d\n",
           score, maxCombo, hit300, hit100, hit50, hit0, accuracy, rank);
   fclose(f);
 }
@@ -247,19 +255,11 @@ void ResultsMenu::init() {
     }
   }
 
-
-  saveScore(
-    Global.scoreSetId,
-    Global.scoreBeatmapId,
-    Global.scoreScore,    
-    Global.gameManager->maxCombo,
-    hit300,
-    hit100,
-    hit50,
-    hit0,
-    accuracyFloat,
-    static_cast<int>(rank)
-  );
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
+            << "Saving Score for " << Global.scoreSetId << "\n";
+  saveScore(Global.scoreSetId, Global.scoreBeatmapId, Global.scoreScore,
+            Global.gameManager->maxCombo, hit300, hit100, hit50, hit0,
+            accuracyFloat, static_cast<int>(rank));
 
   textureOpsState.store(TEX_LOAD);
 

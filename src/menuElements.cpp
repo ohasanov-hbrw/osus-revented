@@ -425,10 +425,9 @@ void FancyScrollingList::update() {
 }
 
 void FancyScrollingList::render() {
-  // DrawTextEx(&Global.DefaultFont, TextFormat("OffsetFull: %d Graphical:
-  // %.0f", graphicalObjectOffsetFull, graphicalObjectOffset),
-  // {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(400))},
-  // Scale(20.05), Scale(2), BLUE);
+  //DrawTextEx(&Global.DefaultFont, TextFormat("OffsetFull: %d Graphical: %.0f", graphicalObjectOffsetFull, graphicalObjectOffset),
+  //{static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(400))},
+  //Scale(20.05), Scale(2), BLUE);
   for (int i = 0; i < objects.size(); i++) {
     // if (i - objectOffsetFull + hardCodedOffset >= 0)
     if (i - (int)objects.size() / 2 - graphicalObjectOffsetFull >= 0 &&

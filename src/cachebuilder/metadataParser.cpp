@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <dirent.h>
+#include <filesystem>
 #include <functional>
 #include <iostream>
 #include <stack>
@@ -12,6 +13,174 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <unordered_map>
+#include <unordered_set>
+
+#include "sqlite3.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+#if defined(__3DS__) || defined(THREEDS_BUILD)
+extern "C" {
+int fileno(FILE *stream);
+int ftruncate(int fd, off_t length);
+}
+#endif
+
+struct StdioFile {
+  sqlite3_file base;
+  FILE *fp;
+};
+
+static int stdioClose(sqlite3_file *pFile) {
+  StdioFile *f = (StdioFile *)pFile;
+  if (f->fp) {
+    fclose(f->fp);
+    f->fp = nullptr;
+  }
+  return SQLITE_OK;
+}
+
+static int stdioRead(sqlite3_file *pFile, void *zBuf, int iAmt,
+                     sqlite3_int64 iOfst) {
+  StdioFile *f = (StdioFile *)pFile;
+  fseek(f->fp, (long)iOfst, SEEK_SET);
+  size_t readAmt = fread(zBuf, 1, iAmt, f->fp);
+  if (readAmt == (size_t)iAmt)
+    return SQLITE_OK;
+  if (readAmt < (size_t)iAmt) {
+    memset((char *)zBuf + readAmt, 0, iAmt - readAmt);
+    return SQLITE_IOERR_SHORT_READ;
+  }
+  return SQLITE_IOERR_READ;
+}
+
+static int stdioWrite(sqlite3_file *pFile, const void *zBuf, int iAmt,
+                      sqlite3_int64 iOfst) {
+  StdioFile *f = (StdioFile *)pFile;
+  fseek(f->fp, (long)iOfst, SEEK_SET);
+  if (fwrite(zBuf, 1, iAmt, f->fp) == (size_t)iAmt)
+    return SQLITE_OK;
+  return SQLITE_IOERR_WRITE;
+}
+
+static int stdioTruncate(sqlite3_file *pFile, sqlite3_int64 size) {
+  StdioFile *f = (StdioFile *)pFile;
+  if (!f || !f->fp)
+    return SQLITE_IOERR_TRUNCATE;
+
+  fflush(f->fp);
+  int fd = fileno(f->fp);
+  if (fd < 0)
+    return SQLITE_IOERR_TRUNCATE;
+
+  return (ftruncate(fd, (off_t)size) == 0) ? SQLITE_OK : SQLITE_IOERR_TRUNCATE;
+}
+
+static int stdioSync(sqlite3_file *pFile, int flags) {
+  StdioFile *f = (StdioFile *)pFile;
+  fflush(f->fp);
+  return SQLITE_OK;
+}
+
+static int stdioFileSize(sqlite3_file *pFile, sqlite3_int64 *pSize) {
+  StdioFile *f = (StdioFile *)pFile;
+  fseek(f->fp, 0, SEEK_END);
+  *pSize = ftell(f->fp);
+  return SQLITE_OK;
+}
+
+static int stdioLock(sqlite3_file *pFile, int eLock) { return SQLITE_OK; }
+static int stdioUnlock(sqlite3_file *pFile, int eLock) { return SQLITE_OK; }
+static int stdioCheckReservedLock(sqlite3_file *pFile, int *pResOut) {
+  *pResOut = 0;
+  return SQLITE_OK;
+}
+static int stdioFileControl(sqlite3_file *pFile, int op, void *pArg) {
+  return SQLITE_NOTFOUND;
+}
+static int stdioSectorSize(sqlite3_file *pFile) { return 512; }
+static int stdioDeviceCharacteristics(sqlite3_file *pFile) { return 0; }
+
+static const sqlite3_io_methods stdioIoMethods = {1,
+                                                  stdioClose,
+                                                  stdioRead,
+                                                  stdioWrite,
+                                                  stdioTruncate,
+                                                  stdioSync,
+                                                  stdioFileSize,
+                                                  stdioLock,
+                                                  stdioUnlock,
+                                                  stdioCheckReservedLock,
+                                                  stdioFileControl,
+                                                  stdioSectorSize,
+                                                  stdioDeviceCharacteristics};
+
+static int stdioOpen(sqlite3_vfs *pVfs, const char *zName, sqlite3_file *pFile,
+                     int flags, int *pOutFlags) {
+  StdioFile *f = (StdioFile *)pFile;
+  memset(f, 0, sizeof(StdioFile));
+  if (!zName)
+    return SQLITE_CANTOPEN;
+
+  FILE *fp = fopen(zName, "r+b");
+  if (!fp && (flags & SQLITE_OPEN_CREATE)) {
+    fp = fopen(zName, "w+b");
+    if (fp) {
+      fclose(fp);
+      fp = fopen(zName, "r+b");
+    }
+  }
+
+  if (!fp)
+    return SQLITE_CANTOPEN;
+
+  f->base.pMethods = &stdioIoMethods;
+  f->fp = fp;
+  if (pOutFlags)
+    *pOutFlags = flags;
+  return SQLITE_OK;
+}
+
+static int stdioDelete(sqlite3_vfs *pVfs, const char *zName, int syncDir) {
+  remove(zName);
+  return SQLITE_OK;
+}
+
+static int stdioAccess(sqlite3_vfs *pVfs, const char *zName, int flags,
+                       int *pResOut) {
+  FILE *fp = fopen(zName, "rb");
+  if (fp) {
+    fclose(fp);
+    *pResOut = 1;
+  } else {
+    *pResOut = 0;
+  }
+  return SQLITE_OK;
+}
+
+static int stdioFullPathname(sqlite3_vfs *pVfs, const char *zIn, int nOut,
+                             char *zOut) {
+  // Pass sdmc:/ paths straight through to fopen without POSIX resolution
+  snprintf(zOut, nOut, "%s", zIn);
+  return SQLITE_OK;
+}
+
+void register3DSVfs() {
+  static sqlite3_vfs stdioVfs;
+  memset(&stdioVfs, 0, sizeof(sqlite3_vfs));
+  stdioVfs.iVersion = 1;
+  stdioVfs.szOsFile = sizeof(StdioFile);
+  stdioVfs.mxPathname = 512;
+  stdioVfs.zName = "3ds-stdio";
+  stdioVfs.xOpen = stdioOpen;
+  stdioVfs.xDelete = stdioDelete;
+  stdioVfs.xAccess = stdioAccess;
+  stdioVfs.xFullPathname = stdioFullPathname;
+
+  sqlite3_vfs_register(&stdioVfs, 1); // Set as default VFS
+}
 
 // Global storage
 std::unordered_map<int, std::vector<FileMetadata>> namesOfSets;
@@ -51,7 +220,6 @@ struct DirState {
   size_t index;
 };
 
-// Configurable threshold for RAM management
 #ifdef THREEDS_BUILD
 constexpr size_t BATCH_SET_LIMIT = 5;
 constexpr size_t BATCH_MAP_LIMIT = 50;
@@ -60,39 +228,173 @@ constexpr size_t BATCH_SET_LIMIT = 20;
 constexpr size_t BATCH_MAP_LIMIT = 200;
 #endif
 
-// Helper: Updates an entry in beatmapsets.db or appends it if new
-void updateOrAppendSetInDb(const std::string &dbFile, int setid,
-                           const std::string &title, int mapCount,
-                           const std::vector<FileMetadata> &metadataList) {
-  std::vector<SetFileMetadata> cachedSets = parseCachedSets(dbFile);
+static void ensureParentDirExists(const std::string &filePath) {
+  std::string path = filePath;
+  normalizePath(path);
 
-  bool setExists = false;
-  for (const auto &s : cachedSets) {
-    if (s.setid == setid) {
-      setExists = true;
-      break;
-    }
-  }
+  size_t lastSlash = path.find_last_of('/');
+  if (lastSlash == std::string::npos)
+    return;
 
-  if (!setExists) {
-    // O(1) Fast append for brand new sets
-    writeBeatmapSetFile(dbFile, setid, title, mapCount, metadataList);
-  } else {
-    // Rewrite beatmapsets.db updating only this modified set
-    FILE *f = fopen(dbFile.c_str(), "w");
-    if (f)
-      fclose(f);
+  std::string dir = path.substr(0, lastSlash);
+  if (dir.empty() || dir == "sdmc:" || dir == "sdmc:/" || dir == "/")
+    return;
 
-    for (const auto &s : cachedSets) {
-      if (s.setid == setid) {
-        writeBeatmapSetFile(dbFile, setid, title, mapCount, metadataList);
-      } else {
-        std::vector<FileMetadata> existingMaps =
-            parseCachedMaps(Global.DatabaseLocation, s.setid);
-        writeBeatmapSetFile(dbFile, s.setid, s.title, s.number, existingMaps);
+  // Recursively create parent directories
+  size_t pos = 0;
+  while ((pos = dir.find('/', pos)) != std::string::npos) {
+    if (pos > 0) {
+      std::string sub = dir.substr(0, pos);
+      if (!sub.empty() && sub != "sdmc:" && sub != "sdmc:/" && sub != "/" &&
+          !dirExists(sub)) {
+        createDir(sub);
       }
     }
+    pos++;
   }
+  if (!dirExists(dir)) {
+    createDir(dir);
+  }
+}
+
+static sqlite3 *openSetDatabase(const std::string &dbPath) {
+  std::string fullPath = dbPath;
+  normalizePath(fullPath);
+
+  // If path doesn't end in .db, append /beatmapsets.db
+  if (fullPath.size() < 3 ||
+      fullPath.compare(fullPath.size() - 3, 3, ".db") != 0) {
+    fullPath += "/beatmapsets.db";
+    normalizePath(fullPath);
+  }
+
+#if defined(__3DS__) || defined(THREEDS_BUILD)
+  // Ensure explicit sdmc:/ prefix for devkitARM FatFs
+  if (fullPath.rfind("sdmc:", 0) != 0) {
+    if (!fullPath.empty() && fullPath[0] == '/') {
+      fullPath = "sdmc:" + fullPath;
+    } else {
+      fullPath = "sdmc:/" + fullPath;
+    }
+  }
+#endif
+
+  // Ensure database directory exists before SQLite tries to open the file
+  ensureParentDirExists(fullPath);
+
+  sqlite3 *db = nullptr;
+  int rc = SQLITE_OK;
+
+#if defined(__3DS__) || defined(THREEDS_BUILD)
+
+  register3DSVfs();
+
+  // Pass raw sdmc:/ path directly with unix-none VFS to bypass URI mangling and
+  // file locks
+  rc = sqlite3_open_v2(fullPath.c_str(), &db,
+                       SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+#else
+  // Windows / PC URI path with nolock support
+  std::string uriPath = "file:";
+  if (fullPath.rfind("//", 0) == 0) {
+    uriPath += "//" + fullPath + "?nolock=1";
+  } else {
+    uriPath += "///" + fullPath + "?nolock=1";
+  }
+
+  rc = sqlite3_open_v2(
+      uriPath.c_str(), &db,
+      SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, nullptr);
+#endif
+
+  if (rc != SQLITE_OK) {
+    std::cerr << "[DATABASE ERROR] Failed to open database (" << fullPath
+              << "): " << (db ? sqlite3_errmsg(db) : "Unknown error")
+              << std::endl;
+    if (db)
+      sqlite3_close(db);
+    return nullptr;
+  }
+
+  // In-memory journaling and relaxed sync for SD card performance
+  sqlite3_busy_timeout(db, 3000);
+  sqlite3_exec(db, "PRAGMA journal_mode = MEMORY;", nullptr, nullptr, nullptr);
+  sqlite3_exec(db, "PRAGMA synchronous = OFF;", nullptr, nullptr, nullptr);
+  sqlite3_exec(db, "PRAGMA cache_size = -500;", nullptr, nullptr, nullptr);
+
+  const char *schema = R"(
+    CREATE TABLE IF NOT EXISTS beatmapsets (
+      setid INTEGER PRIMARY KEY,
+      title TEXT,
+      maps INTEGER,
+      ids TEXT,
+      artists TEXT,
+      creators TEXT
+    );
+  )";
+
+  char *errMsg = nullptr;
+  if (sqlite3_exec(db, schema, nullptr, nullptr, &errMsg) != SQLITE_OK) {
+    std::cerr << "[DATABASE ERROR] Schema creation failed: "
+              << (errMsg ? errMsg : "unknown") << std::endl;
+    sqlite3_free(errMsg);
+  }
+
+  return db;
+}
+
+static void upsertSetInDb(sqlite3 *db, int setid, const std::string &title,
+                          int numMaps,
+                          const std::vector<FileMetadata> &metadataList) {
+  if (!db)
+    return;
+
+  std::string idsList, artistsList, creatorsList;
+  std::unordered_set<std::string> uniqueArtists, uniqueCreators;
+
+  for (size_t i = 0; i < metadataList.size(); ++i) {
+    if (i > 0)
+      idsList += ",";
+    idsList += std::to_string(metadataList[i].id);
+
+    if (uniqueArtists.insert(metadataList[i].artist).second) {
+      if (!artistsList.empty())
+        artistsList += ", ";
+      artistsList += metadataList[i].artist;
+    }
+    if (uniqueCreators.insert(metadataList[i].creator).second) {
+      if (!creatorsList.empty())
+        creatorsList += ", ";
+      creatorsList += metadataList[i].creator;
+    }
+  }
+
+  const char *sql = R"(
+    INSERT OR REPLACE INTO beatmapsets (setid, title, maps, ids, artists, creators)
+    VALUES (?, ?, ?, ?, ?, ?);
+  )";
+
+  sqlite3_stmt *stmt = nullptr;
+  int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+  if (rc != SQLITE_OK) {
+    std::cerr << "[DATABASE ERROR] Prepare failed: " << sqlite3_errmsg(db)
+              << std::endl;
+    return;
+  }
+
+  sqlite3_bind_int(stmt, 1, setid);
+  sqlite3_bind_text(stmt, 2, title.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_int(stmt, 3, numMaps);
+  sqlite3_bind_text(stmt, 4, idsList.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 5, artistsList.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 6, creatorsList.c_str(), -1, SQLITE_TRANSIENT);
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    std::cerr << "[DATABASE ERROR] Step failed: " << sqlite3_errmsg(db)
+              << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
 }
 
 void flushBatch() {
@@ -101,15 +403,16 @@ void flushBatch() {
   if (namesOfSets.empty())
     return;
 
-  // Ensure database root folder exists
   if (!dirExists(Global.DatabaseLocation)) {
     createDir(Global.DatabaseLocation);
   }
 
   processAllSetImages();
 
-  std::string dbFile = Global.DatabaseLocation + "/beatmapsets.db";
-  normalizePath(dbFile);
+  sqlite3 *db = openSetDatabase(Global.DatabaseLocation);
+  if (db) {
+    sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
+  }
 
   while (!namesOfSets.empty()) {
     auto node = namesOfSets.extract(namesOfSets.begin());
@@ -124,7 +427,6 @@ void flushBatch() {
 
     std::vector<FileMetadata> combinedList = std::move(newMaps);
 
-    // Merge with on-disk maps if set folder already exists
     if (dirExists(setDir)) {
       std::vector<FileMetadata> existingMaps =
           parseCachedMaps(Global.DatabaseLocation, setid);
@@ -142,24 +444,32 @@ void flushBatch() {
       }
     }
 
-    // Determine most common title
     std::unordered_map<std::string, int> selection;
     for (const auto &file : combinedList) {
       selection[file.title]++;
     }
     std::string title = "error";
-    int max_value = -1;
+    int maxValue = -1;
     for (const auto &[key, value] : selection) {
-      if (value > max_value) {
-        max_value = value;
+      if (value > maxValue) {
+        maxValue = value;
         title = key;
       }
     }
 
-    // Write map files and update beatmapsets.db
+    // Write individual map .db text files
     writeBeatmapFile(setid, combinedList);
-    updateOrAppendSetInDb(dbFile, setid, title,
-                          static_cast<int>(combinedList.size()), combinedList);
+
+    // Update SQLite set index
+    if (db) {
+      upsertSetInDb(db, setid, title, static_cast<int>(combinedList.size()),
+                    combinedList);
+    }
+  }
+
+  if (db) {
+    sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
+    sqlite3_close(db);
   }
 
   namesOfSets.clear();
@@ -168,6 +478,46 @@ void flushBatch() {
 }
 
 void decideNamesForSets() { flushBatch(); }
+
+int generate9DigitHash(const std::string &input) {
+  size_t rawHash = std::hash<std::string>{}(input);
+  return 100000000 + static_cast<int>(rawHash % 900000000);
+}
+
+void addFileToMap(const std::string &path) {
+  std::vector<std::string> output = ParseNameFile(path);
+  if (output.size() < 6)
+    return;
+
+  int parsedSetId =
+      static_cast<int>(std::strtol(output[4].c_str(), nullptr, 10));
+  int parsedId = static_cast<int>(std::strtol(output[5].c_str(), nullptr, 10));
+
+  if (parsedSetId <= 0) {
+    std::filesystem::path p(path);
+    std::string folderName = p.parent_path().filename().string();
+    parsedSetId = generate9DigitHash(folderName);
+  }
+
+  if (parsedId <= 0) {
+    std::filesystem::path p(path);
+    std::string fileName = p.filename().string();
+    parsedId = generate9DigitHash(fileName);
+  }
+
+  FileMetadata temp{.path = path,
+                    .title = std::move(output[0]),
+                    .artist = std::move(output[1]),
+                    .creator = std::move(output[2]),
+                    .version = std::move(output[3]),
+                    .setid = parsedSetId,
+                    .id = parsedId,
+                    .bgImage = extractBackgroundImage(path),
+                    .coverFile = " "};
+
+  namesOfSets[temp.setid].push_back(std::move(temp));
+  mapsInCurrentBatch++;
+}
 
 void buildFileMap(const std::string &rootPath) {
   std::string root = rootPath;
@@ -220,12 +570,8 @@ void buildFileMap(const std::string &rootPath) {
         } else if (S_ISREG(st.st_mode) &&
                    IsFileExtension(entryName.c_str(), ".osu")) {
           numBeatmapsFound = numBeatmapsFound + 1;
-          // std::cout << "\e[1;35m[DATABASE] \e[38;5;236mFound " <<
-          // numBeatmapsFound << " files"
-          //   << std::endl;
           addFileToMap(fullPath);
 
-          // Flush RAM to disk every 50 unique sets
           if (mapsInCurrentBatch >= BATCH_MAP_LIMIT ||
               namesOfSets.size() >= BATCH_SET_LIMIT) {
             flushBatch();
@@ -237,87 +583,42 @@ void buildFileMap(const std::string &rootPath) {
     }
   }
 
-  // Flush remaining sets
   flushBatch();
-}
-
-void addFileToMap(const std::string &path) {
-  std::vector<std::string> output = ParseNameFile(path);
-  if (output.size() < 6)
-    return;
-
-  FileMetadata temp{
-      .path = path,
-      .title = std::move(output[0]),
-      .artist = std::move(output[1]),
-      .creator = std::move(output[2]),
-      .version = std::move(output[3]),
-      .setid = static_cast<int>(std::strtol(output[4].c_str(), nullptr, 10)),
-      .id = static_cast<int>(std::strtol(output[5].c_str(), nullptr, 10)),
-      .bgImage = extractBackgroundImage(path),
-      .coverFile = " "};
-
-  namesOfSets[temp.setid].push_back(std::move(temp));
-  mapsInCurrentBatch++;
 }
 
 void writeBeatmapFile(int setid,
                       const std::vector<FileMetadata> &metadataList) {
-  std::string dir_name = Global.DatabaseLocation + "/" + std::to_string(setid);
-  normalizePath(dir_name);
-  if (!dirExists(dir_name))
-    createDir(dir_name);
+  std::string dirName = Global.DatabaseLocation + "/" + std::to_string(setid);
+  normalizePath(dirName);
+  if (!dirExists(dirName))
+    createDir(dirName);
 
-  for (const auto &file_info : metadataList) {
-    std::string file_path =
-        dir_name + "/" + std::to_string(file_info.id) + ".db";
-    FILE *file = fopen(file_path.c_str(), "w");
+  for (const auto &fileInfo : metadataList) {
+    std::string filePath = dirName + "/" + std::to_string(fileInfo.id) + ".db";
+    FILE *file = fopen(filePath.c_str(), "w");
     if (!file)
       continue;
 
     fprintf(file,
             "Path:%s\nTitle:%s\nArtist:%s\nCreator:%s\nVersion:%s\nBeatmapID:%"
             "d\nBeatmapSetID:%d\nCoverFile:%s\n",
-            file_info.path.c_str(), file_info.title.c_str(),
-            file_info.artist.c_str(), file_info.creator.c_str(),
-            file_info.version.c_str(), file_info.id, setid,
-            file_info.coverFile.c_str());
+            fileInfo.path.c_str(), fileInfo.title.c_str(),
+            fileInfo.artist.c_str(), fileInfo.creator.c_str(),
+            fileInfo.version.c_str(), fileInfo.id, setid,
+            fileInfo.coverFile.c_str());
     fclose(file);
   }
 }
 
-void writeBeatmapSetFile(const std::string &filename, int beatmap_set_id,
+void writeBeatmapSetFile(const std::string &filename, int beatmapSetId,
                          const std::string &title, int numMaps,
                          const std::vector<FileMetadata> &metadataListObj) {
-  FILE *file = fopen(filename.c_str(), "a");
-  if (!file)
+  sqlite3 *db = openSetDatabase(filename);
+  if (!db)
     return;
 
-  std::string ids_list, artists_list, creators_list;
-  std::unordered_set<std::string> unique_artists, unique_creators;
-
-  for (size_t i = 0; i < metadataListObj.size(); ++i) {
-    if (i > 0)
-      ids_list += ",";
-    ids_list += std::to_string(metadataListObj[i].id);
-
-    if (unique_artists.insert(metadataListObj[i].artist).second) {
-      if (!artists_list.empty())
-        artists_list += ", ";
-      artists_list += metadataListObj[i].artist;
-    }
-    if (unique_creators.insert(metadataListObj[i].creator).second) {
-      if (!creators_list.empty())
-        creators_list += ", ";
-      creators_list += metadataListObj[i].creator;
-    }
-  }
-
-  fprintf(file, "[%d]\nTitle:%s\nMaps:%d\nIDs:%s\nArtists:%s\nCreators:%s\n\n",
-          beatmap_set_id, title.c_str(), numMaps, ids_list.c_str(),
-          artists_list.c_str(), creators_list.c_str());
-
-  fclose(file);
+  upsertSetInDb(db, beatmapSetId, title, numMaps, metadataListObj);
+  sqlite3_close(db);
 }
 
 void clearFileMap() {
@@ -327,51 +628,45 @@ void clearFileMap() {
 
 void listAllMaps() {}
 
-std::vector<SetFileMetadata> parseCachedSets(const std::string &db_path) {
-  std::vector<SetFileMetadata> metadata_list;
-  FILE *file = fopen(db_path.c_str(), "r");
-  if (!file)
-    return metadata_list;
+std::vector<SetFileMetadata> parseCachedSets(const std::string &dbPath) {
+  std::vector<SetFileMetadata> metadataList;
+  sqlite3 *db = openSetDatabase(dbPath);
+  if (!db)
+    return metadataList;
 
-  char line[1024];
-  SetFileMetadata current_meta;
-  bool processing_entry = false;
+  const char *sql =
+      "SELECT setid, title, maps, artists, creators FROM beatmapsets;";
+  sqlite3_stmt *stmt = nullptr;
 
-  while (fgets(line, sizeof(line), file)) {
-    std::string line_str(line);
-    while (!line_str.empty() &&
-           (line_str.back() == '\n' || line_str.back() == '\r'))
-      line_str.pop_back();
-    if (line_str.empty())
-      continue;
-
-    if (line_str.front() == '[' && line_str.find(']') != std::string::npos) {
-      if (processing_entry)
-        metadata_list.push_back(current_meta);
-      current_meta = SetFileMetadata();
-      processing_entry = true;
-      size_t close = line_str.find(']');
-      current_meta.setid = std::stoi(line_str.substr(1, close - 1));
-    } else if (line_str.rfind("Title:", 0) == 0) {
-      current_meta.title = line_str.substr(6);
-    } else if (line_str.rfind("Maps:", 0) == 0) {
-      current_meta.number = std::stoi(line_str.substr(5));
-    } else if (line_str.rfind("Artists:", 0) == 0) {
-      current_meta.artists = line_str.substr(8);
-    } else if (line_str.rfind("Creators:", 0) == 0) {
-      current_meta.creators = line_str.substr(9);
+  if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      SetFileMetadata s;
+      s.setid = sqlite3_column_int(stmt, 0);
+      const char *t =
+          reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+      s.title = t ? t : "";
+      s.number = sqlite3_column_int(stmt, 2);
+      const char *a =
+          reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+      s.artists = a ? a : "";
+      const char *c =
+          reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+      s.creators = c ? c : "";
+      metadataList.push_back(std::move(s));
     }
   }
-  if (processing_entry)
-    metadata_list.push_back(current_meta);
-  fclose(file);
-  return metadata_list;
+
+  if (stmt) {
+    sqlite3_finalize(stmt);
+  }
+  sqlite3_close(db);
+  return metadataList;
 }
 
-std::vector<FileMetadata> parseCachedMaps(const std::string &db_path,
+std::vector<FileMetadata> parseCachedMaps(const std::string &dbPath,
                                           int setid) {
   std::vector<FileMetadata> result;
-  std::string setDir = db_path + "/" + std::to_string(setid);
+  std::string setDir = dbPath + "/" + std::to_string(setid);
   normalizePath(setDir);
 
   DIR *dir = opendir(setDir.c_str());
@@ -449,7 +744,6 @@ std::string extractBackgroundImage(const std::string &osuPath) {
   while (fgets(line, sizeof(line), file)) {
     std::string lineStr(line);
 
-    // Trim trailing whitespace / newlines
     size_t last = lineStr.find_last_not_of("\r\n\t ");
     if (last != std::string::npos)
       lineStr.erase(last + 1);
@@ -474,29 +768,27 @@ std::string extractBackgroundImage(const std::string &osuPath) {
         if (second != std::string::npos) {
           std::string candidate = lineStr.substr(first + 1, second - first - 1);
 
-          // 1. Trim leading spaces from candidate
           size_t start = candidate.find_first_not_of(" \t");
           if (start != std::string::npos) {
             candidate = candidate.substr(start);
           } else {
-            candidate.clear(); // Entirely spaces
+            candidate.clear();
           }
 
           if (candidate.empty())
             continue;
 
-          // 2. Convert to lowercase for extension check
           std::string lower = candidate;
           for (char &c : lower)
             c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 
-          // Check if it ends with a video extension
           bool isVideo = false;
-          static const std::string videoExts[] = {".mp4", ".avi", ".flv", ".mkv",
-                                                  ".mov", ".wmv", ".m4v"};
+          static const std::string videoExts[] = {
+              ".mp4", ".avi", ".flv", ".mkv", ".mov", ".wmv", ".m4v"};
           for (const auto &ext : videoExts) {
             if (lower.size() >= ext.size() &&
-                lower.compare(lower.size() - ext.size(), ext.size(), ext) == 0) {
+                lower.compare(lower.size() - ext.size(), ext.size(), ext) ==
+                    0) {
               isVideo = true;
               break;
             }
@@ -524,7 +816,6 @@ void processAllSetImages() {
 
     for (auto &file : metadataList) {
       if (file.bgImage.empty()) {
-        std::cout << setid << " empty image?" << std::endl;
         continue;
       }
 
@@ -532,7 +823,6 @@ void processAllSetImages() {
       size_t lastSlash = beatmapDir.find_last_of("/\\");
       if (lastSlash != std::string::npos)
         beatmapDir = beatmapDir.substr(0, lastSlash);
-      //std::cout << beatmapDir << std::endl;
 
       normalizePath(beatmapDir);
 
@@ -565,7 +855,6 @@ void processAllSetImages() {
           }
         }
 
-        // Final check after fallbacks
         if (!fileExists(fullBgPath)) {
           continue;
         }
@@ -577,42 +866,59 @@ void processAllSetImages() {
         continue;
       }
 
-      std::cout << "loading " << fullBgPath << " " << fullBgPath.size()
-                << std::endl;
-      Image img = LoadImage(fullBgPath.c_str());
-      if (img.data == nullptr) {
-        std::cout << "failed" << std::endl;
-        continue;
-      }
-
-      float targetAspect = (float)COVER_WIDTH / COVER_HEIGHT;
-      float imageAspect = (float)img.width / img.height;
-      Rectangle cropRect;
-      if (imageAspect > targetAspect) {
-        int cropWidth = (int)(img.height * targetAspect);
-        cropRect = {(float)(img.width - cropWidth) / 2.0f, 0.0f,
-                    (float)cropWidth, (float)img.height};
-      } else {
-        int cropHeight = (int)(img.width / targetAspect);
-        cropRect = {0.0f, (float)(img.height - cropHeight) / 2.0f,
-                    (float)img.width, (float)cropHeight};
-      }
-      ImageCrop(&img, cropRect);
-      ImageResize(&img, COVER_WIDTH, COVER_HEIGHT);
-
       std::string coverName = "cover_" + std::to_string(setid) + "_" +
                               std::to_string(coverIndex++) + ".bmp";
       std::string setDir =
           Global.DatabaseLocation + "/" + std::to_string(setid);
       normalizePath(setDir);
-      std::cout << "\e[1;35m[DATABASE] \e[38;5;236mProcessing " << coverName
-                << std::endl;
-      if (!dirExists(setDir))
-        createDir(setDir);
 
       std::string outPath = setDir + "/" + coverName;
-      ExportImage(img, outPath.c_str());
-      UnloadImage(&img);
+      normalizePath(outPath);
+
+      bool alreadyValid = false;
+
+      if (FileExists(outPath.c_str())) {
+        Image existing = LoadImage(outPath.c_str());
+        if (existing.data != nullptr) {
+          if (existing.width == COVER_WIDTH &&
+              existing.height == COVER_HEIGHT) {
+            alreadyValid = true;
+          }
+          UnloadImage(&existing);
+        }
+      }
+
+      if (!alreadyValid) {
+        Image img = LoadImage(fullBgPath.c_str());
+        if (img.data == nullptr) {
+          continue;
+        }
+        float targetAspect = (float)COVER_WIDTH / COVER_HEIGHT;
+        float imageAspect = (float)img.width / img.height;
+        Rectangle cropRect;
+        if (imageAspect > targetAspect) {
+          int cropWidth = (int)(img.height * targetAspect);
+          cropRect = {(float)(img.width - cropWidth) / 2.0f, 0.0f,
+                      (float)cropWidth, (float)img.height};
+        } else {
+          int cropHeight = (int)(img.width / targetAspect);
+          cropRect = {0.0f, (float)(img.height - cropHeight) / 2.0f,
+                      (float)img.width, (float)cropHeight};
+        }
+        ImageCrop(&img, cropRect);
+        ImageResize(&img, COVER_WIDTH, COVER_HEIGHT);
+
+        if (!dirExists(setDir))
+          createDir(setDir);
+
+        ExportImage(img, outPath.c_str());
+        UnloadImage(&img);
+      }
+      else{
+        std::cout << "\e[1;35m[DATABASE] \e[38;5;236mSkipping  "
+            << fullBgPath << std::endl;
+      }
+
 
       bgToCover[fullBgPath] = coverName;
       file.coverFile = coverName;
@@ -620,7 +926,6 @@ void processAllSetImages() {
   }
 }
 
-// Appends a single new .osu map to disk without requiring a full rebuild
 bool appendSingleBeatmap(const std::string &osuPath) {
   std::vector<std::string> output = ParseNameFile(osuPath);
   if (output.size() < 6)
@@ -637,17 +942,11 @@ bool appendSingleBeatmap(const std::string &osuPath) {
       .bgImage = extractBackgroundImage(osuPath),
       .coverFile = " "};
 
-  // Write individual map file (<id>.db)
   writeBeatmapFile(meta.setid, {meta});
-
-  // Update beatmapsets.db entry
-  std::string dbFile = Global.DatabaseLocation + "/beatmapsets.db";
-  normalizePath(dbFile);
 
   std::vector<FileMetadata> existingMaps =
       parseCachedMaps(Global.DatabaseLocation, meta.setid);
 
-  // Check if map ID is already present
   bool found = false;
   for (const auto &m : existingMaps) {
     if (m.id == meta.id) {
@@ -658,39 +957,13 @@ bool appendSingleBeatmap(const std::string &osuPath) {
   if (!found)
     existingMaps.push_back(meta);
 
-  // Re-read existing beatmapsets.db into memory to modify/append entry
-  std::vector<SetFileMetadata> cachedSets = parseCachedSets(dbFile);
-  bool setExists = false;
-  for (auto &set : cachedSets) {
-    if (set.setid == meta.setid) {
-      setExists = true;
-      break;
-    }
-  }
+  sqlite3 *db = openSetDatabase(Global.DatabaseLocation);
+  if (!db)
+    return false;
 
-  if (!setExists) {
-    // Simple append if set is brand new
-    writeBeatmapSetFile(dbFile, meta.setid, meta.title,
-                        static_cast<int>(existingMaps.size()), existingMaps);
-  } else {
-    // Rewrite entire beatmapsets.db with updated map set metadata
-    FILE *f = fopen(dbFile.c_str(), "w");
-    if (!f)
-      return false;
-    fclose(f);
-
-    for (const auto &set : cachedSets) {
-      if (set.setid == meta.setid) {
-        writeBeatmapSetFile(dbFile, meta.setid, meta.title,
-                            static_cast<int>(existingMaps.size()),
-                            existingMaps);
-      } else {
-        std::vector<FileMetadata> setMaps =
-            parseCachedMaps(Global.DatabaseLocation, set.setid);
-        writeBeatmapSetFile(dbFile, set.setid, set.title, set.number, setMaps);
-      }
-    }
-  }
+  upsertSetInDb(db, meta.setid, meta.title,
+                static_cast<int>(existingMaps.size()), existingMaps);
+  sqlite3_close(db);
 
   return true;
 }
