@@ -63,6 +63,7 @@ private:
   int lastSelection = 0;
   bool showOptions = false;
   bool inBeatmapView = false; // are we showing beatmaps of a set?
+  bool needBackground = true;
   std::vector<FileMetadata> currentBeatmaps; // beatmaps of the selected set
 
   enum TextureState {
@@ -228,6 +229,7 @@ private:
   TestSlider volume;
   Popup popup;
   ImageObject logo;
+  TextBox description;
 
 public:
   MainMenu();

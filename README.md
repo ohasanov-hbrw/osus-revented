@@ -1,5 +1,5 @@
 # osus-revented
-The suspicious osu clone named osus, redone!
+Cross Platform osu! Game Client written in C++. Currently supports Windows, Linux and Nintendo 3DS
 
 
 ## Why do something like this?
@@ -118,3 +118,17 @@ running on WSLg may need `SDL_VIDEODRIVER=wayland ./linuxmakefast.sh`
 
 
 ![alt text](https://github.com/ohasanov-hbrw/osus-revented/blob/3ds-pc-merge/resources/osus.png?raw=true)
+
+
+
+Copyright (C) 2026 Ömer Hasanov
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.

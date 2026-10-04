@@ -82,7 +82,8 @@ void PlayMenu::init() {
   lastSelection = 0;
   // MutexLock(SWITCHING_STATE);
   // std::cout << "loading the playmenu/n";
-  Global.NeedForBackgroundClear = true;
+  needBackground = Global.NeedForBackgroundClear;
+  Global.NeedForBackgroundClear = false;
   Global.useAuto = false;
   Global.LastFrameTime = getGlobalTimer();
   temp = Global.Path;
@@ -206,6 +207,7 @@ void PlayMenu::render() {
       dynamic_cast<FancyScrollingList *>(menu.elements[SCROLLER].get());
 
   int selectionCurrent = fancyList ? fancyList->currentSelection : 0;
+  Global.NeedForBackgroundClear = true;
   if (!inBeatmapView && !beatmapSets.empty() && selectionCurrent >= 0 &&
       selectionCurrent < (int)beatmapSets.size()) {
     int selectedSid = beatmapSets[selectionCurrent % beatmapSets.size()].setid;
@@ -228,7 +230,8 @@ void PlayMenu::render() {
         }
         Rectangle destRect = ScaleRect({leftMostX, topMostY, screenW, screenH});
         DrawTexturePro(&slot.texture, srcRect, destRect, {0.0f, 0.0f}, 0.0f,
-                       Color{64, 64, 64, 128});
+                       Color{32, 32, 32, 255});
+        Global.NeedForBackgroundClear = false;
         break;
       }
     }
@@ -680,6 +683,7 @@ void PlayMenu::unload() {
   leftSideFormatted.clear();
   inBeatmapView = false;
   currentBeatmaps.clear();
+  Global.NeedForBackgroundClear = needBackground;
 }
 
 // only this function can convert images to textures

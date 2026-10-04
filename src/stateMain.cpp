@@ -31,6 +31,8 @@ MainMenu::MainMenu() {
   popup =
       Popup({320, 240}, {300, 120}, GRAY, "Test Popup", WHITE, 20, 1 << 0, -1);
   logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
+  description = TextBox({320, 540}, {520, 40}, {240, 98, 161, 0},
+                        "made by ohasanov (C) 2026", Fade(BLACK, 0.3f), 20, 50);
   animation = 0;
   animationStart = 0;
   animationDone = false;
@@ -326,6 +328,12 @@ void MainMenu::update() {
   }
 
   
+  float leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
+  float rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
+  float topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
+  float bottomMostY = 480 + Global.ZeroPoint.y / Global.Scale;
+
+  description.position.y = bottomMostY - 30;
 
   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
@@ -534,7 +542,9 @@ void MainMenu::render() {
   // (float)Global.OsusLogo.width, WHITE);
   logo.render();
   popup.render();
+  description.render();
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
+  
   // MutexUnlock(SWITCHING_STATE);
   // MutexUnlock(ACCESSING_OBJECTS);
   // test.render();
