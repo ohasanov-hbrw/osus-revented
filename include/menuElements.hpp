@@ -424,3 +424,20 @@ public:
   void deinit() override;
   void reinit();
 };
+
+
+class HalfCircleSlider : public MenuElement {
+private:
+public:
+  enum MenuObjectModes mode = CLICKABLEOBJECT_INACTIVE;
+  float radius;
+  Color sliderColor;
+  HalfCircleSlider() = default;
+  ~HalfCircleSlider() = default;
+  void render() override;
+  void update() override;
+
+  void init() override;
+  void deinit() override;
+  void reinit();
+};

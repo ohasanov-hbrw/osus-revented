@@ -438,3 +438,13 @@ void FancyScrollingList::render() {
       objects[i]->render();
   }
 }
+
+
+
+void HalfCircleSlider::init() {}
+
+void HalfCircleSlider::deinit() {}
+
+void HalfCircleSlider::update() {}
+
+void HalfCircleSlider::render() {}

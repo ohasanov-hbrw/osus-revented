@@ -270,8 +270,8 @@ void ResultsMenu::render() {
     return;
   MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
   if (textureOpsState.load() == TEX_LOADED)
-    DrawTextureEx(&symbol, ScaleCords({420, 280}), 0,
-                  Scale(64.0 / symbol.width), WHITE);
+    DrawTextureEx(&symbol, ScaleCords({ 320 + 150 + (640. - (320+150+128)) / 2, 140}), 0,
+                  Scale(128. / symbol.width), WHITE);
   close.render();
   name.render();
   maxCombo.render();
@@ -280,7 +280,7 @@ void ResultsMenu::render() {
   hit50.render();
   hit0.render();
   accuracy.render();
-  drawAccuracyGraph(ScaleRect({320 - 100, 280, 200, 100}));
+  drawAccuracyGraph(ScaleRect({320 - 150, 260, 300, 140}));
 
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
   // Global.mutex.unlock();
@@ -429,13 +429,13 @@ void ResultsMenu::drawAccuracyGraph(Rectangle area) {
   }
 
   // Build points array for smooth line rendering
-  int n = static_cast<int>(accuracies.size());
+  int n = static_cast<int>(std::min((int)accuracies.size(), (int)GetScreenWidth() / 2));
   std::vector<Vector2> points(n);
   float stepX = graphWidth / (n - 1);
 
   for (int i = 0; i < n; i++) {
     // Clamp accuracy between 0 and 100 just in case
-    float acc = ::std::clamp(accuracies[i], 0.0f, 100.0f);
+    float acc = ::std::clamp(accuracies[std::min((int)accuracies.size(), (int)(((float)i / (float)n) * accuracies.size()))], 0.0f, 100.0f);
 
     points[i] = {graphX + i * stepX,
                  graphY + graphHeight - (acc / 100.0f) * graphHeight};

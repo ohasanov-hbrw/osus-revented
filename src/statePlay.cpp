@@ -259,7 +259,7 @@ void PlayMenu::render() {
           Rectangle destRect =
               ScaleRect({leftMostX, topMostY, screenW, screenH});
           DrawTexturePro(&slot.texture, srcRect, destRect, {0.0f, 0.0f}, 0.0f,
-                         Color{64, 64, 64, 128});
+                         Color{32, 32, 32, 255});
           break;
         }
       }

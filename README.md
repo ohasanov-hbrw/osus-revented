@@ -9,14 +9,14 @@ The current way we handle audio and video is by using SDL2 as the backend and a 
 
 The code is also structured in a way which allows a parallel Nintendo 3DS Port! This is achieved by just copying the needed graphics / sound / input functions and making system spesific functions that are seperated with `#ifdef`s.
 
-Everything summerized the current implementation of our library is not the best (but it works!).
+Everything summarized the current implementation of our library is not the best (but it works!).
 
 I (ohasanov) also am planning to add more game modes to this which originally may not have existed in osu!. This is just going to be a playground, in which we mess around with audio, 2D graphics and shaders.
 
 ## How does it perform?
 Currently the game is running at a pretty constant speed, but it really is dependant on the OS, since we use OS Sleep functions to actually throttle our code (frame limit). On a mobile core2duo from about 2007-8 it manages to easily reach the 1500-1600Hz game logic speed. The game also achieves a good framerate on the 3DS, mostly being locked to 60fps, which is the maximum for that console, while polling input at the highest rate possible, at 250Hz. 
 
-Funnily enough, the 3DS also has the best latency possible, close to actually none. This is probably because of the simpler OS, but the 40ish ms offset I add on desktop builds is not needed for the silly Nintendo Console :D
+Funnily, the 3DS also has the best latency possible, close to actually none. This is probably because of the simpler OS, but the 40ish ms offset I add on desktop builds is not needed for the silly Nintendo Console :D
 
 Here is a ScreenShot of both versions:
 
@@ -111,6 +111,7 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [ ] Stacked objects should be offset from another
 - [ ] Add animated combo counter
 - [ ] Add the flakes~
+- [ ] Add volume control
 
 
 running on WSLg may need `SDL_VIDEODRIVER=wayland ./linuxmakefast.sh`
