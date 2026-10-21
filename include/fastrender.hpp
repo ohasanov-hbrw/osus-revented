@@ -15,3 +15,5 @@ void updateMouseTrail();
 void renderMouse();
 
 void DrawLoadingCircle(Vector2 center, float radius, float thickness, double time, Color color);
+
+void DrawThickCircleLines(Vector2 center, float radius, float startAngle, float endAngle, int segments, float thickness, Color color);

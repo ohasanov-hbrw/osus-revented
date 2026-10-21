@@ -72,3 +72,35 @@ void DrawLoadingCircle(Vector2 center, float radius, float thickness, double tim
     }
     DrawTriangleStrip(points, VERTEX_COUNT, color);
 }
+
+
+void DrawThickCircleLines(Vector2 center, float radius, float startAngle, float endAngle, int segments, float thickness, Color color){
+    Vector2 * points;
+    points = (Vector2*)malloc(sizeof(Vector2) * (segments * 2 + 2));
+    if(points == nullptr)
+        return;
+    double innerRadius = radius - thickness;
+    double outerRadius = radius;
+    while(endAngle < startAngle)
+        endAngle += 360.;
+    double arcLength = endAngle - startAngle;
+
+    for (int i = 0; i < segments; i++)
+    {
+        double progress = (double)i / (segments - 1);
+        double angleRad = (startAngle + (progress * arcLength)) * DEG2RAD;
+
+        double cosA = cosf(angleRad);
+        double sinA = sinf(angleRad);
+
+        // Vertex 2i: Outer point
+        points[2 * i].x = center.x + cosA * outerRadius;
+        points[2 * i].y = center.y + sinA * outerRadius;
+
+        // Vertex 2i + 1: Inner point
+        points[2 * i + 1].x = center.x + cosA * innerRadius;
+        points[2 * i + 1].y = center.y + sinA * innerRadius;
+    }
+    DrawTriangleStrip(points, segments * 2, color);
+    free(points);
+}

@@ -43,6 +43,7 @@ public:
 class PlayMenu : public State {
 private:
   SelectableList dir_list;
+  CircularSliderElement masterVolume;
   Button select;
   Button back;
   Button close;

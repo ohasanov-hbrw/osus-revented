@@ -105,6 +105,10 @@ void PlayMenu::init() {
   menu.elements.push_back(std::make_unique<ClickableObject>());
   menu.elements[4].get()->baseColor = {0xAA, 0x00, 0xAA, 192}; // CC00AAFF
 
+  masterVolume.baseColor = {64, 48, 64, 192};
+  ;
+  masterVolume.sliderColor = {0xAA, 0x00, 0xAA, 192};
+
   float spacingWidth = 160;
   float spacingWidthTop = 240;
   float spacingHeight = 40;
@@ -128,6 +132,9 @@ void PlayMenu::init() {
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 125, 40, 135, 10, 40., 0);
   menu.elements[4].get()->positions =
       Create_Shape_Trapezoid(BOTTOM_RIGHT, 80, 40, 230, 10, 40., (-40.));
+
+  masterVolume.radius = 67;
+  masterVolume.positions.push_back({leftMostX + masterVolume.radius + 10, 240});
 
   menu.elements[3].get()->text = "Select";
   menu.elements[4].get()->text = "Back";
@@ -169,6 +176,11 @@ void PlayMenu::init() {
         ->objectNames.push_back(beatmapSets[i].title);
   }
   menu.init();
+  masterVolume.init();
+  masterVolume.internalBox.SetBox({
+        masterVolume.positions[0].x - masterVolume.radius,
+        masterVolume.positions[0].y - masterVolume.radius,
+        masterVolume.radius * 2, masterVolume.radius * 2});
   leftSideBox.SetText(leftSideFormatted);
   leftSideBox.SetFontSize(30.08f);
   leftSideBox.SetSpacing(2);
@@ -329,6 +341,7 @@ void PlayMenu::render() {
 
   options.render();
   close.render();
+  masterVolume.render();
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
   DrawRectangleLinesEx(ScaleRect({rightMostX - 317.5, 240 - 85 / 2.0, 340, 85}),
@@ -345,6 +358,13 @@ void PlayMenu::update() {
 
   MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
   Global.enableMouse = true;
+
+  if (IsKeyDown(Global.AUDIO_SETUP_KEY))
+    masterVolume.renderObject = true;
+  else
+    masterVolume.renderObject = false;
+  masterVolume.update();
+
   // dir_list.update();
   // select.update();
   // back.update();
@@ -409,6 +429,13 @@ void PlayMenu::update() {
     usedskin.position = {leftMostX + 100, bottomMostY - 40};
     usedsound.position = {leftMostX + 100, bottomMostY - 60};
     options.position = {leftMostX + 75, bottomMostY - 15};
+
+    masterVolume.positions[0] = {leftMostX + masterVolume.radius + 10, 240};
+    masterVolume.internalBox.SetBox({
+        masterVolume.positions[0].x - masterVolume.radius,
+        masterVolume.positions[0].y - masterVolume.radius,
+        masterVolume.radius * 2, masterVolume.radius * 2});
+
     MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     unloadLoaderThread(false);
     MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
@@ -591,7 +618,8 @@ void PlayMenu::update() {
       }
       if (!alreadyAssigned) {
         for (auto &slot : icons) {
-          if (slot.state.load() == TEX_STATE_FREE || slot.state.load() == TEX_NOT_FOUND) {
+          if (slot.state.load() == TEX_STATE_FREE ||
+              slot.state.load() == TEX_NOT_FOUND) {
             slot.setid.store(sid);
             slot.state.store(TEX_STATE_NEEDS_DISK_LOAD);
             break;
@@ -615,7 +643,7 @@ void PlayMenu::update() {
   int minVisibleIdx = -numSlots / 2 + fancyList->currentSelection;
   int maxVisibleIdx = numSlots / 2 + fancyList->currentSelection;
 
-  //std::cout << minVisibleIdx << " " << maxVisibleIdx << std::endl;
+  // std::cout << minVisibleIdx << " " << maxVisibleIdx << std::endl;
   std::unordered_set<int> visibleSetIds;
   for (int itemIdx = maxVisibleIdx; itemIdx >= minVisibleIdx; itemIdx--) {
     if (itemIdx >= 0 && itemIdx < totalSets) {
@@ -746,9 +774,9 @@ void PlayMenu::workerThreadImpl() {
 
         } else {
           slot.state.store(TEX_NOT_FOUND);
-          //slot.setid.store(-1);
+          // slot.setid.store(-1);
         }
-        
+
         break;
       }
     }
@@ -758,7 +786,8 @@ void PlayMenu::workerThreadImpl() {
     }
 
     if (!worked) {
-      SleepInMs(16);
+      SleepInMs(50);
+      //printf("eepin\n");
     }
   }
 }

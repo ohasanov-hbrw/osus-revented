@@ -233,6 +233,7 @@ enum MenuObjectModes {
 class MenuElement {
 public:
   bool drawOutline = false;
+  bool focused = false;
 
   Color outlineColor;
   Color outlineColorFocused;
@@ -426,14 +427,16 @@ public:
 };
 
 
-class HalfCircleSlider : public MenuElement {
+class CircularSliderElement : public MenuElement {
 private:
 public:
   enum MenuObjectModes mode = CLICKABLEOBJECT_INACTIVE;
   float radius;
+  float sliderValue;
+  bool renderObject = false;
   Color sliderColor;
-  HalfCircleSlider() = default;
-  ~HalfCircleSlider() = default;
+  CircularSliderElement() = default;
+  ~CircularSliderElement() = default;
   void render() override;
   void update() override;
 

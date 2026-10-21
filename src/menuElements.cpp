@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "fastrender.hpp"
 
 void MenuElement::init() {}
 
@@ -441,10 +442,39 @@ void FancyScrollingList::render() {
 
 
 
-void HalfCircleSlider::init() {}
+void CircularSliderElement::init() {
+  sliderValue = 0.5;
+  textColor = WHITE;
+  horizontalAlign = HAlign::Center;
+  verticalAlign = VAlign::Middle;
+  internalBox.SetText("Master\nVolume");
+  internalBox.SetFontSize(20.05);
+  internalBox.SetSpacing(2.005);
+  //internalBox.SetBox();
+}
 
-void HalfCircleSlider::deinit() {}
+void CircularSliderElement::deinit() {
 
-void HalfCircleSlider::update() {}
+}
 
-void HalfCircleSlider::render() {}
+void CircularSliderElement::update() {
+  if(positions.empty())
+    return;
+  focused = CheckCollisionPointCircle(Global.MousePosition, positions[0], radius);
+  if(renderObject && focused){
+    sliderValue += 0.05 * Global.Wheel;
+    sliderValue = clip(sliderValue, 0.0, 1.0);
+    Global.Wheel = 0;
+  }
+  
+}
+
+void CircularSliderElement::render() {
+  if(!positions.empty() && renderObject){
+    float startAngle = 150.f;
+    float endAngle = startAngle + 240. * sliderValue;
+    DrawCircleV(ScaleCords(positions[0]), Scale(radius), baseColor);
+    DrawThickCircleLines(ScaleCords(positions[0]), Scale(radius - 2.5), startAngle, endAngle, std::max(3, (int)(30 * sliderValue)), Scale(10) ,focused ? Color{sliderColor.r * 1.5, sliderColor.g * 1.5, sliderColor.b * 1.5, sliderColor.a} : sliderColor);
+    internalBox.Draw(horizontalAlign, verticalAlign, textColor);
+  }
+}
