@@ -177,10 +177,10 @@ void PlayMenu::init() {
   }
   menu.init();
   masterVolume.init();
-  masterVolume.internalBox.SetBox({
-        masterVolume.positions[0].x - masterVolume.radius,
-        masterVolume.positions[0].y - masterVolume.radius,
-        masterVolume.radius * 2, masterVolume.radius * 2});
+  masterVolume.internalBox.SetBox(
+      {masterVolume.positions[0].x - masterVolume.radius,
+       masterVolume.positions[0].y - masterVolume.radius,
+       masterVolume.radius * 2, masterVolume.radius * 2});
   leftSideBox.SetText(leftSideFormatted);
   leftSideBox.SetFontSize(30.08f);
   leftSideBox.SetSpacing(2);
@@ -431,10 +431,10 @@ void PlayMenu::update() {
     options.position = {leftMostX + 75, bottomMostY - 15};
 
     masterVolume.positions[0] = {leftMostX + masterVolume.radius + 10, 240};
-    masterVolume.internalBox.SetBox({
-        masterVolume.positions[0].x - masterVolume.radius,
-        masterVolume.positions[0].y - masterVolume.radius,
-        masterVolume.radius * 2, masterVolume.radius * 2});
+    masterVolume.internalBox.SetBox(
+        {masterVolume.positions[0].x - masterVolume.radius,
+         masterVolume.positions[0].y - masterVolume.radius,
+         masterVolume.radius * 2, masterVolume.radius * 2});
 
     MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     unloadLoaderThread(false);
@@ -557,23 +557,29 @@ void PlayMenu::update() {
   if (!beatmapSets.empty()) {
     if (!inBeatmapView) {
       selection %= beatmapSets.size();
-      std::string newString = TextFormat(
-          "[cCC00AAFF]Title: [r]%s\n\n[cCC00AAFF]Maps: "
-          "[r]%d\n[cCC00AAFF]Artists: "
-          "[r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: "
-          "[cFFFFFF99]%d" //,
-          ,
-          beatmapSets[selection].title.c_str(), beatmapSets[selection].number,
-          beatmapSets[selection].artists.c_str(),
-          beatmapSets[selection].creators.c_str(),
-          beatmapSets[selection].setid);
+
+      // TextFormat is not multithreading SAFE!!!!!!!!!
+      char buffer[1024];
+      std::snprintf(buffer, sizeof(buffer),
+                    "[cCC00AAFF]Title: [r]%s\n\n[cCC00AAFF]Maps: "
+                    "[r]%d\n[cCC00AAFF]Artists: "
+                    "[r]%s\n[cCC00AAFF]Creators: [r]%s\n[cCC00AA99]SetID: "
+                    "[cFFFFFF99]%d",
+                    beatmapSets[selection].title.c_str(),
+                    beatmapSets[selection].number,
+                    beatmapSets[selection].artists.c_str(),
+                    beatmapSets[selection].creators.c_str(),
+                    beatmapSets[selection].setid);
+      std::string newString(buffer);
       if (newString != leftSideFormatted) {
         leftSideFormatted = newString;
         leftSideBox.SetText(leftSideFormatted);
       }
     } else {
       selection %= currentBeatmaps.size();
-      std::string newString = TextFormat(
+      char buffer[1024];
+      std::snprintf(
+          buffer, sizeof(buffer),
           "[cCC00AAFF]Version: [r]%s\n\n[cCC00AAFF]Creator: "
           "[r]%s\n[cCC00AAFF]Title: "
           "[r]%s\n[cCC00AAFF]Artist: [r]%s\n[cCC00AA99]ID: [cFFFFFF99]%d",
@@ -582,6 +588,8 @@ void PlayMenu::update() {
           currentBeatmaps[selection].title.c_str(),
           currentBeatmaps[selection].artist.c_str(),
           currentBeatmaps[selection].id);
+
+      std::string newString(buffer);
       if (newString != leftSideFormatted) {
         leftSideFormatted = newString;
         leftSideBox.SetText(leftSideFormatted);
@@ -787,7 +795,7 @@ void PlayMenu::workerThreadImpl() {
 
     if (!worked) {
       SleepInMs(50);
-      //printf("eepin\n");
+      // printf("eepin\n");
     }
   }
 }
