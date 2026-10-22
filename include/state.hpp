@@ -44,6 +44,8 @@ class PlayMenu : public State {
 private:
   SelectableList dir_list;
   CircularSliderElement masterVolume;
+  CircularSliderElement hitsoundVolume;
+  CircularSliderElement musicVolume;
   Button select;
   Button back;
   Button close;

@@ -454,7 +454,7 @@ void CircularSliderElement::init() {
 }
 
 void CircularSliderElement::deinit() {
-
+  internalBox.Unload();
 }
 
 void CircularSliderElement::update() {

@@ -106,8 +106,11 @@ void PlayMenu::init() {
   menu.elements[4].get()->baseColor = {0xAA, 0x00, 0xAA, 192}; // CC00AAFF
 
   masterVolume.baseColor = {64, 48, 64, 192};
-  ;
   masterVolume.sliderColor = {0xAA, 0x00, 0xAA, 192};
+  hitsoundVolume.baseColor = {64, 48, 64, 192};
+  hitsoundVolume.sliderColor = {0xAA, 0x00, 0xAA, 192};
+  musicVolume.baseColor = {64, 48, 64, 192};
+  musicVolume.sliderColor = {0xAA, 0x00, 0xAA, 192};
 
   float spacingWidth = 160;
   float spacingWidthTop = 240;
@@ -135,6 +138,11 @@ void PlayMenu::init() {
 
   masterVolume.radius = 67;
   masterVolume.positions.push_back({leftMostX + masterVolume.radius + 10, 240});
+  hitsoundVolume.radius = 45;
+  hitsoundVolume.positions.push_back(
+      {leftMostX + hitsoundVolume.radius + 10, 100});
+  musicVolume.radius = 45;
+  musicVolume.positions.push_back({leftMostX + musicVolume.radius + 10, 380});
 
   menu.elements[3].get()->text = "Select";
   menu.elements[4].get()->text = "Back";
@@ -181,6 +189,21 @@ void PlayMenu::init() {
       {masterVolume.positions[0].x - masterVolume.radius,
        masterVolume.positions[0].y - masterVolume.radius,
        masterVolume.radius * 2, masterVolume.radius * 2});
+  hitsoundVolume.init();
+  hitsoundVolume.internalBox.SetBox(
+      {hitsoundVolume.positions[0].x - hitsoundVolume.radius,
+       hitsoundVolume.positions[0].y - hitsoundVolume.radius,
+       hitsoundVolume.radius * 2, hitsoundVolume.radius * 2});
+  musicVolume.init();
+  musicVolume.internalBox.SetBox(
+      {musicVolume.positions[0].x - musicVolume.radius,
+       musicVolume.positions[0].y - musicVolume.radius, musicVolume.radius * 2,
+       musicVolume.radius * 2});
+
+  hitsoundVolume.internalBox.SetText("Hit\nVolume");
+  musicVolume.internalBox.SetText("Music\nVolume");
+  hitsoundVolume.internalBox.SetFontSize(15.05);
+  musicVolume.internalBox.SetFontSize(15.05);
   leftSideBox.SetText(leftSideFormatted);
   leftSideBox.SetFontSize(30.08f);
   leftSideBox.SetSpacing(2);
@@ -342,6 +365,8 @@ void PlayMenu::render() {
   options.render();
   close.render();
   masterVolume.render();
+  musicVolume.render();
+  hitsoundVolume.render();
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
   DrawRectangleLinesEx(ScaleRect({rightMostX - 317.5, 240 - 85 / 2.0, 340, 85}),
@@ -359,11 +384,18 @@ void PlayMenu::update() {
   MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
   Global.enableMouse = true;
 
-  if (IsKeyDown(Global.AUDIO_SETUP_KEY))
+  if (IsKeyDown(Global.AUDIO_SETUP_KEY)) {
     masterVolume.renderObject = true;
-  else
+    hitsoundVolume.renderObject = true;
+    musicVolume.renderObject = true;
+  } else {
     masterVolume.renderObject = false;
+    hitsoundVolume.renderObject = false;
+    musicVolume.renderObject = false;
+  }
   masterVolume.update();
+  hitsoundVolume.update();
+  musicVolume.update();
 
   // dir_list.update();
   // select.update();
@@ -435,6 +467,16 @@ void PlayMenu::update() {
         {masterVolume.positions[0].x - masterVolume.radius,
          masterVolume.positions[0].y - masterVolume.radius,
          masterVolume.radius * 2, masterVolume.radius * 2});
+    hitsoundVolume.positions[0] = {leftMostX + hitsoundVolume.radius + 10, 100};
+    hitsoundVolume.internalBox.SetBox(
+        {hitsoundVolume.positions[0].x - hitsoundVolume.radius,
+         hitsoundVolume.positions[0].y - hitsoundVolume.radius,
+         hitsoundVolume.radius * 2, hitsoundVolume.radius * 2});
+    musicVolume.positions[0] = {leftMostX + musicVolume.radius + 10, 380};
+    musicVolume.internalBox.SetBox(
+        {musicVolume.positions[0].x - musicVolume.radius,
+         musicVolume.positions[0].y - musicVolume.radius,
+         musicVolume.radius * 2, musicVolume.radius * 2});
 
     MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
     unloadLoaderThread(false);
@@ -715,6 +757,9 @@ void PlayMenu::unload() {
   instance = nullptr;
 
   menu.deinit();
+  masterVolume.deinit();
+  hitsoundVolume.deinit();
+  musicVolume.deinit();
   beatmapSets.clear();
   leftSideFormatted.clear();
   inBeatmapView = false;
