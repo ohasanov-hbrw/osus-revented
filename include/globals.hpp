@@ -61,6 +61,7 @@ struct TextureSizes{
 // 1 -> Mark textures to be loaded
 // -1 -> Mark textures to be unloaded
 // 2 -> Starting to unload textures
+// 3 -> Loading textures in progress
 // 10 -> Some basic textures are unloaded
 // 15 -> Hopefully all textures are unloaded
 
@@ -69,6 +70,7 @@ enum TEXTUREOPS {
     TEXTUREOPS_START_LOADING = 1,
     TEXTUREOPS_START_UNLOADING = -1,
     TEXTUREOPS_UNLOADING_IN_PROGRESS = 2,
+    TEXTUREOPS_LOADING_IN_PROGRESS = 3,
     TEXTUREOPS_UNLOADING_DONE_BASIC = 10,
     TEXTUREOPS_UNLOADED = 15
 };

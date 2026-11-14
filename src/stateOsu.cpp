@@ -242,18 +242,10 @@ void Game::textureOps() {
     MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
   }
 
-  if (Global.GameTextures == TEXTUREOPS_START_LOADING) {
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
-              << "trying to get lock for object access for game texture load"
-              << std::endl;
+  if (Global.GameTextures == TEXTUREOPS_START_LOADING || Global.GameTextures == TEXTUREOPS_LOADING_IN_PROGRESS) {
     MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
-              << "got lock for object access for game texture load"
-              << std::endl;
     Global.gameManager->loadGameTextures();
     MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
-              << "loaded textures and unlocked access lock" << std::endl;
   }
 
   if (Global.GameTextures == TEXTUREOPS_START_UNLOADING) {

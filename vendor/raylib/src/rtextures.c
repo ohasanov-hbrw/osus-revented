@@ -3280,6 +3280,11 @@ void UnloadTexture(Texture2D * texture)
     if (texture->id > 0)
     {
         rlUnloadTexture(texture->id);
+        texture->id = 0;
+        texture->width = 0;
+        texture->height = 0;
+        texture->format = 0;
+        texture->mipmaps = 0;
 
         TRACELOG(LOG_INFO, "TEXTURE: [ID %i] Unloaded texture data from VRAM (GPU)", texture->id);
     }

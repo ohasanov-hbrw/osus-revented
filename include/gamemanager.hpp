@@ -180,6 +180,13 @@ class GameManager{
 		std::string currentBackgroundTexture = "";
 		std::string lastPath = "";
 		std::string BeatmapFolderPathWithSlash = "";
+
+		int texLoadStep = 0;
+		int texLoadI = 0;
+		int texLoadJ = 0;
+		std::vector<std::string> texLoadFiles;
+		std::vector<std::string> texLoadBgFiles;
+		std::string texLoadLastPath;
 	private:
 		static GameManager* inst_;
 		void init();

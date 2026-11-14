@@ -683,14 +683,13 @@ void updateTimer() {
 
 // Check if texture is ready to be rendered
 bool IsTextureReady(Texture2D *texture) {
-  // TODO: Validate maximum texture size supported by GPU?
-
-  return ((texture->id > 0) && // Validate OpenGL id
+  if(texture == NULL)
+    return false;
+  return ((texture->id > 0) &&
           (texture->width > 0) &&
-          (texture->height > 0) && // Validate texture size
-          (texture->format > 0) && // Validate texture pixel format
-          (texture->mipmaps >
-           0)); // Validate texture mipmaps (at least 1 for basic mipmap level)
+          (texture->height > 0) &&
+          (texture->format > 0) &&
+          (texture->mipmaps > 0));
 }
 
 // Check if an offscreen buffer is ready to be used

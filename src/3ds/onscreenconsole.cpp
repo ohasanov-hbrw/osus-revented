@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cmath>
+#include <malloc.h>
 
 OnScreenConsole g_onScreenConsole;
 
@@ -219,19 +220,30 @@ static void DrawMemBar(Font *f, int x, int y, int w, const char *label, long lon
     }
 }
 
+extern "C" u32 __ctru_heap_size;
+
+
 void OnScreenConsole::draw() {
     updateMetrics();
     float sw = Global.useTopScreen ? 320.0f : 400.0f;
     float sh = 240.0f;
     DrawRectangle(0, 0, (int)sw, (int)sh, (Color){16, 16, 24, 255});
 
+    struct mallinfo mi = mallinfo();
+    long long unclaimedApp = osGetMemRegionFree(MEMREGION_APPLICATION);
     long long linFree = _os_get_free_linear_ram() / 1024;
     long long linTotal = (long long)Global.linearSpaceFree / 1024;
     long long vramFree = _os_get_free_vram() / 1024;
-    long long sysFree = _os_get_free_ram(MEMREGION_SYSTEM) / 1024;
-    long long sysTotal = _os_get_size_ram(MEMREGION_SYSTEM) / 1024;
-    long long baseFree = _os_get_free_ram(MEMREGION_BASE) / 1024;
-    long long baseTotal = _os_get_size_ram(MEMREGION_BASE) / 1024;
+    // 3. C/C++ Heap (actual live allocations vs. total heap capacity)
+    long long heapTotal = (long long)__ctru_heap_size / 1024;
+    long long heapUsed  = mi.uordblks / 1024;
+    long long heapFree  = heapTotal - heapUsed;
+
+    // 4. Mapped Heap Pages (sbrk high-water mark vs. total heap capacity)
+    long long pagesTotal = heapTotal;
+    long long pagesUsed  = mi.arena / 1024;
+    long long pagesFree  = pagesTotal - pagesUsed;
+
     long long allFree = _os_get_free_ram(MEMREGION_ALL) / 1024;
     long long allTotal = _os_get_size_ram(MEMREGION_ALL) / 1024;
 
@@ -250,8 +262,8 @@ void OnScreenConsole::draw() {
     Font *f = &Global.DefaultFont;
 
     DrawMemBar(f, x, y, (int)sw, "LIN", linFree, linTotal, sw); y += lh;
-    DrawMemBar(f, x, y, (int)sw, "SYS", sysFree, sysTotal, sw); y += lh;
-    DrawMemBar(f, x, y, (int)sw, "BSE", baseFree, baseTotal, sw); y += lh;
+    DrawMemBar(f, x, y, (int)sw, "HEA", heapFree, heapTotal, sw); y += lh;
+    DrawMemBar(f, x, y, (int)sw, "PGE", pagesFree, pagesTotal, sw); y += lh;
     DrawMemBar(f, x, y, (int)sw, "ALL", allFree, allTotal, sw); y += lh;
 
     {
