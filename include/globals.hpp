@@ -136,6 +136,10 @@ struct Globals {
     // Frametime statistics
     double LastFrameTime;
     double FrameTime;
+    double avgFPS = 0.0;
+    double avgHZ = 0.0;
+    double avgSleepMs = 0.0;
+    double avgFrameTimeMs = 0.0;
     // Music and Hitsound volume
     double volume = 1.0f;
     double hitVolume = 1.0f;
@@ -187,6 +191,8 @@ struct Globals {
     // 3DS CONSOLE
     #ifdef THREEDS_BUILD
     PrintConsole * pc;
+    GPU_RENDER_TARGET * consoleWindow;
+    bool frameBegun = false;
     #endif
     // Current state of the textures
     // 0 -> Textures are loaded

@@ -448,7 +448,7 @@ void CircularSliderElement::init() {
   horizontalAlign = HAlign::Center;
   verticalAlign = VAlign::Middle;
   internalBox.SetText("Master\nVolume");
-  internalBox.SetFontSize(20.05);
+  internalBox.SetFontSize(20);
   internalBox.SetSpacing(2.005);
   //internalBox.SetBox();
 }

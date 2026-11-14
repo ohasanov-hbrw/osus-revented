@@ -150,14 +150,14 @@ void PlayMenu::init() {
   dynamic_cast<ClickableObject *>(menu.elements[4].get())->staticobject = false;
 
   menu.elements[4].get()->internalBox.SetText(menu.elements[4].get()->text);
-  menu.elements[4].get()->internalBox.SetFontSize(20.05);
+  menu.elements[4].get()->internalBox.SetFontSize(20);
   menu.elements[4].get()->internalBox.SetSpacing(2);
   menu.elements[4].get()->internalBox.SetWrapWords(false);
   menu.elements[4].get()->textColor = WHITE;
   menu.elements[4].get()->horizontalAlign = HAlign::Center;
 
   menu.elements[3].get()->internalBox.SetText(menu.elements[3].get()->text);
-  menu.elements[3].get()->internalBox.SetFontSize(20.05);
+  menu.elements[3].get()->internalBox.SetFontSize(20);
   menu.elements[3].get()->internalBox.SetSpacing(2);
   menu.elements[3].get()->internalBox.SetWrapWords(false);
   menu.elements[3].get()->textColor = WHITE;

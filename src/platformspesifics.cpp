@@ -1,5 +1,8 @@
 #include "platformspesifics.hpp"
 #include "globals.hpp"
+#ifdef THREEDS_BUILD
+#include "3ds/onscreenconsole.hpp"
+#endif
 #include "rlgl.h"
 #include "utils.hpp"
 #include <cstdint>
@@ -148,10 +151,12 @@ bool _os_should_program_run() {
 void _gpu_start_drawing(GPU_RENDER_TARGET *target) {
 #ifdef THREEDS_BUILD
   C2D_Prepare();
-  C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+  if (!Global.frameBegun) {
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    Global.frameBegun = true;
+  }
   C2D_SceneBegin(target);
-  C2D_Flush();
-  C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_ALL);
+  C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_COLOR);
 #endif
 #ifndef THREEDS_BUILD
   rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
@@ -161,8 +166,17 @@ void _gpu_start_drawing(GPU_RENDER_TARGET *target) {
 
 void _gpu_end_drawing(bool batch) {
 #ifdef THREEDS_BUILD
-  C2D_Flush(); // test
-  C3D_FrameEnd(0);
+  if (Global.frameBegun) {
+    C2D_Flush();
+    if (Global.consoleWindow != NULL) {
+      C2D_SceneBegin(Global.consoleWindow);
+      C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_COLOR);
+      consoleui_draw();
+    }
+    C2D_Flush();
+    C3D_FrameEnd(0);
+    Global.frameBegun = false;
+  }
 #endif
 #ifndef THREEDS_BUILD
   if (batch) {
@@ -176,7 +190,7 @@ void _gpu_end_drawing(bool batch) {
 
 void _gpu_init_render_thread() {
 #ifdef THREEDS_BUILD
-  C3D_Init(0x100000); // C3D_DEFAULT_CMDBUF_SIZE);
+  C3D_Init(0x100000);
   C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 
   std::cout << "\e[1;36m[3DS] \033[38;5;236m" << "WAITING FOR 0.5SECS\n";
@@ -187,26 +201,35 @@ void _gpu_init_render_thread() {
 
   if (Global.useTopScreen) {
     Global.window = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+    Global.consoleWindow = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
   } else {
     Global.window = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+    Global.consoleWindow = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
   }
   Global.gpu_currentRenderTarget = Global.window;
 
-  C2D_Prepare();
-  C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-  C2D_SceneBegin(Global.window);
-  C2D_Flush();
-  C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_ALL);
-  C2D_SetTintMode(C2D_TintMult);
-  EndBlendMode();
-  ClearBackground(Global.Background);
-  C2D_Flush(); // test
-  C3D_FrameEnd(0);
-
-  LoadFontDefault(); // raylib does this automatically normally...
+  LoadFontDefault();
 
   Global.legacyRender = true;
   Global.polygonalRendering = false;
+  Global.frameBegun = false;
+
+  C2D_Prepare();
+  C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+  Global.frameBegun = true;
+  C2D_SceneBegin(Global.window);
+  C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_COLOR);
+  C2D_SetTintMode(C2D_TintMult);
+  EndBlendMode();
+  ClearBackground(Global.Background);
+  if (Global.consoleWindow != NULL) {
+    C2D_SceneBegin(Global.consoleWindow);
+    C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_COLOR);
+    consoleui_draw();
+  }
+  C2D_Flush();
+  C3D_FrameEnd(0);
+  Global.frameBegun = false;
 
 #endif
 #ifndef THREEDS_BUILD
@@ -226,10 +249,7 @@ void _gpu_exit_render_thread() {
 #ifdef THREEDS_BUILD
   UnloadTexture(&Global.OsusLogo);
   UnloadTexture(&Global.cursor);
-  // UnloadFont(&Global.DefaultFont);
-  UnloadFontDefault(); // again, normally this is done by raylib
-                       // automagically...
-
+  UnloadFontDefault();
   C2D_Fini();
   C3D_Fini();
 #endif
@@ -282,17 +302,10 @@ void _os_init_program(bool VSYNC) {
   osSetSpeedupEnable(true);
   gfxInitDefault();
   aptSetSleepAllowed(true);
-  consoleGetDefault()->fg = 23;
-
-  if (Global.useTopScreen) {
-    consoleInit(GFX_BOTTOM, Global.pc);
-  } else {
-    consoleInit(GFX_TOP, Global.pc);
-  }
-
-  // consoleGetDefault()->flags &= ~CONSOLE_COLOR_BOLD;
-  // consoleGetDefault()->flags |= CONSOLE_COLOR_FAINT;
-  consoleGetDefault()->fg = 23;
+  Global.consoleWindow = NULL;
+  Global.frameBegun = false;
+  consoleui_init();
+  consoleui_capture_install();
   std::cout << "\e[1;36m[3DS] \033[38;5;200m"
             << "By ohasanov :3 with love <3\n";
 #endif
@@ -321,9 +334,6 @@ void _os_init_program(bool VSYNC) {
     std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m"
               << "SDL_GL_MULTISAMPLESAMPLES 8 returned " << SDL_GetError()
               << "\n";
-  // if(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16))
-  //     std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m" <<
-  //     "SDL_GL_MULTISAMPLESAMPLES 16 returned " << SDL_GetError() << "\n";
   if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1))
     std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m"
               << "SDL_GL_ACCELERATED_VISUAL returned " << SDL_GetError()
@@ -351,6 +361,8 @@ void _os_init_program(bool VSYNC) {
 }
 void _os_exit_program() {
 #ifdef THREEDS_BUILD
+  consoleui_capture_restore();
+  consoleui_shutdown();
   gfxExit();
   for (int i = 0; i < 24; i++) {
     ndspChnReset(i);

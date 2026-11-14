@@ -79,20 +79,19 @@ std::atomic<bool> __mutex_threads_locks[32][32];
 u32 __stacksize__= 512 * 1024;
 
 // Variables for frametime statistics
-double avgFPS = Global.FPS;
-double avgHZ = 1000;
-
 // VSYNC is set on build...
 // TODO: Move this to Global data and read it from settings.ini
 int VSYNC = 0;
 
 // Helpers for frametime statistics calculations
-int avgFPSqueueNUM = 0;
-int avgHZqueueNUM = 0;
 double avgFPSqueueSUM = 0;
 double avgHZqueueSUM = 0;
+double avgSleepQueueSUM = 0;
+double avgFrameTimeQueueSUM = 0;
 std::queue<double> avgFPSq;
 std::queue<double> avgHZq;
+std::queue<double> avgSleepq;
+std::queue<double> avgFrameTimeq;
 
 // To use spinlocks, or not to use spinlocks...
 bool dumbsleep = false;
@@ -105,6 +104,10 @@ void RenderLoop(void *){
     
 
     Global.globalstart = std::chrono::steady_clock::now();
+    Global.avgFPS = Global.FPS;
+    Global.avgHZ = 1000;
+    Global.avgSleepMs = 0.0;
+    Global.avgFrameTimeMs = 0.0;
     // Used for calculating frametimes
     double last = 0;
     int loc = 0;
@@ -299,8 +302,8 @@ void RenderLoop(void *){
             renderMouse(); 
 
             // Show fps and game ticks per second
-            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.0f", avgFPS), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
-            DrawTextEx(&Global.DefaultFont, TextFormat("TPS: %.0f", avgHZ), {static_cast<float>((int)Scale(100)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
+            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.0f", Global.avgFPS), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
+            DrawTextEx(&Global.DefaultFont, TextFormat("TPS: %.0f", Global.avgHZ), {static_cast<float>((int)Scale(100)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
 
             if(signifyLoading)
                 DrawLoadingCircle(ScaleCords((Vector2){leftMostX + 40, bottomMostY - 40}), Scale(20), Scale(5),getGlobalTimer() - loadingChangeTime, Fade(WHITE, 1));
@@ -354,7 +357,15 @@ void RenderLoop(void *){
             avgFPSqueueSUM -= avgFPSq.front();
             avgFPSq.pop();
         }
-        avgFPS = avgFPSqueueSUM / (double)(avgFPSq.size());
+        Global.avgFPS = avgFPSqueueSUM / (double)(avgFPSq.size());
+        double ft = elapsed.count();
+        avgFrameTimeq.push(ft);
+        avgFrameTimeQueueSUM += ft;
+        if(avgFrameTimeq.size() > 300){
+            avgFrameTimeQueueSUM -= avgFrameTimeq.front();
+            avgFrameTimeq.pop();
+        }
+        Global.avgFrameTimeMs = avgFrameTimeQueueSUM / (double)(avgFrameTimeq.size());
         
     }
 
@@ -509,10 +520,20 @@ int main(){
         // Sleep to save CPU cycles
         std::chrono::duration<double, std::milli> sleepTime {std::chrono::steady_clock::now() - t1};
         unsigned int sleepTimeInt = (unsigned int)(std::max(0.0, (1000.0/(float)(Global.TPS)) - sleepTime.count()) * 980.0);
-        if(!dumbsleep)
+        double sleepMsThisTick = 0.0;
+        if(!dumbsleep){
+            sleepMsThisTick = (double)sleepTimeInt / 1000.0;
             SleepInUs(sleepTimeInt);
+        }
         while(getGlobalTimer() - timerXXX < 1000.0/(float)(Global.TPS) and getGlobalTimer() - timerXXX >= 0)
             continue;
+        avgSleepq.push(sleepMsThisTick);
+        avgSleepQueueSUM += sleepMsThisTick;
+        if(avgSleepq.size() > 300){
+            avgSleepQueueSUM -= avgSleepq.front();
+            avgSleepq.pop();
+        }
+        Global.avgSleepMs = avgSleepQueueSUM / (double)(avgSleepq.size());
     
         // Calculate statistics for game speed
         std::chrono::duration<double, std::milli> elapsed {std::chrono::steady_clock::now() - t1};
@@ -523,7 +544,7 @@ int main(){
             avgHZqueueSUM -= avgHZq.front();
             avgHZq.pop();
         }
-        avgHZ = avgHZqueueSUM / (double)(avgHZq.size());
+        Global.avgHZ = avgHZqueueSUM / (double)(avgHZq.size());
 
         //__lsan_do_recoverable_leak_check();
     }
