@@ -905,7 +905,7 @@ void DrawTextStyled(Font *font, const char *text, Vector2 position,
   position.y = (int)position.y;
   #endif
   if (font->texture.id == 0)
-    *font = GetFontDefault();
+    font = &Global.DefaultFont;
 
   int textLen = TextLength(text);
 

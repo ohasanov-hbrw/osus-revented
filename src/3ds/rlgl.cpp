@@ -54,19 +54,19 @@ GPU_TEXCOLOR raylibPixel2citroPixel(int format){
 void DrawCircle(float x, float y, float radius, Color color){
 	//C2D_DrawCircleSolid(x, y, 0.0f, radius, C2D_Color32(color.r, color.g, color.b, color.a));
     DrawCircleWithDepth((Vector2){x, y}, radius, 16, 0,color);
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 	//may need to add a queue for this (3ds magick circle bad) also check depth
 }
 
 void DrawCircleV(Vector2 Coords, float radius, Color color){
     //C2D_DrawCircleSolid(x, y, 0.0f, radius, C2D_Color32(color.r, color.g, color.b, color.a));
     DrawCircleWithDepth(Coords, radius, 16, 0,color);
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 void DrawLineEx(Vector2 start, Vector2 stop, float size, Color color){
 	C2D_DrawLine(start.x, start.y, C2D_Color32(color.r, color.g, color.b, color.a), stop.x, stop.y, C2D_Color32(color.r, color.g, color.b, color.a), size, 0.0f);
-	C2D_Flush();  //test
+	//C2D_Flush();  //test
     //check depth...
 }
 
@@ -276,9 +276,11 @@ static inline writeFunc _determineWriteFunction(GPU_TEXCOLOR format){
 }
 
 Texture2D LoadTextureFromImage(Image *image, bool vram){
+    
     Texture2D texture = { 0 };
 	texture.id = 0;
     if ((image->width != 0) && (image->height != 0)){
+        C2D_Flush();
         texture.id = 1;
 
 		texture.subtex.width = static_cast<u16>(image->width);
@@ -417,7 +419,7 @@ Texture2D LoadTextureFromImage(Image *image, bool vram){
     texture.format = image->format;
     texture.baseScale = 1;
     //C3D_TexSetFilter(&texture.tex, GPU_LINEAR, GPU_LINEAR);
-    C2D_Flush(); 
+    //C2D_Flush(); 
     return texture;
 }
 
@@ -608,7 +610,7 @@ Texture2D LoadTexture(const char *fileName){
     }
     //C3D_TexSetFilter(&texture.tex, GPU_LINEAR, GPU_LINEAR);
     //C3D_TexSetWrap(&texture.tex, GPU_MIRRORED_REPEAT, GPU_MIRRORED_REPEAT);
-    C2D_Flush();
+    //C2D_Flush();
     return texture;
 }
 
@@ -686,9 +688,9 @@ void DrawTexturePro(Texture2D *texture, Rectangle source, Rectangle dest, Vector
 		float scaleY = (dest.height / source.height) * texture->baseScale;
 
 		//ADD ROTATION :) I CANT BE F*CKIN BOTHERED
-        C2D_Prepare();
+        //C2D_Prepare();
 		C2D_DrawImageAtRotated(image, dest.x - origin.x + (dest.width / 2.0), dest.y - origin.y + (dest.height / 2.0), 0, 0, &c2dTint, scaleX, scaleY);
-        C2D_Flush();  //test
+        //C2D_Flush();  //test
     }
 }
 
@@ -1032,17 +1034,18 @@ static Vector4 *LoadImageDataNormalized(Image *image)
 }
 
 void SetTextureFilter(Texture2D *texture, int Filter){
+    C2D_Flush();
 	if(Filter == RL_TEXTURE_FILTER_POINT){
 		C3D_TexSetFilter(&texture->tex, GPU_NEAREST, GPU_NEAREST);
         //C3D_TexSetFilterMipmap(&texture.tex, GPU_LINEAR);
         C3D_TexFlush(&texture->tex);
-        C2D_Flush();
+        //C2D_Flush();
 	}
 	else{
 		C3D_TexSetFilter(&texture->tex, GPU_LINEAR, GPU_LINEAR);
         //3D_TexSetFilterMipmap(&texture.tex, GPU_NEAREST);
         C3D_TexFlush(&texture->tex);
-        C2D_Flush();
+        //C2D_Flush();
 	}
 }
 
@@ -1082,9 +1085,11 @@ void ImageColorTint(Image *image, Color color){
 void UnloadTexture(Texture2D *texture){
     if(texture->id == 0)
         return;
+    C2D_Flush();
     C3D_TexFlush(&texture->tex);
 	C3D_TexDelete(&texture->tex);
-    C2D_Flush();
+    C3D_TexBind(0, NULL);
+    //C2D_Flush();
     //C3D_TexFlush(&texture.tex);
 	texture->id = 0;
     texture->baseScale = 1;
@@ -1266,7 +1271,7 @@ void ImageAlphaPremultiply(Image *image)
 
 void DrawRectangleRec(Rectangle rec, Color color){
 	C2D_DrawRectSolid(rec.x, rec.y, 0.0f, rec.width, rec.height, C2D_Color32(color.r, color.g, color.b, color.a));
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 void DrawRectangleLinesEx(Rectangle rec, float lineThick, Color color){
@@ -1317,6 +1322,7 @@ RenderTexture2D LoadRenderTexture(int width, int height, bool vram){
     if(height <= 0)
         height = 1;
     if (target.id > 0){
+        C2D_Flush();
         target.texture.id = 1;
 
 		target.texture.subtex.width = static_cast<u16>(width);
@@ -1374,12 +1380,14 @@ void BeginTextureMode(RenderTexture2D *renderTexture){
     //C2D_Prepare();
     C2D_Prepare();
     C2D_SceneBegin(renderTexture->renderTarget);
+    C2D_Flush();
+    C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
     Global.gpu_currentRenderTarget = renderTexture->renderTarget;
 }
 
 void ClearBackground(Color color){
     C2D_TargetClear(Global.gpu_currentRenderTarget, C2D_Color32(color.r, color.g, color.b, color.a));
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 void rlClearScreenBuffers(){
@@ -1393,21 +1401,24 @@ void rlEnableDepthMask(){
 }
 
 void EndTextureMode(){
+    
     C2D_Flush(); 
     //C2D_Prepare();
     C2D_Prepare();
     C2D_SceneBegin(Global.window);
+    C2D_Flush();
+    C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_ALL);
     Global.gpu_currentRenderTarget = Global.window;
 }
 
 void rlEnableDepthTest(){
-    C3D_DepthTest(true, GPU_GREATER, GPU_WRITE_ALL);
     C2D_Flush(); 
+    C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL); // idk?
 }
 
 void rlEnableDepthTest2(){
-    C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_ALL);
     C2D_Flush(); 
+    C3D_DepthTest(true, GPU_GREATER, GPU_WRITE_ALL);
 }
 
 void DrawCircleWithDepth(Vector2 center, float radius, int segments, float depth, Color color){
@@ -1450,13 +1461,13 @@ void DrawCircleWithDepth(Vector2 center, float radius, int segments, float depth
         //rlVertex2f(center.x + cosf(DEG2RAD*angle)*radius, center.y + sinf(DEG2RAD*angle)*radius);
         u32 c = C2D_Color32(color.r, color.g, color.b, color.a);
         C2D_DrawTriangle(center.x, center.y, c, center.x + cosf(DEG2RAD*(angle + stepLength))*radius, center.y + sinf(DEG2RAD*(angle + stepLength))*radius, c, center.x + cosf(DEG2RAD*angle)*radius, center.y + sinf(DEG2RAD*angle)*radius, c, depth);
-        C2D_Flush(); 
+        //C2D_Flush(); 
         angle += stepLength;
     }
 
 
 
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 void DrawCircleWithDepthGrad(Vector2 center, float radius, int segments, float depth, Color color, Color color2){
@@ -1500,10 +1511,10 @@ void DrawCircleWithDepthGrad(Vector2 center, float radius, int segments, float d
         u32 c = C2D_Color32(color2.r, color2.g, color2.b, color2.a);
         u32 cs = C2D_Color32(color.r, color.g, color.b, color.a);
         C2D_DrawTriangle(center.x, center.y, cs, center.x + cosf(DEG2RAD*(angle + stepLength))*radius, center.y + sinf(DEG2RAD*(angle + stepLength))*radius, c, center.x + cosf(DEG2RAD*angle)*radius, center.y + sinf(DEG2RAD*angle)*radius, c, depth);
-        C2D_Flush(); 
+        //C2D_Flush(); 
         angle += stepLength;
     }
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 void rlSetBlendMode(int mode){
@@ -1511,18 +1522,18 @@ void rlSetBlendMode(int mode){
 }
 
 void rlSetBlendFactorsSeparate(GPU_BLENDFACTOR glSrcRGB, GPU_BLENDFACTOR glDstRGB, GPU_BLENDFACTOR glSrcAlpha, GPU_BLENDFACTOR glDstAlpha, GPU_BLENDEQUATION glEqRGB, GPU_BLENDEQUATION glEqAlpha){
-    C3D_AlphaBlend(glEqRGB, glEqAlpha, glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);	
     C2D_Flush(); 
+    C3D_AlphaBlend(glEqRGB, glEqAlpha, glSrcRGB, glDstRGB, glSrcAlpha, glDstAlpha);	
 }
 
 void rlDisableDepthTest(){
-    C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_ALL);
     C2D_Flush(); 
+    C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_ALL);
 }
 
 void EndBlendMode(){
-    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);	
     C2D_Flush(); 
+    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);	
 }
 
 void DrawTextureEx(Texture2D *texture, Vector2 position, float rotation, float scale, Color tint){
@@ -1539,7 +1550,7 @@ void DrawTextureEx(Texture2D *texture, Vector2 position, float rotation, float s
     c2dTint.corners[3] = {C2D_Color32(tint.r, tint.g, tint.b, tint.a), 1.0f};
 
     if(rotation == 0.0f){
-        C2D_Prepare();
+        //C2D_Prepare();
         C2D_DrawImageAt(image, position.x, position.y, 0.0f, &c2dTint, scale * texture->baseScale, scale * texture->baseScale);
         //std::cout << texture->baseScale << std::endl;
         //if(texture.width != 120)
@@ -1548,7 +1559,7 @@ void DrawTextureEx(Texture2D *texture, Vector2 position, float rotation, float s
     else{
         std::cout << "\e[1;36m[3DS] \e[38;5;88m" << "DrawTextureEx doesn't allow rotation\n"; //maybe use the function in drawtexturepro??? hmmm
     }
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 void DrawTextureExDepth(Texture2D *texture, Vector2 position, float depth, float scale, Color tint){
@@ -1564,9 +1575,9 @@ void DrawTextureExDepth(Texture2D *texture, Vector2 position, float depth, float
     c2dTint.corners[2] = {C2D_Color32(tint.r, tint.g, tint.b, tint.a), 1.0f};
     c2dTint.corners[3] = {C2D_Color32(tint.r, tint.g, tint.b, tint.a), 1.0f};
 
-    C2D_Prepare();
+    //C2D_Prepare();
     C2D_DrawImageAt(image, position.x, position.y, depth, &c2dTint, scale * texture->baseScale, scale * texture->baseScale);
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 void DrawTextureRotate(Texture2D *tex, float x, float y, float s, float r, Color tint){
@@ -1583,25 +1594,26 @@ void DrawTextureRotate(Texture2D *tex, float x, float y, float s, float r, Color
     c2dTint.corners[3] = {C2D_Color32(tint.r, tint.g, tint.b, tint.a), 1.0f};
 
     //DUNNO IF ROTATION IS GIVEN IN RADIANS BUT YEAH! FIRE IN THE HOLE!!
-    C2D_Prepare();
+    //C2D_Prepare();
     C2D_DrawImageAtRotated(image, ScaleCordX(x), ScaleCordY(y), 0, DEG2RAD*r, &c2dTint, Scale(s * tex->baseScale), Scale(s * tex->baseScale));
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 void UnloadRenderTexture(RenderTexture2D *renderTexture){
     if(renderTexture->id == 0)
         return;
+    C2D_Flush();
     C3D_RenderTargetDelete(renderTexture->renderTarget);
-    C2D_Flush();
+    //C2D_Flush();
     UnloadTexture(&renderTexture->texture);
-    C2D_Flush();
+    //C2D_Flush();
     renderTexture->texture.id = 0;
     renderTexture->id = 0;
 }
 
 void DrawRectangle(int posX, int posY, int width, int height, Color color){
     C2D_DrawRectSolid(posX, posY, 0.0f, width, height, C2D_Color32(color.r, color.g, color.b, color.a));
-    C2D_Flush();  //test
+    //C2D_Flush();  //test
 }
 
 int GetFPS(){
@@ -1739,7 +1751,7 @@ void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
 void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color){
     u32 c = C2D_Color32(color.r, color.g, color.b, color.a);
     C2D_DrawTriangle(v1.x, v1.y, c, v2.x, v2.y, c, v3.x, v3.y, c, 0.0f);
-    C2D_Flush();
+    //C2D_Flush();
 }
 
 

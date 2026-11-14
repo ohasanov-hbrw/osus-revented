@@ -150,6 +150,8 @@ void _gpu_start_drawing(GPU_RENDER_TARGET *target) {
   C2D_Prepare();
   C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
   C2D_SceneBegin(target);
+  C2D_Flush();
+  C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_ALL);
 #endif
 #ifndef THREEDS_BUILD
   rlViewport(0, 0, GetScreenWidth(), GetScreenHeight());
@@ -193,6 +195,8 @@ void _gpu_init_render_thread() {
   C2D_Prepare();
   C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
   C2D_SceneBegin(Global.window);
+  C2D_Flush();
+  C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_ALL);
   C2D_SetTintMode(C2D_TintMult);
   EndBlendMode();
   ClearBackground(Global.Background);
@@ -379,12 +383,12 @@ void DrawTextureCenter(Texture2D *tex, float x, float y, float s, Color color) {
   /*if(tex.width == 48){
       std::cout << tex.subtex.width << tex.subtex.height << std::endl;
   }*/
-  C2D_Prepare();
+  //C2D_Prepare();
   C2D_DrawImageAt(C2D_Image{&tex->tex, &tex->subtex},
                   ScaleCordX(x - ((tex->width * s) / 2.0f)),
                   ScaleCordY(y - ((tex->height * s) / 2.0f)), 0.0f, &c2dTint,
                   Scale(s * tex->baseScale), Scale(s * tex->baseScale));
-  C2D_Flush(); // test
+  //C2D_Flush(); // test
 }
 #endif
 
