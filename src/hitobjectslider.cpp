@@ -1884,46 +1884,47 @@ void Slider::render() {
   clampedFade = clip(clampedFade, 0.0f, 1.0f);
   clampedFade = easeInOutCubic(clampedFade);
 
-  int index = 0;
-  int topla = 1;
+  auto getReverseArrowAngle = [&](int endIndex, int dir) {
+    float ang = 0.0f;
+    if (renderPoints.size() < 2)
+      return ang;
+    int j = endIndex + dir;
+    while (j >= 0 && j < (int)renderPoints.size()) {
+      float dx = renderPoints[endIndex].x - renderPoints[j].x;
+      float dy = renderPoints[endIndex].y - renderPoints[j].y;
+      if (dx != 0.0f || dy != 0.0f) {
+        ang = atan2(dy, dx) * 180.0f / PI + 180.0f;
+        return ang;
+      }
+      j += dir;
+    }
+    return ang;
+  };
   float angle = 0;
-  if (curRepeat % 2 == 0) {
-    index = renderPoints.size() - 1;
-    topla = -2;
-  }
-  if (renderPoints.size() > 2) {
-    angle = atan2(renderPoints[index].y - renderPoints[index + topla].y,
-                  renderPoints[index].x - renderPoints[index + topla].x);
-    angle = angle * 180 / PI + 180;
-  }
-  if (repeat && !(clampedBigFade < 0.7f))
-    DrawTextureRotate(&gm->reverseArrow, renderPoints[index].x,
-                      renderPoints[index].y, (gm->circlesize / 128.0f), angle,
-                      Fade(WHITE, clampedFade));
+  if (!renderPoints.empty()) {
+    int endIndex = (curRepeat % 2 == 0) ? (int)renderPoints.size() - 1 : 0;
+    int dir = (curRepeat % 2 == 0) ? -1 : 1;
+    angle = getReverseArrowAngle(endIndex, dir);
+    if (repeat && !(clampedBigFade < 0.7f))
+      DrawTextureRotate(&gm->reverseArrow, renderPoints[endIndex].x,
+                        renderPoints[endIndex].y, (gm->circlesize / 128.0f), angle,
+                        Fade(WHITE, clampedFade));
 
-  index = renderPoints.size() - 1;
-  topla = -2;
-  angle = 0;
-  if (curRepeat % 2 == 0) {
-    index = 0;
-    topla = 2;
+    endIndex = (curRepeat % 2 == 0) ? 0 : (int)renderPoints.size() - 1;
+    dir = (curRepeat % 2 == 0) ? 1 : -1;
+    angle = getReverseArrowAngle(endIndex, dir);
+    if (data.colour.size() > 2)
+      renderColor =
+          Fade(Color{(unsigned char)data.colour[0], (unsigned char)data.colour[1],
+                     (unsigned char)data.colour[2]},
+               clampedFade);
+    else
+      renderColor = Fade(Color{255, 255, 255}, clampedFade);
+    if (repeat2 && position > 0 && !(clampedBigFade < 0.7f))
+      DrawTextureRotate(&gm->reverseArrow, renderPoints[endIndex].x,
+                        renderPoints[endIndex].y, (gm->circlesize / 128.0f), angle,
+                        Fade(WHITE, clampedFade));
   }
-  if (renderPoints.size() > 2) {
-    angle = atan2(renderPoints[index].y - renderPoints[index + topla].y,
-                  renderPoints[index].x - renderPoints[index + topla].x);
-    angle = angle * 180 / PI + 180;
-  }
-  if (data.colour.size() > 2)
-    renderColor =
-        Fade(Color{(unsigned char)data.colour[0], (unsigned char)data.colour[1],
-                   (unsigned char)data.colour[2]},
-             clampedFade);
-  else
-    renderColor = Fade(Color{255, 255, 255}, clampedFade);
-  if (repeat2 && position > 0 && !(clampedBigFade < 0.7f))
-    DrawTextureRotate(&gm->reverseArrow, renderPoints[index].x,
-                      renderPoints[index].y, (gm->circlesize / 128.0f), angle,
-                      Fade(WHITE, clampedFade));
 
   if ((gm->currentTime * 1000.0f - data.time > 0 or !state) and
       renderPoints.size() > 0) {

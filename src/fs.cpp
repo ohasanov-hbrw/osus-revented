@@ -44,7 +44,7 @@ std::vector<std::string> ls(char* extension) {
             }
     
             closedir(dr);
-            free(de);
+            //free(de);
             std::sort(text.begin(), text.end());
         }
     #endif
@@ -95,7 +95,7 @@ std::vector<std::string> ls(char* extension, std::string_view path) {
             }
     
             closedir(dr);
-            free(de);
+            //free(de);
             std::sort(text.begin(), text.end());
         }
     #endif

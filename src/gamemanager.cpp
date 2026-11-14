@@ -1995,25 +1995,25 @@ void GameManager::loadGame(std::string filename) {
             << std::endl;
 
 #ifdef THREEDS_BUILD
-  std::cout << "\e[1;36m[3DS] \033[38;5;110m"
-            << "Free Vram: " << _os_get_free_vram() / 1024 << "KB" << std::endl;
-  std::cout << "\e[1;36m[3DS] \033[38;5;110m"
-            << "Free M_ALL: " << _os_get_free_ram(MEMREGION_ALL) / 1024 << "/"
-            << _os_get_size_ram(MEMREGION_ALL) / 1024 << "KB" << std::endl;
-  std::cout << "\e[1;36m[3DS] \033[38;5;110m"
-            << "Free M_APP: " << _os_get_free_ram(MEMREGION_APPLICATION) / 1024
-            << "/" << _os_get_size_ram(MEMREGION_APPLICATION) / 1024 << "KB"
-            << std::endl;
-  std::cout << "\e[1;36m[3DS] \033[38;5;110m"
-            << "Free M_SYS: " << _os_get_free_ram(MEMREGION_SYSTEM) / 1024
-            << "/" << _os_get_size_ram(MEMREGION_SYSTEM) / 1024 << "KB"
-            << std::endl;
-  std::cout << "\e[1;36m[3DS] \033[38;5;110m"
-            << "Free M_BSE: " << _os_get_free_ram(MEMREGION_BASE) / 1024 << "/"
-            << _os_get_size_ram(MEMREGION_BASE) / 1024 << "KB" << std::endl;
-  std::cout << "\e[1;36m[3DS] \033[38;5;110m"
-            << "Free M_LIN: " << _os_get_free_linear_ram() / 1024 << "/"
-            << Global.linearSpaceFree / 1024 << "KB" << std::endl;
+  //std::cout << "\e[1;36m[3DS] \033[38;5;110m"
+  //          << "Free Vram: " << _os_get_free_vram() / 1024 << "KB" << std::endl;
+  //std::cout << "\e[1;36m[3DS] \033[38;5;110m"
+  //          << "Free M_ALL: " << _os_get_free_ram(MEMREGION_ALL) / 1024 << "/"
+  //          << _os_get_size_ram(MEMREGION_ALL) / 1024 << "KB" << std::endl;
+  //std::cout << "\e[1;36m[3DS] \033[38;5;110m"
+  //          << "Free M_APP: " << _os_get_free_ram(MEMREGION_APPLICATION) / 1024
+  //          << "/" << _os_get_size_ram(MEMREGION_APPLICATION) / 1024 << "KB"
+  //          << std::endl;
+  //std::cout << "\e[1;36m[3DS] \033[38;5;110m"
+  //          << "Free M_SYS: " << _os_get_free_ram(MEMREGION_SYSTEM) / 1024
+  //          << "/" << _os_get_size_ram(MEMREGION_SYSTEM) / 1024 << "KB"
+  //          << std::endl;
+  //std::cout << "\e[1;36m[3DS] \033[38;5;110m"
+  //          << "Free M_BSE: " << _os_get_free_ram(MEMREGION_BASE) / 1024 << "/"
+  //          << _os_get_size_ram(MEMREGION_BASE) / 1024 << "KB" << std::endl;
+  //std::cout << "\e[1;36m[3DS] \033[38;5;110m"
+  //          << "Free M_LIN: " << _os_get_free_linear_ram() / 1024 << "/"
+  //          << Global.linearSpaceFree / 1024 << "KB" << std::endl;
 #endif
 
   // SleepInMs(5000);

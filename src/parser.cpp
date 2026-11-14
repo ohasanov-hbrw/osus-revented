@@ -5,6 +5,49 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <limits>
+
+namespace {
+int safe_stoi(const std::string &s, int def = 0){
+	try{
+		size_t idx = 0;
+		int v = std::stoi(s, &idx, 10);
+		return v;
+	}
+	catch(...){
+		return def;
+	}
+}
+
+double safe_stod(const std::string &s, double def = 0.0){
+	try{
+		size_t idx = 0;
+		double v = std::stod(s, &idx);
+		return v;
+	}
+	catch(...){
+		return def;
+	}
+}
+
+std::string safe_substr(const std::string &s, size_t pos, size_t len){
+	if(pos > s.size()) return "";
+	size_t n = std::min(len, s.size() - pos);
+	return s.substr(pos, n);
+}
+
+std::string strip_quotes(const std::string &s){
+	if(s.size() >= 2 && s.front() == '"' && s.back() == '"')
+		return s.substr(1, s.size() - 2);
+	return s;
+}
+
+const std::string &sv_at(const std::vector<std::string> &v, size_t i){
+	static const std::string empty;
+	if(i >= v.size()) return empty;
+	return v[i];
+}
+}
 
 
 
@@ -112,6 +155,8 @@ GameFile Parser::parseMetadata(std::string filename) {
 		}
     }
 	std::string line;
+	std::string subLine;
+    subLine.reserve(8192);
     while (readFullLine(file, line)) {
         sanitizeLine(line);
         if (line.empty()) continue;
@@ -119,7 +164,6 @@ GameFile Parser::parseMetadata(std::string filename) {
             std::string header = line.substr(1);
             header.pop_back(); // Remove ']'
             if (header == "Metadata") {
-				std::string subLine;
                 while (readFullLine(file, subLine)) {
                     sanitizeLine(subLine);
 					if (subLine.empty()) continue;
@@ -149,6 +193,8 @@ std::string Parser::parseBackground(std::string filename){
 	std::ifstream ifs(filename);
 	std::string line;
 	std::string background = "[]";
+	std::string subLine;
+	subLine.reserve(8192);
 	if (ifs.is_open()){
 		while(std::getline(ifs, line)){
 			if(line[line.size()-1] == 13)
@@ -157,7 +203,7 @@ std::string Parser::parseBackground(std::string filename){
 				std::string header = line.substr(1);
 				header.pop_back();
 				if(header == "Events"){
-					std::string subLine;
+					
 					while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
 						if(subLine.size() == 0)
@@ -191,6 +237,7 @@ std::string Parser::parseBackground(std::string filename){
 			}
 		}
 	}
+	subLine.clear();
 	return background;
 }
 
@@ -242,33 +289,34 @@ GameFile Parser::parse(std::string filename){
 		}
 	}
 
+	std::string subLine;
+    subLine.reserve(8192);
 
 	if (ifs.is_open()){
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Beatmap file opened\n";
 		while(std::getline(ifs, line)){
-			if(line.size() > 0 and line[line.size()-1] == 13){
+			if(!line.empty() and line.back() == 13){
 				line.pop_back();
 				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Popped back of " << line << " - size: " << line.size() << std::endl;
 			}
 			lineNumber++;
 			//std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parsing line " << lineNumber << " with size " << line.size() << std::endl;
 			Global.parsedLines++;
-			if(line.size() > 0 and line[0] == '[' and line[line.size()-1] == ']'){
+			if(!line.empty() and line.front() == '[' and line.back() == ']'){
 				std::string header = line.substr(1);
 				header.pop_back();
 				if(header == "General"){
-					std::string subLine;
 					while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[subLine.size()-1] == 13)
+						if(!subLine.empty() and subLine.back() == 13)
 							subLine.pop_back();
 						lineNumber++;
 						//std::cout << "Parsing line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[0] == '/' and subLine[1] == '/')
+						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
 							continue;
 
 						std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, true);
@@ -276,18 +324,17 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "Editor"){
-					std::string subLine;
                     while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-                        if(subLine[subLine.size()-1] == 13){
+                        if(!subLine.empty() and subLine.back() == 13){
                             subLine.pop_back();
 							lineNumber++;
 							//std::cout << "Parsing line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
-                            if(subLine.size() == 0)
+                            if(subLine.empty())
 								break;
-                            if(subLine[0] == '/' and subLine[1] == '/')
+                            if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
 								continue;
 
                             std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, true);
@@ -296,20 +343,19 @@ GameFile Parser::parse(std::string filename){
                     }
                 }
 				else if(header == "Metadata"){
-					std::string subLine;
 					while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
 						lineNumber++;
 						//std::cout << "Correcting line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
-						if(subLine[subLine.size()-1] == 13)
+						if(!subLine.empty() and subLine.back() == 13)
 							subLine.pop_back();
 						
 						//std::cout << "Parsing line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[0] == '/' and subLine[1] == '/')
+						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
 							continue;
 
 						std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, false);
@@ -317,16 +363,15 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "Difficulty"){
-					std::string subLine;
 					while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[subLine.size()-1] == 13)
+						if(!subLine.empty() and subLine.back() == 13)
 							subLine.pop_back();
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[0] == '/' and subLine[1] == '/')
+						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
 							continue;
 
 						std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, false);
@@ -334,39 +379,44 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "Events"){
-					std::string subLine;
 					while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[subLine.size()-1] == 13)
+						if(!subLine.empty() and subLine.back() == 13)
 							subLine.pop_back();
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[0] == '/' and subLine[1] == '/')
+						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
 							continue;
-						if(subLine[0] == ' ')
+						if(!subLine.empty() and subLine[0] == ' ')
 							continue;
 
 						Event tempEvent;
 						std::vector<std::string> tempVector;
 						tempVector = parseSeperatedLists(subLine, ',');
+						if(tempVector.empty())
+							continue;
 
-						if(tempVector[0] == "0")
+						if(sv_at(tempVector,0) == "0")
 							tempEvent.eventType = 0;
-						else if(tempVector[0] == "1" or tempVector[0] == "Video")
+						else if(sv_at(tempVector,0) == "1" or sv_at(tempVector,0) == "Video")
 							tempEvent.eventType = 1;
-						else if(tempVector[0] == "2" or tempVector[0] == "Break")
+						else if(sv_at(tempVector,0) == "2" or sv_at(tempVector,0) == "Break")
 							tempEvent.eventType = 2;
 						else
 							continue;
 
-						tempEvent.startTime = std::stoi(tempVector[1]);
+						if(tempVector.size() < 2)
+							continue;
+						tempEvent.startTime = safe_stoi(sv_at(tempVector,1));
 						if(tempEvent.eventType == 0){
-							tempEvent.filename = tempVector[2].substr(1, tempVector[2].size()-2);
-							if(tempVector.size()>3){
-								tempEvent.xOffset = std::stoi(tempVector[3]);
-								tempEvent.yOffset = std::stoi(tempVector[4]);
+							if(tempVector.size() < 3)
+								continue;
+							tempEvent.filename = strip_quotes(sv_at(tempVector,2));
+							if(tempVector.size()>4){
+								tempEvent.xOffset = safe_stoi(sv_at(tempVector,3));
+								tempEvent.yOffset = safe_stoi(sv_at(tempVector,4));
 							}
 							else{
 								tempEvent.xOffset = 0;
@@ -375,74 +425,79 @@ GameFile Parser::parse(std::string filename){
 							
 						}
 						else if(tempEvent.eventType == 1){
-							tempEvent.filename = tempVector[2].substr(1, tempVector[2].size()-2);
-							if(tempVector.size()>3){
-								tempEvent.xOffset = std::stoi(tempVector[3]);
-								tempEvent.yOffset = std::stoi(tempVector[4]);
+							if(tempVector.size() < 3)
+								continue;
+							tempEvent.filename = strip_quotes(sv_at(tempVector,2));
+							if(tempVector.size()>4){
+								tempEvent.xOffset = safe_stoi(sv_at(tempVector,3));
+								tempEvent.yOffset = safe_stoi(sv_at(tempVector,4));
 							}
 							else{
 								tempEvent.xOffset = 0;
 								tempEvent.yOffset = 0;
 							}
 						}
-						else if(tempEvent.eventType == 2)
-							tempEvent.endTime = std::stoi(tempVector[2]);
+						else if(tempEvent.eventType == 2){
+							if(tempVector.size() < 3)
+								continue;
+							tempEvent.endTime = safe_stoi(sv_at(tempVector,2));
+						}
 						
 						gameFile.events.push_back(tempEvent);
 					}
 				}
 				else if(header == "TimingPoints"){
-					std::string subLine;
 					while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[subLine.size()-1] == 13)
+						if(!subLine.empty() and subLine.back() == 13)
 							subLine.pop_back();
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[0] == '/' and subLine[1] == '/')
+						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
 							continue;
 
 						TimingPoint tempTimingPoint;
 						std::vector<std::string> tempVector;
 						tempVector = parseSeperatedLists(subLine, ',');
-						tempTimingPoint.time = std::stoi(tempVector[0]);
+						if(tempVector.size() < 8)
+							continue;
+						tempTimingPoint.time = safe_stoi(sv_at(tempVector,0));
 						tempTimingPoint.beatLength = -100;
-						if(tempVector[1] != "NaN")
-							tempTimingPoint.beatLength = std::stod(tempVector[1]);
+						if(sv_at(tempVector,1) != "NaN")
+							tempTimingPoint.beatLength = safe_stod(sv_at(tempVector,1), -100);
 						else
 							tempTimingPoint.renderTicks = false;
-						tempTimingPoint.meter = std::stoi(tempVector[2]);
-						tempTimingPoint.sampleSet = std::stoi(tempVector[3]);
-						tempTimingPoint.sampleIndex = std::stoi(tempVector[4]);
-						tempTimingPoint.volume = std::stoi(tempVector[5]);
-						tempTimingPoint.uninherited = bool(std::stoi(tempVector[6]));
-						tempTimingPoint.effects = std::stoi(tempVector[7]);
+						tempTimingPoint.meter = safe_stoi(sv_at(tempVector,2));
+						tempTimingPoint.sampleSet = safe_stoi(sv_at(tempVector,3));
+						tempTimingPoint.sampleIndex = safe_stoi(sv_at(tempVector,4));
+						tempTimingPoint.volume = safe_stoi(sv_at(tempVector,5));
+						tempTimingPoint.uninherited = bool(safe_stoi(sv_at(tempVector,6)));
+						tempTimingPoint.effects = safe_stoi(sv_at(tempVector,7));
 						gameFile.timingPoints.push_back(tempTimingPoint);
 					}
 				}
 				else if(header == "Colours"){
-					std::string subLine;
 					while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[subLine.size()-1] == 13)
+						if(!subLine.empty() and subLine.back() == 13)
 							subLine.pop_back();
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[0] == '/' and subLine[1] == '/')
+						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
 							continue;
 
 						std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, false);
 						
-						if(subLine[0] == 'C'){
+						if(!subLine.empty() and subLine[0] == 'C'){
 							std::vector<short> tempColour (3);
 							std::vector<std::string> tempVectorColours;
 							tempVectorColours = parseSeperatedLists(keyValue.second, ',');
 							for(int i = 0; i < 3; i++)
-								tempColour[i] = std::stoi(tempVectorColours[i]);
+								tempColour[i] = (short)safe_stoi(sv_at(tempVectorColours, i));
 							gameFile.comboColours.push_back(tempColour);
 						}
 
@@ -450,55 +505,58 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "HitObjects"){
-					std::string subLine;
 					while(std::getline(ifs, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[subLine.size()-1] == 13)
+						if(!subLine.empty() and subLine.back() == 13)
 							subLine.pop_back();
-						if(subLine.size() == 0)
+						if(subLine.empty())
 							break;
-						if(subLine[0] == '/' and subLine[1] == '/')
+						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
 							continue;
 						std::vector<std::string> tempVector;
 						tempVector = parseSeperatedLists(subLine, ',');
+						if(tempVector.size() < 5)
+							continue;
 						HitObjectData tempHitObject;
 
-						tempHitObject.x = std::clamp(std::stoi(tempVector[0]) + 64, -32767, 32767);
-						tempHitObject.y = std::clamp(std::stoi(tempVector[1]) + 48, -32767, 32767);
-						tempHitObject.time = std::stoi(tempVector[2]);
-						tempHitObject.type = std::stoi(tempVector[3]);
+						tempHitObject.x = std::clamp(safe_stoi(sv_at(tempVector,0)) + 64, -32767, 32767);
+						tempHitObject.y = std::clamp(safe_stoi(sv_at(tempVector,1)) + 48, -32767, 32767);
+						tempHitObject.time = safe_stoi(sv_at(tempVector,2));
+						tempHitObject.type = safe_stoi(sv_at(tempVector,3));
 
 						std::string typeInBinary;
 						typeInBinary = DecimalToBinaryString(tempHitObject.type);
+						if(typeInBinary.size() < 7)
+							typeInBinary = "0000000";
 						if(typeInBinary[0] == '1'){
 							tempHitObject.type = 1;
-							tempHitObject.hitSound = std::stoi(tempVector[4]);
+							tempHitObject.hitSound = safe_stoi(sv_at(tempVector,4));
 							tempHitObject.startingACombo = typeInBinary[2] == '1';
 							tempHitObject.skipComboColours = int(typeInBinary[4] == '1') + int(typeInBinary[5] == '1') * 2 + int(typeInBinary[6] == '1') * 4;
 
 							if(tempVector.size() > 5){
 								std::vector<std::string> tempVectorHitSample;
-								tempVectorHitSample = parseSeperatedLists(tempVector[5], ':');
+								tempVectorHitSample = parseSeperatedLists(sv_at(tempVector,5), ':');
 								if(tempVectorHitSample.size() > 0)
-									tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
+									tempHitObject.normalSet = safe_stoi(sv_at(tempVectorHitSample,0));
 								else
 									tempHitObject.normalSet = 0;
 								if(tempVectorHitSample.size() > 1)
-									tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
+									tempHitObject.additionSet = safe_stoi(sv_at(tempVectorHitSample,1));
 								else
 									tempHitObject.additionSet = 0;
 								if(tempVectorHitSample.size() > 2)
-									tempHitObject.hindex = std::stoi(tempVectorHitSample[2]);
+									tempHitObject.hindex = safe_stoi(sv_at(tempVectorHitSample,2));
 								else
 									tempHitObject.hindex = 0;
 								if(tempVectorHitSample.size() > 3)
-									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+									tempHitObject.volume = safe_stoi(sv_at(tempVectorHitSample,3));
 								else
 									tempHitObject.volume = 0;
 								if(tempVectorHitSample.size() > 4){
-									tempHitObject.filename = tempVectorHitSample[4];
+									tempHitObject.filename = sv_at(tempVectorHitSample,4);
 									tempHitObject.useDefaultHitSound = false;
 								}
 								else
@@ -515,25 +573,33 @@ GameFile Parser::parse(std::string filename){
 						}
 						else if(typeInBinary[1] == '1'){
 							tempHitObject.type = 2;
-							tempHitObject.hitSound = std::stoi(tempVector[4]);
+							tempHitObject.hitSound = safe_stoi(sv_at(tempVector,4));
 							tempHitObject.startingACombo = typeInBinary[2] == '1';
 							tempHitObject.skipComboColours = int(typeInBinary[4] == '1') + int(typeInBinary[5] == '1') * 2 + int(typeInBinary[6] == '1') * 4;
 
+							if(tempVector.size() < 8){
+								gameFile.hitObjects.push_back(tempHitObject);
+								continue;
+							}
 							std::vector<std::string> tempVectorCurvePoints;
-							tempVectorCurvePoints = parseSeperatedLists(tempVector[5], '|');
-							tempHitObject.curveType = tempVectorCurvePoints[0][0];
+							tempVectorCurvePoints = parseSeperatedLists(sv_at(tempVector,5), '|');
+							if(!tempVectorCurvePoints.empty() && !tempVectorCurvePoints[0].empty())
+								tempHitObject.curveType = tempVectorCurvePoints[0][0];
+							else
+								tempHitObject.curveType = 'B';
 
-							if(tempVectorCurvePoints.size()-1 == 1){
+							if(tempVectorCurvePoints.size() > 0 && tempVectorCurvePoints.size()-1 == 1){
 								tempHitObject.curveType = 'L';
 							}
-							if(tempVectorCurvePoints.size()-1 >= 3 && tempHitObject.curveType == 'P'){
+							if(tempVectorCurvePoints.size() > 0 && tempVectorCurvePoints.size()-1 >= 3 && tempHitObject.curveType == 'P'){
 								tempHitObject.curveType = 'B';
 							}
 							
 							for(size_t i = 1; i < tempVectorCurvePoints.size(); i++){
 								std::vector<std::string> tempVectorCurvePointCords;
 								tempVectorCurvePointCords = parseSeperatedLists(tempVectorCurvePoints[i], ':');
-								tempHitObject.curvePoints.push_back(std::make_pair(std::clamp(std::stoi(tempVectorCurvePointCords[0])+64, -32767, 32767), std::clamp(std::stoi(tempVectorCurvePointCords[1])+48, -32767, 32767)));
+								if(tempVectorCurvePointCords.size() >= 2)
+									tempHitObject.curvePoints.push_back(std::make_pair(std::clamp(safe_stoi(sv_at(tempVectorCurvePointCords,0))+64, -32767, 32767), std::clamp(safe_stoi(sv_at(tempVectorCurvePointCords,1))+48, -32767, 32767)));
 							}
 
 							/*if(tempHitObject.curveType == 'P' and tempHitObject.curvePoints.size() == 2 and (
@@ -543,13 +609,13 @@ GameFile Parser::parse(std::string filename){
 								tempHitObject.curveType = 'L';
 							}*/
 
-							tempHitObject.slides = std::stoi(tempVector[6]);
-							tempHitObject.length = std::stoi(tempVector[7]);
+							tempHitObject.slides = safe_stoi(sv_at(tempVector,6));
+							tempHitObject.length = safe_stoi(sv_at(tempVector,7));
 							if(tempVector.size() > 8){
 								std::vector<std::string> tempVectorEdgeSounds;
-								tempVectorEdgeSounds = parseSeperatedLists(tempVector[8], '|');
+								tempVectorEdgeSounds = parseSeperatedLists(sv_at(tempVector,8), '|');
 								for(size_t i = 0; i < tempVectorEdgeSounds.size(); i++)
-									tempHitObject.edgeSounds.push_back(std::stoi(tempVectorEdgeSounds[i]));
+									tempHitObject.edgeSounds.push_back(safe_stoi(tempVectorEdgeSounds[i]));
 							}
 							else{
 								for(int i = 0; i < tempHitObject.slides; i++){
@@ -559,12 +625,15 @@ GameFile Parser::parse(std::string filename){
 							}
 							if(tempVector.size() > 9){
 								std::vector<std::string> tempVectorEdgeSets;
-								tempVectorEdgeSets = parseSeperatedLists(tempVector[9], '|');
+								tempVectorEdgeSets = parseSeperatedLists(sv_at(tempVector,9), '|');
 
 								for(size_t i = 0; i < tempVectorEdgeSets.size(); i++){
 									std::vector<std::string> tempVectorEdgeSetsCords;
 									tempVectorEdgeSetsCords = parseSeperatedLists(tempVectorEdgeSets[i], ':');
-									tempHitObject.edgeSets.push_back(std::make_pair(std::stoi(tempVectorEdgeSetsCords[0]), std::stoi(tempVectorEdgeSetsCords[1])));
+									if(tempVectorEdgeSetsCords.size() >= 2)
+										tempHitObject.edgeSets.push_back(std::make_pair(safe_stoi(sv_at(tempVectorEdgeSetsCords,0)), safe_stoi(sv_at(tempVectorEdgeSetsCords,1))));
+									else
+										tempHitObject.edgeSets.push_back(std::make_pair(0, 0));
 								}
 							}
 							else{
@@ -575,25 +644,25 @@ GameFile Parser::parse(std::string filename){
 							}
 							if(tempVector.size() > 10){
 								std::vector<std::string> tempVectorHitSample;
-								tempVectorHitSample = parseSeperatedLists(tempVector[10], ':');
+								tempVectorHitSample = parseSeperatedLists(sv_at(tempVector,10), ':');
 								if(tempVectorHitSample.size() > 0)
-									tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
+									tempHitObject.normalSet = safe_stoi(sv_at(tempVectorHitSample,0));
 								else
 									tempHitObject.normalSet = 0;
 								if(tempVectorHitSample.size() > 1)
-									tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
+									tempHitObject.additionSet = safe_stoi(sv_at(tempVectorHitSample,1));
 								else
 									tempHitObject.additionSet = 0;
 								if(tempVectorHitSample.size() > 2)
-									tempHitObject.hindex = std::stoi(tempVectorHitSample[2]);
+									tempHitObject.hindex = safe_stoi(sv_at(tempVectorHitSample,2));
 								else
 									tempHitObject.hindex = 0;
 								if(tempVectorHitSample.size() > 3)
-									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+									tempHitObject.volume = safe_stoi(sv_at(tempVectorHitSample,3));
 								else
 									tempHitObject.volume = 0;
 								if(tempVectorHitSample.size() > 4){
-									tempHitObject.filename = tempVectorHitSample[4];
+									tempHitObject.filename = sv_at(tempVectorHitSample,4);
 									tempHitObject.useDefaultHitSound = false;
 								}
 								else
@@ -609,34 +678,34 @@ GameFile Parser::parse(std::string filename){
 						}
 						else if(typeInBinary[3] == '1'){
 							tempHitObject.type = 3;
-							tempHitObject.hitSound = std::stoi(tempVector[4]);
+							tempHitObject.hitSound = safe_stoi(sv_at(tempVector,4));
 							tempHitObject.startingACombo = typeInBinary[2] == '1';
 							tempHitObject.skipComboColours = int(typeInBinary[4] == '1') + int(typeInBinary[5] == '1') * 2 + int(typeInBinary[6] == '1') * 4;
 
-							tempHitObject.endTime = std::stoi(tempVector[5]);
+							tempHitObject.endTime = safe_stoi(sv_at(tempVector,5));
 
 							if(tempVector.size() > 6){
 								std::vector<std::string> tempVectorHitSample;
-								tempVectorHitSample = parseSeperatedLists(tempVector[6], ':');
+								tempVectorHitSample = parseSeperatedLists(sv_at(tempVector,6), ':');
 
 								if(tempVectorHitSample.size() > 0)
-									tempHitObject.normalSet = std::stoi(tempVectorHitSample[0]);
+									tempHitObject.normalSet = safe_stoi(sv_at(tempVectorHitSample,0));
 								else
 									tempHitObject.normalSet = 0;
 								if(tempVectorHitSample.size() > 1)
-									tempHitObject.additionSet = std::stoi(tempVectorHitSample[1]);
+									tempHitObject.additionSet = safe_stoi(sv_at(tempVectorHitSample,1));
 								else
 									tempHitObject.additionSet = 0;
 								if(tempVectorHitSample.size() > 2)
-									tempHitObject.hindex = std::stoi(tempVectorHitSample[2]);
+									tempHitObject.hindex = safe_stoi(sv_at(tempVectorHitSample,2));
 								else
 									tempHitObject.hindex = 0;
 								if(tempVectorHitSample.size() > 3)
-									tempHitObject.volume = std::stoi(tempVectorHitSample[3]);
+									tempHitObject.volume = safe_stoi(sv_at(tempVectorHitSample,3));
 								else
 									tempHitObject.volume = 0;
 								if(tempVectorHitSample.size() > 4){
-									tempHitObject.filename = tempVectorHitSample[4];
+									tempHitObject.filename = sv_at(tempVectorHitSample,4);
 									tempHitObject.useDefaultHitSound = false;
 								}
 								else
@@ -667,18 +736,22 @@ GameFile Parser::parse(std::string filename){
 
 std::pair<std::string, std::string> Parser::parseKeyValue(std::string line, bool hasSpaceBefore, bool hasSpaceAfter)
 {
-	size_t spliceLocation;
-	for(spliceLocation = 0; spliceLocation < line.size(); spliceLocation++)
-		if(line[spliceLocation] == ':')
-			break;
-	if(hasSpaceAfter)
-		if(spliceLocation + 1 < line.size() && line[spliceLocation + 1] != ' ')
+	size_t spliceLocation = line.find(':');
+	if(spliceLocation == std::string::npos)
+		return std::make_pair(line, std::string());
+	if(hasSpaceAfter){
+		if(spliceLocation + 1 >= line.size() || line[spliceLocation + 1] != ' ')
 			hasSpaceAfter = false;
-	if(hasSpaceBefore)
-		if(spliceLocation - 1 >= 0 && line[spliceLocation - 1] != ' ')
+	}
+	if(hasSpaceBefore){
+		if(spliceLocation == 0 || line[spliceLocation - 1] != ' ')
 			hasSpaceBefore = false;
-	return make_pair(line.substr(0, spliceLocation - hasSpaceBefore), 
-	line.substr(spliceLocation + hasSpaceAfter + 1, line.size() - 1 - spliceLocation - hasSpaceAfter));
+	}
+	size_t keyEnd = spliceLocation - (hasSpaceBefore ? 1 : 0);
+	size_t valStart = spliceLocation + 1 + (hasSpaceAfter ? 1 : 0);
+	if(keyEnd > line.size()) keyEnd = line.size();
+	if(valStart > line.size()) valStart = line.size();
+	return std::make_pair(line.substr(0, keyEnd), line.substr(valStart));
 }
 
 std::vector<std::string> Parser::parseSeperatedLists(std::string list, char seperator){

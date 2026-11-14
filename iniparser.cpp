@@ -193,14 +193,15 @@ int main() {
     std::map<std::string, std::vector<INIValue>> ini;
 
     std::streampos oldpos;
-
+    std::string subLine;
+    subLine.reserve(8192);
     while(std::getline(ifs, line)) {
         line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
         if(starts_with(line, "[") && ends_with(line, "]")) {
             std::string header = line.substr(1);
             header.pop_back();
 
-            std::string subLine;
+            
             while(std::getline(ifs, subLine)){
                 if(starts_with(subLine, "//") || std::all_of(subLine.begin(), subLine.end(), isspace)) {
                     continue; 

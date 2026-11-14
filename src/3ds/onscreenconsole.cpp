@@ -224,10 +224,11 @@ extern "C" u32 __ctru_heap_size;
 
 
 void OnScreenConsole::draw() {
+    C2D_Flush();
     updateMetrics();
     float sw = Global.useTopScreen ? 320.0f : 400.0f;
     float sh = 240.0f;
-    DrawRectangle(0, 0, (int)sw, (int)sh, (Color){16, 16, 24, 255});
+    
 
     struct mallinfo mi = mallinfo();
     long long unclaimedApp = osGetMemRegionFree(MEMREGION_APPLICATION);
@@ -261,6 +262,7 @@ void OnScreenConsole::draw() {
     int lh = 10;
     Font *f = &Global.DefaultFont;
 
+    DrawRectangle(0, 0, (int)sw, (int)sh, (Color){16, 16, 24, 255});
     DrawMemBar(f, x, y, (int)sw, "LIN", linFree, linTotal, sw); y += lh;
     DrawMemBar(f, x, y, (int)sw, "HEA", heapFree, heapTotal, sw); y += lh;
     DrawMemBar(f, x, y, (int)sw, "PGE", pagesFree, pagesTotal, sw); y += lh;
