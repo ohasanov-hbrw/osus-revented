@@ -114,25 +114,45 @@ OnScreenConsoleBuf::OnScreenConsoleBuf() {}
 
 int OnScreenConsoleBuf::overflow(int c) {
     if (c == traits_type::eof()) return traits_type::not_eof(c);
+    _multithread_mutex_lock(&g_onScreenConsole.mtx);
     char ch = static_cast<char>(c);
     if (ch == '\n') {
-        flushLine();
+        flushLineLocked();
     } else if (ch == '\r') {
     } else {
         current.push_back(ch);
     }
+    _multithread_mutex_unlock(&g_onScreenConsole.mtx);
     return c;
 }
 
-int OnScreenConsoleBuf::sync() {
-    if (!current.empty()) {
-        flushLine();
+std::streamsize OnScreenConsoleBuf::xsputn(const char *s, std::streamsize n) {
+    if (n <= 0) return 0;
+    _multithread_mutex_lock(&g_onScreenConsole.mtx);
+    for (std::streamsize i = 0; i < n; i++) {
+        char ch = s[i];
+        if (ch == '\n') {
+            flushLineLocked();
+        } else if (ch == '\r') {
+        } else {
+            current.push_back(ch);
+        }
     }
+    _multithread_mutex_unlock(&g_onScreenConsole.mtx);
+    return n;
+}
+
+int OnScreenConsoleBuf::sync() {
+    _multithread_mutex_lock(&g_onScreenConsole.mtx);
+    if (!current.empty()) {
+        flushLineLocked();
+    }
+    _multithread_mutex_unlock(&g_onScreenConsole.mtx);
     return 0;
 }
 
-void OnScreenConsoleBuf::flushLine() {
-    g_onScreenConsole.addLine(current);
+void OnScreenConsoleBuf::flushLineLocked() {
+    g_onScreenConsole.addLineLocked(current);
     current.clear();
 }
 
@@ -175,13 +195,17 @@ void OnScreenConsole::shutdown() {
     _multithread_mutex_unlock(&mtx);
 }
 
-void OnScreenConsole::addLine(const std::string &line) {
-    _multithread_mutex_lock(&mtx);
+void OnScreenConsole::addLineLocked(const std::string &line) {
     if (maxLines <= 0) maxLines = 1;
     lines.push_back(line);
     while ((int)lines.size() > maxLines) {
         lines.erase(lines.begin());
     }
+}
+
+void OnScreenConsole::addLine(const std::string &line) {
+    _multithread_mutex_lock(&mtx);
+    addLineLocked(line);
     _multithread_mutex_unlock(&mtx);
 }
 

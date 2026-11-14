@@ -14,9 +14,10 @@ public:
 protected:
     int overflow(int c) override;
     int sync() override;
+    std::streamsize xsputn(const char *s, std::streamsize n) override;
 private:
     std::string current;
-    void flushLine();
+    void flushLineLocked();
 };
 
 class OnScreenConsole {
@@ -30,12 +31,14 @@ public:
     int getMaxLines() const;
     void updateMetrics();
 private:
+    void addLineLocked(const std::string &line);
     std::vector<std::string> lines;
     int maxLines = 0;
     MULTITHREAD_MUTEX mtx;
     int logStartY = 0;
     int logLineHeight = 10;
     int hudHeight = 0;
+    friend class OnScreenConsoleBuf;
 };
 
 extern OnScreenConsole g_onScreenConsole;

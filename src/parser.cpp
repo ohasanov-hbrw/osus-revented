@@ -190,52 +190,55 @@ GameFile Parser::parseMetadata(std::string filename) {
 
 //this here is just a dumb parser, nothing to document here tbh
 std::string Parser::parseBackground(std::string filename){
-	std::ifstream ifs(filename);
+	FILE* file = fopen(filename.c_str(), "rb");
 	std::string line;
 	std::string background = "[]";
 	std::string subLine;
 	subLine.reserve(8192);
-	if (ifs.is_open()){
-		while(std::getline(ifs, line)){
-			if(line[line.size()-1] == 13)
-				line.pop_back();
-			if(line[0] == '[' and line[line.size()-1] == ']'){
+	if (file != nullptr){
+		while(readFullLine(file, line)){
+			sanitizeLine(line);
+			if(!line.empty() && line.front() == '[' && line.back() == ']'){
 				std::string header = line.substr(1);
 				header.pop_back();
 				if(header == "Events"){
 					
-					while(std::getline(ifs, subLine)){
+					while(readFullLine(file, subLine)){
 						Global.parsedLines++;
-						if(subLine.size() == 0)
+						sanitizeLine(subLine);
+						if(subLine.empty())
 							break;
-						if(subLine[subLine.size()-1] == 13)
-							subLine.pop_back();
-						if(subLine.size() == 0)
-							break;
-						if(subLine[0] == '/' and subLine[1] == '/')
+						if(subLine.size() >= 2 && subLine[0] == '/' && subLine[1] == '/')
 							continue;
-						if(subLine[0] == ' ')
+						if(!subLine.empty() && subLine[0] == ' ')
 							continue;
 
 						Event tempEvent;
 						std::vector<std::string> tempVector;
 						tempVector = parseSeperatedLists(subLine, ',');
 
-						if(tempVector[0] == "0")
+						if(tempVector.empty())
+							continue;
+						if(sv_at(tempVector,0) == "0")
 							tempEvent.eventType = 0;
 						else
 							continue;
 
-						tempEvent.startTime = std::stoi(tempVector[1]);
+						if(tempVector.size() < 3)
+							continue;
+						tempEvent.startTime = safe_stoi(sv_at(tempVector,1));
 						if(tempEvent.eventType == 0){
-							tempEvent.filename = tempVector[2].substr(1, tempVector[2].size()-2);
+							tempEvent.filename = strip_quotes(sv_at(tempVector,2));
 							background = tempEvent.filename;
+							fclose(file);
+							subLine.clear();
 							return background;
 						}
 					}
 				}
 			}
 		}
+		fclose(file);
 	}
 	subLine.clear();
 	return background;
@@ -253,12 +256,35 @@ GameFile Parser::parse(std::string filename){
 	gameFile.configDifficulty["SliderTickRate"] = "1";
 
 	int numLines = 0;
-	std::ifstream lineCounter(filename);
-	std::string unused;
-	if (lineCounter.is_open()){
-		while ( std::getline(lineCounter, unused) )
+	FILE* lineCounter = fopen(filename.c_str(), "rb");
+	if (lineCounter != nullptr){
+		char buf[4096];
+		size_t nread;
+		bool sawCR = false;
+		bool hasData = false;
+		unsigned char last = 0;
+		while ((nread = fread(buf, 1, sizeof(buf), lineCounter)) > 0){
+			hasData = true;
+			for (size_t i = 0; i < nread; i++){
+				unsigned char c = (unsigned char)buf[i];
+				if (c == '\n'){
+					if (!sawCR)
+						++numLines;
+					sawCR = false;
+				}
+				else if (c == '\r'){
+					++numLines;
+					sawCR = true;
+				}
+				else{
+					sawCR = false;
+				}
+				last = c;
+			}
+		}
+		if (hasData && last != '\n' && last != '\r')
 			++numLines;
-		lineCounter.close();
+		fclose(lineCounter);
 	}
 	//\\wsl.localhost\archlinux\home\nyarch\Projects\osus-revented\beatmaps\1639480 ichigo from KISIDA KYODAN & THE AKEBOSI ROCKETS - STONE OCEAN (TV Size) [no video]
 	////wsl.localhost/archlinux/home/nyarch/Projects/osus-revented/beatmaps/1639480 ichigo from KISIDA KYODAN & THE AKEBOSI ROCKETS - STONE OCEAN (TV Size) [no video]/ichigo from KISIDA KYODAN & THE AKEBOSI ROCKETS - STONE OCEAN (TV Size) (Sotarks) [Akitoshi's NORMAL].osu
@@ -266,24 +292,24 @@ GameFile Parser::parse(std::string filename){
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Opening: " << filename << std::endl;
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Ifstream found " << numLines << " lines to parse" << std::endl;
 	Global.numberLines = numLines;
-    std::ifstream ifs(filename);
+	FILE* file = fopen(filename.c_str(), "rb");
 	std::string line;
 	int lineNumber = 0;
 	Global.parsedLines = 0;
 	gameFile.hitObjects.shrink_to_fit();
 	gameFile.hitObjects.reserve(numLines);
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parser reserved " << numLines << " HitObjects based on the number of lines" << std::endl;
-	if(!ifs.is_open()){
+	if(file == nullptr){
 		std::cout << "\e[1;38;5;220m[WARN] \e[38;5;236m"<< "Couldn't open file for parsing, retrying, maybe length? " << filename.size() << std::endl;
-		for (int i = 0; i < filename.size(); i++) {
+		for (int i = 0; i < (int)filename.size(); i++) {
 			if (filename[i] == '/') {
 				filename[i] = '\\';
 			}
 		}
 		filename = prepare_long_path(filename).string();
 		std::cout << filename << std::endl;
-		ifs = std::ifstream(filename);
-		if (!ifs.is_open()) {
+		file = fopen(filename.c_str(), "rb");
+		if (file == nullptr) {
 			std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m"<< "welp... messy solution didnt work" << std::endl;
 			return gameFile; // Could not open file
 		}
@@ -292,13 +318,15 @@ GameFile Parser::parse(std::string filename){
 	std::string subLine;
     subLine.reserve(8192);
 
-	if (ifs.is_open()){
+	if (file != nullptr){
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Beatmap file opened\n";
-		while(std::getline(ifs, line)){
-			if(!line.empty() and line.back() == 13){
-				line.pop_back();
-				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Popped back of " << line << " - size: " << line.size() << std::endl;
+		while(readFullLine(file, line)){
+			if(!line.empty() && (line.back() == '\r' || (line.size() >= 2 && line[line.size()-2] == '\r' && line.back() == '\n'))){
+				std::string popped = line;
+				sanitizeLine(popped);
+				std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Popped back of " << popped << " - size: " << popped.size() << std::endl;
 			}
+			sanitizeLine(line);
 			lineNumber++;
 			//std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Parsing line " << lineNumber << " with size " << line.size() << std::endl;
 			Global.parsedLines++;
@@ -306,12 +334,11 @@ GameFile Parser::parse(std::string filename){
 				std::string header = line.substr(1);
 				header.pop_back();
 				if(header == "General"){
-					while(std::getline(ifs, subLine)){
+					while(readFullLine(file, subLine)){
 						Global.parsedLines++;
+						sanitizeLine(subLine);
 						if(subLine.empty())
 							break;
-						if(!subLine.empty() and subLine.back() == 13)
-							subLine.pop_back();
 						lineNumber++;
 						//std::cout << "Parsing line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
 						if(subLine.empty())
@@ -324,34 +351,30 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "Editor"){
-                    while(std::getline(ifs, subLine)){
+                    while(readFullLine(file, subLine)){
 						Global.parsedLines++;
+						sanitizeLine(subLine);
 						if(subLine.empty())
 							break;
-                        if(!subLine.empty() and subLine.back() == 13){
-                            subLine.pop_back();
-							lineNumber++;
-							//std::cout << "Parsing line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
-                            if(subLine.empty())
-								break;
-                            if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
-								continue;
+						lineNumber++;
+						//std::cout << "Parsing line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
+						if(subLine.empty())
+							break;
+						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
+							continue;
 
-                            std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, true);
-                            gameFile.configEditor[keyValue.first] = keyValue.second;
-                        }
+						std::pair<std::string, std::string> keyValue = parseKeyValue(subLine, false, true);
+						gameFile.configEditor[keyValue.first] = keyValue.second;
                     }
                 }
 				else if(header == "Metadata"){
-					while(std::getline(ifs, subLine)){
+					while(readFullLine(file, subLine)){
 						Global.parsedLines++;
+						sanitizeLine(subLine);
 						if(subLine.empty())
 							break;
 						lineNumber++;
 						//std::cout << "Correcting line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
-						if(!subLine.empty() and subLine.back() == 13)
-							subLine.pop_back();
-						
 						//std::cout << "Parsing line: " << lineNumber << " with the length: " << subLine.size() << " -> " << subLine << std::endl;
 						if(subLine.empty())
 							break;
@@ -363,12 +386,11 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "Difficulty"){
-					while(std::getline(ifs, subLine)){
+					while(readFullLine(file, subLine)){
 						Global.parsedLines++;
+						sanitizeLine(subLine);
 						if(subLine.empty())
 							break;
-						if(!subLine.empty() and subLine.back() == 13)
-							subLine.pop_back();
 						if(subLine.empty())
 							break;
 						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
@@ -379,12 +401,9 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "Events"){
-					while(std::getline(ifs, subLine)){
+					while(readFullLine(file, subLine)){
 						Global.parsedLines++;
-						if(subLine.empty())
-							break;
-						if(!subLine.empty() and subLine.back() == 13)
-							subLine.pop_back();
+						sanitizeLine(subLine);
 						if(subLine.empty())
 							break;
 						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
@@ -447,12 +466,9 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "TimingPoints"){
-					while(std::getline(ifs, subLine)){
+					while(readFullLine(file, subLine)){
 						Global.parsedLines++;
-						if(subLine.empty())
-							break;
-						if(!subLine.empty() and subLine.back() == 13)
-							subLine.pop_back();
+						sanitizeLine(subLine);
 						if(subLine.empty())
 							break;
 						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
@@ -479,12 +495,9 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "Colours"){
-					while(std::getline(ifs, subLine)){
+					while(readFullLine(file, subLine)){
 						Global.parsedLines++;
-						if(subLine.empty())
-							break;
-						if(!subLine.empty() and subLine.back() == 13)
-							subLine.pop_back();
+						sanitizeLine(subLine);
 						if(subLine.empty())
 							break;
 						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
@@ -505,12 +518,9 @@ GameFile Parser::parse(std::string filename){
 					}
 				}
 				else if(header == "HitObjects"){
-					while(std::getline(ifs, subLine)){
+					while(readFullLine(file, subLine)){
 						Global.parsedLines++;
-						if(subLine.empty())
-							break;
-						if(!subLine.empty() and subLine.back() == 13)
-							subLine.pop_back();
+						sanitizeLine(subLine);
 						if(subLine.empty())
 							break;
 						if(subLine.size() >= 2 and subLine[0] == '/' and subLine[1] == '/')
@@ -727,7 +737,7 @@ GameFile Parser::parse(std::string filename){
 				}
 			}
 		}
-		ifs.close();
+		fclose(file);
 		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Beatmap file closed\n";
 	}
 	
