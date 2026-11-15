@@ -153,7 +153,7 @@ MSAARenderTexture LoadMSAARenderTexture(int width, int height, int requestedSamp
 
     target.samples = samples;
     target.usingMSAA = true;
-    std::cout << "Using MSAA: " << target.usingMSAA << std::endl;
+    std::cout << "\e[1;38;5;236m[GPU] \e[38;5;236m" << "Using MSAA: " << target.usingMSAA << std::endl;
     target.valid = true;
     return target;
 }

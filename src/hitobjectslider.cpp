@@ -180,6 +180,7 @@ void Slider::init() {
   data.textureReady = false;
   data.textureLoaded = false;
   bool durationNull = false;
+  followAnim = 0.0f;
 
   // Get the number of points on a slider
   // double templength = data.length;
@@ -703,42 +704,50 @@ void Slider::update() {
   }
 
   position *= (double)100;
-  curRepeat = std::max(0, (int)(position / data.length));
+  double totalPosition = std::max((double)0, position);
+  double sliderLength = (double)data.length;
+  if (sliderLength < 1.0)
+    sliderLength = 1.0;
+  time = totalPosition;
+  curRepeat = (int)(totalPosition / sliderLength);
+  if (curRepeat < 0)
+    curRepeat = 0;
+  if (curRepeat >= data.slides)
+    curRepeat = data.slides - 1;
   if (data.timing.beatLength < 0.1)
     curRepeat = 0;
-  if ((int)(std::max((double)0, position) + data.length) <
-      (int)(data.length * data.slides)) {
+  if (totalPosition < sliderLength * (data.slides - 1)) {
     repeat = true;
   } else {
     repeat = false;
   }
-  if ((int)(std::max((double)0, position) + 2 * data.length) <
-      (int)(data.length * data.slides)) {
+  if (totalPosition < sliderLength * (data.slides - 2)) {
     repeat2 = true;
   } else {
     repeat2 = false;
   }
-
-  time = position;
-
-  double absolutePosition = position;
-  while (absolutePosition > (double)data.length) {
-    absolutePosition -= (double)data.length;
-  }
-
+  int spanIndex = curRepeat;
+  double spanPos = totalPosition - (double)spanIndex * sliderLength;
+  if (spanPos < 0.0)
+    spanPos = 0.0;
+  if (spanPos > sliderLength)
+    spanPos = sliderLength;
   if (gm->currentTime * 1000.0f - data.time > 0) {
     if (data.timing.beatLength > 0.1) {
-      if ((int)((gm->currentTime * 1000.0f - data.time) /
-                ((data.length / 100) * (data.timing.beatLength) /
-                 (gm->sliderSpeed * data.timing.sliderSpeedOverride))) %
-              2 ==
-          1)
-        position = (double)data.length - (absolutePosition + 1.0f);
+      if (spanIndex % 2 == 1)
+        position = sliderLength - spanPos;
       else
-        position = absolutePosition + 1.0f;
+        position = spanPos;
+    } else {
+      position = 0.0;
     }
+  } else {
+    position = 0.0;
   }
-  position = std::max((double)0, position);
+  if (position < 0.0)
+    position = 0.0;
+  if (position > sliderLength)
+    position = sliderLength;
   if (is_hit_at_first ||
       gm->currentTime * 1000.0f > data.time + gm->gameFile.p50Final)
     state = false;
@@ -750,8 +759,14 @@ void Slider::update() {
     gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
     gm->clickCombo = 0;
   }
-  calPos = position;
-  calPos = std::min(calPos, static_cast<int>(renderPoints.size() - 1));
+  calPos = (int)position;
+  if (calPos < 0)
+    calPos = 0;
+  if (renderPoints.size() > 0) {
+    calPos = std::min(calPos, static_cast<int>(renderPoints.size() - 1));
+  } else {
+    calPos = 0;
+  }
   /*if(data.length == 7105)
       std::cout << renderPoints[calPos].x << " " << renderPoints[calPos].y <<
      "\n";*/
@@ -770,8 +785,10 @@ void Slider::update() {
     inSlider = false;
   }
 
-  // DEBUG
+  
 
+  lastPosition = renderPoints[calPos];
+  // DEBUG
   bool debugf = IsKeyDown(Global.AUTO_KEY);
   if (debugf) {
     inSlider = true;
@@ -784,6 +801,26 @@ void Slider::update() {
   float templength = (data.length / 100) * (data.timing.beatLength) /
                      (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
                      data.slides;
+
+  float dt = (float)Global.FrameTime / 1000.0f;
+  if (dt < 0.0f)
+    dt = 0.0f;
+  if (dt > 0.1f)
+    dt = 0.1f;
+  bool followTracking = false;
+  if ((gm->currentTime * 1000.0f - data.time > 0 or !state) &&
+      renderPoints.size() > 0 && !data.destruct) {
+    followTracking = inSlider && (Global.Key1D || Global.Key2D || debugf);
+  }
+  if (followTracking) {
+    followAnim += dt / 0.15f;
+  } else {
+    followAnim -= dt / 0.15f;
+  }
+  if (followAnim < 0.0f)
+    followAnim = 0.0f;
+  if (followAnim > 1.0f)
+    followAnim = 1.0f;
 
   // templength = std::ceil(templength);
 
@@ -1888,15 +1925,29 @@ void Slider::render() {
     float ang = 0.0f;
     if (renderPoints.size() < 2)
       return ang;
+    dir *=2;
     int j = endIndex + dir;
+    int chosen = -1;
+    int fallback = -1;
     while (j >= 0 && j < (int)renderPoints.size()) {
-      float dx = renderPoints[endIndex].x - renderPoints[j].x;
-      float dy = renderPoints[endIndex].y - renderPoints[j].y;
-      if (dx != 0.0f || dy != 0.0f) {
-        ang = atan2(dy, dx) * 180.0f / PI + 180.0f;
-        return ang;
+      float dx = renderPoints[j].x - renderPoints[endIndex].x;
+      float dy = renderPoints[j].y - renderPoints[endIndex].y;
+      float dist = sqrt(dx * dx + dy * dy);
+      if (dist > 0.001f) {
+        if (fallback == -1)
+          fallback = j;
+        chosen = j;
+        if (dist >= 4.0f)
+          break;
       }
       j += dir;
+    }
+    if (chosen == -1)
+      chosen = fallback;
+    if (chosen != -1) {
+      float dx = renderPoints[chosen].x - renderPoints[endIndex].x;
+      float dy = renderPoints[chosen].y - renderPoints[endIndex].y;
+      ang = atan2(dy, dx) * 180.0f / PI;
     }
     return ang;
   };
@@ -1990,11 +2041,12 @@ void Slider::render() {
                       texturePositionSmooth.y,
                       (gm->circlesize / gm->sliderb.width) * 1.3f, angle,
                       Fade(renderColor, clampedFade));
-    if (inSlider)
+    if (followAnim > 0.001f)
       DrawTextureRotate(&gm->sliderfollow, texturePositionSmooth.x,
                         texturePositionSmooth.y,
-                        (gm->circlesize / gm->sliderfollow.width) * 2.0f, angle,
-                        Fade(WHITE, clampedFade));
+                        (gm->circlesize / gm->sliderfollow.width) * 2.0f *
+                            (0.7f + 0.3f * followAnim),
+                        angle, Fade(WHITE, clampedFade * followAnim));
   }
 
   clampedFade = (gm->currentTime * 1000.0f - data.time + gm->gameFile.preempt) /
@@ -2186,38 +2238,29 @@ void Slider::dead_render() {
         DrawTextureCenter(gm->selectCircle, x, y,
     scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f)
     , renderColor);*/
-    if (is_hit_at_end) {
-
-      if (inSlider) {
-        DrawTextureRotate(&gm->sliderfollow, renderPoints[position].x,
-                          renderPoints[position].y,
-                          (clip(clampedFade, 0.7, 2)) *
-                              (gm->circlesize / gm->sliderfollow.width) * 2.0f,
-                          0, Fade(WHITE, clampedFade2));
-        // DrawTextureCenter(gm->hitCircle, x, y,
-        // /*clip(scale/1.5f,1,2)**/gm->circlesize/gm->hitCircle.width ,
-        // renderColor); DrawTextureCenter(gm->sliderb,
-        // renderPoints[position].x, renderPoints[position].y,
-        // (gm->circlesize/gm->sliderb.width) * 1.3f,
-        // Fade(renderColor,clampedFade));
-      }
+    if (followAnim > 0.001f) {
+      DrawTextureRotate(&gm->sliderfollow, x,
+                        y,
+                        (gm->circlesize / gm->sliderfollow.width) * 2.0f *
+                            (0.7f + 0.3f * followAnim),
+                        0, Fade(WHITE, clampedFade2 * followAnim));
     }
 
     if (data.point == 0)
       DrawTextureCenter(
-          &gm->hit0, renderPoints[position].x, renderPoints[position].y,
+          &gm->hit0, x, y,
           (gm->circlesize / gm->hit0.width) * 0.5f, Fade(WHITE, clampedFade));
     else if (data.point == 1)
       DrawTextureCenter(
-          &gm->hit50, renderPoints[position].x, renderPoints[position].y,
+          &gm->hit50, x, y,
           (gm->circlesize / gm->hit50.width) * 0.5f, Fade(WHITE, clampedFade));
     else if (data.point == 2)
       DrawTextureCenter(
-          &gm->hit100, renderPoints[position].x, renderPoints[position].y,
+          &gm->hit100, x, y,
           (gm->circlesize / gm->hit100.width) * 0.5f, Fade(WHITE, clampedFade));
     else if (data.point == 3 && Global.textureSize.render300)
       DrawTextureCenter(
-          &gm->hit300, renderPoints[position].x, renderPoints[position].y,
+          &gm->hit300, x, y,
           (gm->circlesize / gm->hit300.width) * 0.5f, Fade(WHITE, clampedFade));
   }
 }
@@ -2243,6 +2286,14 @@ void Slider::unloadTextures() {
 
 void Slider::dead_update() {
   GameManager *gm = GameManager::getInstance();
+  float dt = (float)Global.FrameTime / 1000.0f;
+  if (dt < 0.0f)
+    dt = 0.0f;
+  if (dt > 0.1f)
+    dt = 0.1f;
+  followAnim -= dt / 0.15f;
+  if (followAnim < 0.0f)
+    followAnim = 0.0f;
   if (data.time + gm->gameFile.fade_in / 1.0f < gm->currentTime * 1000.0f) {
     readyToDelete = true;
     if (!data.textureReady) {

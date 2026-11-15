@@ -73,4 +73,5 @@ class Slider : public HitObject{
         float minX = static_cast<float>(INT_MAX), minY = static_cast<float>(INT_MAX), maxX = INT_MIN, maxY = INT_MIN;
 
         bool inSlider = false;
+        float followAnim = 0.0f;
 };

@@ -339,7 +339,7 @@ void _os_init_program(bool VSYNC) {
               << "SDL_GL_ACCELERATED_VISUAL returned " << SDL_GetError()
               << "\n";
 
-  std::cout << "Init Window" << std::endl;
+  std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Init Window" << std::endl;
   InitWindow(640, 480, "osus - revented");
 
   SDL_Surface *pIcon = SDL_CreateRGBSurface(0, 64, 64, 32, 0, 0, 0, 0);

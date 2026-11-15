@@ -488,7 +488,7 @@ void PlayMenu::update() {
   menu.update();
 
   if (!loaderLoaded) {
-    std::cout << "trying to reload loaderthread" << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to reload loaderthread" << std::endl;
     loadLoaderThread();
   }
 
@@ -778,12 +778,12 @@ void PlayMenu::textureOps() {
     // Upload decoded CPU image to GPU VRAM
     if (st == TEX_STATE_DISK_LOADED) {
       currentTexNumber++;
-      std::cout << currentTexNumber << " " << slot.setid.load()
+      std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << currentTexNumber << " " << slot.setid.load()
                 << " loaded a tex\n";
 
       slot.texture = LoadTextureFromImage(&slot.image);
       currentImgNumber--;
-      std::cout << "image: " << currentImgNumber << std::endl;
+      //std::cout << "image: " << currentImgNumber << std::endl;
       UnloadImage(&slot.image);
       SetTextureFilter(&slot.texture, TEXTURE_FILTER_BILINEAR);
       slot.state.store(TEX_STATE_READY);
@@ -791,7 +791,7 @@ void PlayMenu::textureOps() {
     // Free VRAM when scrolled out of view
     else if (st == TEX_STATE_NEEDS_UNLOAD) {
       currentTexNumber--;
-      std::cout << currentTexNumber << " " << slot.setid.load()
+      std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << currentTexNumber << " " << slot.setid.load()
                 << " unloaded a tex\n";
       slot.state.store(TEX_STATE_FREE);
       UnloadTexture(&slot.texture);
@@ -821,7 +821,7 @@ void PlayMenu::workerThreadImpl() {
         if (FileExists(path.c_str())) {
           slot.image = LoadImage(path.c_str());
           currentImgNumber++;
-          std::cout << "image: " << currentImgNumber << std::endl;
+          //std::cout << "image: " << currentImgNumber << std::endl;
           slot.state.store(TEX_STATE_DISK_LOADED);
           worked = true;
 
@@ -859,7 +859,7 @@ void PlayMenu::unloadLoaderThread(bool lockedMutexes) {
     if (slot.state.load() == TEX_STATE_DISK_LOADED) {
       slot.state.store(TEX_STATE_FREE);
       currentImgNumber--;
-      std::cout << "image: " << currentImgNumber << std::endl;
+      //std::cout << "image: " << currentImgNumber << std::endl;
       UnloadImage(&slot.image);
     }
   }
@@ -869,7 +869,7 @@ void PlayMenu::unloadLoaderThread(bool lockedMutexes) {
   }
   textureOpsDone.store(false);
   while (!textureOpsDone.load()) {
-    std::cout << "waiting for textureops\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "waiting for textureops\n";
     SleepInMs(lockedMutexes ? 50 : 1);
   }
   if (lockedMutexes) {
@@ -899,11 +899,11 @@ void PlayMenu::unloadLoaderThread(bool lockedMutexes, int setid) {
       if (slot.state.load() == TEX_STATE_DISK_LOADED) {
         slot.state.store(TEX_STATE_FREE);
         currentImgNumber--;
-        std::cout << "image: " << currentImgNumber << std::endl;
+        //std::cout << "image: " << currentImgNumber << std::endl;
         UnloadImage(&slot.image);
       }
     } else {
-      std::cout << "not deleting image " << setid << std::endl;
+      //std::cout << "not deleting image " << setid << std::endl;
     }
   }
   if (lockedMutexes) {
@@ -912,7 +912,7 @@ void PlayMenu::unloadLoaderThread(bool lockedMutexes, int setid) {
   }
   textureOpsDone.store(false);
   while (!textureOpsDone.load()) {
-    std::cout << "waiting for textureops\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "waiting for textureops\n";
     SleepInMs(lockedMutexes ? 50 : 1);
   }
   if (lockedMutexes) {

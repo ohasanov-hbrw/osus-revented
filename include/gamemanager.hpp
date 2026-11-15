@@ -187,6 +187,9 @@ class GameManager{
 		std::vector<std::string> texLoadFiles;
 		std::vector<std::string> texLoadBgFiles;
 		std::string texLoadLastPath;
+
+		int lastClickComboForPop = 0;
+		float comboPop = 0.0f;
 	private:
 		static GameManager* inst_;
 		void init();

@@ -150,7 +150,7 @@ GameFile Parser::parseMetadata(std::string filename) {
 			}
 		}
 		filename = prepare_long_path(filename).string();
-		std::cout << filename << std::endl;
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << filename << std::endl;
 		if (file == nullptr) {
 			std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m"<< "welp... messy solution didnt work" << std::endl;
         	return gameFile; // Could not open file
@@ -313,7 +313,7 @@ GameFile Parser::parse(std::string filename){
 			}
 		}
 		filename = prepare_long_path(filename).string();
-		std::cout << filename << std::endl;
+		std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << filename << std::endl;
 		file = fopen(filename.c_str(), "rb");
 		if (file == nullptr) {
 			std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m"<< "welp... messy solution didnt work" << std::endl;

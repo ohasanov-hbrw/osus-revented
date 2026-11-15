@@ -133,7 +133,8 @@ void Game::render() {
     } else {
       DrawTextEx(
           &Global.DefaultFont,
-          TextFormat("Paused: %.3f/%.3f",
+          Global.startTime < 0 ? TextFormat("Starting in: %.3f",
+                     -Global.startTime / 1000.0) : TextFormat("Paused: %.3f/%.3f",
                      GetMusicTimePlayed(&Global.gameManager->backgroundMusic) *
                          1000000.0f,
                      GetMusicTimeLength(&Global.gameManager->backgroundMusic)),

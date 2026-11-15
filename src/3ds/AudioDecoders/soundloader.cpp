@@ -307,7 +307,7 @@ int loadmp3(const char *fileName, Sound *sound){
     setvbuf ( file , NULL , _IOFBF , 32768 );
     fseek(file, 0, SEEK_END);
     int lSize = ftell(file);
-    std::cout << lSize << "bytes are available\n";
+    std::cout << "\e[1;36m[3DS] \e[38;5;88m" << lSize << "bytes are available in the mp3 file\n";
     fseek(file, 0, SEEK_SET);
     uint8_t *fileBuffer = (uint8_t *)malloc(lSize * sizeof(uint8_t));
     

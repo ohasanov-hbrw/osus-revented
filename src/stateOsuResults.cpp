@@ -81,7 +81,7 @@ void saveScore(int setid, int beatmapid, int score, int maxCombo, int hit300,
   normalizePath(filePath);
 
   FILE *f = fopen(filePath.c_str(), "w");
-  
+
   if (!f)
     return;
 
@@ -320,7 +320,7 @@ void ResultsMenu::unload() {
     MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
   textureOpsState.store(TEX_FREE);
   while (textureOpsState.load() != TEX_FREED) {
-    std::cout << "waiting for textureops\n";
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "waiting for textureops\n";
     SleepInMs(10);
   }
   if (accessLocked)
@@ -369,7 +369,7 @@ void ResultsMenu::textureOps() {
           Global.GameBinaryPath + "/resources/default_skin/" + rankFilename;
       symbol = LoadTexture(defaultSkinPath.c_str());
     }
-    std::cout << "loaded " << rankFilename << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "loaded " << rankFilename << std::endl;
     textureOpsState.store(TEX_LOADED);
     break;
   }

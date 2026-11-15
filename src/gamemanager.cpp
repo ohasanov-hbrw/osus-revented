@@ -36,7 +36,10 @@ GameManager *GameManager::getInstance() {
 GameManager::GameManager() { init(); }
 
 // Initilize the game manager?
-void GameManager::init() {}
+void GameManager::init() {
+  lastClickComboForPop = 0;
+  comboPop = 0.0f;
+}
 
 // Osu! Game loop
 void GameManager::update() {
@@ -762,9 +765,22 @@ void GameManager::render() {
                         (ScaleCordY(0) / Scale(1)),
                     0.5f + scale, Fade(WHITE, 0.8 - scale));
 
+  if (clickCombo > lastClickComboForPop) {
+    comboPop = 1.0f;
+  }
+  lastClickComboForPop = clickCombo;
+  if (comboPop > 0.0f) {
+    comboPop -= (float)Global.FrameTime / 150.0f;
+    if (comboPop < 0.0f)
+      comboPop = 0.0f;
+  }
+  float comboScale = 0.6f * (1.0f + 0.2f * comboPop);
+  float comboBaseScale = 0.6f;
+  float comboY = 460 + ((GetScreenHeight() - Scale(480))) / Scale(2) -
+                 (numbers[0].height * (comboScale - comboBaseScale)) / 8.0f;
   DrawCNumbersLeft(
-      clickCombo, 15 - ((GetScreenWidth() - Scale(640))) / Scale(2),
-      460 + ((GetScreenHeight() - Scale(480))) / Scale(2), 0.6f, WHITE);
+      clickCombo, 15 - ((GetScreenWidth() - Scale(640))) / Scale(2) + (numbers[0].width * (comboScale - comboBaseScale)) / 8.0f,
+      comboY, comboScale, WHITE);
 
   if (spawnedHitObjects == 0 &&
       gameFile.hitObjects[gameFile.hitObjects.size() - 1].time >
@@ -1713,6 +1729,8 @@ void GameManager::loadGame(std::string filename) {
   hit100s = 0;
   hit50s = 0;
   hit0s = 0;
+  lastClickComboForPop = 0;
+  comboPop = 0.0f;
 
   // TODO: these are not used right now, USE THEM
   float hpdrainrate = std::stof(gameFile.configDifficulty["HPDrainRate"]);
@@ -2529,9 +2547,9 @@ void GameManager::loadGameTextures() {
       }
     }
 
-    std::cout << "Found this many files: " << texLoadBgFiles.size() << std::endl;
+    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Found this many files: " << texLoadBgFiles.size() << std::endl;
     for (int i = 0; i < (int)texLoadBgFiles.size(); i++) {
-      std::cout << texLoadBgFiles[i] << std::endl;
+      std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << texLoadBgFiles[i] << std::endl;
     }
 
     texLoadI = 0;
