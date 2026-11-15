@@ -25,7 +25,7 @@ int loadogg(const char *fileName, Sound *sound){
         fclose(file);
         return 0;
     }
-
+    setvbuf ( file , NULL , _IOFBF , 32768 );
     fseek(file, 0, SEEK_END);
     int lSize = ftell(file);
     //std::cout << lSize << "bytes are available\n";
@@ -158,7 +158,7 @@ int loadwav(const char *fileName, Sound *sound){
         fclose(file);
         return 0;
     }
-
+    setvbuf ( file , NULL , _IOFBF , 32768 );
     fseek(file, 0, SEEK_END);
     int lSize = ftell(file);
     //std::cout << lSize << "bytes are available\n";
@@ -304,7 +304,7 @@ int loadmp3(const char *fileName, Sound *sound){
         fclose(file);
         return 0;
     }
-
+    setvbuf ( file , NULL , _IOFBF , 32768 );
     fseek(file, 0, SEEK_END);
     int lSize = ftell(file);
     std::cout << lSize << "bytes are available\n";
@@ -492,7 +492,7 @@ Sound decodeSoundFromFile(const char *fileName){
         fclose(file);
         return sound;
     }
-
+    setvbuf ( file , NULL , _IOFBF , 32768 );
     //std::cout << "loaded file for reading\n";
     fseek(file, 0, SEEK_END);
     int lSize = ftell(file);

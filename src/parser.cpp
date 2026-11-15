@@ -120,7 +120,7 @@ void sanitizeLine(std::string& line) {
 // Helper function to read an entire line of any length using a fixed buffer chunk
 bool readFullLine(FILE* file, std::string& outLine) {
     outLine.clear();
-    char buffer[512]; // Small, efficient stack chunk size
+    char buffer[32768]; // Small, efficient stack chunk size
 
     while (fgets(buffer, sizeof(buffer), file) != nullptr) {
         outLine.append(buffer);
@@ -130,6 +130,9 @@ bool readFullLine(FILE* file, std::string& outLine) {
         if (!outLine.empty() && outLine.back() == '\n') {
             break;
         }
+		#ifdef THREEDS_BUILD
+		svcSleepThread(500000); // fs subsystem is trash on the 3ds
+		#endif
     }
 
     // Return true if we actually read data, false if we hit EOF right away
@@ -148,12 +151,12 @@ GameFile Parser::parseMetadata(std::string filename) {
 		}
 		filename = prepare_long_path(filename).string();
 		std::cout << filename << std::endl;
-		file = fopen(filename.c_str(), "r");
 		if (file == nullptr) {
 			std::cout << "\e[1;38;5;52m[ERR] \e[38;5;236m"<< "welp... messy solution didnt work" << std::endl;
         	return gameFile; // Could not open file
 		}
     }
+	setvbuf ( file , NULL , _IOFBF , 32768 );
 	std::string line;
 	std::string subLine;
     subLine.reserve(8192);
@@ -191,6 +194,7 @@ GameFile Parser::parseMetadata(std::string filename) {
 //this here is just a dumb parser, nothing to document here tbh
 std::string Parser::parseBackground(std::string filename){
 	FILE* file = fopen(filename.c_str(), "rb");
+	setvbuf ( file , NULL , _IOFBF , 32768 );
 	std::string line;
 	std::string background = "[]";
 	std::string subLine;
@@ -257,6 +261,7 @@ GameFile Parser::parse(std::string filename){
 
 	int numLines = 0;
 	FILE* lineCounter = fopen(filename.c_str(), "rb");
+	setvbuf ( lineCounter , NULL , _IOFBF , 32768 );
 	if (lineCounter != nullptr){
 		char buf[4096];
 		size_t nread;
@@ -293,6 +298,7 @@ GameFile Parser::parse(std::string filename){
 	std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Ifstream found " << numLines << " lines to parse" << std::endl;
 	Global.numberLines = numLines;
 	FILE* file = fopen(filename.c_str(), "rb");
+	
 	std::string line;
 	int lineNumber = 0;
 	Global.parsedLines = 0;
@@ -314,7 +320,7 @@ GameFile Parser::parse(std::string filename){
 			return gameFile; // Could not open file
 		}
 	}
-
+	setvbuf ( file , NULL , _IOFBF , 32768 ); // increase buffer
 	std::string subLine;
     subLine.reserve(8192);
 

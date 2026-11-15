@@ -132,7 +132,7 @@ static int stdioOpen(sqlite3_vfs *pVfs, const char *zName, sqlite3_file *pFile,
       fp = fopen(zName, "r+b");
     }
   }
-
+  setvbuf ( fp , NULL , _IOFBF , 32768 );
   if (!fp)
     return SQLITE_CANTOPEN;
 
@@ -690,6 +690,7 @@ std::vector<FileMetadata> parseCachedMaps(const std::string &dbPath,
     FILE *file = fopen(filePath.c_str(), "r");
     if (!file)
       continue;
+    setvbuf ( file , NULL , _IOFBF , 32768 );
 
     FileMetadata meta{.setid = setid, .id = 0};
     char line[1024];
@@ -736,6 +737,7 @@ std::string extractBackgroundImage(const std::string &osuPath) {
   FILE *file = fopen(osuPath.c_str(), "r");
   if (!file)
     return "";
+  setvbuf ( file , NULL , _IOFBF , 32768 );
 
   char line[1024];
   bool inEvents = false;

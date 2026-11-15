@@ -81,6 +81,7 @@ void saveScore(int setid, int beatmapid, int score, int maxCombo, int hit300,
   normalizePath(filePath);
 
   FILE *f = fopen(filePath.c_str(), "w");
+  
   if (!f)
     return;
 

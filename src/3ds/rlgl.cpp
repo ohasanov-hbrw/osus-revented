@@ -1345,13 +1345,13 @@ RenderTexture2D LoadRenderTexture(int width, int height, bool vram){
 		target.texture.subtex.right = (target.texture.subtex.width /static_cast<float>(w_pow2));
 		target.texture.subtex.bottom = (1.0 - (target.texture.subtex.height / static_cast<float>(h_pow2)));
         
-        if(vramSpaceFree() <=  w_pow2 * h_pow2 * 2){
+        if(vramSpaceFree() <=  w_pow2 * h_pow2 * 4){
             vram = false;
         }
 		if(vram)
             target.texture.id = C3D_TexInitVRAM(&target.texture.tex, static_cast<u16>(w_pow2), static_cast<u16>(h_pow2), _determineHardwareFormat(PIXELFORMAT_UNCOMPRESSED_R4G4B4A4));
-        else
-            target.texture.id = C3D_TexInit(&target.texture.tex, static_cast<u16>(w_pow2), static_cast<u16>(h_pow2), _determineHardwareFormat(PIXELFORMAT_UNCOMPRESSED_R4G4B4A4));
+        //else
+        //    target.texture.id = C3D_TexInit(&target.texture.tex, static_cast<u16>(w_pow2), static_cast<u16>(h_pow2), _determineHardwareFormat(PIXELFORMAT_UNCOMPRESSED_R4G4B4A4));
         //std::cout << "texinitdone.\n";
 		if(target.texture.id == 0){
             target.id = 0;

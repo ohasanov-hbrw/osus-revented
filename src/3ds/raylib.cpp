@@ -14,6 +14,7 @@ unsigned char *LoadFileData(const char *fileName, int *dataSize){
     if (fileName != NULL){
         FILE *file = fopen(fileName, "rb");
         if (file != NULL){
+            setvbuf ( file , NULL , _IOFBF , 32768 );
             // WARNING: On binary streams SEEK_END could not be found,
             // using fseek() and ftell() could not work in some (rare) cases
             fseek(file, 0, SEEK_END);
