@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "utils.hpp"
 #include <algorithm>
+#include <cmath>
 #include <map>
 #include <memory>
 #include <string>
@@ -20,13 +21,13 @@ public:
     // m_cachedLines starts empty automatically
   }
 
-  // Setters that trigger re-calculation only when mutated
+  // SetBox is called every frame for moving elements, so only re-layout when
+  // the size has drifted by at least 5 units from the last laid-out size.
   void SetBox(const Rectangle &newBox) {
-    if (m_box.width != newBox.width || m_box.height != newBox.height) {
-      m_box = newBox;
-      UpdateLayout();
-    }
     m_box = newBox;
+    if (std::abs(newBox.width - m_layoutWidth) >= 5.0f ||
+        std::abs(newBox.height - m_layoutHeight) >= 5.0f)
+      UpdateLayout();
   }
 
   void SetText(const std::string &newText) {
@@ -103,6 +104,8 @@ public:
 private:
   std::string m_text;
   Rectangle m_box;
+  float m_layoutWidth = 0.0f;
+  float m_layoutHeight = 0.0f;
   float m_fontSize;
   float m_spacing;
   bool m_wrapWords;
@@ -112,6 +115,8 @@ private:
 
   // Heavy string processing isolated here
   void UpdateLayout() {
+    m_layoutWidth = m_box.width;
+    m_layoutHeight = m_box.height;
     m_cachedLines.clear();
     float lineHeight = (float)Scale(m_fontSize);
 
@@ -421,6 +426,10 @@ public:
   float mouseTotalDragDistance = 0.0f;
   double dragVelocity = 0.0;
   int pressedLogicalIndex = -1;
+  // Screen-space (logical grid) rect where list mouse input is accepted.
+  // {0,0,0,0} means the whole scroller; menus can shrink it to keep buttons
+  // drawn on top of the list from stealing drags.
+  Rectangle mouseInputRect = {0, 0, 0, 0};
 
   std::vector<std::string> objectNames;
   std::vector<std::unique_ptr<ClickableObject>> objects;

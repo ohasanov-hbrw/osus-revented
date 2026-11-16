@@ -33,12 +33,19 @@ MainMenu::MainMenu() {
   logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
   description = TextBox({320, 540}, {520, 40}, {240, 98, 161, 0},
                         "made by ohasanov (C) 2026", Fade(BLACK, 0.3f), 20, 50);
+  topBar.baseColor = {48, 32, 48, 192};
+  topBar.positions = Create_Shape_Rectangle_With_Trapezoid(
+      MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0, 0,
+      MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
+      MenuSizes.topCard.edgeRampWidth);
+  
   animation = 0;
   animationStart = 0;
   animationDone = false;
 }
 
 void MainMenu::init() {
+  topBar.init();
   // MutexLock(SWITCHING_STATE);
   Global.NeedForBackgroundClear = true;
   Global.LastFrameTime = getGlobalTimer();
@@ -308,6 +315,13 @@ void MainMenu::update() {
   MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
   Global.enableMouse = true;
 
+  if (Global.ScaleUpdated) {
+    Update_Shape_Rectangle_With_Trapezoid(
+        MenuSizes.topCard.anchor, true, false, 0, MenuSizes.topCard.height, 0,
+        0, MenuSizes.topCard.edgeHeight, MenuSizes.topCard.edgeWidth,
+        MenuSizes.topCard.edgeRampWidth, &topBar.positions);
+  }
+
   popup.update();
 
   if (popup.action) {
@@ -499,11 +513,11 @@ void MainMenu::update() {
     animation = -2;
     animationDone = false;
     return;
-  } else if (false && wip2.action) {
+  } else if (wip2.action) {
     MutexLock(RENDER_BLOCK, UPDATETHREAD_ID);
     MutexLock(SWITCHING_STATE, UPDATETHREAD_ID);
     Global.CurrentState->unload();
-    Global.CurrentState.reset(new WipMenu2());
+    Global.CurrentState.reset(new SettingsMenu());
     Global.CurrentState->init();
     MutexUnlock(SWITCHING_STATE, UPDATETHREAD_ID);
     MutexUnlock(RENDER_BLOCK, UPDATETHREAD_ID);
@@ -529,6 +543,8 @@ void MainMenu::render() {
   // MutexLock(ACCESSING_OBJECTS);
   MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
 
+  topBar.render();
+
   play.render();
   wip.render();
   wip2.render();
@@ -552,6 +568,7 @@ void MainMenu::render() {
 }
 void MainMenu::unload() {
   initializationStage = STATE_UNINITIALIZED;
+  topBar.deinit();
   // MutexLock(SWITCHING_STATE);
   // MutexUnlock(SWITCHING_STATE);
 }

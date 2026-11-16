@@ -174,6 +174,10 @@ void PlayMenu::init() {
   menu.elements[SCROLLER].get()->positions.push_back(
       {rightMostX - 310, topMostY});
   menu.elements[SCROLLER].get()->positions.push_back({rightMostX, bottomMostY});
+  // Keep the bottom band (where Select/Back are drawn) out of the mouse area.
+  dynamic_cast<FancyScrollingList *>(menu.elements[SCROLLER].get())
+      ->mouseInputRect = {rightMostX - 310, topMostY, 310,
+                          (bottomMostY - topMostY) - 55};
 
   inBeatmapView = false;
   currentBeatmaps.clear();
@@ -443,6 +447,9 @@ void PlayMenu::update() {
 
     menu.elements[SCROLLER].get()->positions[0] = {rightMostX - 310, topMostY};
     menu.elements[SCROLLER].get()->positions[1] = {rightMostX, bottomMostY};
+    dynamic_cast<FancyScrollingList *>(menu.elements[SCROLLER].get())
+        ->mouseInputRect = {rightMostX - 310, topMostY, 310,
+                            (bottomMostY - topMostY) - 55};
 
     leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40,
                                    (rightMostX - 330) - (leftMostX + 20),
@@ -486,6 +493,22 @@ void PlayMenu::update() {
   dynamic_cast<FancyScrollingList *>(menu.elements[0].get())->frameChange +=
       (Global.Wheel);
   menu.update();
+
+  auto *centerClickList =
+      dynamic_cast<FancyScrollingList *>(menu.elements[SCROLLER].get());
+  if (centerClickList->centerItemActivated) {
+    centerClickList->centerItemActivated = false;
+    int selection = centerClickList->currentSelection;
+    if (selection >= 0 &&
+        selection < (int)centerClickList->objectNames.size()) {
+      std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
+                << "selected: " << centerClickList->objectNames[selection]
+                << std::endl;
+    }
+    // A click on the centred card runs the same action as the Select button.
+    dynamic_cast<ClickableObject *>(menu.elements[SELECT_BUTTON].get())
+        ->action = true;
+  }
 
   if (!loaderLoaded) {
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "trying to reload loaderthread" << std::endl;

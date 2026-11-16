@@ -194,6 +194,18 @@ public:
 
 class SettingsMenu : public State {
 private:
+  enum SETTINGS_ELEMENTS {
+    SCROLLER = 0,
+    SAVE_BUTTON = 1,
+    CHANGE_BUTTON = 2
+  };
+  MenuOverlay menu;
+  ClickableObject topBar;
+  ClickableObject bottomCard;
+  Button close;
+  TextBoxSmart leftSideBox;
+  std::string leftSideFormatted = "";
+
 public:
   SettingsMenu();
   void init() override;
@@ -225,6 +237,7 @@ public:
 
 class MainMenu : public State {
 private:
+  ClickableObject topBar;
   Button play;
   Button wip;
   Button wip2;
