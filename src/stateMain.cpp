@@ -25,7 +25,7 @@
 MainMenu::MainMenu() {
   play = Button({250, 420}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
   wip = Button({500, 340}, {220, 40}, {255, 135, 198, 0}, "  Load Database", BLACK, 20);
-  wip2 = Button({500, 300}, {120, 40}, {255, 135, 198, 0}, "WIP2", BLACK, 20);
+  wip2 = Button({500, 300}, {120, 40}, {255, 135, 198, 0}, "Settings", BLACK, 20);
   load = Button({390, 420}, {120, 60}, {255, 135, 198, 255}, "Load", BLACK, 20);
   volume = TestSlider({510, 460}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
   popup =
@@ -60,7 +60,7 @@ void MainMenu::init() {
     play =
         Button({250, 420}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
     wip = Button({500, 340}, {220, 40}, {255, 135, 198, 0}, "  Load Database", BLACK, 20);
-    wip2 = Button({500, 300}, {120, 40}, {255, 135, 198, 0}, "WIP2", BLACK, 20);
+    wip2 = Button({500, 300}, {120, 40}, {255, 135, 198, 0}, "Settings", BLACK, 20);
     load =
         Button({390, 420}, {120, 60}, {255, 135, 198, 255}, "Load", BLACK, 20);
     volume = TestSlider({510, 460}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
@@ -70,7 +70,7 @@ void MainMenu::init() {
     play =
         Button({320, 240}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
     wip = Button({370, 290}, {220, 40}, {150, 80, 120, 255}, "  Load Database", BLACK, 20);
-    wip2 = Button({540, 290}, {120, 40}, {100, 60, 80, 255}, "WIP2", BLACK, 20);
+    wip2 = Button({540, 290}, {120, 40}, {100, 60, 80, 255}, "Settings", BLACK, 20);
     load =
         Button({320, 240}, {120, 60}, {200, 100, 160, 255}, "Load", BLACK, 20);
     volume = TestSlider({320, 240}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
@@ -83,7 +83,7 @@ void MainMenu::init() {
   } else if (animation == 2) {
     play = Button({0, 240}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
     wip = Button({0, 290}, {220, 40}, {150, 80, 120, 255}, "  Load Database", BLACK, 20);
-    wip2 = Button({0, 290}, {120, 40}, {100, 60, 80, 255}, "WIP2", BLACK, 20);
+    wip2 = Button({0, 290}, {120, 40}, {100, 60, 80, 255}, "Settings", BLACK, 20);
     load = Button({0, 240}, {120, 60}, {200, 100, 160, 255}, "Load", BLACK, 20);
     volume = TestSlider({320, 240}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
     popup = Popup({320, 240}, {300, 120}, GRAY, tempMsg.message.c_str(), WHITE,
@@ -95,7 +95,7 @@ void MainMenu::init() {
     play =
         Button({380, 240}, {120, 60}, {255, 135, 198, 255}, "Play", BLACK, 20);
     wip = Button({370, 290}, {220, 40}, {150, 80, 120, 255}, "  Load Database", BLACK, 20);
-    wip2 = Button({540, 290}, {160, 40}, {100, 60, 80, 255}, "WIP2", BLACK, 20);
+    wip2 = Button({540, 290}, {160, 40}, {100, 60, 80, 255}, "Settings", BLACK, 20);
     load =
         Button({540, 240}, {160, 60}, {200, 100, 160, 255}, "Load", BLACK, 20);
     volume = TestSlider({320, 240}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);

@@ -226,6 +226,7 @@ void Game::unload() {
   // MutexLock(SWITCHING_STATE);
   // MutexLock(ACCESSING_OBJECTS);
   Global.doingTimeConsumingOp = true;
+  initializationStage = STATE_UNINITIALIZED;
   Global.gameManager->unloadGame();
   Global.doingTimeConsumingOp = false;
   Global.NeedForBackgroundClear = true;
@@ -233,6 +234,9 @@ void Game::unload() {
   // MutexUnlock(SWITCHING_STATE);
 }
 void Game::textureOps() {
+  if(initializationStage == STATE_UNINITIALIZED)
+    Global.skipRendering = true;
+
   // std::cout << "Trying to acquire Lock for accessing objects\n";
 
   // std::cout << "Got Permission!\n";
@@ -250,6 +254,7 @@ void Game::textureOps() {
   }
 
   if (Global.GameTextures == TEXTUREOPS_START_UNLOADING) {
+    Global.skipRendering = true;
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
               << "trying to get lock for object access for game texture unload"
               << std::endl;

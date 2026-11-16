@@ -413,6 +413,15 @@ public:
 
   int frameChange = 0;
 
+  bool mousePressedOnList = false;
+  bool mouseDragging = false;
+  bool centerItemActivated = false;
+  float mousePressStartY = 0.0f;
+  float mouseLastY = 0.0f;
+  float mouseTotalDragDistance = 0.0f;
+  double dragVelocity = 0.0;
+  int pressedLogicalIndex = -1;
+
   std::vector<std::string> objectNames;
   std::vector<std::unique_ptr<ClickableObject>> objects;
   FancyScrollingList() = default;

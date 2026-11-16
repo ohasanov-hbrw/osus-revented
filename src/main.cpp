@@ -257,6 +257,7 @@ void RenderLoop(void *){
 
         // While loading/initializing nothing should be rendered...
         if(Global.readyForRenderLoop){
+            Global.skipRendering = false;
             leftMostX = 0 - Global.ZeroPoint.x / Global.Scale;
             rightMostX = 640 + Global.ZeroPoint.x / Global.Scale;
             topMostY = 0 - Global.ZeroPoint.y / Global.Scale;
@@ -277,12 +278,14 @@ void RenderLoop(void *){
             // Dont want to be rendering stuff while loading stuff
             MutexLock(SWITCHING_STATE, RENDERTHREAD_ID);
             // Dont flash while loading, just keep the last image
-            if(Global.NeedForBackgroundClear && Global.CurrentState->initializationStage != STATE_UNINITIALIZED){
-                ClearBackground(Global.Background);
-                DrawCoolBackground(backgroundTriangles, backgroundTriangleColors, backgroundTriangleVelocity, NUMBER_BACKGROUND_TRIS, delta / 1000.0);
+            if(!Global.skipRendering){
+                if(Global.NeedForBackgroundClear && Global.CurrentState->initializationStage != STATE_UNINITIALIZED){
+                    ClearBackground(Global.Background);
+                    DrawCoolBackground(backgroundTriangles, backgroundTriangleColors, backgroundTriangleVelocity, NUMBER_BACKGROUND_TRIS, delta / 1000.0);
+                }
+                // The state should know not to render while its loading
+                Global.CurrentState->render();
             }
-            // The state should know not to render while its loading
-            Global.CurrentState->render();
 
             //signifyLoading = false; //dynamic?
             if(Global.doingTimeConsumingOp != signifyLoading){
@@ -294,22 +297,23 @@ void RenderLoop(void *){
             MutexUnlock(SWITCHING_STATE, RENDERTHREAD_ID);
             MutexUnlock(RENDER_BLOCK, RENDERTHREAD_ID);
             
-            // Draw input indicator
-            DrawRectangle(Scale(200), Scale(5), Scale(20), Scale(20), (Color){(unsigned char)(255 * (int)Global.Key1D), (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
-            DrawRectangle(Scale(230), Scale(5), Scale(20), Scale(20), (Color){(unsigned char)(255 * (int)Global.Key2D), (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
-            
-            // Render mouse and its trail
-            renderMouse(); 
+            if(!Global.skipRendering){
+                // Draw input indicator
+                DrawRectangle(Scale(200), Scale(5), Scale(20), Scale(20), (Color){(unsigned char)(255 * (int)Global.Key1D), (unsigned char)(255 * (int)Global.Key1P), (unsigned char)(255 * (int)Global.Key1D), 100});
+                DrawRectangle(Scale(230), Scale(5), Scale(20), Scale(20), (Color){(unsigned char)(255 * (int)Global.Key2D), (unsigned char)(255 * (int)Global.Key2P), (unsigned char)(255 * (int)Global.Key2D), 100});
+                
+                // Render mouse and its trail
+                renderMouse(); 
 
-            // Show fps and game ticks per second
-            DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.0f", Global.avgFPS), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
-            DrawTextEx(&Global.DefaultFont, TextFormat("TPS: %.0f", Global.avgHZ), {static_cast<float>((int)Scale(100)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
+                // Show fps and game ticks per second
+                DrawTextEx(&Global.DefaultFont, TextFormat("FPS: %.0f", Global.avgFPS), {static_cast<float>((int)Scale(5)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
+                DrawTextEx(&Global.DefaultFont, TextFormat("TPS: %.0f", Global.avgHZ), {static_cast<float>((int)Scale(100)), static_cast<float>((int)Scale(5))}, Scale(20.05), Scale(2), GREEN);
 
-            if(signifyLoading)
-                DrawLoadingCircle(ScaleCords((Vector2){leftMostX + 40, bottomMostY - 40}), Scale(20), Scale(5),getGlobalTimer() - loadingChangeTime, Fade(WHITE, 1));
-            else if(getGlobalTimer() - loadingChangeTime < 1000)
-                DrawLoadingCircle(ScaleCords((Vector2){leftMostX + 40, bottomMostY - 40}), Scale(20), Scale(5),getGlobalTimer() - loadingChangeTime + loadingOffset, Fade(WHITE, 1.0 - clip(((getGlobalTimer() - loadingChangeTime) / 1000.0), 0., 1.)));
-
+                if(signifyLoading)
+                    DrawLoadingCircle(ScaleCords((Vector2){leftMostX + 40, bottomMostY - 40}), Scale(20), Scale(5),getGlobalTimer() - loadingChangeTime, Fade(WHITE, 1));
+                else if(getGlobalTimer() - loadingChangeTime < 1000)
+                    DrawLoadingCircle(ScaleCords((Vector2){leftMostX + 40, bottomMostY - 40}), Scale(20), Scale(5),getGlobalTimer() - loadingChangeTime + loadingOffset, Fade(WHITE, 1.0 - clip(((getGlobalTimer() - loadingChangeTime) / 1000.0), 0., 1.)));
+            }
             // Mainly for 3DS Debugging purposes
             _gpu_check_command_buffer();
 

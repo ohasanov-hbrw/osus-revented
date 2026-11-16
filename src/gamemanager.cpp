@@ -2066,7 +2066,7 @@ void GameManager::unloadGame() {
   Global.scoreScore = score;
   currentComboIndex = 0;
 
-  SleepInMs(20);
+  SleepInMs(5);
 
   for (auto &pair : SoundFilesAll.data) {
     UnloadSound(&pair.second);
@@ -2089,7 +2089,7 @@ void GameManager::unloadGame() {
             << "unlocking the hold access lock\n";
   // MutexUnlock(SWITCHING_STATE);
   while (true) {
-    SleepInMs(500);
+    SleepInMs(100);
 
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;32m"
               << "waiting for textures to unload\n";

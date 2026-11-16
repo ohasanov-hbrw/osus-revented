@@ -345,6 +345,8 @@ struct Globals {
     int lastWindowWidth = 0;
     double TimeStepSize = 0; //in milliseconds
 
+    bool skipRendering = false;
+
     std::atomic<bool> doingTimeConsumingOp = false;
 
 };

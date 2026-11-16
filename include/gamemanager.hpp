@@ -72,33 +72,33 @@ class GameManager{
 		
 		Background backgroundTextures;
 		
-		Texture2D hitCircle;
-		Texture2D hitCircleOverlay;
-		Texture2D approachCircle;
-		Texture2D cursor;
-		Texture2D selectCircle;
-		Texture2D hit0;
-		Texture2D hit50;
-		Texture2D hit100;
-		Texture2D hit300;
-		Texture2D sliderb;
-		Texture2D sliderscorepoint;
-		Texture2D sliderfollow;
-		Texture2D reverseArrow;
-		Texture2D sliderin;
-		Texture2D sliderblank;
-		Texture2D sliderout;
-		Texture2D numbers[10];
-		Texture2D spinnerBottom;
-		Texture2D spinnerTop;
-		Texture2D spinnerCircle;
-		Texture2D spinnerApproachCircle;
-		Texture2D spinnerMetre;
-		Texture2D spinnerBack;
-		Texture2D followPoint;
+		Texture2D hitCircle = {0};
+		Texture2D hitCircleOverlay = {0};
+		Texture2D approachCircle = {0};
+		Texture2D cursor = {0};
+		Texture2D selectCircle = {0};
+		Texture2D hit0 = {0};
+		Texture2D hit50 = {0};
+		Texture2D hit100 = {0};
+		Texture2D hit300 = {0};
+		Texture2D sliderb = {0};
+		Texture2D sliderscorepoint = {0};
+		Texture2D sliderfollow = {0};
+		Texture2D reverseArrow = {0};
+		Texture2D sliderin = {0};
+		Texture2D sliderblank = {0};
+		Texture2D sliderout = {0};
+		Texture2D numbers[10] = {0};
+		Texture2D spinnerBottom = {0};
+		Texture2D spinnerTop = {0};
+		Texture2D spinnerCircle = {0};
+		Texture2D spinnerApproachCircle = {0};
+		Texture2D spinnerMetre = {0};
+		Texture2D spinnerBack = {0};
+		Texture2D followPoint = {0};
 
-		RenderTexture2D sliderInnerBall;
-		RenderTexture2D sliderOuterBall;
+		RenderTexture2D sliderInnerBall = {0};
+		RenderTexture2D sliderOuterBall = {0};
 
 		Music backgroundMusic;
 
