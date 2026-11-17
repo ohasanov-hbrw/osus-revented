@@ -180,7 +180,7 @@ void Slider::init() {
   // Set variables to initial position as nothing is initialized yet
   data.textureReady = false;
   data.textureLoaded = false;
-  bool durationNull = false;
+  durationNull = false;
   followAnim = 0.0f;
 
   // Get the number of points on a slider
@@ -2212,7 +2212,7 @@ void Slider::dead_render() {
     if (data.textureReady) {
       Global.sliderTexNeedDeleting = true;
       float draw = std::max(meshSnakeStart, meshSnakeEnd);
-      if (!AreSame(meshSnakeStart, meshSnakeStart)) {
+      if (!AreSame(meshSnakeStart, meshSnakeEnd)) {
         meshSnakeStart = draw;
         meshSnakeEnd = draw;
       }

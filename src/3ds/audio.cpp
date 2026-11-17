@@ -250,9 +250,9 @@ void MusicThread(Music *music){
 
     while(true){
         MutexLock(MUSIC_BLOCK, MUSICTHREAD_ID);
-        u32 command = music->command & 0x0000000F;
+        u32 command = music->command & 0x000000FF;
         MutexUnlock(MUSIC_BLOCK, MUSICTHREAD_ID);
-        if(command == 0x0000000F){
+        if((command & 0x0000000F) == 0x0000000F){
             break;
         }
         if((command & 0x000000F0) == 0x000000F0){
