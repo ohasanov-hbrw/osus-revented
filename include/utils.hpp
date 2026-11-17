@@ -87,6 +87,14 @@ void DrawTextureOnCircle(Texture2D*, float, float, float, float, float, float, C
 //Draw a slider texture (exclusively for a slider object)
 void DrawTextureSlider(Texture2D*, float, float, Color, float);
 
+struct TexturedVertex {
+  Vector2 position;
+  Vector2 uv;
+  float depth;
+};
+
+void DrawTexturedTrianglesDepth(Texture2D*, const TexturedVertex*, int, Color);
+
 void DrawSpinnerMeter(Texture2D*, float);
 
 void DrawSpinnerBack(Texture2D*, Color);

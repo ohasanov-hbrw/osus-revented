@@ -437,5 +437,36 @@ void DrawTextureCenter(Texture2D *tex, float x, float y, float s, Color color) {
       tex, ScaleCords(GetRaylibOrigin({x, y, tex->width * s, tex->height * s})),
       0, Scale(s), color);
 }
+#ifndef MESH_BATCH_CHUNK_TRIS
+#define MESH_BATCH_CHUNK_TRIS 200
+#endif
+ 
+// ok so, why quads? well because triangles simply dont friggin work????
+// do not ask why quads work, but they do, so im happy. 
+void DrawTexturedTrianglesDepth(Texture2D *tex, const TexturedVertex *vertices,
+                                int count, Color color) {
+  if (tex->id == 0 || count < 3) return;
+  const int triangles = count / 3;
+  for (int base = 0; base < triangles; base += MESH_BATCH_CHUNK_TRIS) {
+    const int n = std::min(MESH_BATCH_CHUNK_TRIS, triangles - base);
+    rlCheckRenderBatchLimit(n * 4);  // flush BEFORE binding the texture
+    rlSetTexture(tex->id);
+    rlBegin(RL_QUADS);
+    rlColor4ub(color.r, color.g, color.b, color.a);
+    rlNormal3f(0.0f, 0.0f, 1.0f);
+    for (int t = base; t < base + n; t++) {
+      const TexturedVertex &a = vertices[t * 3 + 0];
+      const TexturedVertex &b = vertices[t * 3 + 1];
+      const TexturedVertex &c = vertices[t * 3 + 2];
+      const TexturedVertex *quad[4] = {&a, &b, &c, &c};
+      for (int k = 0; k < 4; k++) {
+        rlTexCoord2f(quad[k]->uv.x, quad[k]->uv.y);
+        rlVertex3f(quad[k]->position.x, quad[k]->position.y, quad[k]->depth);
+      }
+    }
+    rlEnd();
+  }
+  rlSetTexture(0);
+}
 
 #endif

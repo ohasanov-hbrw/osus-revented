@@ -6,6 +6,7 @@
 #include <hitobject.hpp>
 #include <iostream>
 #include <limits>
+#include <meshslider.hpp>
 
 #if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
 #include "msaaRenderTexture.hpp"
@@ -785,8 +786,6 @@ void Slider::update() {
     inSlider = false;
   }
 
-  
-
   lastPosition = renderPoints[calPos];
   // DEBUG
   bool debugf = IsKeyDown(Global.AUTO_KEY);
@@ -1081,6 +1080,56 @@ void Slider::update() {
   }
 }
 
+void Slider::renderMeshBody(float alpha, bool recompute) {
+  if (renderPoints.size() < 2 || alpha <= 0.0f)
+    return;
+
+  GameManager *gm = GameManager::getInstance();
+  double now = gm->currentTime * 1000.0;
+  double preempt = std::max(1.0, static_cast<double>(gm->gameFile.preempt));
+  int spans = std::max(1, static_cast<int>(data.slides));
+  double spanDur = std::max(1.0, static_cast<double>(sliderDuration));
+
+  // snake in: head grows during the last third of preempt
+  double start = 0.0;
+  double end = clip((now - (data.time - preempt)) / (preempt / 3.0), 0.0, 1.0);
+
+  if (recompute) {
+    // snake out:
+    double t = now - data.time;
+    if (t >= 0.0) {
+      double x = t / spanDur;
+      int span = std::min(static_cast<int>(std::floor(x)), spans - 1);
+      double p = clip(x - span, 0.0, 1.0);
+      if (span == spans - 1) {
+        if (span % 2 == 0)
+          start = p; // ball moving toward the tail
+        else
+          end = std::min(end, 1.0 - p); // ball moving back toward the head
+      }
+    }
+    meshSnakeStart = start;
+    meshSnakeEnd = end;
+  } else {
+    start = meshSnakeStart;
+    end = meshSnakeEnd;
+  }
+
+  Color bodyColour = Fade(WHITE, 1.0f);
+  if (data.colour.size() > 2)
+    bodyColour =
+        Fade(Color{data.colour[0], data.colour[1], data.colour[2]}, 1.0f);
+
+  MeshSliderDrawData drawData{&renderPoints,
+                              static_cast<float>(start),
+                              static_cast<float>(end),
+                              gm->circlesize / 2.0f,
+                              alpha,
+                              bodyColour,
+                              &meshCache};
+  MeshSliderRender(drawData);
+}
+
 void Slider::render() {
   bool legacyRender = Global.legacyRender;
 
@@ -1090,7 +1139,8 @@ void Slider::render() {
   GameManager *gm = GameManager::getInstance();
   // bool changeTex = false;
 
-  if (data.textureReady == true and data.textureLoaded == false) {
+  if (!Global.meshSliders and data.textureReady == true and
+      data.textureLoaded == false) {
 
     if (legacyRender) {
       texSizeXoffset = std::max(
@@ -1110,7 +1160,8 @@ void Slider::render() {
                 texSizeXoffset),
           (int)(((std::max(maxY - minY, 1.0f) + (float)gm->circlesize) + 16) *
                     Global.sliderTexSize -
-                texSizeYoffset), 4);
+                texSizeYoffset),
+          4);
 #else
       sliderTexture = LoadRenderTexture(
           (int)(((std::max(maxX - minX, 1.0f) + (float)gm->circlesize) + 16) *
@@ -1133,7 +1184,8 @@ void Slider::render() {
 #if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
       sliderTexture = LoadMSAARenderTexture(
           (int)(((std::max(maxX - minX, 1.0f) + (float)gm->circlesize) + 16)),
-          (int)(((std::max(maxY - minY, 1.0f) + (float)gm->circlesize) + 16)), 4);
+          (int)(((std::max(maxY - minY, 1.0f) + (float)gm->circlesize) + 16)),
+          4);
 #else
       sliderTexture = LoadRenderTexture(
           (int)(((std::max(maxX - minX, 1.0f) + (float)gm->circlesize) + 16)),
@@ -1160,6 +1212,7 @@ void Slider::render() {
       //     rlClearDepth(0.0f);
       //     rlDisableDepthTest();
       // }
+      rlDrawRenderBatchActive();
       rlEnableDepthTest();
       ClearBackground({0, 0, 0, 0});
       if (legacyRender) {
@@ -1167,6 +1220,7 @@ void Slider::render() {
         rlClearScreenBuffers();
       }
       // EndBlendMode();
+      rlDrawRenderBatchActive();
       rlDisableDepthTest();
 
       // changeTex = true;
@@ -1206,27 +1260,35 @@ void Slider::render() {
                1.0f,
            0, 100.0f);
   Color renderColor;
+  if (Global.meshSliders) {
+    data.textureLoaded = false;
+  } else {
 #if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
-  data.textureLoaded =
-      sliderTexture.valid; // IsRenderTextureReady(&sliderTexture.resolve);
+    data.textureLoaded =
+        sliderTexture.valid; // IsRenderTextureReady(&sliderTexture.resolve);
 #else
 
-  data.textureLoaded = IsRenderTextureReady(&sliderTexture);
+    data.textureLoaded = IsRenderTextureReady(&sliderTexture);
 #endif
+  }
 
+  rlDrawRenderBatchActive();
   rlDisableDepthTest();
   // rlCustomDepthFunc(true);
   int maxDrawAtTime = 10;
   int drawn = 0;
   // if(last < renderPoints.size() - 1)
   //     last++;
-  if (data.textureLoaded and data.textureReady) {
+  if (Global.meshSliders or (data.textureLoaded and data.textureReady)) {
     legacyRender = Global.legacyRender;
     int GMSkip = gm->skip;
     if (last + GMSkip >= (int)renderPoints.size()) {
       GMSkip = gm->smallskip;
     }
-    if (legacyRender) {
+    if (Global.meshSliders) {
+      renderMeshBody(easeInOutCubic(clampedFade),
+                     true); // slider is active here, so recompute!
+    } else if (legacyRender) {
       bool polygonalRender = Global.polygonalRendering;
       // polygonalRender = false; //DrawTexxtureExDepth is not supported on PC
       if (polygonalRender) {
@@ -1239,6 +1301,7 @@ void Slider::render() {
 #else
           BeginTextureMode(&sliderTexture);
 #endif
+          rlDrawRenderBatchActive();
           rlEnableDepthTest();
 
           bool draw = true;
@@ -1466,6 +1529,7 @@ void Slider::render() {
             }
             EndBlendMode();
           }
+          rlDrawRenderBatchActive();
           rlDisableDepthTest();
 #if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
           EndMSAARenderTexture(sliderTexture);
@@ -1530,6 +1594,7 @@ void Slider::render() {
           // rlSetBlendFactorsSeparate(RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA,
           // RL_SRC_ALPHA, RL_ONE_MINUS_SRC_ALPHA, RL_BLEND_ADD_COLORS,
           // RL_BLEND_ADD_COLORS);
+          rlDrawRenderBatchActive();
           rlSetBlendFactorsSeparate(RL_ONE, RL_ONE, RL_ONE, RL_ONE, RL_MAX,
                                     RL_MAX);
           // BeginBlendMode(BLEND_ALPHA_PREMUL);
@@ -1789,8 +1854,10 @@ void Slider::render() {
             }
             // rlDisableDepthTest();
             EndBlendMode();
+            rlDrawRenderBatchActive();
             rlDisableDepthTest();
           }
+          rlDrawRenderBatchActive();
           rlDisableDepthTest();
           EndBlendMode();
 #if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
@@ -1915,6 +1982,7 @@ void Slider::render() {
       EndShaderMode();
     }
   }
+  rlDrawRenderBatchActive();
   rlDisableDepthTest();
 
   // std::cout << "done with slider render stuff?" << std::endl;
@@ -1925,7 +1993,7 @@ void Slider::render() {
     float ang = 0.0f;
     if (renderPoints.size() < 2)
       return ang;
-    dir *=2;
+    dir *= 2;
     int j = endIndex + dir;
     int chosen = -1;
     int fallback = -1;
@@ -1958,23 +2026,23 @@ void Slider::render() {
     angle = getReverseArrowAngle(endIndex, dir);
     if (repeat && !(clampedBigFade < 0.7f))
       DrawTextureRotate(&gm->reverseArrow, renderPoints[endIndex].x,
-                        renderPoints[endIndex].y, (gm->circlesize / 128.0f), angle,
-                        Fade(WHITE, clampedFade));
+                        renderPoints[endIndex].y, (gm->circlesize / 128.0f),
+                        angle, Fade(WHITE, clampedFade));
 
     endIndex = (curRepeat % 2 == 0) ? 0 : (int)renderPoints.size() - 1;
     dir = (curRepeat % 2 == 0) ? 1 : -1;
     angle = getReverseArrowAngle(endIndex, dir);
     if (data.colour.size() > 2)
-      renderColor =
-          Fade(Color{(unsigned char)data.colour[0], (unsigned char)data.colour[1],
-                     (unsigned char)data.colour[2]},
-               clampedFade);
+      renderColor = Fade(Color{(unsigned char)data.colour[0],
+                               (unsigned char)data.colour[1],
+                               (unsigned char)data.colour[2]},
+                         clampedFade);
     else
       renderColor = Fade(Color{255, 255, 255}, clampedFade);
     if (repeat2 && position > 0 && !(clampedBigFade < 0.7f))
       DrawTextureRotate(&gm->reverseArrow, renderPoints[endIndex].x,
-                        renderPoints[endIndex].y, (gm->circlesize / 128.0f), angle,
-                        Fade(WHITE, clampedFade));
+                        renderPoints[endIndex].y, (gm->circlesize / 128.0f),
+                        angle, Fade(WHITE, clampedFade));
   }
 
   if ((gm->currentTime * 1000.0f - data.time > 0 or !state) and
@@ -2140,7 +2208,61 @@ void Slider::dead_render() {
   clampedFade2 = easeInOutCubic(clampedFade2);
   clampedFade2 = clampedFade2 * 0.7;
 
-  if (data.textureReady and data.textureLoaded) {
+  if (Global.meshSliders) {
+    if (data.textureReady) {
+      Global.sliderTexNeedDeleting = true;
+      float draw = std::max(meshSnakeStart, meshSnakeEnd);
+      if (!AreSame(meshSnakeStart, meshSnakeStart)) {
+        meshSnakeStart = draw;
+        meshSnakeEnd = draw;
+      }
+      renderMeshBody(clampedFade2, false);
+      float scale = (gm->currentTime * 1000.0f + gm->gameFile.fade_in / 2.0f -
+                     data.time) /
+                    (gm->gameFile.fade_in / 2.0f);
+      scale = clip(scale, 1, 2);
+      scale -= 1.0;
+      scale = easeInOutCubic(scale);
+      scale += 1.0;
+
+      Color renderColor;
+      float x = lastPosition.x;
+      float y = lastPosition.y;
+      if (data.colour.size() > 2)
+        renderColor = Fade(Color{(unsigned char)data.colour[0],
+                                 (unsigned char)data.colour[1],
+                                 (unsigned char)data.colour[2]},
+                           clampedFade2);
+      else
+        renderColor = Fade(Color{255, 255, 255}, clampedFade2);
+      DrawTextureRotate(
+          &gm->sliderb, x, y, (gm->circlesize / gm->sliderb.width) * 1.3f, 0,
+          Fade(renderColor, clampedFade2)); // need to save angle, TODO
+      if (followAnim > 0.001f) {
+        DrawTextureRotate(&gm->sliderfollow, x, y,
+                          (gm->circlesize / gm->sliderfollow.width) * 2.0f *
+                              (0.7f + 0.3f * followAnim),
+                          0, Fade(WHITE, clampedFade2 * followAnim));
+      }
+
+      if (data.point == 0)
+        DrawTextureCenter(&gm->hit0, x, y,
+                          (gm->circlesize / gm->hit0.width) * 0.5f,
+                          Fade(WHITE, clampedFade));
+      else if (data.point == 1)
+        DrawTextureCenter(&gm->hit50, x, y,
+                          (gm->circlesize / gm->hit50.width) * 0.5f,
+                          Fade(WHITE, clampedFade));
+      else if (data.point == 2)
+        DrawTextureCenter(&gm->hit100, x, y,
+                          (gm->circlesize / gm->hit100.width) * 0.5f,
+                          Fade(WHITE, clampedFade));
+      else if (data.point == 3 && Global.textureSize.render300)
+        DrawTextureCenter(&gm->hit300, x, y,
+                          (gm->circlesize / gm->hit300.width) * 0.5f,
+                          Fade(WHITE, clampedFade));
+    }
+  } else if (data.textureReady and data.textureLoaded) {
     Global.sliderTexNeedDeleting = true;
     float outlineSize = 4.0 * gm->circlesize / gm->sliderin.width;
     float outlineColor[4] = {1.0f, 1.0f, 1.0f,
@@ -2238,48 +2360,53 @@ void Slider::dead_render() {
         DrawTextureCenter(gm->selectCircle, x, y,
     scale*gm->circlesize/gm->selectCircle.width*(gm->selectCircle.width/128.0f)
     , renderColor);*/
+    DrawTextureRotate(&gm->sliderb, x, y,
+                      (gm->circlesize / gm->sliderb.width) * 1.3f, 0,
+                      Fade(renderColor, clampedFade2)); // need to save angle
+
     if (followAnim > 0.001f) {
-      DrawTextureRotate(&gm->sliderfollow, x,
-                        y,
+      DrawTextureRotate(&gm->sliderfollow, x, y,
                         (gm->circlesize / gm->sliderfollow.width) * 2.0f *
                             (0.7f + 0.3f * followAnim),
                         0, Fade(WHITE, clampedFade2 * followAnim));
     }
 
     if (data.point == 0)
-      DrawTextureCenter(
-          &gm->hit0, x, y,
-          (gm->circlesize / gm->hit0.width) * 0.5f, Fade(WHITE, clampedFade));
+      DrawTextureCenter(&gm->hit0, x, y,
+                        (gm->circlesize / gm->hit0.width) * 0.5f,
+                        Fade(WHITE, clampedFade));
     else if (data.point == 1)
-      DrawTextureCenter(
-          &gm->hit50, x, y,
-          (gm->circlesize / gm->hit50.width) * 0.5f, Fade(WHITE, clampedFade));
+      DrawTextureCenter(&gm->hit50, x, y,
+                        (gm->circlesize / gm->hit50.width) * 0.5f,
+                        Fade(WHITE, clampedFade));
     else if (data.point == 2)
-      DrawTextureCenter(
-          &gm->hit100, x, y,
-          (gm->circlesize / gm->hit100.width) * 0.5f, Fade(WHITE, clampedFade));
+      DrawTextureCenter(&gm->hit100, x, y,
+                        (gm->circlesize / gm->hit100.width) * 0.5f,
+                        Fade(WHITE, clampedFade));
     else if (data.point == 3 && Global.textureSize.render300)
-      DrawTextureCenter(
-          &gm->hit300, x, y,
-          (gm->circlesize / gm->hit300.width) * 0.5f, Fade(WHITE, clampedFade));
+      DrawTextureCenter(&gm->hit300, x, y,
+                        (gm->circlesize / gm->hit300.width) * 0.5f,
+                        Fade(WHITE, clampedFade));
   }
 }
 
 void Slider::unloadTextures() {
   if (readyToDelete) {
+    if (!Global.meshSliders) {
 #if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
-    if (sliderTexture.valid) {
-      UnloadMSAARenderTexture(sliderTexture);
-      // std::cout << "UnloadingSliderTexture\n";
-      readyToDelete = false;
-    }
+      if (sliderTexture.valid) {
+        UnloadMSAARenderTexture(sliderTexture);
+        readyToDelete = false;
+      }
 #else
-    if (IsRenderTextureReady(&sliderTexture)) {
-      UnloadRenderTexture(&sliderTexture);
-      // std::cout << "UnloadingSliderTexture\n";
-      readyToDelete = false;
-    }
+      if (IsRenderTextureReady(&sliderTexture)) {
+        UnloadRenderTexture(&sliderTexture);
+        readyToDelete = false;
+      }
 #endif
+    } else {
+      readyToDelete = false; // hacky way of wiring this in
+    }
     data.textureReady = false;
   }
 }

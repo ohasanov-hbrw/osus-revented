@@ -169,6 +169,11 @@ void DrawTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color);
 
 void DrawTriangleStrip(Vector2 *points, int pointCount, Color color);                              // Draw a triangle strip defined by points
 
+struct TexturedVertex; // apparently i have created circular dependancies. shit.
+void DrawTexturedTrianglesDepth(Texture2D*, const TexturedVertex*, int, Color);
+void rlDrawRenderBatchActive();
+
+
 void DrawRectangleV(Vector2 position, Vector2 size, Color color);                                  // Draw a color-filled rectangle (Vector version)
 
 void DrawTextCodepoint(Font *font, int codepoint, Vector2 position, float fontSize, Color tint); // Draw one character (codepoint)

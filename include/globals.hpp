@@ -338,6 +338,7 @@ struct Globals {
         bool legacyRender = true;
         bool polygonalRendering = true;
     #endif
+    bool meshSliders = false;
     // IDK honestly, this does something important
     Globals() = default;
     bool ScaleUpdated = true;

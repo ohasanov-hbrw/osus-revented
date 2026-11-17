@@ -1,4 +1,5 @@
 #include "hitobjectdefinition.hpp"
+#include "meshslider.hpp"
 #include "rlgl.h"
 #include <climits>
 
@@ -47,6 +48,10 @@ class Slider : public HitObject{
         bool durationNull = false;
 
     private:
+    MeshSliderCache meshCache;
+    void renderMeshBody(float alpha, bool recompute);
+    float meshSnakeStart = 0.0f;
+    float meshSnakeEnd = 1.0f;
     #if !defined(THREEDS_BUILD) && defined(MSAA_RENDER)
         MSAARenderTexture sliderTexture;
     #else

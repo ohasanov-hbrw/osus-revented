@@ -3,6 +3,7 @@
 #include "gamemanager.hpp"
 #include "globals.hpp"
 #include "menuElements.hpp"
+#include "meshslider.hpp"
 #include "raylib.h"
 #include "rlgl.h"
 #include "settingsParser.hpp"
@@ -250,6 +251,8 @@ void Game::textureOps() {
   if (Global.GameTextures == TEXTUREOPS_START_LOADING || Global.GameTextures == TEXTUREOPS_LOADING_IN_PROGRESS) {
     MutexLock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     Global.gameManager->loadGameTextures();
+    if(Global.meshSliders)
+      MeshSliderInit();
     MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
   }
 
@@ -263,6 +266,8 @@ void Game::textureOps() {
               << "got lock for object access for game texture unload"
               << std::endl;
     Global.gameManager->unloadGameTextures();
+    if(Global.meshSliders) 
+      MeshSliderFreeResources();
     MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
     std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m"
               << "unloaded textures and unlocked access lock" << std::endl;

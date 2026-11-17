@@ -221,11 +221,11 @@ struct DirState {
 };
 
 #ifdef THREEDS_BUILD
-constexpr size_t BATCH_SET_LIMIT = 5;
-constexpr size_t BATCH_MAP_LIMIT = 50;
+const size_t BATCH_SET_LIMIT = 5;
+const size_t BATCH_MAP_LIMIT = 50;
 #else
-constexpr size_t BATCH_SET_LIMIT = 20;
-constexpr size_t BATCH_MAP_LIMIT = 200;
+const size_t BATCH_SET_LIMIT = 20;
+const size_t BATCH_MAP_LIMIT = 200;
 #endif
 
 static void ensureParentDirExists(const std::string &filePath) {

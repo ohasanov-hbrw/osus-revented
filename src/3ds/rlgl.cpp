@@ -1,6 +1,7 @@
 #include "rlgl.h"
 #include "globals.hpp"
 #include "time_util.hpp"
+#include "utils.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -1790,3 +1791,77 @@ void DrawRectangleV(Vector2 position, Vector2 size, Color color){
 }
 
 
+// this part is basically copied code 
+static DVLB_s *meshDvlb = nullptr;
+static shaderProgram_s meshProgram;
+static int meshProjectionLocation = -1;
+static bool meshShaderReady = false;
+
+static void ensureMeshShader(){
+    if(meshShaderReady)
+        return;
+    meshDvlb = DVLB_ParseFile((u32*)vshader_shbin, vshader_shbin_size);
+    shaderProgramInit(&meshProgram);
+    shaderProgramSetVsh(&meshProgram, &meshDvlb->DVLE[0]);
+    meshProjectionLocation = shaderInstanceGetUniformLocation(meshProgram.vertexShader, "projection");
+    meshShaderReady = true;
+}
+
+void DrawTexturedTrianglesDepth(Texture2D *tex, const TexturedVertex *verts,
+                                int count, Color tint) {
+    if (tex->id == 0 || count <= 0)
+        return;
+
+    C2D_Flush();
+    ensureMeshShader();
+    C3D_BindProgram(&meshProgram);
+
+    C3D_AttrInfo *attrInfo = C3D_GetAttrInfo();
+    AttrInfo_Init(attrInfo);
+    AttrInfo_AddLoader(attrInfo, 0, GPU_FLOAT, 3); // what the hell is this? idk, ask google
+    AttrInfo_AddLoader(attrInfo, 1, GPU_FLOAT, 4); // what the hell is this? idk, ask google
+    AttrInfo_AddLoader(attrInfo, 2, GPU_FLOAT, 2); // what the hell is this? idk, ask google
+    AttrInfo_AddLoader(attrInfo, 3, GPU_FLOAT, 2); // what the hell is this? idk, ask google
+
+    C3D_BufInfo *bufInfo = C3D_GetBufInfo();
+    BufInfo_Init(bufInfo);
+
+    float po2W = (float)GetNextPowerOf2(GetScreenWidth());
+    float po2H = (float)GetNextPowerOf2(GetScreenHeight()); // we need to project the whole texture, so POT is needed
+
+    C3D_Mtx projection;
+    Mtx_Ortho(&projection, 0.0f, po2W, po2H, 0.0f, 0.0f, 1.0f, true);
+    C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, meshProjectionLocation, &projection); // yes.
+
+    C3D_TexBind(0, &tex->tex);
+    C3D_TexEnv *env = C3D_GetTexEnv(0);
+    C3D_TexEnvInit(env);
+    C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+    C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+
+    for (int i = 1; i < 6; i++)
+        C3D_TexEnvInit(C3D_GetTexEnv(i)); // clear C2D madness, c3d goated
+
+    float r = tint.r / 255.0f;
+    float g = tint.g / 255.0f;
+    float bl = tint.b / 255.0f;
+    float al = tint.a / 255.0f;
+
+    C3D_CullFace(GPU_CULL_NONE);
+    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
+    C3D_ImmDrawBegin(GPU_TRIANGLES);
+    for (int i = 0; i < count; i++) { // hope the buffer is big enough l o l
+        const TexturedVertex &v = verts[i];
+        C3D_ImmSendAttrib(v.position.x, v.position.y, v.depth, 0.0f);
+        C3D_ImmSendAttrib(r, g, bl, al);
+        C3D_ImmSendAttrib(v.uv.x, v.uv.y, 0.0f, 0.0f);
+        C3D_ImmSendAttrib(0.0f, 0.0f, 0.0f, 0.0f);
+    }
+    C3D_ImmDrawEnd();
+    C2D_Prepare();
+}
+
+void rlDrawRenderBatchActive(){
+    // we flush already :), but why not
+    C2D_Flush();
+}

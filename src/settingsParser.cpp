@@ -123,7 +123,11 @@ void parseSettings(){
                         }
                         else if(keyValue.first == "legacyRender"){
                             Global.legacyRender = (bool)std::stoi(keyValue.second);
-                            std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set legacyRender to: " << (bool)std::stoi(keyValue.second) << std::endl;                      
+                            std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set legacyRender to: " << (bool)std::stoi(keyValue.second) << std::endl;
+                        }
+                        else if(keyValue.first == "meshSliders"){
+                            Global.meshSliders = (bool)std::stoi(keyValue.second);
+                            std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set meshSliders to: " << (bool)std::stoi(keyValue.second) << std::endl;
                         }
                         else if(keyValue.first == "useTopScreen"){
                             Global.useTopScreen = (bool)std::stoi(keyValue.second);

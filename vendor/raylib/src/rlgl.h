@@ -630,6 +630,7 @@ RLAPI bool rlIsStereoRenderEnabled(void);               // Check if stereo rende
 RLAPI void rlClearColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a); // Clear color buffer with color
 RLAPI void rlClearDepth(float i);
 RLAPI void rlCustomDepthFunc(bool enable);
+RLAPI void rlDepthFuncAlways();
 RLAPI void rlClearScreenBuffers(void);                  // Clear used screen buffers (color and depth)
 RLAPI void rlCheckErrors(void);                         // Check and log OpenGL error codes
 RLAPI void rlSetBlendMode(int mode);                    // Set blending mode
@@ -2054,6 +2055,10 @@ void rlCustomDepthFunc(bool enable){
         glDepthFunc(GL_LESS);  
     else
         glDepthFunc(GL_LEQUAL);  
+}
+
+void rlDepthFuncAlways(){
+    glDepthFunc(GL_ALWAYS);  
 }
 
 /*void rlAlphaTest(bool enable){
