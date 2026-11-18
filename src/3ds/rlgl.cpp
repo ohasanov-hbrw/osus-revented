@@ -1807,9 +1807,41 @@ static void ensureMeshShader(){
     meshShaderReady = true;
 }
 
+struct MeshVboVertex {
+    float x, y, z;
+    float r, g, b, a;
+    float u, v;
+    float pad0, pad1;
+};
+
+static constexpr int MAX_MESH_VERTS = 32768;
+static MeshVboVertex *meshVboPool = nullptr;
+static int meshVboOffset = 0;
+
+static void ensureMeshVbo(){
+    if(!meshVboPool)
+        meshVboPool = (MeshVboVertex*)linearAlloc(sizeof(MeshVboVertex) * MAX_MESH_VERTS);
+}
+
+void MeshVboReset() {
+    meshVboOffset = 0;
+}
+
+void MeshVboFree() {
+    if(meshVboPool){
+        linearFree(meshVboPool);
+        meshVboPool = nullptr;
+    }
+    meshVboOffset = 0;
+}
+
 void DrawTexturedTrianglesDepth(Texture2D *tex, const TexturedVertex *verts,
                                 int count, Color tint) {
     if (tex->id == 0 || count <= 0)
+        return;
+
+    ensureMeshVbo();
+    if (!meshVboPool || meshVboOffset + count > MAX_MESH_VERTS)
         return;
 
     C2D_Flush();
@@ -1822,9 +1854,6 @@ void DrawTexturedTrianglesDepth(Texture2D *tex, const TexturedVertex *verts,
     AttrInfo_AddLoader(attrInfo, 1, GPU_FLOAT, 4); // what the hell is this? idk, ask google
     AttrInfo_AddLoader(attrInfo, 2, GPU_FLOAT, 2); // what the hell is this? idk, ask google
     AttrInfo_AddLoader(attrInfo, 3, GPU_FLOAT, 2); // what the hell is this? idk, ask google
-
-    C3D_BufInfo *bufInfo = C3D_GetBufInfo();
-    BufInfo_Init(bufInfo);
 
     float po2W = (float)GetNextPowerOf2(GetScreenWidth());
     float po2H = (float)GetNextPowerOf2(GetScreenHeight()); // we need to project the whole texture, so POT is needed
@@ -1847,17 +1876,31 @@ void DrawTexturedTrianglesDepth(Texture2D *tex, const TexturedVertex *verts,
     float bl = tint.b / 255.0f;
     float al = tint.a / 255.0f;
 
+    MeshVboVertex *dst = meshVboPool + meshVboOffset;
+    for (int i = 0; i < count; i++) {
+        const TexturedVertex &v = verts[i];
+        dst[i].x = v.position.x;
+        dst[i].y = v.position.y;
+        dst[i].z = v.depth;
+        dst[i].r = r;
+        dst[i].g = g;
+        dst[i].b = bl;
+        dst[i].a = al;
+        dst[i].u = v.uv.x;
+        dst[i].v = v.uv.y;
+        dst[i].pad0 = 0.0f;
+        dst[i].pad1 = 0.0f;
+    }
+    GSPGPU_FlushDataCache(dst, count * sizeof(MeshVboVertex));
+
+    C3D_BufInfo *bufInfo = C3D_GetBufInfo();
+    BufInfo_Init(bufInfo);
+    BufInfo_Add(bufInfo, dst, sizeof(MeshVboVertex), 4, 0x3210);
+
     C3D_CullFace(GPU_CULL_NONE);
     C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
-    C3D_ImmDrawBegin(GPU_TRIANGLES);
-    for (int i = 0; i < count; i++) { // hope the buffer is big enough l o l
-        const TexturedVertex &v = verts[i];
-        C3D_ImmSendAttrib(v.position.x, v.position.y, v.depth, 0.0f);
-        C3D_ImmSendAttrib(r, g, bl, al);
-        C3D_ImmSendAttrib(v.uv.x, v.uv.y, 0.0f, 0.0f);
-        C3D_ImmSendAttrib(0.0f, 0.0f, 0.0f, 0.0f);
-    }
-    C3D_ImmDrawEnd();
+    C3D_DrawArrays(GPU_TRIANGLES, 0, count);
+    meshVboOffset += count;
     C2D_Prepare();
 }
 

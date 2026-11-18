@@ -275,6 +275,12 @@ void FancyScrollingList::update() {
     objectOffsetFull = 0 - std::max(1, (int)objectNames.size()) + 1;
   }
   frameChange = 0;
+#ifdef THREEDS_BUILD
+  const float clickPixels = 6.0f;
+#else
+  const float clickPixels = 3.0f;
+#endif
+  const float clickOffset = clickPixels / std::max(0.001f, Global.Scale);
   if (Global.ScaleUpdated) {
     for (int i = 0; i < objects.size(); i++) {
       objects[i]->deinit();
@@ -348,7 +354,7 @@ void FancyScrollingList::update() {
   if (Global.Key1D && mousePressedOnList && Global.MouseInFocus) {
     float deltaY = Global.MousePosition.y - mouseLastY;
     mouseTotalDragDistance += std::abs(deltaY);
-    if (mouseTotalDragDistance > 1.0f)
+    if (mouseTotalDragDistance > clickOffset)
       mouseDragging = true;
     if (mouseDragging)
       dragVelocity = deltaY;
@@ -359,7 +365,7 @@ void FancyScrollingList::update() {
     if (Global.MouseInFocus) {
       float deltaY = Global.MousePosition.y - mouseLastY;
       mouseTotalDragDistance += std::abs(deltaY);
-      if (mouseDragging || mouseTotalDragDistance > 1.0f) {
+      if (mouseDragging || mouseTotalDragDistance > clickOffset) {
         dragVelocity += deltaY; // carry the last bit of movement as a flick
       } else if (pressedLogicalIndex >= 0) {
         if (pressedLogicalIndex == logicalIndexNearestCenter()) {
@@ -407,14 +413,15 @@ void FancyScrollingList::update() {
   dragVelocity +=
       ((-dragVelocity) / 2.0f) * ((Global.FrameTime / 1000.0f) * 8.0f);
 
-  objectOffsetFull += (int)trunc((objectOffset / objectDistance));
+  int offsetSteps = (int)std::round(objectOffset / objectDistance);
+  objectOffsetFull += offsetSteps;
 
   // bool updateTexts = false;
-  if ((int)trunc((objectOffset / objectDistance)) != 0) {
+  if (offsetSteps != 0) {
     updateTexts = true;
   }
 
-  objectOffset -= trunc((objectOffset / objectDistance)) * objectDistance;
+  objectOffset -= offsetSteps * objectDistance;
 
   // Stop the scroll momentum at either end of the list.
   {

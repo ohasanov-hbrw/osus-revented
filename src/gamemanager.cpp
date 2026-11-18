@@ -1333,6 +1333,22 @@ void GameManager::loadGame(std::string filename) {
   objectPoints.clear();
   objectPoints.shrink_to_fit();
 
+
+  while (true) {
+    if (objectsLinkedList.getHead() == NULL)
+      break;
+    ((HitObject *)objectsLinkedList.getHead()->object)->deinit();
+    delete (HitObject *)objectsLinkedList.getHead()->object;
+    objectsLinkedList.deleteHead();
+  }
+  while (true) {
+    if (deadObjectsLinkedList.getHead() == NULL)
+      break;
+    ((HitObject *)deadObjectsLinkedList.getHead()->object)->deinit();
+    delete (HitObject *)deadObjectsLinkedList.getHead()->object;
+    deadObjectsLinkedList.deleteHead();
+  }
+
   // clear linked lists, WARNING, WILL MEMORY LEAK!
   deadObjectsLinkedList.init();
   objectsLinkedList.init();
@@ -1453,25 +1469,35 @@ void GameManager::loadGame(std::string filename) {
               std::pow(std::abs(edgePoints[j].y - edgePoints[j + 1].y), 2)));
         for (size_t j = 0; j < lineLengths.size(); j++)
           totalLength += lineLengths[j];
-        float angle = atan2(edgePoints[edgePoints.size() - 1].y -
-                                edgePoints[edgePoints.size() - 2].y,
-                            edgePoints[edgePoints.size() - 1].x -
-                                edgePoints[edgePoints.size() - 2].x) *
-                      180 / 3.14159265;
-        float hipotenus = gameFile.hitObjects[i].length - totalLength;
-        float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-        float ydiff = sqrt(std::abs(hipotenus * hipotenus - xdiff * xdiff));
-        int ything = 1;
-        if (angle < 0.0f) {
-          ything = -1;
-        } else if (angle == 0.0f) {
-          ything = 0;
+
+        // this is undocumented behaviour. here i have no choice but to read the source code... forgive me.
+        size_t last = edgePoints.size() - 1;
+        bool lastSegmentZero = AreSame(edgePoints[last].x, edgePoints[last - 1].x) &&
+                       AreSame(edgePoints[last].y, edgePoints[last - 1].y);
+        
+        Vector2 extraPosition = edgePoints[last];
+        if (!lastSegmentZero){               
+          float angle = atan2(edgePoints[edgePoints.size() - 1].y -
+                                  edgePoints[edgePoints.size() - 2].y,
+                              edgePoints[edgePoints.size() - 1].x -
+                                  edgePoints[edgePoints.size() - 2].x) *
+                        180 / 3.14159265;
+          float hipotenus = gameFile.hitObjects[i].length - totalLength;
+          float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+          float ydiff = sqrt(std::abs(hipotenus * hipotenus - xdiff * xdiff));
+          int ything = 1;
+          if (angle < 0.0f) {
+            ything = -1;
+          } else if (angle == 0.0f) {
+            ything = 0;
+          }
+
+          extraPosition = {edgePoints[edgePoints.size() - 1].x + xdiff,
+                                  edgePoints[edgePoints.size() - 1].y -
+                                      ydiff * (float)ything};
+
+          
         }
-
-        Vector2 extraPosition = {edgePoints[edgePoints.size() - 1].x + xdiff,
-                                 edgePoints[edgePoints.size() - 1].y -
-                                     ydiff * (float)ything};
-
         gameFile.hitObjects[i].totalLength = totalLength;
         gameFile.hitObjects[i].lengths = lineLengths;
         gameFile.hitObjects[i].extraPos = extraPosition;
@@ -1494,25 +1520,32 @@ void GameManager::loadGame(std::string filename) {
                 std::pow(std::abs(edgePoints[j].y - edgePoints[j + 1].y), 2)));
           for (size_t j = 0; j < lineLengths.size(); j++)
             totalLength += lineLengths[j];
-          float angle = atan2(edgePoints[edgePoints.size() - 1].y -
-                                  edgePoints[edgePoints.size() - 2].y,
-                              edgePoints[edgePoints.size() - 1].x -
-                                  edgePoints[edgePoints.size() - 2].x) *
-                        180 / 3.14159265;
-          float hipotenus = gameFile.hitObjects[i].length - totalLength;
-          float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-          float ydiff = sqrt(std::abs(hipotenus * hipotenus - xdiff * xdiff));
-          int ything = 1;
-          if (angle < 0.0f) {
-            ything = -1;
-          } else if (angle == 0.0f) {
-            ything = 0;
+          // this is undocumented behaviour. here i have no choice but to read the source code... forgive me.
+          size_t last = edgePoints.size() - 1;
+          bool lastSegmentZero = AreSame(edgePoints[last].x, edgePoints[last - 1].x) &&
+                        AreSame(edgePoints[last].y, edgePoints[last - 1].y);
+          
+          Vector2 extraPosition = edgePoints[last];
+          if (!lastSegmentZero){
+            float angle = atan2(edgePoints[edgePoints.size() - 1].y -
+                                    edgePoints[edgePoints.size() - 2].y,
+                                edgePoints[edgePoints.size() - 1].x -
+                                    edgePoints[edgePoints.size() - 2].x) *
+                          180 / 3.14159265;
+            float hipotenus = gameFile.hitObjects[i].length - totalLength;
+            float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+            float ydiff = sqrt(std::abs(hipotenus * hipotenus - xdiff * xdiff));
+            int ything = 1;
+            if (angle < 0.0f) {
+              ything = -1;
+            } else if (angle == 0.0f) {
+              ything = 0;
+            }
+
+            Vector2 extraPosition = {edgePoints[edgePoints.size() - 1].x + xdiff,
+                                    edgePoints[edgePoints.size() - 1].y -
+                                        ydiff * (float)ything};
           }
-
-          Vector2 extraPosition = {edgePoints[edgePoints.size() - 1].x + xdiff,
-                                   edgePoints[edgePoints.size() - 1].y -
-                                       ydiff * (float)ything};
-
           gameFile.hitObjects[i].totalLength = totalLength;
           gameFile.hitObjects[i].lengths = lineLengths;
           gameFile.hitObjects[i].extraPos = extraPosition;
@@ -1532,25 +1565,32 @@ void GameManager::loadGame(std::string filename) {
                            2)));
             for (size_t j = 0; j < lineLengths.size(); j++)
               totalLength += lineLengths[j];
-            float angle = atan2(edgePoints[edgePoints.size() - 1].y -
-                                    edgePoints[edgePoints.size() - 2].y,
-                                edgePoints[edgePoints.size() - 1].x -
-                                    edgePoints[edgePoints.size() - 2].x) *
-                          180 / 3.14159265;
-            float hipotenus = gameFile.hitObjects[i].length - totalLength;
-            float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-            float ydiff = sqrt(std::abs(hipotenus * hipotenus - xdiff * xdiff));
-            int ything = 1;
-            if (angle < 0.0f) {
-              ything = -1;
-            } else if (angle == 0.0f) {
-              ything = 0;
+            // this is undocumented behaviour. here i have no choice but to read the source code... forgive me.
+            size_t last = edgePoints.size() - 1;
+            bool lastSegmentZero = AreSame(edgePoints[last].x, edgePoints[last - 1].x) &&
+                          AreSame(edgePoints[last].y, edgePoints[last - 1].y);
+            
+            Vector2 extraPosition = edgePoints[last];
+            if (!lastSegmentZero){
+              float angle = atan2(edgePoints[edgePoints.size() - 1].y -
+                                      edgePoints[edgePoints.size() - 2].y,
+                                  edgePoints[edgePoints.size() - 1].x -
+                                      edgePoints[edgePoints.size() - 2].x) *
+                            180 / 3.14159265;
+              float hipotenus = gameFile.hitObjects[i].length - totalLength;
+              float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+              float ydiff = sqrt(std::abs(hipotenus * hipotenus - xdiff * xdiff));
+              int ything = 1;
+              if (angle < 0.0f) {
+                ything = -1;
+              } else if (angle == 0.0f) {
+                ything = 0;
+              }
+
+              Vector2 extraPosition = {
+                  edgePoints[edgePoints.size() - 1].x + xdiff,
+                  edgePoints[edgePoints.size() - 1].y - ydiff * (float)ything};
             }
-
-            Vector2 extraPosition = {
-                edgePoints[edgePoints.size() - 1].x + xdiff,
-                edgePoints[edgePoints.size() - 1].y - ydiff * (float)ything};
-
             gameFile.hitObjects[i].curveType = 'L';
 
             gameFile.hitObjects[i].totalLength = totalLength;
@@ -2838,8 +2878,8 @@ std::vector<Vector2> interpolate2(std::vector<Vector2> &coordinates,
 int *GameManager::sliderPreInit(HitObjectData data) {
   bool durationNull = false;
   double templength = data.length;
-  if (data.length < 1) {
-    data.length = 1;
+  if (data.length <= 1) {
+    data.length = 2;
     durationNull = true;
   }
 
@@ -3127,18 +3167,21 @@ int *GameManager::sliderPreInit(HitObjectData data) {
       std::__throw_invalid_argument("Invalid Slider type!");
     }
   }
-  for (size_t i = 0; i < renderPointsSize; i++) {
-    if (renderPoints[i].x < Global.sliderMinimumX) {
-      renderPoints[i].x = Global.sliderMinimumX;
-    }
-    if (renderPoints[i].y < Global.sliderMinimumY) {
-      renderPoints[i].y = Global.sliderMinimumY;
-    }
-    if (renderPoints[i].x > Global.sliderMaximumX) {
-      renderPoints[i].x = Global.sliderMaximumX;
-    }
-    if (renderPoints[i].y > Global.sliderMaximumY) {
-      renderPoints[i].y = Global.sliderMaximumY;
+
+  if(!Global.meshSliders){
+    for (size_t i = 0; i < renderPointsSize; i++) {
+      if (renderPoints[i].x < Global.sliderMinimumX) {
+        renderPoints[i].x = Global.sliderMinimumX;
+      }
+      if (renderPoints[i].y < Global.sliderMinimumY) {
+        renderPoints[i].y = Global.sliderMinimumY;
+      }
+      if (renderPoints[i].x > Global.sliderMaximumX) {
+        renderPoints[i].x = Global.sliderMaximumX;
+      }
+      if (renderPoints[i].y > Global.sliderMaximumY) {
+        renderPoints[i].y = Global.sliderMaximumY;
+      }
     }
   }
 

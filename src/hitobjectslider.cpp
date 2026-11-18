@@ -187,7 +187,7 @@ void Slider::init() {
   // double templength = data.length;
 
   // If length is smaller than one, we basically have only one point?
-  if (data.length < 1) {
+  if (data.length <= 1) {
     data.length = 1;
     durationNull = true;
   }
@@ -363,25 +363,38 @@ void Slider::init() {
           }
         }
         if (renderPoints.size() < data.length) {
-          float angle = atan2(renderPoints[renderPoints.size() - 1].y -
-                                  renderPoints[renderPoints.size() - 2].y,
-                              renderPoints[renderPoints.size() - 1].x -
-                                  renderPoints[renderPoints.size() - 2].x) *
-                        180 / 3.14159265;
-          float hipotenus = data.length - totalLength;
-          float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
-          float ydiff = sqrt(hipotenus * hipotenus - xdiff * xdiff);
-          extraPosition = {renderPoints[renderPoints.size() - 1].x + xdiff,
-                           renderPoints[renderPoints.size() - 1].y -
-                               ydiff * (angle / std::abs(angle))};
-          int lerploc = renderPoints.size() - 1;
-          int res = 0;
-          for (float i = 1.0 / hipotenus; i <= 1; i += 1.0 / hipotenus) {
-            res++;
-            if (res > hipotenus)
-              break;
-            renderPoints.push_back(
-                lerp(renderPoints[lerploc], extraPosition, i));
+          size_t last = renderPoints.size() - 1;
+          bool lastSegmentZero =
+              last >= 1 &&
+              AreSame(renderPoints[last].x, renderPoints[last - 1].x) &&
+              AreSame(renderPoints[last].y, renderPoints[last - 1].y);
+          if (!lastSegmentZero) {
+            float angle = atan2(renderPoints[renderPoints.size() - 1].y -
+                                    renderPoints[renderPoints.size() - 2].y,
+                                renderPoints[renderPoints.size() - 1].x -
+                                    renderPoints[renderPoints.size() - 2].x) *
+                          180 / 3.14159265;
+            float hipotenus = data.length - totalLength;
+            float xdiff = hipotenus * cos(-angle * 3.14159265 / 180.0f);
+            float ydiff = sqrt(hipotenus * hipotenus - xdiff * xdiff);
+            extraPosition = {renderPoints[renderPoints.size() - 1].x + xdiff,
+                             renderPoints[renderPoints.size() - 1].y -
+                                 ydiff * (angle / std::abs(angle))};
+            int lerploc = renderPoints.size() - 1;
+            int res = 0;
+            for (float i = 1.0 / hipotenus; i <= 1; i += 1.0 / hipotenus) {
+              res++;
+              if (res > hipotenus)
+                break;
+              renderPoints.push_back(
+                  lerp(renderPoints[lerploc], extraPosition, i));
+            }
+          }
+          else{
+            // bruh
+            while(renderPoints.size() < data.length){
+              renderPoints.push_back(renderPoints[last]);
+            }
           }
         }
         while (!false) {
@@ -594,17 +607,19 @@ void Slider::init() {
     }
   }
   for (size_t i = 0; i < renderPoints.size(); i++) { // Global.sliderMinimumX
-    if (renderPoints[i].x < Global.sliderMinimumX) {
-      renderPoints[i].x = Global.sliderMinimumX;
-    }
-    if (renderPoints[i].y < Global.sliderMinimumY) {
-      renderPoints[i].y = Global.sliderMinimumY;
-    }
-    if (renderPoints[i].x > Global.sliderMaximumX) {
-      renderPoints[i].x = Global.sliderMaximumX;
-    }
-    if (renderPoints[i].y > Global.sliderMaximumY) {
-      renderPoints[i].y = Global.sliderMaximumY;
+    if (!Global.meshSliders) {
+      if (renderPoints[i].x < Global.sliderMinimumX) {
+        renderPoints[i].x = Global.sliderMinimumX;
+      }
+      if (renderPoints[i].y < Global.sliderMinimumY) {
+        renderPoints[i].y = Global.sliderMinimumY;
+      }
+      if (renderPoints[i].x > Global.sliderMaximumX) {
+        renderPoints[i].x = Global.sliderMaximumX;
+      }
+      if (renderPoints[i].y > Global.sliderMaximumY) {
+        renderPoints[i].y = Global.sliderMaximumY;
+      }
     }
     minX = std::min(minX, renderPoints[i].x);
     minY = std::min(minY, renderPoints[i].y);
@@ -896,11 +911,11 @@ void Slider::update() {
     playtick = false;
   }
 
-  if (durationNull or
+  if ((durationNull && gm->currentTime * 1000.0f > data.time) or
       gm->currentTime * 1000.0f >
-          data.time + (data.length / 100) * (data.timing.beatLength) /
-                          (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
-                          data.slides) {
+      data.time + (data.length / 100) * (data.timing.beatLength) /
+                      (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
+                      data.slides) {
 
     // std::cout << "Slides: " << data.slides << " TickCount: " << ticks << "
     // SliderDuration: " << sliderDuration << " Beatlength: " <<
@@ -917,9 +932,8 @@ void Slider::update() {
 
     if (durationNull or
         (data.length / 100) * (data.timing.beatLength) /
-                (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
-                data.slides <=
-            36.0f) {
+            (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides <=
+        36.0f) {
       if (is_hit_at_first) {
         data.point = 3;
         gm->score +=
@@ -1092,12 +1106,15 @@ void Slider::renderMeshBody(float alpha, bool recompute) {
 
   // snake in: head grows during the last third of preempt
   double start = 0.0;
-  double end = clip((now - (data.time - preempt)) / (preempt / 3.0), 0.0, 1.0);
+  double end =
+      Global.snakeIn
+          ? clip((now - (data.time - preempt)) / (preempt / 3.0), 0.0, 1.0)
+          : 1.0;
 
   if (recompute) {
     // snake out:
     double t = now - data.time;
-    if (t >= 0.0) {
+    if (Global.snakeOut && t >= 0.0) {
       double x = t / spanDur;
       int span = std::min(static_cast<int>(std::floor(x)), spans - 1);
       double p = clip(x - span, 0.0, 1.0);
@@ -1259,6 +1276,7 @@ void Slider::render() {
             gm->gameFile.fade_in) /
                1.0f,
            0, 100.0f);
+  float snakeFade = Global.snakeIn ? clampedFade : 1.0f;
   Color renderColor;
   if (Global.meshSliders) {
     data.textureLoaded = false;
@@ -1313,9 +1331,8 @@ void Slider::render() {
             int lastDrawnInnerCircle = last;
 
             for (int i = last;
-                 i <
-                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
-                          (float)(renderPoints.size()));
+                 i < std::min(((float)renderPoints.size() * (snakeFade * 2.0f)),
+                              (float)(renderPoints.size()));
                  i += GMSkip) {
               draw = false;
               if (i < (int)renderPoints.size() and
@@ -1386,9 +1403,8 @@ void Slider::render() {
             rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
 
             for (int i = lastDrawnOuterBorder;
-                 i <
-                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
-                          (float)(renderPoints.size()));
+                 i < std::min(((float)renderPoints.size() * (snakeFade * 2.0f)),
+                              (float)(renderPoints.size()));
                  i += GMSkip) {
               draw = false;
               if (i < (int)renderPoints.size() and
@@ -1457,9 +1473,8 @@ void Slider::render() {
             rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
 
             for (int i = lastDrawnInnerCircle;
-                 i <
-                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
-                          (float)(renderPoints.size()));
+                 i < std::min(((float)renderPoints.size() * (snakeFade * 2.0f)),
+                              (float)(renderPoints.size()));
                  i += GMSkip) {
               draw = false;
               if (i < (int)renderPoints.size() and
@@ -1605,9 +1620,8 @@ void Slider::render() {
             int lastDrawnOuterBorder = last;
             drawn = 0;
             for (int i = last;
-                 i <
-                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
-                          (float)(renderPoints.size()));
+                 i < std::min(((float)renderPoints.size() * (snakeFade * 2.0f)),
+                              (float)(renderPoints.size()));
                  i += GMSkip) {
               // draw = false;
               drawn++;
@@ -1680,9 +1694,8 @@ void Slider::render() {
             // rlEnableDepthTest();
             drawn = 0;
             for (int i = lastDrawnOuterBorder;
-                 i <
-                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
-                          (float)(renderPoints.size()));
+                 i < std::min(((float)renderPoints.size() * (snakeFade * 2.0f)),
+                              (float)(renderPoints.size()));
                  i += GMSkip) {
               // draw = false;
               drawn++;
@@ -1783,9 +1796,8 @@ void Slider::render() {
             // rlEnableDepthTest();
             drawn = 0;
             for (int i = lastDrawnOuterBorder;
-                 i <
-                 std::min(((float)renderPoints.size() * (clampedFade * 2.0f)),
-                          (float)(renderPoints.size()));
+                 i < std::min(((float)renderPoints.size() * (snakeFade * 2.0f)),
+                              (float)(renderPoints.size()));
                  i += GMSkip) {
               // draw = false;
 
@@ -1917,7 +1929,7 @@ void Slider::render() {
         // bool draw = true;
         if ((int)renderPoints.size() > 0) {
           for (int i = last;
-               i < std::min(((float)renderPoints.size() * (clampedFade * 2.5f)),
+               i < std::min(((float)renderPoints.size() * (snakeFade * 2.5f)),
                             (float)(renderPoints.size()));
                i += GMSkip) {
             // draw = false;
@@ -2200,6 +2212,9 @@ void Slider::dead_render() {
   float clampedFade2 =
       (gm->gameFile.fade_in / 2.0f + data.time - gm->currentTime * 1000.0f) /
       (gm->gameFile.fade_in / 2.0f);
+  float clampedFade3 =
+      (gm->gameFile.fade_in / 6.0f + data.time - gm->currentTime * 1000.0f) /
+      (gm->gameFile.fade_in / 6.0f);
 
   clampedFade = clip(clampedFade, 0.0f, 1.0f);
   clampedFade = easeInOutCubic(clampedFade);
@@ -2208,15 +2223,19 @@ void Slider::dead_render() {
   clampedFade2 = easeInOutCubic(clampedFade2);
   clampedFade2 = clampedFade2 * 0.7;
 
+  clampedFade3 = clip(clampedFade3, 0.0f, 1.0f);
+  clampedFade3 = easeInOutCubic(clampedFade3);
+  clampedFade3 = clampedFade3 * 0.7;
+
   if (Global.meshSliders) {
     if (data.textureReady) {
       Global.sliderTexNeedDeleting = true;
       float draw = std::max(meshSnakeStart, meshSnakeEnd);
-      if (!AreSame(meshSnakeStart, meshSnakeEnd)) {
+      if (!AreSame(meshSnakeStart, meshSnakeEnd) && Global.snakeOut) {
         meshSnakeStart = draw;
         meshSnakeEnd = draw;
       }
-      renderMeshBody(clampedFade2, false);
+      renderMeshBody(Global.snakeOut ? clampedFade3 : clampedFade2, false);
       float scale = (gm->currentTime * 1000.0f + gm->gameFile.fade_in / 2.0f -
                      data.time) /
                     (gm->gameFile.fade_in / 2.0f);
@@ -2237,7 +2256,9 @@ void Slider::dead_render() {
         renderColor = Fade(Color{255, 255, 255}, clampedFade2);
       DrawTextureRotate(
           &gm->sliderb, x, y, (gm->circlesize / gm->sliderb.width) * 1.3f, 0,
-          Fade(renderColor, clampedFade2)); // need to save angle, TODO
+          Fade(renderColor, Global.snakeOut
+                                ? clampedFade3
+                                : clampedFade2)); // need to save angle, TODO
       if (followAnim > 0.001f) {
         DrawTextureRotate(&gm->sliderfollow, x, y,
                           (gm->circlesize / gm->sliderfollow.width) * 2.0f *

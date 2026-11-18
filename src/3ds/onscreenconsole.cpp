@@ -330,7 +330,7 @@ void OnScreenConsole::draw() {
         y += lh;
     }
 
-    DrawTextEx(f, TextFormat("FT %.2fms FPS %.1f TPS %.1f", Global.avgFrameTimeMs, Global.avgFPS, Global.avgHZ), (Vector2){(float)x, (float)y}, 10, 1, YELLOW);
+    DrawTextEx(f, TextFormat("made by ohasanov. FT %.2fms FPS %.1f TPS %.1f", Global.avgFrameTimeMs, Global.avgFPS, Global.avgHZ), (Vector2){(float)x, (float)y}, 10, 1, PURPLE);
     y += lh;
 
     DrawRectangle(0, hudHeight - 2, (int)sw, 1, (Color){80,80,100,255});

@@ -153,6 +153,8 @@ void _gpu_start_drawing(GPU_RENDER_TARGET *target) {
   C2D_Prepare();
   if (!Global.frameBegun) {
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    if(Global.meshSliders)
+      MeshVboReset();
     Global.frameBegun = true;
   }
   C2D_SceneBegin(target);

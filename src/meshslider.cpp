@@ -86,9 +86,14 @@ const int LUT_SIZE = 128;
 const int LUT_ROWS = 8;
 const size_t MAX_LUTS = 24; // distinct combo colours kept alive
 const float BORDER_PORTION = 0.192f;
+#ifdef THREEDS_BUILD
+const float AA_PORTION = 0.06f;
+#else
 const float AA_PORTION = 0.02f;
+#endif
 const float OPACITY_AT_EDGE = 0.6f;
 const float OPACITY_AT_CENTRE = 0.6f;
+const float SHADOW_ALPHA = 0.35f;
 
 // Geometry quality is derived from the ON-SCREEN radius so we never spend
 // triangles that are smaller than a fraction of a pixel (3DS: ~10 segments per
@@ -139,40 +144,62 @@ float clipFloat(float v, float lo, float hi) {
   return v;
 }
 
+float smoothstep(float t) {
+  t = clipFloat(t, 0.0f, 1.0f);
+  return t * t * (3.0f - 2.0f * t);
+}
+
 float dotProduct(Vector2 a, Vector2 b) { return a.x * b.x + a.y * b.y; }
 Vector2 addVectors(Vector2 a, Vector2 b) { return {a.x + b.x, a.y + b.y}; }
 Vector2 subVectors(Vector2 a, Vector2 b) { return {a.x - b.x, a.y - b.y}; }
 Vector2 scaleVector(Vector2 v, float s) { return {v.x * s, v.y * s}; }
 
 Color gradientAt(float position, const Color &accent) {
-  if (position < AA_PORTION) {
-    float outerAlpha = clipFloat(position / AA_PORTION, 0.0f, 1.0f);
-    return Fade(WHITE, outerAlpha);
-  }
-  float gradient = clipFloat(
-      (position - BORDER_PORTION) / (1.0f - BORDER_PORTION), 0.0f, 1.0f);
-  float bodyAlpha =
-      OPACITY_AT_EDGE - (OPACITY_AT_EDGE - OPACITY_AT_CENTRE) * gradient;
-  Color bodyColour = Fade(Color{static_cast<unsigned char>(accent.r / 2),
-                                static_cast<unsigned char>(accent.g / 2),
-                                static_cast<unsigned char>(accent.b / 2), 255},
-                          clipFloat(bodyAlpha, 0.0f, 1.0f));
-  const float innerStart = BORDER_PORTION - AA_PORTION * 0.5f;
-  const float innerEnd = BORDER_PORTION + AA_PORTION * 0.5f;
+  if (position >= AA_PORTION) {
+    float gradient = clipFloat(
+        (position - BORDER_PORTION) / (1.0f - BORDER_PORTION), 0.0f, 1.0f);
+    float bodyAlpha =
+        OPACITY_AT_EDGE - (OPACITY_AT_EDGE - OPACITY_AT_CENTRE) * gradient;
+    Color bodyColour = Fade(Color{static_cast<unsigned char>(accent.r / 2),
+                                  static_cast<unsigned char>(accent.g / 2),
+                                  static_cast<unsigned char>(accent.b / 2), 255},
+                            clipFloat(bodyAlpha, 0.0f, 1.0f));
+    const float innerStart = BORDER_PORTION - AA_PORTION * 0.5f;
+    const float innerEnd = BORDER_PORTION + AA_PORTION * 0.5f;
 
-  if (position <= innerStart) {
-    return WHITE;
+    if (position <= innerStart) {
+      return WHITE;
+    }
+    if (position < innerEnd) {
+      float t = smoothstep((position - innerStart) / (innerEnd - innerStart));
+      return Color{
+          static_cast<unsigned char>(255.0f + (bodyColour.r - 255.0f) * t),
+          static_cast<unsigned char>(255.0f + (bodyColour.g - 255.0f) * t),
+          static_cast<unsigned char>(255.0f + (bodyColour.b - 255.0f) * t),
+          static_cast<unsigned char>(255.0f + (bodyColour.a - 255.0f) * t)};
+    }
+    return bodyColour; // well i can make gradients too so ye
   }
-  if (position < innerEnd) {
-    float t = (position - innerStart) / (innerEnd - innerStart);
-    t = t * t * (3.0f - 2.0f * t); // better than lerp, so yea
-    return Color{
-        static_cast<unsigned char>(255.0f + (bodyColour.r - 255.0f) * t),
-        static_cast<unsigned char>(255.0f + (bodyColour.g - 255.0f) * t),
-        static_cast<unsigned char>(255.0f + (bodyColour.b - 255.0f) * t),
-        static_cast<unsigned char>(255.0f + (bodyColour.a - 255.0f) * t)};
+
+  // Outer band: the white border's AA hands off straight into the shadow, so
+  // there is no transparent gap between the two. Shadow peaks at the visual
+  // edge (position 0) and smoothstep-fades out at the rim.
+  float shadowDepth = MESH_SLIDER_SHADOW_SCALE - 1.0f;
+  float whiteA = clipFloat(position / AA_PORTION, 0.0f, 1.0f);
+  float shadowA;
+  if (position >= 0.0f)
+    shadowA = SHADOW_ALPHA * (1.0f - whiteA);
+  else
+    shadowA = SHADOW_ALPHA * (1.0f - smoothstep(-position / shadowDepth));
+
+  float outA = whiteA + shadowA * (1.0f - whiteA);
+  Color out = {0, 0, 0, static_cast<unsigned char>(outA * 255.0f)};
+  if (outA > 0.0f) {
+    out.r = static_cast<unsigned char>(255.0f * whiteA / outA);
+    out.g = out.r;
+    out.b = out.r;
   }
-  return bodyColour; // well i can make gradients too so ye
+  return out;
 }
 
 // u (0 = centre line, 1 = rim)
@@ -191,7 +218,7 @@ void renderLut(RenderTexture2D &target, const Color &accent) {
   rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
   for (int x = 0; x < LUT_SIZE; x++) {
     float u = (float)x / (LUT_SIZE - 1);
-    Color colour = gradientAt(1.0f - u, accent);
+    Color colour = gradientAt(1.0f - u * MESH_SLIDER_SHADOW_SCALE, accent);
     DrawRectangleV({x, 0.0f},
                    {1.0f, LUT_ROWS}, colour);
   }
@@ -542,6 +569,9 @@ void MeshSliderFreeResources() {
   lutEvictCursor = 0;
   allocatedWidth = 0;
   allocatedHeight = 0;
+#ifdef THREEDS_BUILD
+  MeshVboFree();
+#endif
 }
 
 void MeshSliderRender(const MeshSliderDrawData &data) {
@@ -563,7 +593,7 @@ void MeshSliderRender(const MeshSliderDrawData &data) {
 
   MeshSliderCache localCache;
   MeshSliderCache &cache = data.cache ? *data.cache : localCache;
-  refreshCache(cache, *data.points, data.radius);
+  refreshCache(cache, *data.points, data.radius * MESH_SLIDER_SHADOW_SCALE);
 
   bool full = data.startProgress <= 0.0f && data.endProgress >= 1.0f;
   if (!full)
@@ -572,19 +602,19 @@ void MeshSliderRender(const MeshSliderDrawData &data) {
   if (visible.empty())
     return;
 
-  Quality quality = qualityFor(data.radius);
+  Quality quality = qualityFor(data.radius * MESH_SLIDER_SHADOW_SCALE);
   std::vector<TexturedVertex> *meshPtr;
   if (full) {
     if (!cache.meshValid || cache.meshW != allocatedWidth ||
         cache.meshH != allocatedHeight) {
-      buildMesh(visible, data.radius, quality, cache.dirs, cache.mesh);
+      buildMesh(visible, data.radius * MESH_SLIDER_SHADOW_SCALE, quality, cache.dirs, cache.mesh);
       cache.meshW = allocatedWidth;
       cache.meshH = allocatedHeight;
       cache.meshValid = true;
     }
     meshPtr = &cache.mesh;
   } else {
-    buildMesh(visible, data.radius, quality, cache.dirs, cache.partialMesh);
+    buildMesh(visible, data.radius * MESH_SLIDER_SHADOW_SCALE, quality, cache.dirs, cache.partialMesh);
     meshPtr = &cache.partialMesh;
   }
   std::vector<TexturedVertex> &vertices = *meshPtr;
@@ -603,10 +633,10 @@ void MeshSliderRender(const MeshSliderDrawData &data) {
   }
   // todo, this outer box check could be way better?
 
-  Vector2 screenTL = {ScaleCordX(minX - 1.2f * data.radius),
-                      ScaleCordY(minY - 1.2f * data.radius)};
-  Vector2 screenBR = {ScaleCordX(maxX + 1.2f * data.radius),
-                      ScaleCordY(maxY + 1.2f * data.radius)};
+  Vector2 screenTL = {ScaleCordX(minX - 1.2f * data.radius * MESH_SLIDER_SHADOW_SCALE),
+                      ScaleCordY(minY - 1.2f * data.radius * MESH_SLIDER_SHADOW_SCALE)};
+  Vector2 screenBR = {ScaleCordX(maxX + 1.2f * data.radius * MESH_SLIDER_SHADOW_SCALE),
+                      ScaleCordY(maxY + 1.2f * data.radius * MESH_SLIDER_SHADOW_SCALE)};
   // small margins for a bit more space i guess?
 
   int screenX = clipFloat(std::min(screenTL.x, screenBR.x), 0.0f, screenWidth);
@@ -619,9 +649,9 @@ void MeshSliderRender(const MeshSliderDrawData &data) {
     return;
 
   Vector2 targetTL =
-      toTarget({minX - 1.2f * data.radius, minY - 1.2f * data.radius});
+      toTarget({minX - 1.2f * data.radius * MESH_SLIDER_SHADOW_SCALE, minY - 1.2f * data.radius * MESH_SLIDER_SHADOW_SCALE});
   Vector2 targetBR =
-      toTarget({maxX + 1.2f * data.radius, maxY + 1.2f * data.radius});
+      toTarget({maxX + 1.2f * data.radius * MESH_SLIDER_SHADOW_SCALE, maxY + 1.2f * data.radius * MESH_SLIDER_SHADOW_SCALE});
   int targetX =
       clipFloat(std::min(targetTL.x, targetBR.x), 0.0f, allocatedWidth);
   int targetY =

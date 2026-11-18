@@ -286,6 +286,7 @@ struct Globals {
     // 3DS spesific memory debug
     u32 linearSpaceFree = 0;
     // Hard limits for the points on a slider, clamps to 4:3 quasi
+    // for mesh sliders its not even needed i think?
     float sliderMinimumX = 0.0f; // -150
     float sliderMinimumY = 0.0f; // -150
     float sliderMaximumX = 640.0f; // 790
@@ -339,6 +340,8 @@ struct Globals {
         bool polygonalRendering = true;
     #endif
     bool meshSliders = false;
+    bool snakeIn = true;
+    bool snakeOut = true;
     // IDK honestly, this does something important
     Globals() = default;
     bool ScaleUpdated = true;

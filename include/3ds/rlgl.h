@@ -171,6 +171,8 @@ void DrawTriangleStrip(Vector2 *points, int pointCount, Color color);           
 
 struct TexturedVertex; // apparently i have created circular dependancies. shit.
 void DrawTexturedTrianglesDepth(Texture2D*, const TexturedVertex*, int, Color);
+void MeshVboReset();
+void MeshVboFree();
 void rlDrawRenderBatchActive();
 
 

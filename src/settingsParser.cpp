@@ -137,6 +137,14 @@ void parseSettings(){
                             Global.touchScreenTouchEnabled = (bool)std::stoi(keyValue.second);
                             std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set touchScreenTouchEnabled to: " << (bool)std::stoi(keyValue.second) << std::endl;                      
                         }
+                        else if(keyValue.first == "snakeIn"){
+                            Global.snakeIn = (bool)std::stoi(keyValue.second);
+                            std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set snakeIn to: " << (bool)std::stoi(keyValue.second) << std::endl;
+                        }
+                        else if(keyValue.first == "snakeOut"){
+                            Global.snakeOut = (bool)std::stoi(keyValue.second);
+                            std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m" << "set snakeOut to: " << (bool)std::stoi(keyValue.second) << std::endl;
+                        }
 
 					}
 					break;

@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <vector>
 
+constexpr float MESH_SLIDER_SHADOW_SCALE = 1.06f;
+
 // Holds the simplified center line + arc lengths so that
 // the path is simplified once, not every frame (per frame simplification of a
 // snaking subpath made the vertices pop around),
