@@ -103,7 +103,7 @@ void SettingsMenu::init() {
       Rectangle{rightMostX - 115, bottomMostY - 10 - 40, 105, 40};
   change->internalBox.SetBox(change->textRect);
 
-  leftSideBox.SetFontSize(30.08f);
+  leftSideBox.SetFontSize(MenuFontSize(20));
   leftSideBox.SetSpacing(2);
   leftSideBox.SetWrapWords(true);
   leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40,

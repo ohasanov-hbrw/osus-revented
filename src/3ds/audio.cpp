@@ -594,12 +594,21 @@ Music LoadMusicStream(const char *filename){
     return music;
 }
 
+static void ClearSoundChannels() {
+  for (int i = 0; i < 24; i++) {
+    Global.channelOccupied[i] = false;
+    Global.soundAtChannel[i] = NULL;
+  }
+}
+
 void UnloadSound(Sound *sound){
     if(sound->loaded){
         for(int i = 1; i < 24; i++){
             ndspChnReset(i);
             ndspChnWaveBufClear(i);
         }
+        ClearSoundChannels();
+        sound->id = 0;
         linearFree((void *)sound->waveBuf.data_vaddr);
         Global.totalNumOfSamples -= sound->sampleSize;
         sound->loaded = false;
@@ -628,6 +637,7 @@ void UnloadMusicStream(Music *music){
             ndspChnReset(i);
             ndspChnWaveBufClear(i);
         }
+        ClearSoundChannels();
         music->loaded = false;
         music->playing = false;
         if(!music->oggplayback){

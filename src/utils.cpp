@@ -491,18 +491,26 @@ void DrawTextureOnCircle(Texture2D *tex, float x, float y, float rad, float s,
 void DrawTextCenter(const char *text, float x, float y, float s, Color color) {
   // draw centered text
   Vector2 size = MeasureTextEx(&Global.DefaultFont, text, s, 2);
-  DrawTextPro(&Global.DefaultFont, text,
-              ScaleCords(Vector2{x - size.x / 2.0f, y - size.y / 2.0f}),
-              Vector2{0, 0}, 0, Scale(s), Scale(1), color);
+  Vector2 pos = ScaleCords(Vector2{x - size.x / 2.0f, y - size.y / 2.0f});
+#ifdef THREEDS_BUILD
+  pos.x = (float)((int)pos.x);
+  pos.y = (float)((int)pos.y);
+#endif
+  DrawTextPro(&Global.DefaultFont, text, pos, Vector2{0, 0}, 0, Scale(s),
+              Scale(2), color);
 }
 
 // Lay text from the left
 void DrawTextLeft(const char *text, float x, float y, float s, Color color) {
   // draw text LTR
   Vector2 size = MeasureTextEx(&Global.DefaultFont, text, s, 2);
-  DrawTextPro(&Global.DefaultFont, text,
-              ScaleCords(Vector2{x, y - size.y / 2.0f}), Vector2{0, 0}, 0,
-              Scale(s), Scale(1), color);
+  Vector2 pos = ScaleCords(Vector2{x, y - size.y / 2.0f});
+#ifdef THREEDS_BUILD
+  pos.x = (float)((int)pos.x);
+  pos.y = (float)((int)pos.y);
+#endif
+  DrawTextPro(&Global.DefaultFont, text, pos, Vector2{0, 0}, 0, Scale(s),
+              Scale(2), color);
 }
 
 // Draw a number from the left using the osu skin assets
@@ -984,18 +992,24 @@ void DrawTextStyled(Font *font, const char *text, Vector2 position,
         increaseX +=
             ((float)font->glyphs[index].advanceX * scaleFactor + spacing);
 
+      float glyphX = position.x + textOffsetX;
+      float glyphY = position.y + textOffsetY;
+#ifdef THREEDS_BUILD
+      // Snap each glyph to whole pixels; accumulated fractional offsets make
+      // later characters render inconsistently with the point-filtered font.
+      glyphX = (float)((int)glyphX);
+      glyphY = (float)((int)glyphY);
+#endif
+
       // Draw background rectangle color (if required)
       if (colBack.a > 0)
-        DrawRectangleRec((Rectangle){position.x + textOffsetX,
-                                     position.y + textOffsetY - backRecPadding,
-                                     increaseX, fontSize + 2 * backRecPadding},
+        DrawRectangleRec((Rectangle){glyphX, glyphY - backRecPadding, increaseX,
+                                     fontSize + 2 * backRecPadding},
                          colBack);
 
       if ((codepoint != ' ') && (codepoint != '\t')) {
-        DrawTextCodepoint(
-            font, codepoint,
-            (Vector2){position.x + textOffsetX, position.y + textOffsetY},
-            fontSize, colFront);
+        DrawTextCodepoint(font, codepoint, (Vector2){glyphX, glyphY}, fontSize,
+                          colFront);
       }
 
       textOffsetX += increaseX;

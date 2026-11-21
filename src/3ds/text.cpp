@@ -498,8 +498,9 @@ int GetCodepointNext(const char *text, int *codepointSize){
 
 int GetGlyphIndex(Font *font, int codepoint){
     //No support for unordered glyphs yet
-    int index = 0;
-    index = codepoint - 32;
+    int index = codepoint - 32;
+    if (index < 0 || index >= font->glyphCount)
+        index = '?' - 32;
     return index;
 }
 

@@ -61,7 +61,11 @@ int countExtractedEntry(const char *filename, void *arg) {
 }
 
 std::string shortName(const std::string &name, size_t maxChars = 24) {
-  return name.size() <= maxChars ? name : name.substr(0, maxChars - 3) + "...";
+  std::string safe;
+  safe.reserve(name.size());
+  for (unsigned char c : name)
+    safe += (c < 128) ? (char)c : '?';
+  return safe.size() <= maxChars ? safe : safe.substr(0, maxChars - 3) + "...";
 }
 } // namespace
 
@@ -125,9 +129,13 @@ void LoadMenu::render() {
     float fontSize = MenuFontSize(20);
     Vector2 textSize = MeasureTextEx(&Global.DefaultFont,
                                            statusMessage.c_str(), fontSize, 2);
-    DrawTextEx(&Global.DefaultFont, statusMessage.c_str(),
-               ScaleCords({320.0f - textSize.x / 2.0f,
-                           108.0f - textSize.y / 2.0f}),
+    Vector2 pos = ScaleCords({320.0f - textSize.x / 2.0f,
+                              108.0f - textSize.y / 2.0f});
+#ifdef THREEDS_BUILD
+    pos.x = (float)((int)pos.x);
+    pos.y = (float)((int)pos.y);
+#endif
+    DrawTextEx(&Global.DefaultFont, statusMessage.c_str(), pos,
                Scale(fontSize), Scale(2), statusColor);
   }
 

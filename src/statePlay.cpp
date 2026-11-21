@@ -209,7 +209,7 @@ void PlayMenu::init() {
   hitsoundVolume.internalBox.SetFontSize(15.05);
   musicVolume.internalBox.SetFontSize(15.05);
   leftSideBox.SetText(leftSideFormatted);
-  leftSideBox.SetFontSize(30.08f);
+  leftSideBox.SetFontSize(MenuFontSize(20));
   leftSideBox.SetSpacing(2);
   leftSideBox.SetWrapWords(true);
   leftSideBox.SetBox((Rectangle){leftMostX + 20, topMostY + 40,

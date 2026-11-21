@@ -141,6 +141,8 @@ long long int _os_get_free_linear_ram() {
 
 bool _os_should_program_run() {
 #ifdef THREEDS_BUILD
+  if (aptShouldJumpToHome())
+    return false;
   return aptMainLoop();
 #endif
 #ifndef THREEDS_BUILD

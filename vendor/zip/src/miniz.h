@@ -1133,7 +1133,7 @@ extern "C" {
 enum {
   /* Note: These enums can be reduced as needed to save memory or stack space -
      they are pretty conservative. */
-  MZ_ZIP_MAX_IO_BUF_SIZE = 8 * 1024,
+  MZ_ZIP_MAX_IO_BUF_SIZE = 64 * 1024,
   MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE = 512,
   MZ_ZIP_MAX_ARCHIVE_FILE_COMMENT_SIZE = 512
 };
@@ -7263,6 +7263,8 @@ mz_bool mz_zip_reader_extract_to_file(mz_zip_archive *pZip, mz_uint file_index,
   pFile = MZ_FOPEN(pDst_filename, "wb");
   if (!pFile)
     return mz_zip_set_error(pZip, MZ_ZIP_FILE_OPEN_FAILED);
+
+  setvbuf(pFile, NULL, _IOFBF, MZ_ZIP_MAX_IO_BUF_SIZE);
 
   status = mz_zip_reader_extract_to_callback(
       pZip, file_index, mz_zip_file_write_callback, pFile, flags);

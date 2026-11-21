@@ -75,7 +75,7 @@ public:
         if (hAlign != HAlign::Left) {
           Vector2 textSize =
               MeasureTextEx(&Global.DefaultFont, m_cachedLines[i].c_str(),
-                            (float)Scale(m_fontSize), (float)Scale(m_spacing) * m_fontSize / 20.f);
+                            (float)Scale(m_fontSize), (float)Scale(m_spacing));
           if (hAlign == HAlign::Center) {
             xPos = ScaleRect(m_box).x +
                    (ScaleRect(m_box).width - textSize.x) / 2.0f;
@@ -85,7 +85,7 @@ public:
         }
 
         DrawTextStyled(&Global.DefaultFont, m_cachedLines[i].c_str(), Vector2{xPos, currentY},
-                       (float)Scale(m_fontSize), (float)Scale(m_spacing) * m_fontSize / 20.f,
+                       (float)Scale(m_fontSize), (float)Scale(m_spacing),
                        color);
       }
     }
