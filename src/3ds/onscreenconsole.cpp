@@ -269,8 +269,8 @@ void OnScreenConsole::draw() {
     long long pagesUsed  = mi.arena / 1024;
     long long pagesFree  = pagesTotal - pagesUsed;
 
-    long long allFree = _os_get_free_ram(MEMREGION_ALL) / 1024;
-    long long allTotal = _os_get_size_ram(MEMREGION_ALL) / 1024;
+    //long long allFree = _os_get_free_ram(MEMREGION_ALL) / 1024;
+    //long long allTotal = _os_get_size_ram(MEMREGION_ALL) / 1024;
 
     double budget = 1000.0 / (double)(Global.TPS > 0 ? Global.TPS : 1);
     double avgSleep = Global.avgSleepMs;
@@ -286,11 +286,11 @@ void OnScreenConsole::draw() {
     int lh = 10;
     Font *f = &Global.DefaultFont;
 
-    DrawRectangle(0, 0, (int)sw, (int)sh, (Color){16, 16, 24, 255});
+    DrawRectangle(0, 0, (int)sw, (int)sh, Global.Background);
     DrawMemBar(f, x, y, (int)sw, "LIN", linFree, linTotal, sw); y += lh;
     DrawMemBar(f, x, y, (int)sw, "HEA", heapFree, heapTotal, sw); y += lh;
     DrawMemBar(f, x, y, (int)sw, "PGE", pagesFree, pagesTotal, sw); y += lh;
-    DrawMemBar(f, x, y, (int)sw, "ALL", allFree, allTotal, sw); y += lh;
+    //DrawMemBar(f, x, y, (int)sw, "ALL", allFree, allTotal, sw); y += lh;
 
     {
         double vtotal = 6144.0;

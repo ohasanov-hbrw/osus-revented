@@ -160,10 +160,14 @@ Color gradientAt(float position, const Color &accent) {
         (position - BORDER_PORTION) / (1.0f - BORDER_PORTION), 0.0f, 1.0f);
     float bodyAlpha =
         OPACITY_AT_EDGE - (OPACITY_AT_EDGE - OPACITY_AT_CENTRE) * gradient;
-    Color bodyColour = Fade(Color{static_cast<unsigned char>(accent.r / 2),
-                                  static_cast<unsigned char>(accent.g / 2),
-                                  static_cast<unsigned char>(accent.b / 2), 255},
-                            clipFloat(bodyAlpha, 0.0f, 1.0f));
+    float bright = 0.5f;
+    if (!Global.flatSliders)
+      bright = 0.5f + 0.5f * smoothstep(gradient); // rim -> centre: accent/2 -> accent
+    Color bodyColour = Fade(
+        Color{static_cast<unsigned char>(accent.r * bright),
+              static_cast<unsigned char>(accent.g * bright),
+              static_cast<unsigned char>(accent.b * bright), 255},
+        clipFloat(bodyAlpha, 0.0f, 1.0f));
     const float innerStart = BORDER_PORTION - AA_PORTION * 0.5f;
     const float innerEnd = BORDER_PORTION + AA_PORTION * 0.5f;
 
@@ -231,8 +235,8 @@ void renderLut(RenderTexture2D &target, const Color &accent) {
 // So that we dont constantly redraw the lut, we sacrifice some memory
 // but cache em. 
 RenderTexture2D *getLut(const Color &accent) {
-  uint32_t key = (uint32_t(accent.r) << 16) | (uint32_t(accent.g) << 8) |
-                 uint32_t(accent.b);
+  uint32_t key = (uint32_t(accent.r) << 17) | (uint32_t(accent.g) << 9) |
+                 (uint32_t(accent.b) << 1) | (Global.flatSliders ? 1 : 0);
   for (size_t i = 0; i < lutCount; i++)
     if (luts[i].key == key)
       return &luts[i].target;
@@ -268,7 +272,7 @@ void dedupePoints(std::vector<Vector2> &p, float eps) {
 // Ramer-Douglas-Peucker with an explicit error bound
 // check wikipedia, actually cool algorithm
 std::vector<Vector2> simplifyPath(const std::vector<Vector2> &pts, float eps) {
-  int n = static_cast<int>(pts.size());
+  int n = (int)(pts.size());
   if (n <= 2)
     return pts;
   int numkeep = 2;
@@ -333,7 +337,7 @@ Quality qualityFor(float radius) {
     rPx = 1.0f;
   float dTheta =
       2.0f * acosf(clipFloat(1.0f - MESHSLIDER_SAG_PX / rPx, -1.0f, 1.0f));
-  int cap = static_cast<int>(ceilf(PI / std::max(dTheta, 0.01f)));
+  int cap = (int)(ceilf(PI / std::max(dTheta, 0.01f)));
   #ifdef THREEDS_BUILD
   cap = std::max(6, std::min(24, cap));
   #else
@@ -348,9 +352,16 @@ Quality qualityFor(float radius) {
 void refreshCache(MeshSliderCache &c, const std::vector<Vector2> &src,
                   float radius) {
   if (!c.points.empty() && c.srcData == src.data() &&
-      c.srcCount == src.size() && AreSame(c.radius, radius))
+      c.srcCount == src.size() && AreSame(c.radius, radius) &&
+      c.meshW == allocatedWidth && c.meshH == allocatedHeight)
     return;
-  c.points = simplifyPath(src, qualityFor(radius).epsilon);
+  float eps = qualityFor(radius).epsilon;
+  float threshold = std::max(1.0f, Global.adaptiveRdpThreshold);
+  if (src.size() > threshold) {
+    float factor = sqrtf(src.size() / threshold);
+    eps *= clipFloat(factor, 1.0f, 8.0f);
+  }
+  c.points = simplifyPath(src, eps); // Long sliders are just pain bruh
   c.meshValid = false;
   dedupePoints(c.points, 0.01f);
   c.arcLength.assign(c.points.size(), 0.0f);
@@ -365,49 +376,65 @@ void refreshCache(MeshSliderCache &c, const std::vector<Vector2> &src,
   size_t n = c.points.size();
   size_t maxVerts =
       (n > 1 ? (n - 1) * 15 : 0) + qualityFor(radius).capSegments * 6;
+  c.mesh.clear();
   c.mesh.reserve(maxVerts);
-  c.partialMesh.reserve(maxVerts);
-  c.dirs.reserve(n > 1 ? n - 1 : 0);
-  c.partialPoints.reserve(n);
+  c.dirs.clear();
+  c.dirs.resize(n > 1 ? n - 1 : 0);
+  for (size_t i = 0; i + 1 < n; i++) {
+    Vector2 d = subVectors(c.points[i + 1], c.points[i]);
+    float len = sqrtf(dotProduct(d, d));
+    c.dirs[i] = len > 1e-6f ? scaleVector(d, 1.0f / len) : Vector2{1.0f, 0.0f};
+  }
+  c.segStart.assign(n > 1 ? n - 1 : 0, 0);
+  c.joinStart.assign(n, 0);
+  c.joinCount.assign(n, 0);
+  c.cap0Start = c.cap1Start = 0;
+  c.builtVerts = 0;
+  c.builtSeg = 0;
+  c.builtJoin = 0;
+  c.cap0Done = c.cap1Done = false;
+  c.meshValid = true;
+  c.meshW = allocatedWidth;
+  c.meshH = allocatedHeight;
 }
 
-// Visible part of the path between two progress values, by TRUE arc length,
-// with interpolated cut points (smooth head / tail movement).
-void cutPath(const MeshSliderCache &c, float startProgress, float endProgress,
-             std::vector<Vector2> &out) {
-  out.clear();
-  size_t n = c.points.size();
-  if (n < 2) {
-    out = c.points;
-    return;
-  }
-  out.reserve(c.points.size() + 1);
-  float total = c.arcLength.back();
-  float d0 = clipFloat(startProgress, 0.0f, 1.0f) * total;
-  float d1 = clipFloat(endProgress, 0.0f, 1.0f) * total;
-  if (d1 <= d0)
-    d1 = d0 + 0.01f; // keep a dot (head/tail circle) alive
+// Index of the segment whose arc-length span contains d, and the point on the
+// centerline at arc length d (linearly interpolated within that segment).
+// Both cuts always land on a segment, so interior vertices never need
+// regenerating - only the ridge/cap at the moving cut.
 
-  auto pointAt = [&](float d) -> Vector2 {
-    size_t i = static_cast<size_t>(
-        std::upper_bound(c.arcLength.begin(), c.arcLength.end(), d) -
-        c.arcLength.begin());
-    if (i == 0)
-      return c.points[0];
-    if (i >= n)
-      return c.points[n - 1];
-    float seg = c.arcLength[i] - c.arcLength[i - 1];
-    float t = seg > 0.0f ? (d - c.arcLength[i - 1]) / seg : 0.0f;
-    Vector2 a = c.points[i - 1], b = c.points[i];
-    return {a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t};
-  };
+// This saves so much memory and cpu that its not even funny
+int segmentAt(const MeshSliderCache &c, float d) {
+  int n = c.points.size();
+  if (n < 2)
+    return 0;
+  int i = 
+      std::upper_bound(c.arcLength.begin(), c.arcLength.end(), d) -
+      c.arcLength.begin();
+  if (i == 0)
+    return 0;
+  if (i >= n)
+    return n - 2;
+  return i - 1;
+}
 
-  out.push_back(pointAt(d0));
-  for (size_t i = 0; i < n; i++)
-    if (c.arcLength[i] > d0 && c.arcLength[i] < d1)
-      out.push_back(c.points[i]);
-  out.push_back(pointAt(d1));
-  dedupePoints(out, 0.0005f);
+Vector2 pointAt(const MeshSliderCache &c, float d) {
+  int n = c.points.size();
+  if (n == 0)
+    return {0.0f, 0.0f};
+  if (n == 1)
+    return c.points[0];
+  int i = 
+      std::upper_bound(c.arcLength.begin(), c.arcLength.end(), d) -
+      c.arcLength.begin();
+  if (i == 0)
+    return c.points[0];
+  if (i >= n)
+    return c.points[n - 1];
+  float seg = c.arcLength[i] - c.arcLength[i - 1];
+  float t = seg > 0.0f ? (d - c.arcLength[i - 1]) / seg : 0.0f;
+  Vector2 a = c.points[i - 1], b = c.points[i];
+  return {a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t};
 }
 
 // target coords are inverted on pc/opengl
@@ -444,96 +471,117 @@ void emitTriangle(std::vector<TexturedVertex> &out, Vector2 a, float ua,
   emitVertex(out, c, uc);
 }
 
-// pts: simplified+cut centre line (deduped), radius in playfield units.
-void buildMesh(const std::vector<Vector2> &pts, float radius, const Quality &q,
-               std::vector<Vector2> &dirs, std::vector<TexturedVertex> &out) {
-  out.clear();
-  int n = static_cast<int>(pts.size());
-  if (n == 0)
+// Geometry emitters. Each writes 3*steps TexturedVertex.
+// One ridge for segment a->b. 12 vertices (4 triangles).
+void emitRidge(std::vector<TexturedVertex> &out, Vector2 a, Vector2 b,
+               Vector2 dir, float radius) {
+  Vector2 nrm = {-dir.y, dir.x};
+  Vector2 off = scaleVector(nrm, radius);
+  Vector2 al = addVectors(a, off), ar = subVectors(a, off);
+  Vector2 bl = addVectors(b, off), br = subVectors(b, off);
+  emitTriangle(out, al, 1.0f, bl, 1.0f, b, 0.0f);
+  emitTriangle(out, al, 1.0f, b, 0.0f, a, 0.0f);
+  emitTriangle(out, a, 0.0f, b, 0.0f, br, 1.0f);
+  emitTriangle(out, a, 0.0f, br, 1.0f, ar, 1.0f);
+}
+
+// Round outer join at point k
+int emitJoin(std::vector<TexturedVertex> &out, const MeshSliderCache &c, int k,
+             float radius, const Quality &q) {
+  Vector2 d0 = c.dirs[k - 1], d1 = c.dirs[k];
+  float cross = d0.x * d1.y - d0.y * d1.x;
+  float s = cross > 0.0f ? -1.0f : 1.0f;
+  Vector2 m0 = {s * -d0.y, s * d0.x};
+  Vector2 m1 = {s * -d1.y, s * d1.x};
+  float ang = atan2f(m0.x * m1.y - m0.y * m1.x, dotProduct(m0, m1));
+  if (fabsf(ang) < 1e-4f)
+    return 0;
+  if (fabsf(ang) > PI - 0.01f) {
+    Vector2 mid = {-m0.y, m0.x};
+    ang = dotProduct(mid, d0) >= 0.0f ? PI : -PI;
+  }
+  int steps = std::max(1, (int)(ceilf(fabsf(ang) / q.joinStep)));
+  Vector2 centre = c.points[k];
+  Vector2 prev = addVectors(centre, scaleVector(m0, radius));
+  for (int j = 1; j <= steps; j++) {
+    float th = ang * j / steps;
+    float cc = cosf(th), sn = sinf(th);
+    Vector2 m = {m0.x * cc - m0.y * sn, m0.x * sn + m0.y * cc};
+    Vector2 cur = addVectors(centre, scaleVector(m, radius));
+    emitTriangle(out, centre, 0.0f, prev, 1.0f, cur, 1.0f);
+    prev = cur;
+  }
+  return steps * 3;
+}
+
+// Round cap (half circle facing outward).
+void emitCap(std::vector<TexturedVertex> &out, Vector2 centre, Vector2 tangent,
+             float radius, const Quality &q) {
+  float base = atan2f(tangent.y, tangent.x);
+  for (int i = 0; i < q.capSegments; i++) {
+    float a0 = base - PI / 2.0f + i * PI / q.capSegments;
+    float a1 = base - PI / 2.0f + (i + 1) * PI / q.capSegments;
+    Vector2 p0 =
+        addVectors(centre, Vector2{cosf(a0) * radius, sinf(a0) * radius});
+    Vector2 p1 =
+        addVectors(centre, Vector2{cosf(a1) * radius, sinf(a1) * radius});
+    emitTriangle(out, centre, 0.0f, p0, 1.0f, p1, 1.0f);
+  }
+}
+
+// Full disc for a single collapsed point.
+void emitDisc(std::vector<TexturedVertex> &out, Vector2 centre, float radius,
+              const Quality &q) {
+  int steps = q.capSegments * 2;
+  for (int i = 0; i < steps; i++) {
+    float a0 = 2.0f * PI * i / steps, a1 = 2.0f * PI * (i + 1) / steps;
+    emitTriangle(out, centre, 0.0f,
+                 {centre.x + cosf(a0) * radius, centre.y + sinf(a0) * radius},
+                 1.0f,
+                 {centre.x + cosf(a1) * radius, centre.y + sinf(a1) * radius},
+                 1.0f);
+  }
+}
+
+// Ensure the cached mesh contains all geometry up to arc length dmax. Pieces
+// are appended once, in path order: [cap0][ridge0][join1][ridge1]...[cap1].
+// Repeated calls with growing dmax only emit newly exposed pieces.
+void ensureMeshUpTo(MeshSliderCache &c, float radius, const Quality &q,
+                    float dmax) {
+  int n = (int)(c.points.size());
+  if (n < 2)
     return;
+  float total = c.arcLength.back();
+  dmax = clipFloat(dmax, 0.0f, total);
 
-  // single point: a disc
-  if (n == 1) {
-    int steps = q.capSegments * 2;
-    for (int i = 0; i < steps; i++) {
-      float a0 = 2.0f * PI * i / steps, a1 = 2.0f * PI * (i + 1) / steps;
-      emitTriangle(
-          out, pts[0], 0.0f,
-          {pts[0].x + cosf(a0) * radius, pts[0].y + sinf(a0) * radius}, 1.0f,
-          {pts[0].x + cosf(a1) * radius, pts[0].y + sinf(a1) * radius}, 1.0f);
-    }
-    return;
+  if (!c.cap0Done) {
+    c.cap0Start = (int)(c.mesh.size());
+    emitCap(c.mesh, c.points[0], Vector2{-c.dirs[0].x, -c.dirs[0].y}, radius, q);
+    c.cap0Done = true;
   }
 
-  dirs.clear();
-  dirs.resize(n - 1);
-  for (int i = 0; i < n - 1; i++) {
-    Vector2 d = subVectors(pts[i + 1], pts[i]);
-    float len = sqrtf(dotProduct(d, d));
-    dirs[i] = len > 1e-6f ? scaleVector(d, 1.0f / len) : Vector2{1.0f, 0.0f};
+  for (int s = c.builtSeg; s < n - 1; s++) {
+    if (c.arcLength[s] > dmax)
+      break;
+    if (s >= 1 && c.joinCount[s] == 0 && c.arcLength[s] < dmax) {
+      c.joinStart[s] = (int)(c.mesh.size());
+      c.joinCount[s] = emitJoin(c.mesh, c, s, radius, q);
+    }
+    if (c.arcLength[s + 1] > dmax) {
+      c.segStart[s] = (int)(c.mesh.size());
+      break;
+    }
+    c.segStart[s] = (int)(c.mesh.size());
+    emitRidge(c.mesh, c.points[s], c.points[s + 1], c.dirs[s], radius);
+    c.builtSeg = s + 1;
   }
 
-  out.reserve(static_cast<size_t>((n - 1) * 15 + q.capSegments * 6));
-
-  // One ridge per segment. Every segment owns its rim vertices, so each ridge
-  // is an exact "distance to this segment" cone; overlaps on the inner side of
-  // a bend are resolved by the depth test. smart ye?
-  for (int i = 0; i < n - 1; i++) {
-    Vector2 nrm = {-dirs[i].y, dirs[i].x};
-    Vector2 off = scaleVector(nrm, radius);
-    Vector2 a = pts[i], b = pts[i + 1];
-    Vector2 al = addVectors(a, off), ar = subVectors(a, off);
-    Vector2 bl = addVectors(b, off), br = subVectors(b, off);
-    emitTriangle(out, al, 1.0f, bl, 1.0f, b, 0.0f);
-    emitTriangle(out, al, 1.0f, b, 0.0f, a, 0.0f);
-    emitTriangle(out, a, 0.0f, b, 0.0f, br, 1.0f);
-    emitTriangle(out, a, 0.0f, br, 1.0f, ar, 1.0f);
+  if (dmax >= total && !c.cap1Done) {
+    c.cap1Start = (int)(c.mesh.size());
+    emitCap(c.mesh, c.points[n - 1], c.dirs[n - 2], radius, q);
+    c.cap1Done = true;
   }
-
-  // Round joins: fill the wedge on the OUTER side of each bend.
-  for (int k = 1; k < n - 1; k++) {
-    Vector2 d0 = dirs[k - 1], d1 = dirs[k];
-    float cross = d0.x * d1.y - d0.y * d1.x;
-    float s = cross > 0.0f ? -1.0f : 1.0f; // outer side
-    Vector2 m0 = {s * -d0.y, s * d0.x};
-    Vector2 m1 = {s * -d1.y, s * d1.x};
-    float ang = atan2f(m0.x * m1.y - m0.y * m1.x, dotProduct(m0, m1));
-    if (fabsf(ang) < 1e-4f)
-      continue;
-    // Near exact 180 degree reversal: m1 == -m0, so atan2 returns +PI or -PI
-    // depending on float noise and the fan may sweep through the BACK of the
-    // path
-    if (fabsf(ang) > PI - 0.01f) {
-      Vector2 mid = {-m0.y, m0.x}; // m0 rotated by +90 degrees
-      ang = dotProduct(mid, d0) >= 0.0f ? PI : -PI;
-    }
-    int steps = std::max(1, static_cast<int>(ceilf(fabsf(ang) / q.joinStep)));
-    Vector2 prev = addVectors(pts[k], scaleVector(m0, radius));
-    for (int j = 1; j <= steps; j++) {
-      float th = ang * j / steps;
-      float c = cosf(th), sn = sinf(th);
-      Vector2 m = {m0.x * c - m0.y * sn, m0.x * sn + m0.y * c};
-      Vector2 cur = addVectors(pts[k], scaleVector(m, radius));
-      emitTriangle(out, pts[k], 0.0f, prev, 1.0f, cur, 1.0f);
-      prev = cur;
-    }
-  }
-
-  // Round caps (half circle facing outward).
-  auto addCap = [&](Vector2 centre, Vector2 tangent) {
-    float base = atan2f(tangent.y, tangent.x);
-    for (int i = 0; i < q.capSegments; i++) {
-      float a0 = base - PI / 2.0f + i * PI / q.capSegments;
-      float a1 = base - PI / 2.0f + (i + 1) * PI / q.capSegments;
-      Vector2 p0 =
-          addVectors(centre, Vector2{cosf(a0) * radius, sinf(a0) * radius});
-      Vector2 p1 =
-          addVectors(centre, Vector2{cosf(a1) * radius, sinf(a1) * radius});
-      emitTriangle(out, centre, 0.0f, p0, 1.0f, p1, 1.0f);
-    }
-  };
-  addCap(pts[0], {-dirs[0].x, -dirs[0].y});
-  addCap(pts[n - 1], dirs[n - 2]);
+  c.builtVerts = (int)(c.mesh.size());
 }
 
 void releaseTarget() {
@@ -594,42 +642,91 @@ void MeshSliderRender(const MeshSliderDrawData &data) {
   MeshSliderCache localCache;
   MeshSliderCache &cache = data.cache ? *data.cache : localCache;
   refreshCache(cache, *data.points, data.radius * MESH_SLIDER_SHADOW_SCALE);
-
-  bool full = data.startProgress <= 0.0f && data.endProgress >= 1.0f;
-  if (!full)
-    cutPath(cache, data.startProgress, data.endProgress, cache.partialPoints);
-  std::vector<Vector2> &visible = full ? cache.points : cache.partialPoints;
-  if (visible.empty())
+  int n = (int)(cache.points.size());
+  if (n < 1)
     return;
 
-  Quality quality = qualityFor(data.radius * MESH_SLIDER_SHADOW_SCALE);
-  std::vector<TexturedVertex> *meshPtr;
-  if (full) {
-    if (!cache.meshValid || cache.meshW != allocatedWidth ||
-        cache.meshH != allocatedHeight) {
-      buildMesh(visible, data.radius * MESH_SLIDER_SHADOW_SCALE, quality, cache.dirs, cache.mesh);
-      cache.meshW = allocatedWidth;
-      cache.meshH = allocatedHeight;
-      cache.meshValid = true;
-    }
-    meshPtr = &cache.mesh;
+  Quality q = qualityFor(data.radius * MESH_SLIDER_SHADOW_SCALE);
+  float radius = data.radius * MESH_SLIDER_SHADOW_SCALE;
+  float total = cache.arcLength.back();
+
+  // Build the full mesh once. For snake-in only the exposed prefix is
+  // emitted, so the work is spread across frames instead of one big rebuild.
+  ensureMeshUpTo(cache, radius, q, total);
+
+  float startD = clipFloat(data.startProgress, 0.0f, 1.0f) * total;
+  float endD = clipFloat(data.endProgress, 0.0f, 1.0f) * total;
+  if (endD <= startD)
+    endD = startD + 0.01f; // keep a dot alive
+
+  // A visible sub-range is one contiguous slice [lo, hi); the cut ridges/caps are regenerated in scratch.
+  int lo = 0;
+  int hi = (int)(cache.mesh.size());
+  std::vector<TexturedVertex> cutScratch;
+  Vector2 cutPoint = pointAt(cache, endD);
+  Vector2 startPoint = pointAt(cache, startD);
+
+  bool collapsed = (endD - startD) <= 0.01f;
+  if (collapsed) {
+    lo = 0;
+    hi = 0;
+    emitDisc(cutScratch, startPoint, radius, q);
+  } else if (startD <= 0.0f && endD >= total) {
+    lo = 0;
+    hi = (int)(cache.mesh.size());
   } else {
-    buildMesh(visible, data.radius * MESH_SLIDER_SHADOW_SCALE, quality, cache.dirs, cache.partialMesh);
-    meshPtr = &cache.partialMesh;
-  }
-  std::vector<TexturedVertex> &vertices = *meshPtr;
-  if (vertices.empty())
-    return;
+    int s0 = segmentAt(cache, startD);
+    int s1 = segmentAt(cache, endD);
+    if (endD < total)
+      hi = cache.segStart[s1];
+    else
+      hi = (int)(cache.mesh.size());
 
+    lo = hi; // empty interior by default
+    int firstInterior = s0 + 1;
+    if (startD > 0.0f && firstInterior <= n - 2) {
+      lo = cache.joinCount[firstInterior] > 0
+               ? cache.joinStart[firstInterior]
+               : cache.segStart[firstInterior];
+    } else if (startD <= 0.0f) {
+      lo = 0;
+    }
+    if (lo > hi)
+      lo = hi;
+    if (endD >= total && cache.cap1Done && lo >= cache.cap1Start)
+      lo = cache.cap1Start;
+
+    // Regenerate the cut ridge/caps. When both cuts are in the SAME segment,
+    // emit a single ridge between them.
+    if (s0 == s1) {
+      emitRidge(cutScratch, startPoint, cutPoint, cache.dirs[s0], radius);
+      if (startD > 0.0f)
+        emitCap(cutScratch, startPoint,
+                Vector2{-cache.dirs[s0].x, -cache.dirs[s0].y}, radius, q);
+      if (endD < total)
+        emitCap(cutScratch, cutPoint, cache.dirs[s1], radius, q);
+    } else {
+      if (startD > 0.0f) {
+        Vector2 b = (s0 + 1 < n) ? cache.points[s0 + 1] : startPoint;
+        emitRidge(cutScratch, startPoint, b, cache.dirs[s0], radius);
+        emitCap(cutScratch, startPoint,
+                Vector2{-cache.dirs[s0].x, -cache.dirs[s0].y}, radius, q);
+      }
+      if (endD < total) {
+        emitRidge(cutScratch, cache.points[s1], cutPoint, cache.dirs[s1], radius);
+        emitCap(cutScratch, cutPoint, cache.dirs[s1], radius, q);
+      }
+    }
+  }
   int screenWidth = GetScreenWidth();
   int screenHeight = GetScreenHeight();
-  float minX = visible[0].x, maxX = minX;
-  float minY = visible[0].y, maxY = minY;
-  for (size_t i = 1; i < visible.size(); i++) {
-    minX = std::min(minX, visible[i].x);
-    maxX = std::max(maxX, visible[i].x);
-    minY = std::min(minY, visible[i].y);
-    maxY = std::max(maxY, visible[i].y);
+  float minX = cache.points[0].x, maxX = minX;
+  float minY = cache.points[0].y, maxY = minY;
+  for (int i = 1; i < n; i++) {
+    minX = std::min(minX, cache.points[i].x);
+    maxX = std::max(maxX, cache.points[i].x);
+    minY = std::min(minY, cache.points[i].y);
+    maxY = std::max(maxY, cache.points[i].y);
   }
   // todo, this outer box check could be way better?
 
@@ -711,8 +808,11 @@ void MeshSliderRender(const MeshSliderDrawData &data) {
                             REPLACE_EQUATION);
   rlSetBlendMode(RL_BLEND_CUSTOM_SEPARATE);
   Color tint = Fade(WHITE, data.alpha);
-  DrawTexturedTrianglesDepth(&lutTex, vertices.data(),
-                             static_cast<int>(vertices.size()), tint);
+  if (lo < hi)
+    DrawTexturedTrianglesDepth(&lutTex, cache.mesh.data() + lo, hi - lo, tint);
+  if (!cutScratch.empty())
+    DrawTexturedTrianglesDepth(&lutTex, cutScratch.data(),
+                               (int)(cutScratch.size()), tint);
 
 #ifdef THREEDS_BUILD
   C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_COLOR); // depth writing we dont need, so not using disabledepthtest

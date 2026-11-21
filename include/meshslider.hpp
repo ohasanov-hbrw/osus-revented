@@ -17,15 +17,25 @@ struct MeshSliderCache {
   const Vector2 *srcData = nullptr;
   size_t srcCount = 0;
   float radius = -1.0f;
-  // full-length mesh (start=0, end=1) in target space: built once, reused every
-  // frame until the path, radius, screen size changes. Snaking rebuilds only
-  // the partial mesh.
+
+  // One contiguous mesh laid out in path order:
+  //   [cap0][ridge0][join1][ridge1][join2]...[ridge(n-2)][cap1]
+  // Built incrementally during snake-in (append as the cut advances), so no
+  // full rebuild per frame and no partial-mesh buffer needed.
   std::vector<TexturedVertex> mesh;
+  std::vector<Vector2> dirs;        // full-centerline segment directions
+  std::vector<int> segStart;        // vertex index of ridge s (size n-1)
+  std::vector<int> joinStart;       // vertex index of join at point k (size n)
+  std::vector<int> joinCount;       // vertex count of join at point k (size n)
+  int cap0Start = 0;
+  int cap1Start = 0;
+  int builtVerts = 0;               // vertices currently emitted into mesh
+  int builtSeg = 0;                 // segments fully emitted (0..builtSeg-1)
+  int builtJoin = 0;                // joins emitted for points 1..builtJoin-1
+  bool cap0Done = false;
+  bool cap1Done = false;
   bool meshValid = false;
   int meshW = 0, meshH = 0;
-  std::vector<Vector2> partialPoints;
-  std::vector<Vector2> dirs;
-  std::vector<TexturedVertex> partialMesh;
 };
 
 struct MeshSliderDrawData {

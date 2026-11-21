@@ -182,6 +182,21 @@ void parseSettings() {
                 std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m"
                           << "set snakeOut to: "
                           << (bool)std::stoi(keyValue.second) << std::endl;
+              } else if (keyValue.first == "coloredSliders") {
+                Global.coloredSliders = (bool)std::stoi(keyValue.second);
+                std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m"
+                          << "set coloredSliders to: "
+                          << (bool)std::stoi(keyValue.second) << std::endl;
+              } else if (keyValue.first == "flatSliders") {
+                Global.flatSliders = (bool)std::stoi(keyValue.second);
+                std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m"
+                          << "set flatSliders to: "
+                          << (bool)std::stoi(keyValue.second) << std::endl;
+              } else if (keyValue.first == "adaptiveRdpThreshold") {
+                Global.adaptiveRdpThreshold = std::stof(keyValue.second);
+                std::cout << "\e[1;38;5;21m[SET] \e[38;5;236m"
+                          << "set adaptiveRdpThreshold to: "
+                          << Global.adaptiveRdpThreshold << std::endl;
               }
             } catch (const std::exception& e) {
                 std::cout << "\e[1;38;5;52m[ERR] \e[38;5;52m"

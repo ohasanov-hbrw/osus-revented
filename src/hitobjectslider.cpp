@@ -12,6 +12,18 @@
 #include "msaaRenderTexture.hpp"
 #endif
 
+Color sliderBaseColour(const std::vector<short> &colour) {
+  
+  if (Global.coloredSliders){
+    if (colour.size() <= 2)
+      return {64,48,64,255};
+    else
+      return Color{colour[0], colour[1], colour[2], 255};
+  }
+
+  return {64,48,64,255};
+}
+
 // I... uhhh... MATH
 float interpolate(float *p, float *time, float t) {
   float L01 = p[0] * (time[1] - t) / (time[1] - time[0]) +
@@ -389,10 +401,9 @@ void Slider::init() {
               renderPoints.push_back(
                   lerp(renderPoints[lerploc], extraPosition, i));
             }
-          }
-          else{
+          } else {
             // bruh
-            while(renderPoints.size() < data.length){
+            while (renderPoints.size() < data.length) {
               renderPoints.push_back(renderPoints[last]);
             }
           }
@@ -913,9 +924,9 @@ void Slider::update() {
 
   if ((durationNull && gm->currentTime * 1000.0f > data.time) or
       gm->currentTime * 1000.0f >
-      data.time + (data.length / 100) * (data.timing.beatLength) /
-                      (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
-                      data.slides) {
+          data.time + (data.length / 100) * (data.timing.beatLength) /
+                          (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
+                          data.slides) {
 
     // std::cout << "Slides: " << data.slides << " TickCount: " << ticks << "
     // SliderDuration: " << sliderDuration << " Beatlength: " <<
@@ -932,8 +943,9 @@ void Slider::update() {
 
     if (durationNull or
         (data.length / 100) * (data.timing.beatLength) /
-            (gm->sliderSpeed * data.timing.sliderSpeedOverride) * data.slides <=
-        36.0f) {
+                (gm->sliderSpeed * data.timing.sliderSpeedOverride) *
+                data.slides <=
+            36.0f) {
       if (is_hit_at_first) {
         data.point = 3;
         gm->score +=
@@ -1134,8 +1146,8 @@ void Slider::renderMeshBody(float alpha, bool recompute) {
 
   Color bodyColour = Fade(WHITE, 1.0f);
   if (data.colour.size() > 2)
-    bodyColour =
-        Fade(Color{data.colour[0], data.colour[1], data.colour[2]}, 1.0f);
+      bodyColour =
+          Fade(sliderBaseColour({data.colour[0], data.colour[1], data.colour[2]}), 1.0f);
 
   MeshSliderDrawData drawData{&renderPoints,
                               static_cast<float>(start),
@@ -1304,6 +1316,7 @@ void Slider::render() {
       GMSkip = gm->smallskip;
     }
     if (Global.meshSliders) {
+      if(data.textureReady == true)
       renderMeshBody(easeInOutCubic(clampedFade),
                      true); // slider is active here, so recompute!
     } else if (legacyRender) {
@@ -1427,10 +1440,10 @@ void Slider::render() {
                             minY - texSizeYoffset + gm->circlesize / 2.0f) *
                            Global.sliderTexSize))};
 
-                  Color color =
-                      Color{(unsigned char)((float)data.colour[0] * 0.5f),
-                            (unsigned char)((float)data.colour[1] * 0.5f),
-                            (unsigned char)((float)data.colour[2] * 0.5f)};
+                  Color base = sliderBaseColour(data.colour);
+                  Color color = Color{(unsigned char)((float)base.r * 0.5f),
+                                      (unsigned char)((float)base.g * 0.5f),
+                                      (unsigned char)((float)base.b * 0.5f)};
                   DrawCircleWithDepth(centerCoord,
                                       ((gm->circlesize / 2.0f) * 0.85) *
                                           Global.sliderTexSize,
@@ -1483,10 +1496,10 @@ void Slider::render() {
                   renderPoints[i].y > Global.sliderMinimumY and
                   renderPoints[i].y < Global.sliderMaximumY) {
                 if (true) {
-                  Color color =
-                      Color{(unsigned char)((float)data.colour[0] * 0.7f),
-                            (unsigned char)((float)data.colour[1] * 0.7f),
-                            (unsigned char)((float)data.colour[2] * 0.7f)};
+                  Color base = sliderBaseColour(data.colour);
+                  Color color = Color{(unsigned char)((float)base.r * 0.7f),
+                                      (unsigned char)((float)base.g * 0.7f),
+                                      (unsigned char)((float)base.b * 0.7f)};
 
                   Vector2 centerCoord = {
                       (renderPoints[i].x + 4 * Global.sliderTexSize - minX -
@@ -1502,11 +1515,13 @@ void Slider::render() {
                           ((renderPoints[i].y + 4 * Global.sliderTexSize -
                             minY - texSizeYoffset + gm->circlesize / 2.0f) *
                            Global.sliderTexSize))};
-                  DrawCircleWithDepthGrad(
-                      centerCoord,
-                      ((gm->circlesize / 2.0f) * 0.76) * Global.sliderTexSize,
-                      Global.circleSector, DEPTH_MULT * 0.3f, Fade(color, 0.7f),
-                      Fade(color, 0.3f)); //{2, 0, 4, 128});
+                  if (!Global.flatSliders)
+                    DrawCircleWithDepthGrad(
+                        centerCoord,
+                        ((gm->circlesize / 2.0f) * 0.76) * Global.sliderTexSize,
+                        Global.circleSector, DEPTH_MULT * 0.3f,
+                        Fade(color, 0.7f),
+                        Fade(color, 0.3f)); //{2, 0, 4, 128});
                   lastDrawnInnerCircle = std::max(i + gm->smallskip, 0);
                   if (lastDrawnInnerCircle >= (int)renderPoints.size() - 1) {
                     lastDrawnInnerCircle = renderPoints.size();
@@ -1528,12 +1543,14 @@ void Slider::render() {
                               4 * Global.sliderTexSize - minY - texSizeYoffset +
                               gm->circlesize / 2.0f) *
                              Global.sliderTexSize))};
-                    DrawCircleWithDepthGrad(
-                        centerCoord,
-                        ((gm->circlesize / 2.0f) * 0.76) * Global.sliderTexSize,
-                        Global.circleSector, DEPTH_MULT * 0.3f,
-                        Fade(color, 0.7f),
-                        Fade(color, 0.3f)); //{2, 0, 4, 128});
+                    if (!Global.flatSliders)
+                      DrawCircleWithDepthGrad(
+                          centerCoord,
+                          ((gm->circlesize / 2.0f) * 0.76) *
+                              Global.sliderTexSize,
+                          Global.circleSector, DEPTH_MULT * 0.3f,
+                          Fade(color, 0.7f),
+                          Fade(color, 0.3f)); //{2, 0, 4, 128});
                   }
                 }
               }
@@ -1716,15 +1733,14 @@ void Slider::render() {
                       (((renderPoints[i].y + 4 * Global.sliderTexSize - minY -
                          texSizeYoffset + gm->circlesize / 2.0f) *
                         Global.sliderTexSize))};
-                  Color color =
-                      Color{(unsigned char)((float)data.colour[0] * 0.5f),
-                            (unsigned char)((float)data.colour[1] * 0.5f),
-                            (unsigned char)((float)data.colour[2] * 0.5f)};
-                  Color color3 = Color{
-                      ((unsigned char)((float)data.colour[0] * 0.5f) + 255) / 2,
-                      ((unsigned char)((float)data.colour[1] * 0.5f) + 255) / 2,
-                      ((unsigned char)((float)data.colour[2] * 0.5f) + 255) /
-                          2};
+                  Color base = sliderBaseColour(data.colour);
+                  Color color = Color{(unsigned char)((float)base.r * 0.5f),
+                                      (unsigned char)((float)base.g * 0.5f),
+                                      (unsigned char)((float)base.b * 0.5f)};
+                  Color color3 =
+                      Color{((unsigned char)((float)base.r * 0.5f) + 255) / 2,
+                            ((unsigned char)((float)base.g * 0.5f) + 255) / 2,
+                            ((unsigned char)((float)base.b * 0.5f) + 255) / 2};
                   DrawCircleWithDepth(
                       centerCoord,
                       ((gm->circlesize / 2.0f) * 0.78) * Global.sliderTexSize,
@@ -1823,21 +1839,22 @@ void Slider::render() {
                       (((renderPoints[i].y + 4 * Global.sliderTexSize - minY -
                          texSizeYoffset + gm->circlesize / 2.0f) *
                         Global.sliderTexSize))};
-                  Color color =
-                      Color{(unsigned char)((float)data.colour[0] * 0.6f),
-                            (unsigned char)((float)data.colour[1] * 0.6f),
-                            (unsigned char)((float)data.colour[2] * 0.6f)};
+                  Color base = sliderBaseColour(data.colour);
+                  Color color = Color{(unsigned char)((float)base.r * 0.6f),
+                                      (unsigned char)((float)base.g * 0.6f),
+                                      (unsigned char)((float)base.b * 0.6f)};
                   // DrawTextureExDepth(&gm->sliderInnerBall.texture,
                   // Vector2{centerCoord.x - gm->circlesize / 2.0f *
                   // Global.sliderTexSize * 0.85f, centerCoord.y -
                   // gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f},
                   // 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize *
                   // 0.85f, WHITE);
-                  DrawCircleWithDepthGrad(
-                      centerCoord,
-                      ((gm->circlesize / 2.0f) * 0.73) * Global.sliderTexSize,
-                      Global.circleSector, 0.4f, Fade(color, 0.7f),
-                      Fade(color, 0.3f)); //{2, 0, 4, 128});
+                  if (!Global.flatSliders)
+                    DrawCircleWithDepthGrad(
+                        centerCoord,
+                        ((gm->circlesize / 2.0f) * 0.73) * Global.sliderTexSize,
+                        Global.circleSector, 0.4f, Fade(color, 0.7f),
+                        Fade(color, 0.3f)); //{2, 0, 4, 128});
                   if (last >= (int)renderPoints.size()) {
                     Vector2 centerCoord = {
                         (renderPoints[renderPoints.size() - 1].x +
@@ -1855,11 +1872,13 @@ void Slider::render() {
                     // gm->circlesize / 2.0f * Global.sliderTexSize * 0.85f},
                     // 0.1f, gm->circlesize / 64.0f * Global.sliderTexSize *
                     // 0.85f, WHITE);
-                    DrawCircleWithDepthGrad(
-                        centerCoord,
-                        ((gm->circlesize / 2.0f) * 0.73) * Global.sliderTexSize,
-                        Global.circleSector, 0.4f, Fade(color, 0.7f),
-                        Fade(color, 0.3f)); //{2, 0, 4, 128});
+                    if (!Global.flatSliders)
+                      DrawCircleWithDepthGrad(
+                          centerCoord,
+                          ((gm->circlesize / 2.0f) * 0.73) *
+                              Global.sliderTexSize,
+                          Global.circleSector, 0.4f, Fade(color, 0.7f),
+                          Fade(color, 0.3f)); //{2, 0, 4, 128});
                   }
                 }
               }

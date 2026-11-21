@@ -339,9 +339,12 @@ struct Globals {
         bool legacyRender = true;
         bool polygonalRendering = true;
     #endif
-    bool meshSliders = false;
+    bool meshSliders = true;
     bool snakeIn = true;
     bool snakeOut = true;
+    bool coloredSliders = true;
+    bool flatSliders = false;
+    float adaptiveRdpThreshold = 2000.0f;
     // IDK honestly, this does something important
     Globals() = default;
     bool ScaleUpdated = true;
