@@ -14,113 +14,96 @@ Spinner::Spinner(HitObjectData data){
 //initilizes a circle
 void Spinner::init(){
     GameManager* gm = GameManager::getInstance();
-    neededAngle = (((gm->spinsPerSecond) * (data.endTime - data.time) * 360) / 1000.0f ) / 3.0f;
+    minSpinsPerSecond = gm->spinsPerSecond;
+    float duration_s = std::max(0.0f, (data.endTime - data.time) / 1000.0f);
+    float spinsRequired = std::floor((duration_s * minSpinsPerSecond + 0.5f) * 2.0f) / 2.0f;
+    neededAngle = spinsRequired * 360.0f;
     data.ex = data.x;
     data.ey = data.y;
+}
+
+void Spinner::reportDelta(float delta) {
+    if (delta == 0.0f)
+        return;
+    spinAccum += delta;
+    float current = spinAccum - spinAtCompletion;
+    currentSpinMax = std::max(currentSpinMax, std::abs(current));
+    while (currentSpinMax >= 360.0f) {
+        int direction = current >= 0.0f ? 1 : -1;
+        completedSpins++;
+        spinAtCompletion += direction * 360.0f;
+        current = spinAccum - spinAtCompletion;
+        currentSpinMax = std::abs(current);
+    }
+    totalRotation = 360.0f * completedSpins + currentSpinMax;
+    renderAngle = spinAccum;
 }
 
 //the main code that runs for every circle on screen, the collision and point manager is in the GamerManager
 void Spinner::update(){
     GameManager* gm = GameManager::getInstance();
-    //the circle is not clickable after some time so we check that
-    float angle = atan2(240 - Global.MousePosition.y, 320 - Global.MousePosition.x) * 180.0f / PI;
+    float now = gm->currentTime*1000.0f;
 
-    if(data.touch and gm->currentTime*1000.0f > data.time){
-        if(Global.Key1P or Global.Key2P){
-            first = true;
+    if(data.touch and now > data.time and now <= data.endTime){
+        float angle = atan2(static_cast<float>(data.y) - Global.MousePosition.y,
+                            static_cast<float>(data.x) - Global.MousePosition.x) * 180.0f / PI;
+        if(Global.Key1D or Global.Key2D){
+            float delta = angle - lastAngle;
+            while(delta > 180.0f) delta -= 360.0f;
+            while(delta < -180.0f) delta += 360.0f;
+            // velocity bound: 477 RPM max; clamp per-frame delta so a single
+            // cursor jump cannot instantly complete the spinner.
+            float maxDelta = (477.0f / 60.0f) * 360.0f * (Global.FrameTime / 1000.0f) * 1.05f;
+            maxDelta = clip(maxDelta, 1.0f, 180.0f);
+            delta = clip(delta, -maxDelta, maxDelta);
+            reportDelta(delta);
             lastAngle = angle;
-            hit = true;
-        }
-        if((Global.Key1D or Global.Key2D) and hit){
-            if(angle != lastAngle){
-                if(angle > lastAngle){
-                    if(angle > 120 && lastAngle < -120)
-                        rotation = -1;
-                    else
-                        rotation = 1;
-                }
-                else{
-                    if(angle < -120 && lastAngle > 120)
-                        rotation = 1;
-                    else
-                        rotation = -1;
-                }
-                if(first && std::abs(angle - lastAngle) > 7){
-                    startRotation = rotation;
-                    first = false;
-                }
-                if(startRotation == rotation && !first){
-                    addedAngle = std::abs(angle - lastAngle);
-                    if((angle > 120 and lastAngle < -120)) {
-                        addedAngle = std::abs(180 - angle) + std::abs(-180 - lastAngle);
-                    }
-                    if((angle < -120 and lastAngle > 120)){
-                        addedAngle = std::abs(-180 - angle) + std::abs(180 - lastAngle);
-                    }
-                    /*if(addedAngle > ((477.0f * 360.0f) / (60.0f * 1000.0f)) * ((float)GetFrameTime() * 1000.0f)){
-                        addedAngle = ((477.0f * 360.0f) / (60.0f * 1000.0f)) * ((float)GetFrameTime() * 1000.0f);
-                    }*/
-                    totalAngle += addedAngle;
-                    renderAngle += rotation * addedAngle;
-                    
-                }
-                if(!first)
-                    lastAngle = angle;
-            }
-            //std::cout << std::abs(angle - lastAngle) << " " << startRotation << " " << rotation << "\n";
-        }
-        else{
-            first = false;
-            lastAngle = 0;
-            rotation = 0;
-            startRotation = -2;
+        } else {
+            lastAngle = angle;
         }
     }
-    if(totalAngle > neededAngle + 360 * extra){
-        extra++;
-        gm->score += 1000;
+    while (scoredSpins < completedSpins) {
+        scoredSpins++;
+        if (360.0f * scoredSpins <= neededAngle) {
+            gm->score += 100;
+        } else {
+            gm->score += 1000;
+            extra++;
+        }
     }
-    if(gm->currentTime*1000.0f > data.endTime){
-        data.time = gm->currentTime*1000.0f;
+
+    if(now > data.endTime){
+        data.time = now;
         data.point = 0;
-        if(neededAngle < 360){
+        // Very short spinners (less than one full spin required) auto complete
+        if(neededAngle < 360.0f or totalRotation >= neededAngle){
             data.point = 3;
             gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
             gm->clickCombo++;
             gm->hit300s++;
             gm->objectPoints.push_back(OSU_300);
         }
-        else{
-            if(totalAngle > neededAngle){
-                data.point = 3;
-                gm->score += 300 + (300 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-                gm->clickCombo++;
-                gm->hit300s++;
-                gm->objectPoints.push_back(OSU_300);
-            }
-            else if(totalAngle >= neededAngle - 360){
-                data.point = 2;
-                gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-                gm->clickCombo++;
-                gm->hit100s++;
-                gm->objectPoints.push_back(OSU_100);
-            }
-            else if(totalAngle >= neededAngle / 4.0f){
-                gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
-                gm->clickCombo++;
-                data.point = 1;
-                gm->hit50s++;
-                gm->objectPoints.push_back(OSU_50);
-            }
-            else{
-                data.point = 0;
-                gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
-                gm->clickCombo = 0;
-                gm->hit0s++;
-                gm->objectPoints.push_back(OSU_0);
-            }
+        else if(totalRotation >= neededAngle - 360.0f){
+            data.point = 2;
+            gm->score += 100 + (100 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+            gm->clickCombo++;
+            gm->hit100s++;
+            gm->objectPoints.push_back(OSU_100);
         }
-        //gm->destroyHitObject(data.index);
+        else if(totalRotation >= neededAngle / 4.0f){
+            gm->score += 50 + (50 * (std::max(gm->clickCombo-1,0) * gm->difficultyMultiplier * 1)/25);
+            gm->clickCombo++;
+            data.point = 1;
+            gm->hit50s++;
+            gm->objectPoints.push_back(OSU_50);
+        }
+        else{
+            data.point = 0;
+            gm->maxCombo = std::max(gm->maxCombo, gm->clickCombo);
+            gm->clickCombo = 0;
+            gm->hit0s++;
+            gm->objectPoints.push_back(OSU_0);
+        }
         data.destruct = true;
     }
 }
@@ -138,18 +121,20 @@ void Spinner::render(){
     if(gm->renderSpinnerBack){
         DrawSpinnerBack(&gm->spinnerBack, Fade(WHITE, clampedFade / 2.0f));
     }
-    if(gm->renderSpinnerMetre)
-        DrawSpinnerMeter(&gm->spinnerMetre,totalAngle/neededAngle);
-    
+    if(gm->renderSpinnerMetre){
+        float progress = neededAngle > 0.0f ? totalRotation / neededAngle : 1.0f;
+        DrawSpinnerMeter(&gm->spinnerMetre, progress);
+    }
+
     DrawTextureRotate(&gm->spinnerBottom, data.x, data.y, (310.0f/gm->spinnerBottom.width), 0, Fade(spinnerColor, clampedFade));
     DrawTextureRotate(&gm->spinnerTop, data.x, data.y, (310.0f/gm->spinnerTop.width), renderAngle, Fade(spinnerColor, clampedFade));
-    
+
     if(gm->renderSpinnerCircle)
         DrawTextureRotate(&gm->spinnerCircle, data.x, data.y, (310.0f/gm->spinnerCircle.width), renderAngle, Fade(spinnerColor, clampedFade));
     if(extra > 1){
         DrawCNumbersCenter((extra - 1) * 1000, 320, 400, 1, spinnerColor);
     }
-    
+
 }
 
 //renders the "dead" Circle
@@ -166,7 +151,7 @@ void Spinner::dead_render(){
         DrawTextureCenter(&gm->hit300, data.x, data.y, (gm->circlesize/gm->hit300.width)*0.7f , Fade(WHITE,clampedFade));
 }
 
-//just gives more time to render the "dead" Circle 
+//just gives more time to render the "dead" Circle
 void Spinner::dead_update(){
     GameManager* gm = GameManager::getInstance();
     //TODO: gives 400ms for the animation to play, MAKE IT DEPENDANT TO APPROACH RATE

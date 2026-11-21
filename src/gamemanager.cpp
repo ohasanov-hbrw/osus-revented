@@ -1709,15 +1709,12 @@ void GameManager::loadGame(std::string filename) {
   // calculate all the variables for the game (these are mathematically correct
   // but they feel weird?)
 
-  // TODO: Spinners are still in their initial state, this is probably pretty
-  // wrong
-  float od = std::stoi(gameFile.configDifficulty["OverallDifficulty"]);
+  // osu! full spins per second required to clear a spinner (wiki formula).
+  float od = std::stof(gameFile.configDifficulty["OverallDifficulty"]);
   if (od < 5) {
-    spinsPerSecond = 5.0f - 2.0f * (5.0f - od) / 5.0f;
-  } else if (od > 5) {
-    spinsPerSecond = 5.0f - 2.0f * (od - 5.0f) / 5.0f;
+    spinsPerSecond = 1.5f + 0.2f * od;
   } else {
-    spinsPerSecond = 5.0f;
+    spinsPerSecond = 1.25f + 0.25f * od;
   }
 
   // calculate the time windows for 300-100-50 points

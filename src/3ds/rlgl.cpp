@@ -1891,7 +1891,7 @@ void DrawTexturedTrianglesDepth(Texture2D *tex, const TexturedVertex *verts,
         dst[i].pad0 = 0.0f;
         dst[i].pad1 = 0.0f;
     }
-    GSPGPU_FlushDataCache(dst, count * sizeof(MeshVboVertex));
+    // GSPGPU_FlushDataCache(dst, count * sizeof(MeshVboVertex)); // as the buffer is constant all over the frame, it can be flushed at the end. 
 
     C3D_BufInfo *bufInfo = C3D_GetBufInfo();
     BufInfo_Init(bufInfo);

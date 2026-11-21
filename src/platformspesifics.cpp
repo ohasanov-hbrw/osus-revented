@@ -440,7 +440,7 @@ void DrawTextureCenter(Texture2D *tex, float x, float y, float s, Color color) {
       0, Scale(s), color);
 }
 #ifndef MESH_BATCH_CHUNK_TRIS
-#define MESH_BATCH_CHUNK_TRIS 200
+#define MESH_BATCH_CHUNK_TRIS 800
 #endif
  
 // ok so, why quads? well because triangles simply dont friggin work????

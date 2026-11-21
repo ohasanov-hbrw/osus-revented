@@ -662,7 +662,10 @@ void MeshSliderRender(const MeshSliderDrawData &data) {
   // A visible sub-range is one contiguous slice [lo, hi); the cut ridges/caps are regenerated in scratch.
   int lo = 0;
   int hi = (int)(cache.mesh.size());
-  std::vector<TexturedVertex> cutScratch;
+  static std::vector<TexturedVertex> cutScratch; // yeah what the hell
+  if (cutScratch.capacity() < 256)
+    cutScratch.reserve(256);
+  cutScratch.clear();
   Vector2 cutPoint = pointAt(cache, endD);
   Vector2 startPoint = pointAt(cache, startD);
 
