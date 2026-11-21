@@ -91,7 +91,7 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [x] Create a codebase for the 3DS Builds
 - [x] Implement .ogg playback for the 3DS
 - [ ] Debug some memory problems 
-- [ ] Menu rewrite
+- [x] Menu rewrite (most work done)
 - [ ] Error management
 - [x] Check-stresstest the zip library
 - [ ] Skin customization with an options menu
@@ -102,16 +102,24 @@ When you encounter a bug, or see something missing, just report it using the "Is
 - [ ] Add the game mode taiko!
 - [ ] Fix the spinners
 - [ ] Try to get beatmaps from a mirror (eg. https://catboy.best/about)
-- [ ] Use the second screen on the 3DS
+- [x] Use the second screen on the 3DS (I mean at least raylib commands run on it?)
 - [ ] Dynamic slider resolution with more interpolation to cut down on calculation time
 - [x] Seperate thread for background loading. Mainly for the new menu implementations
 - [x] Images on the beatmap selection
 - [ ] Redo fancy textbox
 - [x] Add ranking to the resultsmenu
 - [x] Stacked objects should be offset from another
-- [ ] Add animated combo counter
+- [x] Add animated combo counter
 - [ ] Add the flakes~
 - [ ] Add volume control
+- [x] Add modern renderer for sliders
+- [x] Add snake in and snake out for sliders
+- [ ] Add changeble resolution for modern sliders
+- [ ] Optimize vertices to be able to be rendered with triangle strip commands
+- [ ] Fix 1px offsets that are happening on the 3ds build when rendering stuff with float coordinates
+- [ ] Show gameplay on both screens on 3ds
+- [ ] Actually make the UI for the settings menu
+
 
 
 running on WSLg may need `SDL_VIDEODRIVER=wayland ./linuxmakefast.sh`
@@ -120,8 +128,7 @@ running on WSLg may need `SDL_VIDEODRIVER=wayland ./linuxmakefast.sh`
 
 ![alt text](https://github.com/ohasanov-hbrw/osus-revented/blob/3ds-pc-merge/resources/osus.png?raw=true)
 
-
-
+## License
 Copyright (C) 2026 Ömer Hasanov
 
 This program is free software: you can redistribute it and/or modify
