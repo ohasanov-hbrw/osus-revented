@@ -12,6 +12,12 @@
 
 #define MAKEDWORD(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 
+// One music buffer = sampleRate / MUSIC_BUFFER_DIVISOR samples = 1000 / divisor ms.
+// Used by the decoder, the wave-buffer allocation, and GetMusicTimePlayed so
+// reported time stays correct for any divisor.
+#define MUSIC_BUFFER_DIVISOR 20
+#define MUSIC_BUFFER_MS (1000 / MUSIC_BUFFER_DIVISOR)
+
 void SetSoundVolume(Sound *sound, float volume){
     sound->volume = volume;
     if(sound->volume > 1.0f){
@@ -103,7 +109,7 @@ void PlayMusicStream(Music *music){
         AtomicSwap(&(music->command), 0x00000000);
         //music->command = 0x00000000;
 
-        music->thread = threadCreate((void (*)(void*))MusicThread, music, 512*1024, 0x27, -1, false);
+        music->thread = threadCreate((void (*)(void*))MusicThread, music, 512*1024, 0x2F, -1, false);
         MutexUnlock(MUSIC_BLOCK, UPDATETHREAD_ID);
     }
     
@@ -154,7 +160,7 @@ void UpdateMusicStream(Music *music){
 float GetMusicTimePlayed(Music *music){
     int channel = 0;
     MutexLock(MUSIC_BLOCK, UPDATETHREAD_ID);
-    u64 timePlayed = music->playedChannels * 250 + music->offset + (ndspChnGetSamplePos(channel) * 1000) / music->sampleRate;
+    u64 timePlayed = music->playedChannels * MUSIC_BUFFER_MS + music->offset + (ndspChnGetSamplePos(channel) * 1000) / music->sampleRate;
     timePlayed = std::max(music->lastTimePlayed, timePlayed);
     music->lastTimePlayed = timePlayed;
     MutexUnlock(MUSIC_BLOCK, UPDATETHREAD_ID);
@@ -216,7 +222,7 @@ void MusicThread(Music *music){
     int channel = 0;
 	int bufferIndex = 0;
 	int sampleRate = music->sampleRate;
-	int bufferSamples = music->sampleRate / 4;
+	int bufferSamples = music->sampleRate / MUSIC_BUFFER_DIVISOR;
 	int bufferSize = bufferSamples * music->channels * sizeof(mp3d_sample_t);
 
     int numberOfBuffers = 2;
@@ -521,7 +527,7 @@ Music LoadMusicStream(const char *filename){
     int channel = 0;
 	int bufferIndex = 0;
 	int sampleRate = music.sampleRate;
-	int bufferSamples = music.sampleRate / 4;
+	int bufferSamples = music.sampleRate / MUSIC_BUFFER_DIVISOR;
 	int bufferSize = bufferSamples * music.channels * sizeof(mp3d_sample_t);
     if(music.oggplayback)
         bufferSize = bufferSamples * music.channels * sizeof(short);

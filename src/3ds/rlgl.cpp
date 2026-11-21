@@ -1899,7 +1899,7 @@ void DrawTexturedTrianglesDepth(Texture2D *tex, const TexturedVertex *verts,
 
     C3D_CullFace(GPU_CULL_NONE);
     C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
-    C3D_DrawArrays(GPU_TRIANGLES, 0, count);
+    C3D_DrawArrays(GPU_TRIANGLE_STRIP, 0, count);
     meshVboOffset += count;
     C2D_Prepare();
 }

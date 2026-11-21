@@ -374,8 +374,15 @@ void refreshCache(MeshSliderCache &c, const std::vector<Vector2> &src,
   c.radius = radius;
 
   size_t n = c.points.size();
+#ifdef THREEDS_BUILD
+  // Strip layout: ridge 6 verts + 2 bridge, join (2*steps+2) + 2 bridge,
+  // caps 2*C+2. Leave headroom for joins that need many steps.
+  size_t maxVerts =
+      (n > 1 ? (n - 1) * 18 : 0) + qualityFor(radius).capSegments * 6;
+#else
   size_t maxVerts =
       (n > 1 ? (n - 1) * 15 : 0) + qualityFor(radius).capSegments * 6;
+#endif
   c.mesh.clear();
   c.mesh.reserve(maxVerts);
   c.dirs.clear();
@@ -471,18 +478,44 @@ void emitTriangle(std::vector<TexturedVertex> &out, Vector2 a, float ua,
   emitVertex(out, c, uc);
 }
 
-// Geometry emitters. Each writes 3*steps TexturedVertex.
-// One ridge for segment a->b. 12 vertices (4 triangles).
+#ifdef THREEDS_BUILD
+// The 3DS draws the whole mesh as one triangle strip. Consecutive pieces are
+// stitched with two degenerate vertices: a copy of the previous piece's last
+// vertex and a copy of this piece's first. They produce only zero-area
+// triangles at the boundary, so the slice stays one contiguous strip.
+void emitStripBridge(std::vector<TexturedVertex> &out, Vector2 p, float u) {
+  if (out.empty())
+    return;
+  out.push_back(out.back());
+  float depth = DEPTH_CENTRE + (DEPTH_EDGE - DEPTH_CENTRE) * u;
+  out.push_back({toTarget(p), {lutCoord(u), 0.5f}, depth});
+}
+
+#endif
+
+// Geometry emitters. On PC each writes independent triangles (3 verts each);
+// on 3DS each writes a strip piece with a 2-vertex degenerate bridge.
 void emitRidge(std::vector<TexturedVertex> &out, Vector2 a, Vector2 b,
                Vector2 dir, float radius) {
   Vector2 nrm = {-dir.y, dir.x};
   Vector2 off = scaleVector(nrm, radius);
   Vector2 al = addVectors(a, off), ar = subVectors(a, off);
   Vector2 bl = addVectors(b, off), br = subVectors(b, off);
+#ifdef THREEDS_BUILD
+  // One 6-vertex strip covering the same two planar quads.
+  emitStripBridge(out, al, 1.0f);
+  emitVertex(out, al, 1.0f);
+  emitVertex(out, bl, 1.0f);
+  emitVertex(out, a, 0.0f);
+  emitVertex(out, b, 0.0f);
+  emitVertex(out, ar, 1.0f);
+  emitVertex(out, br, 1.0f);
+#else
   emitTriangle(out, al, 1.0f, bl, 1.0f, b, 0.0f);
   emitTriangle(out, al, 1.0f, b, 0.0f, a, 0.0f);
   emitTriangle(out, a, 0.0f, b, 0.0f, br, 1.0f);
   emitTriangle(out, a, 0.0f, br, 1.0f, ar, 1.0f);
+#endif
 }
 
 // Round outer join at point k
@@ -503,6 +536,21 @@ int emitJoin(std::vector<TexturedVertex> &out, const MeshSliderCache &c, int k,
   int steps = std::max(1, (int)(ceilf(fabsf(ang) / q.joinStep)));
   Vector2 centre = c.points[k];
   Vector2 prev = addVectors(centre, scaleVector(m0, radius));
+#ifdef THREEDS_BUILD
+  // Fan as a strip: [C, rim0, C, rim1, ...].
+  emitStripBridge(out, centre, 0.0f);
+  emitVertex(out, centre, 0.0f);
+  emitVertex(out, prev, 1.0f);
+  for (int j = 1; j <= steps; j++) {
+    float th = ang * j / steps;
+    float cc = cosf(th), sn = sinf(th);
+    Vector2 m = {m0.x * cc - m0.y * sn, m0.x * sn + m0.y * cc};
+    Vector2 cur = addVectors(centre, scaleVector(m, radius));
+    emitVertex(out, centre, 0.0f);
+    emitVertex(out, cur, 1.0f);
+  }
+  return steps * 2 + 2;
+#else
   for (int j = 1; j <= steps; j++) {
     float th = ang * j / steps;
     float cc = cosf(th), sn = sinf(th);
@@ -512,12 +560,24 @@ int emitJoin(std::vector<TexturedVertex> &out, const MeshSliderCache &c, int k,
     prev = cur;
   }
   return steps * 3;
+#endif
 }
 
 // Round cap (half circle facing outward).
 void emitCap(std::vector<TexturedVertex> &out, Vector2 centre, Vector2 tangent,
              float radius, const Quality &q) {
   float base = atan2f(tangent.y, tangent.x);
+#ifdef THREEDS_BUILD
+  emitStripBridge(out, centre, 0.0f);
+  emitVertex(out, centre, 0.0f);
+  for (int i = 0; i <= q.capSegments; i++) {
+    float a = base - PI / 2.0f + i * PI / q.capSegments;
+    Vector2 p = addVectors(centre, Vector2{cosf(a) * radius, sinf(a) * radius});
+    emitVertex(out, p, 1.0f);
+    if (i < q.capSegments)
+      emitVertex(out, centre, 0.0f);
+  }
+#else
   for (int i = 0; i < q.capSegments; i++) {
     float a0 = base - PI / 2.0f + i * PI / q.capSegments;
     float a1 = base - PI / 2.0f + (i + 1) * PI / q.capSegments;
@@ -527,12 +587,25 @@ void emitCap(std::vector<TexturedVertex> &out, Vector2 centre, Vector2 tangent,
         addVectors(centre, Vector2{cosf(a1) * radius, sinf(a1) * radius});
     emitTriangle(out, centre, 0.0f, p0, 1.0f, p1, 1.0f);
   }
+#endif
 }
 
 // Full disc for a single collapsed point.
 void emitDisc(std::vector<TexturedVertex> &out, Vector2 centre, float radius,
               const Quality &q) {
   int steps = q.capSegments * 2;
+#ifdef THREEDS_BUILD
+  emitStripBridge(out, centre, 0.0f);
+  emitVertex(out, centre, 0.0f);
+  for (int i = 0; i <= steps; i++) {
+    float a = 2.0f * PI * i / steps;
+    emitVertex(out,
+               {centre.x + cosf(a) * radius, centre.y + sinf(a) * radius},
+               1.0f);
+    if (i < steps)
+      emitVertex(out, centre, 0.0f);
+  }
+#else
   for (int i = 0; i < steps; i++) {
     float a0 = 2.0f * PI * i / steps, a1 = 2.0f * PI * (i + 1) / steps;
     emitTriangle(out, centre, 0.0f,
@@ -541,6 +614,7 @@ void emitDisc(std::vector<TexturedVertex> &out, Vector2 centre, float radius,
                  {centre.x + cosf(a1) * radius, centre.y + sinf(a1) * radius},
                  1.0f);
   }
+#endif
 }
 
 // Ensure the cached mesh contains all geometry up to arc length dmax. Pieces
