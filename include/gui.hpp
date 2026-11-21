@@ -105,6 +105,7 @@ public:
     int renderindex2 = 0;
     bool mouseSelect = false;
     int mouseSelectIndex = 0;
+    bool scrollWithoutHover = false;
 };
 
 class Popup : public GuiElement {

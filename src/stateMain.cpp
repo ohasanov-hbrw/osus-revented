@@ -30,6 +30,10 @@ MainMenu::MainMenu() {
   volume = TestSlider({510, 460}, {240, 20}, BLACK, PURPLE, WHITE, WHITE);
   popup =
       Popup({320, 240}, {300, 120}, GRAY, "Test Popup", WHITE, 20, 1 << 0, -1);
+  confirmPopup =
+      Popup({320, 240}, {560, 190}, GRAY,
+            "Rebuild the database from all beatmaps?\nThis overwrites existing data.",
+            WHITE, MenuFontSize(10), ERR_CONFIRM, -2);
   logo = ImageObject({320, 200}, {400, 400}, WHITE, 1, 0, &Global.OsusLogo);
   description = TextBox({320, 540}, {520, 40}, {240, 98, 161, 0},
                         "made by ohasanov (C) 2026", Fade(BLACK, 0.3f), 20, 50);
@@ -113,6 +117,8 @@ void MainMenu::init() {
     animationMs = 0; //200
   }
   animationStartTime = getGlobalTimer(); // disable animation
+  confirmPopup.block = false;
+  dialogInputGuard = false;
   initializationStage = STATE_INITIALIZED;
   // MutexUnlock(SWITCHING_STATE);
 }
@@ -322,7 +328,9 @@ void MainMenu::update() {
         MenuSizes.topCard.edgeRampWidth, &topBar.positions);
   }
 
+
   popup.update();
+  confirmPopup.update();
 
   if (popup.action) {
     if (popup.ans == 2) {
@@ -330,11 +338,43 @@ void MainMenu::update() {
     }
   }
 
-  if (!popup.block) {
+  if (confirmPopup.action) {
+    confirmPopup.block = false;
+    confirmPopup.action = false;
+    dialogInputGuard = true;
+    play.focusbreak = wip.focusbreak = wip2.focusbreak = load.focusbreak = true;
+    if (confirmPopup.ans == 2) {
+      Global.doingTimeConsumingOp = true;
+      clearFileMap();
+      buildFileMap(Global.BeatmapLocation);
+      listAllMaps();
+      decideNamesForSets();
+      clearFileMap();
+      Global.doingTimeConsumingOp = false;
+    }
+  }
+
+  if (!popup.block && !confirmPopup.block) {
+    // Keep swallowing input until the click that dismissed the modal has been
+    // fully released, so it cannot re-trigger any button underneath it.
+    bool swallowClick = dialogInputGuard;
+    if (swallowClick && !Global.Key1P && !Global.Key1R && !Global.Key1D)
+      swallowClick = dialogInputGuard = false;
+
+    const bool kp = Global.Key1P;
+    const bool kr = Global.Key1R;
+    const bool kd = Global.Key1D;
+    if (swallowClick)
+      Global.Key1P = Global.Key1R = Global.Key1D = false;
+
     play.update();
     wip.update();
     wip2.update();
     load.update();
+
+    Global.Key1P = kp;
+    Global.Key1R = kr;
+    Global.Key1D = kd;
   }
 
   if (Global.errors.empty()) {
@@ -352,26 +392,25 @@ void MainMenu::update() {
   MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
 
   if(wip.action){
-    Global.doingTimeConsumingOp = true;
-    // IMMEDIATELY SEGFAULTS THE SYSTEM ON 3DS????
-    //MutexLock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-    clearFileMap();
-    buildFileMap(Global.BeatmapLocation);
-    listAllMaps();
-    #ifdef THREEDS_BUILD
-    //std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free Vram: " << _os_get_free_vram() / 1024 << "KB" << std::endl;
-    //std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_ALL: " << _os_get_free_ram(MEMREGION_ALL) / 1024 << "/" << _os_get_size_ram(MEMREGION_ALL) / 1024 << "KB" << std::endl;
-    //std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_APP: " << _os_get_free_ram(MEMREGION_APPLICATION) / 1024 << "/" << _os_get_size_ram(MEMREGION_APPLICATION) / 1024 << "KB" << std::endl;
-    //std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_SYS: " << _os_get_free_ram(MEMREGION_SYSTEM) / 1024 << "/" << _os_get_size_ram(MEMREGION_SYSTEM) / 1024 << "KB" << std::endl;
-    //std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_BSE: " << _os_get_free_ram(MEMREGION_BASE) / 1024<< "/" << _os_get_size_ram(MEMREGION_BASE) / 1024 << "KB" << std::endl;
-    //std::cout << "\e[1;36m[3DS] \033[38;5;110m" << "Free M_LIN: " << _os_get_free_linear_ram() / 1024 << "/" << Global.linearSpaceFree / 1024 << "KB" << std::endl;
-    #endif
-    decideNamesForSets();
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Decided Names" << std::endl;
-    std::cout << "\e[1;38;5;236m[INFO] \e[38;5;236m" << "Done rebuilding database" << std::endl;
-    clearFileMap();
-    //MutexUnlock(ACCESSING_OBJECTS, UPDATETHREAD_ID);
-    Global.doingTimeConsumingOp = 0;
+    confirmPopup.block = true;
+    wip.action = false;
+  }
+
+  // Dismiss the confirmation using the press event directly: clicking Cancel,
+  // clicking away, or pressing the back key all mean "no". This does not rely
+  // on Button::update()'s press-then-release sequence.
+  if (confirmPopup.block) {
+    const Rectangle okRect = GetRaylibOriginR(
+        {confirmPopup.b2.position.x, confirmPopup.b2.position.y,
+         confirmPopup.b2.size.x, confirmPopup.b2.size.y});
+    if (IsKeyPressed(Global.GO_BACK_KEY) ||
+        (Global.Key1P &&
+         !CheckCollisionPointRec(Global.MousePosition, okRect))) {
+      confirmPopup.block = false;
+      confirmPopup.action = false;
+      dialogInputGuard = true;
+      play.focusbreak = wip.focusbreak = wip2.focusbreak = load.focusbreak = true;
+    }
   }
 
   // test.update();
@@ -558,6 +597,7 @@ void MainMenu::render() {
   // (float)Global.OsusLogo.width, WHITE);
   logo.render();
   popup.render();
+  confirmPopup.render();
   description.render();
   MutexUnlock(ACCESSING_OBJECTS, RENDERTHREAD_ID);
   

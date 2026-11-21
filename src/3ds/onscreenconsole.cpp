@@ -179,7 +179,7 @@ void OnScreenConsole::init() {
 }
 
 void OnScreenConsole::updateMetrics() {
-    hudHeight = 10 * 7 + 4;
+    hudHeight = 10 * 6 + 4;
     logStartY = hudHeight;
     logLineHeight = 10;
     int screenH = 240;

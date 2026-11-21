@@ -224,6 +224,13 @@ private:
   TextBox bg;
   TextBox path;
   TextBox description;
+  TextBox title;
+
+  std::string statusMessage;
+  Color statusColor = {120, 220, 140, 255};
+  double statusUntil = 0.0;
+
+  void rebuildDirList();
 
 public:
   LoadMenu();
@@ -244,6 +251,8 @@ private:
   Button load;
   TestSlider volume;
   Popup popup;
+  Popup confirmPopup;
+  bool dialogInputGuard = false;
   ImageObject logo;
   TextBox description;
 

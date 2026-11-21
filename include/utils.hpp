@@ -11,6 +11,13 @@
     #include "raymath.h"
 //}
 
+// On 3DS Global.Scale is 0.5, so a logical font size must be a multiple of 20
+// to produce a crisp 10px-multiple glyph size. PC keeps the original sizes.
+inline float MenuFontSize(float size) {
+  if (size <= 0.0f) return size;
+  return fmaxf(20.0f, roundf(size / 20.0f) * 20.0f);
+}
+
 
 extern MULTITHREAD_MUTEX stateLock;
 extern MULTITHREAD_MUTEX accessLock;

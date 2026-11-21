@@ -10,6 +10,7 @@
 #define __STDC_WANT_LIB_EXT1__ 1
 
 #include <errno.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <time.h>
 
@@ -200,9 +201,13 @@ static int zip_mkpath(char *path) {
       }
 #endif
 
-      if (MZ_MKDIR(npath) == -1) {
-        if (errno != EEXIST) {
-          return ZIP_EMKDIR;
+      // Device prefixes such as 3DS's "sdmc:" are not directories; attempting
+      // to create them fails with ZIP_EMKDIR (-23). Skip that first component.
+      if (len == 0 || npath[len - 1] != ':') {
+        if (MZ_MKDIR(npath) == -1) {
+          if (errno != EEXIST) {
+            return ZIP_EMKDIR;
+          }
         }
       }
     }
@@ -302,6 +307,8 @@ static int zip_archive_extract(mz_zip_archive *zip_archive, const char *dir,
                                                  void *arg),
                                void *arg) {
   int err = 0;
+  int softErr = 0;
+  int extractedFiles = 0;
   mz_uint i, n;
   char path[MAX_PATH + 1];
   char symlink_to[MAX_PATH + 1];
@@ -386,10 +393,13 @@ static int zip_archive_extract(mz_zip_archive *zip_archive, const char *dir,
     } else {
       if (!mz_zip_reader_is_file_a_directory(zip_archive, i)) {
         if (!mz_zip_reader_extract_to_file(zip_archive, i, path, 0)) {
-          // Cannot extract zip archive to file
-          err = ZIP_ENOFILE;
-          goto out;
+          // One bad entry (e.g. a non-ASCII filename on 3DS) must not abort
+          // the whole archive: keep the other files and the beatmap import.
+          fprintf(stderr, "[ZIP] could not extract: %s\n", path);
+          softErr = ZIP_ENOFILE;
+          continue;
         }
+        extractedFiles++;
       }
 
 #if defined(_MSC_VER) || defined(PS4)
@@ -417,6 +427,9 @@ out:
   if (!mz_zip_reader_end(zip_archive)) {
     // Cannot end zip reader
     err = ZIP_ECLSZIP;
+  } else if (err == 0 && extractedFiles == 0 && softErr != 0) {
+    // Nothing at all could be extracted, report the first failure.
+    err = softErr;
   }
   return err;
 }

@@ -198,39 +198,61 @@ void SelectableList::render() {
 
 void SelectableList::update() {
     action = false;
-    renderindex2 = renderindex1 + std::min((int)size.y/objectsize, (int)objects.size());
+    int count = (int)objects.size();
+    int visible = objectsize > 0 ? (int)(size.y / objectsize) : 0;
+    if (visible > 0 && count > 0)
+        renderindex2 = renderindex1 + std::min(visible, count);
+    else
+        renderindex2 = renderindex1;
+
     bool hover = CheckCollisionPointRec(Global.MousePosition, this->getRect());
     mouseSelect = false;
-    if (hover){   
-        selectedindex -= Global.Wheel;
-        if(selectedindex >= (int)objects.size()){
+    if (hover || scrollWithoutHover) {
+        if (count > 0) {
+            selectedindex -= Global.Wheel;
+            if (selectedindex < 0) selectedindex = 0;
+            if (selectedindex >= count) selectedindex = count - 1;
+
+            if (visible > 0) {
+                int maxStart = std::max(0, count - visible);
+                renderindex1 = std::min(std::max(0, renderindex1), maxStart);
+                if (selectedindex >= renderindex1 + std::min(visible, count))
+                    renderindex1 = std::min(selectedindex - visible + 1, maxStart);
+                else if (selectedindex < renderindex1)
+                    renderindex1 = selectedindex;
+                if (renderindex1 < 0) renderindex1 = 0;
+                renderindex2 = renderindex1 + std::min(visible, count);
+            } else {
+                renderindex1 = 0;
+                renderindex2 = count;
+            }
+        } else {
             selectedindex = 0;
+            renderindex1 = 0;
+            renderindex2 = 0;
         }
-        if(selectedindex < 0){
-            selectedindex = objects.size() - 1;
-        }
-        if(selectedindex >= renderindex2){
-            renderindex1 = selectedindex - size.y/objectsize + 1;
-            renderindex2 = renderindex1 + std::min((int)size.y/objectsize, (int)objects.size());
-        }
-        if(selectedindex < renderindex1){
-            renderindex1 = selectedindex;
-            renderindex2 = renderindex1 + std::min((int)size.y/objectsize, (int)objects.size());
-        }
-        //std::cout << renderindex2 - renderindex1 << " out of max " << (int)size.y/objectsize << " and currently on " << renderindex1 + (int)((Global.MousePosition.y -  this->getRect().y) / objectsize) << std::endl;
-        mouseSelectIndex = renderindex1 + (int)((Global.MousePosition.y -  this->getRect().y) / objectsize);
+    }
+
+    if (hover && count > 0 && objectsize > 0) {
+        Rectangle r = this->getRect();
+        mouseSelectIndex = renderindex1 + (int)((Global.MousePosition.y - r.y) / objectsize);
+        if (mouseSelectIndex < 0) mouseSelectIndex = 0;
+        if (mouseSelectIndex >= count) mouseSelectIndex = count - 1;
         mouseSelect = true;
         if(selectedindex == mouseSelectIndex and Global.Key1P){
-            action = true;
+            //action = true;
         }
-        if(Global.Key1P){
+        if (Global.Key1P)
             selectedindex = mouseSelectIndex;
-        }
     }
-    for(int i = renderindex1; i < renderindex2; i++){
-        objects[i].position = {position.x, position.y - size.y / 2.0f + (i-renderindex1)*objectsize + objectsize/2.0f };
+
+    for(int i = renderindex1; i < renderindex2; i++) {
+        objects[i].position = {position.x,
+                               position.y - size.y / 2.0f +
+                                   (i - renderindex1) * (float)objectsize +
+                                   objectsize / 2.0f};
     }
-    for(int i = renderindex1; i < renderindex2; i++){
+    for(int i = renderindex1; i < renderindex2; i++) {
         if(selectedindex == i)
             objects[i].focused = true;
         objects[i].update();
@@ -277,9 +299,16 @@ void Popup::update() {
     if(block){
         b1.update();
         b2.update();
-        if(b2.action){
-            action = true;
-            ans = 2;
+        // Hit-test the release directly: Button::update() only reports an
+        // action after a separate press frame, which is easy to miss here.
+        if(Global.Key1R){
+            if(CheckCollisionPointRec(Global.MousePosition, b1.getRect())){
+                action = true;
+                ans = 1;
+            } else if(CheckCollisionPointRec(Global.MousePosition, b2.getRect())){
+                action = true;
+                ans = 2;
+            }
         }
     }
 }
@@ -292,18 +321,21 @@ void Popup::init() {
     size.x = std::max(size2.x, size.x);
     size.y = std::max(size2.y, size.y);
     bg = TextBox({position.x, position.y}, {size.x, size.y}, color, " ", BLACK, 0, 50);
-    msg = TextBox({position.x, position.y - 10}, {size.x, size.y}, {0,0,0,0} , text, WHITE, 15, 2000);
+    msg = TextBox({position.x, position.y - 10}, {size.x, size.y}, {0,0,0,0} , text, WHITE, MenuFontSize(15), 2000);
     std::string BorderText = "Border";
     if (type & ERR_FILEIO){
         BorderText = "Error while reading/writing files!";
     }
-    top = TextBox({position.x, position.y - (size.y / 2.0f) + 10}, {size.x, 20}, {60,60,60,255} , BorderText.c_str(), WHITE, 10, 2000);
+    if (type & ERR_CONFIRM){
+        BorderText = "Confirm";
+    }
+    top = TextBox({position.x, position.y - (size.y / 2.0f) + 12}, {size.x, 26}, {60,60,60,255} , BorderText.c_str(), WHITE, MenuFontSize(10), 2000);
 
-    b1 = Button({position.x - 40, position.y + (size.y / 2.0f) - 20}, {70,30}, {200,200,200,255}, "Cancel", BLACK, 15);
-    b2 = Button({position.x + 40, position.y + (size.y / 2.0f) - 20}, {70,30}, {200,200,200,255}, "OK", BLACK, 15);
+    b1 = Button({position.x - 65, position.y + (size.y / 2.0f) - 26}, {100,40}, {200,200,200,255}, "Cancel", BLACK, MenuFontSize(15));
+    b2 = Button({position.x + 65, position.y + (size.y / 2.0f) - 26}, {100,40}, {200,200,200,255}, "OK", BLACK, MenuFontSize(15));
 
     if (type & ERR_RETRY){
-        b2 = Button({position.x + 40, position.y + (size.y / 2.0f) - 20}, {70,30}, {200,200,200,255}, "Retry", BLACK, 15);
+        b2 = Button({position.x + 65, position.y + (size.y / 2.0f) - 26}, {100,40}, {200,200,200,255}, "Retry", BLACK, MenuFontSize(15));
     }
 
     block = false;

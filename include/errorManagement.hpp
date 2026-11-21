@@ -7,6 +7,7 @@
 #define ERR_ZIP     1 << 3
 #define ERR_RETRY   1 << 3
 #define ERR_CRASH   1 << 4
+#define ERR_CONFIRM 1 << 5
 
 struct ErrorMessage {
     std::string message;
